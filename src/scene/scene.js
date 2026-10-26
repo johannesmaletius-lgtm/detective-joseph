@@ -53,7 +53,7 @@ export class Scene {
 
   update(dt) {
     this.motion?.update(dt);
-    this.outside?.update(dt, this.motion?.speed ?? 0);
+    this.outside?.update(dt, this.motion);
     for (const spot of this.animations) spot.player.update(dt);
 
     if (this.clickMarker) {
@@ -66,7 +66,6 @@ export class Scene {
   draw(ctx, player) {
     // 1) alles, was nur durch die durchsichtigen Stellen des Hintergrunds zu sehen ist
     this.outside?.draw(ctx);
-    this.motion?.drawBehind(ctx);
     this.drawAnimations(ctx, 'behind');
 
     // 2) das Hintergrundbild
@@ -80,6 +79,7 @@ export class Scene {
     player.draw(ctx, this);
 
     // 4) Licht und Flackern liegen über allem – auch über Joseph
+    this.outside?.drawLight(ctx);
     this.motion?.drawFront(ctx, GAME_WIDTH, GAME_HEIGHT);
   }
 

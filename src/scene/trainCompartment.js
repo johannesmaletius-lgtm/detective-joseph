@@ -20,20 +20,41 @@ export const trainCompartment = {
   },
 
   // Die Landschaft hinter den Fenstern – Ebenen von hinten nach vorne (siehe outsideView.js).
-  // speed = Pixel pro Sekunde bei voller Fahrt. Nahes zieht schneller vorbei als Fernes.
+  // speed = Pixel pro Sekunde bei voller Fahrt (im Referenzabstand). Nahes zieht schneller vorbei als Fernes.
   outside: {
-    sides: [
-      { from: 0, to: 640 },                                                // linke Wagenseite
-      { from: 640, to: 1280, mirror: true, phase: 777, frameOffset: 10 }, // rechte Seite, gespiegelt
+    // Fluchtpunkt: Hier laufen alle Linien des Abteils zusammen (Augenhöhe, hinten an der Tür).
+    vanishingPoint: { x: 640, y: 206 },
+    // In diesem Abstand vom Fluchtpunkt (mittlere Fenster) blickt man genau zur Seite hinaus und die
+    // Landschaft hat Originalgröße. Weiter innen wirkt sie kleiner und langsamer, weiter außen größer und schneller.
+    referenceDistance: 400,
+    // Die durchsichtigen Fensterscheiben im Hintergrundbild (nur dort wird die Außenwelt gezeichnet).
+    // Mit Taste D sind sie als blaue Rahmen zu sehen.
+    windows: [
+      { from: 47, to: 139, top: 106, bottom: 292 },   // links vorne
+      { from: 198, to: 283, top: 136, bottom: 285 },  // links Mitte
+      { from: 322, to: 372, top: 161, bottom: 261 },  // links hinten
+      { from: 936, to: 976, top: 162, bottom: 260 },  // rechts hinten
+      { from: 1012, to: 1087, top: 138, bottom: 272 }, // rechts Mitte
+      { from: 1142, to: 1239, top: 106, bottom: 286 }, // rechts vorne
     ],
     layers: [
-      { image: 'assets/scenes/train-compartment/outside/sky.png', x: 0, y: 85 },
+      { image: 'assets/scenes/train-compartment/outside/sky.png', y: 85, turning: true }, // dreht sich einmal pro Runde
+      // Der Mond steht in Richtung "bearing" (Grad) und wandert dadurch langsam von Fenster zu Fenster.
+      // Mit 158 steht er beim Spielstart im mittleren rechten Fenster.
+      { image: 'assets/scenes/train-compartment/outside/moon.png', y: 142, bearing: 158 },
       { image: 'assets/scenes/train-compartment/outside/clouds.png', y: 88, speed: 6 },
       { image: 'assets/scenes/train-compartment/outside/hills.png', y: 150, speed: 14 },
+      {
+        // Der Turm steht in der Mitte des Kreises, den der Zug fährt – er bewegt sich nie.
+        image: 'assets/scenes/train-compartment/outside/tower.png', x: 224, y: 147,
+        blink: { x: 16, y: 6, color: [255, 70, 60], every: 2.6 },
+      },
       { image: 'assets/scenes/train-compartment/outside/treeline.png', y: 150, speed: 45 },
       { image: 'assets/scenes/train-compartment/outside/forest.png', y: 60, speed: 160 },
-      { animation: 'outside-near', y: 85 },
+      { image: 'assets/scenes/train-compartment/outside/near.png', y: 85, speed: 1100 },
     ],
+    // Kaltes Licht, das durch die Fenster auf Wände und Sitze fällt (flackert, wenn draußen Stämme vorbeirauschen)
+    windowLight: { color: [140, 160, 255], strength: 0.16 },
   },
 
   // Animierte Stellen im Bild. layer 'behind' = hinter dem Hintergrund, also nur durch
@@ -51,12 +72,16 @@ export const trainCompartment = {
     },
   ],
 
-  // Der Zug fährt (siehe src/effects/trainMotion.js)
+  // Der Zug fährt – im Kreis (siehe src/effects/trainMotion.js)
   train: {
     speed: 1,                // 1 = volle Fahrt, 0 = Stillstand
-    shake: 1,                // Stärke des Rumpelns, 0 = aus
+    shake: 1,                // Stärke des Rumpelns und Schaukelns, 0 = aus
     railJointInterval: 1.15, // Sekunden zwischen zwei Schienenstößen ("ta-dam")
-    lanternEvery: [6, 12],   // alle 6 bis 12 Sekunden zieht draußen eine Laterne vorbei
+    lap: 150,                // Sekunden für eine Runde bei voller Fahrt – dann ist der Zug wieder am selben Punkt
+    startAt: 105,            // so weit in der Runde ist der Zug, wenn das Spiel beginnt (Tunnel nach ~40 s)
+    tunnel: { length: 8, lampEvery: 0.45 }, // Tunnel an der Nahtstelle der Runde: Dauer, Abstand der Lampen
+    lanternEvery: [6, 12],   // alle 6 bis 12 Sekunden eine Laterne – in jeder Runde an denselben Stellen
+    squealEvery: [15, 40],   // alle 15 bis 40 Sekunden quietschen die Räder in der Kurve
     lamps: [
       { x: 515, y: 18, radius: 170, strength: 0.28 }, // Deckenlampe links
       { x: 762, y: 18, radius: 170, strength: 0.28 }, // Deckenlampe rechts

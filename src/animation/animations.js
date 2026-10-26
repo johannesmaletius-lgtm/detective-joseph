@@ -12,9 +12,6 @@ export const ANIMATIONS = {
   // Kleiner Bildschirm im Zugabteil: schwarz-weißes Rauschen
   'tv-noise': { path: 'assets/animations/tv-noise/frame_{frame}.png', frameCount: 20, fps: 15, loop: true },
 
-  // Vorbeirauschende Bäume und Masten vor den Zugfenstern
-  'outside-near': { path: 'assets/scenes/train-compartment/outside/near/frame_{frame}.png', frameCount: 20, fps: 20, loop: true },
-
   // Joseph steht (je ein Bild pro Blickrichtung)
   'joseph-idle-front': { path: 'assets/characters/joseph/front.png', frameCount: 1, fps: 1, loop: true },
   'joseph-idle-back': { path: 'assets/characters/joseph/back.png', frameCount: 1, fps: 1, loop: true },

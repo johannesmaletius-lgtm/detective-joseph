@@ -30,7 +30,12 @@ export class Game {
   async loadScene(sceneData) {
     const scene = new Scene(sceneData);
     await Promise.all([scene.load(), this.player.load()]);
-    if (scene.motion) scene.motion.onBump = (strength) => this.sound.clack(strength);
+    if (scene.motion) {
+      scene.motion.onBump = (strength) => this.sound.clack(strength);
+      scene.motion.onTunnel = (inside) => this.sound.tunnel(inside);
+      scene.motion.onSqueal = (duration) => this.sound.squeal(duration);
+      this.sound.inTunnel = scene.motion.inTunnel;
+    }
     this.scene = scene;
     this.camera.reset();
     this.player.enterScene(scene);
@@ -88,5 +93,6 @@ export class Game {
     if (key === KEYS.toggleDebug) this.debug.toggle();
     if (key === KEYS.toggleGrid) this.debug.toggleGrid();
     if (key === KEYS.toggleSound) this.sound.toggleMute();
+    if (key === KEYS.skipToTunnel && this.debug.enabled) this.scene.motion?.skipToTunnel();
   }
 }

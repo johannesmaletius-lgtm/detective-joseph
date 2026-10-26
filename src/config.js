@@ -14,6 +14,7 @@ export const KEYS = {
   toggleDebug: 'd', // Laufbereich, Weg und Koordinaten anzeigen
   toggleGrid: 'g',  // Koordinaten-Raster anzeigen
   toggleSound: 'm', // Ton an/aus
+  skipToTunnel: 't', // nur in der Debug-Ansicht: Zug springt kurz vor den Tunnel
 };
 
 // Adress-Zusätze zum Testen, z. B. http://localhost:8150/?debug&mute
