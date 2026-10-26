@@ -1,0 +1,44 @@
+/* Die Seite um das Spiel herum: dunkler Rahmen, Spielbild zentriert und immer im Format 16:9. */
+
+:root {
+  color-scheme: dark;
+  --frame: #140d09;      /* dunkles Braun rund um das Spielbild */
+  --screen: #000;
+  --text-muted: #b39a72; /* warmes, gedämpftes Papierweiß */
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--frame);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.stage {
+  position: relative;
+}
+
+/* So groß wie möglich, ohne das Bild zu verzerren. Die echte Pixelzahl setzt src/core/screen.js. */
+#game-canvas {
+  display: block;
+  width: min(100vw, 100dvh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  background: var(--screen);
+  touch-action: none; /* auf dem Handy: Tippen = Klicken, kein Scrollen oder Zoomen */
+}
+
+.status {
+  position: absolute;
+  inset: 45% 0 auto;
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  color: var(--text-muted);
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Detective Joseph</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='26' cy='26' r='16' fill='%23213a3a' stroke='%23d9a441' stroke-width='7'/><path d='M38 38l16 16' stroke='%23d9a441' stroke-width='9' stroke-linecap='round'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <canvas id="game-canvas" width="1280" height="720" aria-label="Detective Joseph – Spielszene"></canvas>
+    <p id="status" class="status">Lade Detective Joseph …</p>
+  </main>
+
+  <script>
+    // Hilfe für den häufigsten Anfängerfehler: index.html per Doppelklick geöffnet.
+    if (location.protocol === 'file:') {
+      document.getElementById('status').textContent =
+        'Das Spiel muss über den kleinen Server laufen: im Projektordner „npm start“ ausführen ' +
+        '(oder start.command doppelklicken) und dann http://localhost:8150 öffnen.';
+    }
+  </script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

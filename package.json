@@ -1,0 +1,10 @@
+{
+  "name": "detective-joseph",
+  "version": "0.1.0",
+  "description": "Point-and-Click-Adventure „Detective Joseph“",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
