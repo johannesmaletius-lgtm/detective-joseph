@@ -3,8 +3,8 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 // Entwickler-Ansicht – nur zum Bauen und Testen, nicht Teil des eigentlichen Spiels.
 //
 // Taste D: zeigt den begehbaren Bereich (grün), Hindernisse (rot), die nummerierten Ecken,
-//          Josephs aktuellen Weg, Koordinaten, die Fenster und den Fluchtpunkt (blau)
-//          und den Zustand von Zug (Runde, Tunnel) und Ton.
+//          Josephs aktuellen Weg, Koordinaten, die Fenster und den Fluchtpunkt (blau),
+//          die anklickbaren Stellen (orange, mit Standplatz) und den Zustand von Zug, Ton und Geschichte.
 // Taste G: blendet ein Koordinaten-Raster ein (hilft beim Eintragen neuer Eckpunkte).
 // Taste T: (nur bei eingeschalteter Debug-Ansicht) der Zug springt kurz vor den Tunnel.
 export class DebugOverlay {
@@ -33,6 +33,7 @@ export class DebugOverlay {
 
     const { walkArea, outside } = game.scene;
     if (outside) drawOutside(ctx, outside);
+    drawHotspots(ctx, game.scene);
     drawPolygon(ctx, walkArea.outline, 'rgba(90, 255, 150, 0.16)', '#6dffa6');
     for (const hole of walkArea.holes) drawPolygon(ctx, hole, 'rgba(255, 80, 80, 0.28)', '#ff7070');
     walkArea.outline.forEach((corner, i) => drawLabel(ctx, String(i), corner.x + 6, corner.y - 6, '#6dffa6'));
@@ -77,6 +78,8 @@ export class DebugOverlay {
       const tunnel = motion.inTunnel ? 'im Tunnel' : `Tunnel in ${Math.round(motion.tunnelAhead / Math.max(motion.speed, 0.01))} s`;
       lines.push(`Runde   ${motion.lap}  ·  ${Math.round(motion.lapTime)} von ${motion.lapLength} s  ·  ${tunnel}`);
     }
+    const flags = Object.entries(game.story.flags).filter(([, value]) => value).map(([name, value]) => (value === true ? name : `${name}=${value}`));
+    lines.push(`Merker  ${flags.join(' ').slice(0, 90) || '–'}`);
     lines.push(`FPS     ${Math.round(this.fps)}`);
 
     ctx.save();
@@ -89,6 +92,21 @@ export class DebugOverlay {
     lines.forEach((line, i) => ctx.fillText(line, 22, 18 + i * 20));
     ctx.restore();
   }
+}
+
+// Anklickbare Stellen (orange) – grau, wenn sie gerade nicht aktiv sind – und wo Joseph sich hinstellt
+function drawHotspots(ctx, scene) {
+  ctx.save();
+  for (const hotspot of scene.hotspots) {
+    const active = scene.isActive(hotspot);
+    const color = active ? '#ffb14a' : 'rgba(200, 200, 200, 0.5)';
+    ctx.setLineDash(active ? [] : [5, 5]);
+    drawPolygon(ctx, hotspot.area, active ? 'rgba(255, 177, 74, 0.12)' : 'rgba(0, 0, 0, 0)', color);
+    const { x, y } = hotspot.area[0];
+    drawLabel(ctx, hotspot.id, x + 4, y + 14, color);
+    if (hotspot.walkTo && active) drawDot(ctx, { x: hotspot.walkTo[0], y: hotspot.walkTo[1] }, color);
+  }
+  ctx.restore();
 }
 
 // Fenster (blaue Rahmen) und Fluchtpunkt der Außenwelt

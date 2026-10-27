@@ -224,8 +224,8 @@ Am besten in dieser Reihenfolge, jede Erkenntnis ein kleines Aha:
 
 ### Rätsel, die die fertige Zug-Animation nutzen
 
-- **Laternen zählen ergibt einen Code.** Mit den jetzigen Einstellungen fahren pro Runde 7 Laternen links und 9 rechts
-  vorbei, also Code **79**. (Ändert man `lap` oder `lanternEvery`, ändert sich auch die Zahl.)
+- **Laternen zählen ergibt einen Code.** Mit den jetzigen Einstellungen fahren pro Runde 7 Laternen links und 8 rechts
+  vorbei, also Code **78**. (Ändert man `lap`, `tunnel` oder `lanternEvery`, ändert sich auch die Zahl.)
 - **Turmlicht morst:** Das rote Licht blinkt ein Wort oder eine Zahl.
 - **Geheimschrift im Tunnellicht:** Nur im orangen Licht der Tunnellampen wird eine Schrift an der Wand sichtbar. Joseph
   muss im Tunnel am richtigen Platz stehen.
@@ -245,6 +245,12 @@ Am besten in dieser Reihenfolge, jede Erkenntnis ein kleines Aha:
 
 ## Einstiegsrätsel für das erste Abteil (passt zu allen Versionen)
 
+> **Umgesetzt** – mit Vorschlag 1 („Ringbahn“) in `src/story/wagon1.js`. Abweichungen vom Entwurf hier:
+> Die Batterie steckt hinter einer festgeschraubten Klappe am Schaltpult (aufschrauben mit dem Taschenmesser
+> aus dem Rucksack), und die Strichliste ist in die Tür geritzt. Dazu kommen der Brief, der nach dem Tunnel
+> wieder im Schlitz steckt, Schritte im Dunkeln, der Totenkopf auf dem Bildschirm und die Durchsage
+> „nächster Halt: Ringbahnhof“.
+
 Ein kurzes Rätsel, das genau die nächsten Schritte im Fahrplan abdeckt (Schritt 3: anklickbare Objekte, Schritt 4:
 Inventar und Tür):
 
@@ -256,7 +262,7 @@ Inventar und Tür):
 5. **Laternen zählen:** Joseph kann eine Runde lang aus dem Fenster schauen. Wer nicht zählen will, leuchtet im Tunnel
    mit der Taschenlampe an die Wand und findet dort eine Strichliste, die Joseph in einer früheren Runde selbst
    gemacht hat.
-6. **Code 79 an der Tür:** Die Tür geht auf, und das zweite Abteil beginnt.
+6. **Code 78 an der Tür:** Die Tür geht auf, und das zweite Abteil beginnt.
 
 ---
 

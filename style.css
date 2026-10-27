@@ -32,6 +32,7 @@ body {
   aspect-ratio: 16 / 9;
   background: var(--screen);
   touch-action: none; /* auf dem Handy: Tippen = Klicken, kein Scrollen oder Zoomen */
+  cursor: none;       /* das Spiel zeichnet seinen eigenen Mauszeiger (src/ui/cursor.js) */
 }
 
 .status {

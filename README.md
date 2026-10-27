@@ -2,7 +2,13 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Schritt 2.** Joseph läuft mit echter Beinbewegung durch das erste Zugabteil. Der Zug fährt:
+**Stand: Wagen 1 ist spielbar – mit Geschichte und Tutorial.** Joseph wacht in einem Nachtzug auf und weiß
+nicht, wie er hineingekommen ist. Auf seiner Hand steht in seiner eigenen Schrift: *NICHT EINSCHLAFEN*. Er
+findet einen Brief, durchsucht einen Rucksack, bastelt sich eine Taschenlampe – und muss im dunklen Tunnel
+herausfinden, wie das Zahlenschloss der Tür aufgeht. Die Geschichte folgt Vorschlag 1 („Ringbahn“) aus
+[`docs/story-ideen.md`](docs/story-ideen.md).
+
+Der Zug fährt:
 Vor den Fenstern zieht eine nächtliche Landschaft **mit Perspektive** vorbei (durch die hinteren Fenster
 klein und langsam, durch die vorderen groß und schnell), Masten und Stämme rauschen von Fenster zu Fenster,
 der Wagen rumpelt im Takt der Schienenstöße und wiegt sich in den Federn, die Lampen flackern, Laternenlicht
@@ -11,7 +17,7 @@ huscht durch den Wagen und der kleine Bildschirm zeigt schwarz-weißes Rauschen.
 **Der Zug fährt im Kreis.** Wer genau hinsieht, merkt es: Der Mond wandert langsam von Fenster zu Fenster,
 ein ferner Turm mit rotem Licht steht immer still im selben Fenster (er ist die Mitte des Kreises), die
 Laternen kommen jede Runde an denselben Stellen, die Räder quietschen in der endlosen Kurve – und an der
-Nahtstelle jeder Runde fährt der Zug durch einen Tunnel. Ideen für die Geschichte dazu: [`docs/story-ideen.md`](docs/story-ideen.md).
+Nahtstelle jeder Runde fährt der Zug durch einen Tunnel, in dem im Abteil das Licht ausgeht.
 
 ## Spiel starten
 
@@ -30,15 +36,22 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 
 | Eingabe | Wirkung |
 | --- | --- |
-| Linksklick auf den Boden | Joseph läuft dorthin |
-| Klick auf Sitz, Wand, Kiste … | Joseph läuft so nah wie möglich heran |
-| Doppelklick | Joseph rennt |
+| Linksklick auf den Boden | Joseph läuft dorthin (Doppelklick: er rennt) |
+| Linksklick auf etwas | benutzen, nehmen oder ansprechen – Joseph läuft vorher hin |
+| Rechtsklick auf etwas | anschauen (auf dem Mac auch ctrl + Klick oder Klick mit zwei Fingern) |
+| Maus an den unteren Rand | Inventar fährt heraus |
+| Linksklick auf einen Gegenstand im Inventar | Joseph nimmt ihn in die Hand – dann auf etwas im Abteil klicken (benutzen) oder auf einen anderen Gegenstand (kombinieren) |
+| Rechtsklick auf einen Gegenstand | anschauen / lesen (mit einem Gegenstand in der Hand: loslassen) |
+| Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß |
+| **Leertaste** oder Klick | Sprechtext überspringen |
+| **Esc** | Notizbuch / Zahlenschloss schließen, Gegenstand loslassen |
 | Taste **M** | Ton an/aus (der Ton startet mit dem ersten Klick) |
-| Taste **D** | Debug-Ansicht: begehbarer Bereich, Ecken-Nummern, Weg, Koordinaten, Fenster, Zug (Runde, Tunnel) und Ton |
+| Taste **D** | Debug-Ansicht: Laufbereich, anklickbare Stellen, Fenster, Koordinaten, Zug (Runde, Tunnel), Merker der Geschichte |
 | Taste **G** | Koordinaten-Raster (50-Pixel-Schritte) |
 | Taste **T** | nur in der Debug-Ansicht: der Zug springt kurz vor den Tunnel |
 
-Adress-Zusätze zum Testen: <http://localhost:8150/?debug> (Debug-Ansicht an), `?mute` (ohne Ton), kombiniert `?debug&mute`.
+Adress-Zusätze zum Testen: <http://localhost:8150/?debug> (Debug-Ansicht an), `?mute` (ohne Ton),
+`?skipintro` (ohne Titelbild und Anfangsszene), kombiniert z. B. `?debug&mute&skipintro`.
 
 ## Projektstruktur
 
@@ -52,33 +65,55 @@ detective-joseph/
 ├── assets/
 │   ├── scenes/train-compartment/
 │   │   ├── background.png     Hintergrund – Fensterscheiben und Bildschirm sind durchsichtig
+│   │   ├── letter-in-slot.png Brief, der aus dem Schlitz am Schaltpult ragt
+│   │   ├── scratches.png      eingeritzte Striche in der Tür (nur im Dunkeln zu sehen)
 │   │   └── outside/           Außenwelt: sky, moon, clouds, hills, tower, treeline, forest, near
-│   ├── animations/tv-noise/   TV-Rauschen: frame_001 … frame_020.png
+│   ├── animations/
+│   │   ├── tv-noise/          TV-Rauschen: frame_001 … frame_020.png
+│   │   └── tv-skull/          Totenkopf erscheint auf dem Bildschirm (15 Frames, aus deinem Bogen)
 │   ├── characters/joseph/     front/back/left/right.png (Stehen) + walk-…/ (je 8 Lauf-Frames)
+│   ├── items/                 Gegenstände fürs Inventar (je 128 × 128)
+│   ├── ui/                    Mauszeiger (cursors/), Inventarleiste, Notizbuch-Knopf
 │   └── reference/             Originale und Material für spätere Schritte
 ├── docs/story-ideen.md        Vorschläge für die Geschichte (Zug im Kreis, Rätsel pro Abteil)
 ├── tools/                     Werkzeuge, die Platzhalter-Grafiken erzeugen (siehe unten)
 └── src/
-    ├── main.js                Einstieg: Spiel erzeugen, erste Szene laden, starten
+    ├── main.js                Einstieg: Spiel erzeugen, erste Szene mit ihrer Geschichte laden, starten
     ├── config.js              Zentrale Einstellungen (1280 × 720, Doppelklick, Tasten)
+    ├── story/
+    │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Ende
+    │   ├── tutorial.js        Die Tutorial-Schritte (Hinweisschild oben)
+    │   ├── items.js           Katalog der Gegenstände (Name, Bild, Beschreibung, Kombinationen)
+    │   └── story.js           Führt die Geschichte aus: say, note, give, cutscene … (Befehle fürs Drehbuch)
+    ├── ui/
+    │   ├── cursor.js          Mauszeiger: Zeigefinger, Auge, Hand, Sprechblase, Gegenstand
+    │   ├── inventory.js       Inventarleiste mit 5 Plätzen
+    │   ├── speech.js          Sprechtexte über den Köpfen
+    │   ├── notebook.js        Notizbuch (Knopf + aufgeschlagene Seiten)
+    │   ├── codeLock.js        Zahlenschloss in Nahansicht
+    │   ├── hints.js           Hinweisschild für das Tutorial
+    │   ├── overlay.js         Abblenden und Karten: Titelbild, Hand, Brief, Ende
+    │   └── text.js            Schriften, Zeilenumbruch, Text mit Umriss
     ├── core/
-    │   ├── game.js            Spiel-Schleife: ~60× pro Sekunde update() und draw()
+    │   ├── game.js            Spiel-Schleife (~60× pro Sekunde) und wohin ein Klick geht
     │   ├── screen.js          Zeichenfläche: 1280 × 720 logisch, scharf in jeder Fenstergröße
     │   ├── camera.js          Kamera ohne Zoom, mit leichtem Rumpeln (Oberfläche bleibt ruhig)
-    │   ├── input.js           Maus + Tastatur, Doppelklick-Erkennung
+    │   ├── input.js           Maus (links/rechts) + Tastatur, Doppelklick-Erkennung
     │   └── assets.js          Lädt Bilder – jedes nur einmal (Cache)
     ├── animation/
     │   ├── animations.js      KATALOG aller Frame-Animationen (Pfad, Anzahl, fps, Schleife)
     │   ├── animation.js       Lädt die Bilder einer Animation (erst wenn sie gebraucht wird)
     │   └── animationPlayer.js Spielt eine Animation ab: play, stop, restart, speed, onEnd
     ├── scene/
-    │   ├── scene.js           Allgemeine Szene: Zeichenreihenfolge, Perspektive, Animationen
+    │   ├── scene.js           Allgemeine Szene: Zeichenreihenfolge, anklickbare Stellen, Dunkelheit
     │   ├── outsideView.js     Außenwelt hinter den Fenstern (Ebenen mit Perspektive, Mond, Tunnel)
-    │   └── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, Außenwelt, Lampen …
+    │   └── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
     ├── effects/
-    │   └── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Laternen
+    │   ├── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Licht aus, Laternen
+    │   └── darkness.js        Dunkelheit im Tunnel mit Lichtkegel der Taschenlampe
     ├── audio/
-    │   └── trainSound.js      Fahrgeräusch, „Klack“, Tunnel-Hall, Quietschen – ohne Sounddateien
+    │   ├── trainSound.js      Fahrgeräusch, „Klack“, Tunnel-Hall, Quietschen – ohne Sounddateien
+    │   └── soundEffects.js    kurze Geräusche: Aufheben, Schloss, Schritte, Licht, Bildschirm …
     ├── navigation/
     │   ├── walkArea.js        Begehbarer Bereich, Kollision und Wegsuche (A*)
     │   └── geometry.js        Mathe-Helfer für Punkte, Linien und Vielecke
@@ -90,10 +125,15 @@ detective-joseph/
 ```
 
 **So hängt alles zusammen:** `main.js` erzeugt ein `Game`. Das Game lädt die Szene aus
-`trainCompartment.js` und stellt Joseph auf seine Startposition. In jedem Bild zeichnet die Szene
-von hinten nach vorne: Außenwelt → Bildschirm-Rauschen → Hintergrund (mit durchsichtigen Scheiben)
-→ Joseph → Fensterlicht, Lampen und Flackern. Bei einem Klick fragt Joseph den begehbaren Bereich (`walkArea.js`)
-nach einem Weg und läuft ihn mit `playerMovement.js` ab; dabei spielt er seine Laufanimation.
+`trainCompartment.js` mit ihrer Geschichte aus `wagon1.js` und stellt Joseph auf seine Startposition.
+In jedem Bild zeichnet die Szene von hinten nach vorne: Außenwelt → Bildschirm → Hintergrund (mit
+durchsichtigen Scheiben) → kleine Bilder (Brief, Kratzer) → Joseph → Fensterlicht und Lampen →
+Dunkelheit (im Tunnel) → Lichtstreifen. Darüber kommt die Oberfläche: Sprechtexte, Tutorial,
+Inventar, Notizbuch, Zahlenschloss, Karten und zuletzt der Mauszeiger.
+
+Ein Klick auf den Boden: Joseph fragt den begehbaren Bereich (`walkArea.js`) nach einem Weg und läuft ihn
+ab. Ein Klick auf eine anklickbare Stelle: `story.js` lässt Joseph hinlaufen und führt dann die passende
+Reaktion aus `wagon1.js` aus.
 
 ## Animationen (PNG-Sequenzen)
 
@@ -109,6 +149,7 @@ die alten Dateien ersetzen – oder neuen Ordner anlegen und `path`, `frameCount
 | Animation | Wo | Frames |
 | --- | --- | --- |
 | `tv-noise` | kleiner Bildschirm (Totenkopf-Monitor) | 20, 15 fps, Schleife |
+| `tv-skull` | derselbe Bildschirm: der Totenkopf erscheint (im ersten Tunnel) | 15, 6 fps, einmal |
 | `joseph-walk-front/back/left/right` | Joseph läuft | je 8 (= 2 Schritte), 10 fps |
 | `joseph-idle-…` | Joseph steht | je 1 |
 
@@ -126,7 +167,46 @@ die alten Dateien ersetzen – oder neuen Ordner anlegen und `path`, `frameCount
 - **Joseph:** Stand- und Laufbilder in `assets/characters/joseph/` ersetzen. Regeln: transparenter
   Hintergrund, Füße berühren den unteren Bildrand, Figur waagerecht mittig, alle Bilder im
   gleichen Maßstab (Figurenhöhe: `SPRITE_HEIGHT` in `src/player/player.js`).
+- **Gegenstände, Mauszeiger, Inventarleiste:** Bilder in `assets/items/` und `assets/ui/` ersetzen
+  (Gegenstände 128 × 128 mit transparentem Hintergrund). Die Gegenstände sind Platzhalter aus
+  `tools/make-items.mjs`; Mauszeiger und Inventarleiste sind deine Bilder.
 - PNG, WebP und JPG funktionieren gleichermaßen – nur den Dateinamen im Code anpassen.
+
+## Die Geschichte bearbeiten
+
+Alles, was in Wagen 1 passiert, steht in **`src/story/wagon1.js`** – Texte, Rätsel und Abläufe.
+Oben in der Datei ist die Rätselkette beschrieben.
+
+**Ein Text ändern:** Jede anklickbare Stelle hat dort einen Eintrag mit derselben `id` wie in
+`trainCompartment.js`. `look` ist der Rechtsklick (anschauen), `use` der Linksklick, `items` sagt, was
+passiert, wenn man einen Gegenstand darauf anwendet:
+
+```js
+jar: {
+  look: 'Ein Glas mit grün leuchtender Flüssigkeit.',     // ein Satz
+  use: ['Lieber nicht anfassen.', 'Wirklich nicht.'],     // mehrere Sätze nacheinander
+  items: { knife: 'Das Glas ist zu dick.' },              // Messer auf das Glas
+},
+```
+
+Für mehr als Text gibt es Funktionen mit Befehlen (erklärt oben in `src/story/story.js`):
+`say`, `note` (Notizbuch), `give` / `remove` / `has` (Inventar), `flags` (Merker), `wait`,
+`cutscene`, `sound`, `fadeOut` / `fadeIn`.
+
+**Eine neue anklickbare Stelle:** In `trainCompartment.js` unter `hotspots` eintragen – Umriss (`area`),
+Standplatz (`walkTo`, `facing`) und Name. Mit **D** sieht man alle Stellen als orange Rahmen, mit **G**
+das Raster zum Ablesen der Koordinaten. Dann in `wagon1.js` unter `hotspots` die Reaktionen ergänzen.
+Mit `when: 'merker'` erscheint eine Stelle nur, solange der Merker gesetzt ist, mit `inDark: true` nur
+im Dunkeln.
+
+**Neue Gegenstände:** in `src/story/items.js` (Name, Bild, Beschreibung, was sich kombinieren lässt).
+
+**Tutorial:** Die Hinweise und wann sie kommen stehen in `src/story/tutorial.js`.
+
+**Der Code der Tür** ist die Zahl der Laternen pro Runde – erst links, dann rechts (gerade 7 und 8, also 78).
+Er wird aus denselben Einstellungen berechnet, nach denen die Laternen fahren. Wer `lap`, `tunnel` oder
+`lanternEvery` ändert, ändert damit auch den Code; danach `node tools/make-items.mjs` ausführen, damit die
+eingeritzten Striche wieder stimmen (das Werkzeug zählt die Laternen selbst).
 
 ## Werkzeuge (`tools/`)
 
@@ -138,6 +218,7 @@ Platzhalter neu erzeugen oder verändern willst – aufrufen jeweils im Projekto
 | `node tools/cut-glass.mjs` | Hintergrund mit durchsichtigen Scheiben (aus `assets/reference/train-compartment-original.png`) |
 | `node tools/make-outside.mjs` | Himmel, Mond, Wolken, Hügel, Turm, Baumreihe, Wald und den Streifen der nahen Stämme |
 | `node tools/make-tv-noise.mjs` | die 20 Frames TV-Rauschen |
+| `node tools/make-items.mjs` | Gegenstände fürs Inventar, Notizbuch-Knopf, Brief im Schlitz, eingeritzte Striche (zählt dafür die Laternen) |
 | `node tools/make-joseph-walk.mjs` | Josephs Laufanimation (4 Richtungen × 8 Frames) aus seinen Standbildern |
 
 ## Zug-Gefühl anpassen
@@ -153,6 +234,7 @@ In `src/scene/trainCompartment.js` unter `train`:
 - `lanternEvery`: wie oft draußen eine Laterne vorbeizieht (jede Runde an denselben Stellen)
 - `squealEvery`: wie oft die Räder in der Kurve quietschen
 - `lamps`: Position, Größe und Helligkeit des Lampenscheins
+- `lightsOutInTunnel`: im Tunnel geht im Abteil das Licht aus
 
 Unter `outside`:
 
@@ -163,8 +245,9 @@ Unter `outside`:
   Hintergrundbild hier anpassen
 - `windowLight`: Farbe und Stärke des kalten Lichts, das durch die Fenster auf Wände und Sitze fällt
 
-Die Runde zählt das Spiel mit (`game.scene.motion.lap`, in der Debug-Ansicht zu sehen) – später lassen
-sich daran Rätsel hängen, die sich von Runde zu Runde verändern.
+Die Runde zählt das Spiel mit (`game.scene.motion.lap`, in der Debug-Ansicht zu sehen); das Notizbuch
+sortiert Josephs Notizen danach. Die Geschichte setzt den Zug beim Start so, dass der erste Tunnel nach
+gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 
 ## Laufbereich und Perspektive anpassen
 
@@ -181,9 +264,8 @@ sich daran Rätsel hängen, die sich von Runde zu Runde verändern.
 | --- | --- |
 | `train-compartment-original.png` | das unveränderte Abteilbild (ohne durchsichtige Scheiben) |
 | `window-animation/` | deine Fenster-Frames als Bogen |
-| `screen-animation/` | TV-Bilder `tv1`–`tv6` und der Totenkopf-Bogen (für die spätere Totenkopf-Animation) |
-| `inventory/` | Inventar-Leiste (`inventory-bar.png`) und das Referenzbild |
-| `cursors/` | Cursor: anschauen, laufen, interagieren, sprechen |
+| `screen-animation/` | TV-Bilder `tv1`–`tv6` und der Totenkopf-Bogen (daraus ist `assets/animations/tv-skull/` ausgeschnitten) |
+| `inventory/` | das Referenzbild fürs Inventar (die Leiste selbst liegt jetzt in `assets/ui/`) |
 | `joseph/` | Charakter-Sheet mit allen vier Ansichten |
 
 ## Fahrplan
@@ -191,6 +273,8 @@ sich daran Rätsel hängen, die sich von Runde zu Runde verändern.
 - [x] **Schritt 1:** Szene 1280 × 720, Joseph, Laufen per Maus, begehbarer Bereich, Kollision, Kamera ohne Zoom
 - [x] **Schritt 2:** Animationssystem für PNG-Sequenzen, fahrende Außenwelt, TV-Rauschen, Zug-Gefühl, Laufanimation
 - [x] **Schritt 2b:** Außenwelt mit Perspektive, Zug fährt im Kreis (Runden, wandernder Mond, Turm, Tunnel), Schaukeln, Fensterlicht, Tunnel- und Kurvengeräusche
-- [ ] **Schritt 3:** Anklickbare Objekte + Cursor-System
-- [ ] **Schritt 4:** Inventar mit 5 Slots, ersten Gegenstand aufnehmen (Demo: Schlüssel → Tür)
-- [ ] Später: Totenkopf-Animation, Vordergrund-Ebenen (Joseph hinter Sitzen), weitere Szenen
+- [x] **Schritt 3:** Anklickbare Objekte + Cursor-System (anschauen, benutzen, sprechen)
+- [x] **Schritt 4:** Inventar mit 5 Plätzen, Gegenstände benutzen und kombinieren
+- [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
+- [ ] **Wagen 2:** der Speisewagen (siehe `docs/story-ideen.md`, Vorschlag 1)
+- [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), Spielstand speichern, echte Sounds

@@ -4,7 +4,8 @@
 // - Schienenstöße:  im Takt "ta-dam … ta-dam" ruckelt das Bild kurz (und es klackt, siehe trainSound.js)
 // - Schaukeln:      der Wagen federt und wiegt sich – draußen bewegt sich die Welt gegen die Fensterrahmen
 // - Tempo:          der Zug wird ganz leicht schneller und wieder langsamer
-// - Lampen:         die Deckenlampen leuchten warm und flackern ab und zu
+// - Lampen:         die Deckenlampen leuchten warm und flackern ab und zu – und gehen im Tunnel aus
+//                   (wenn lightsOutInTunnel eingeschaltet ist)
 // - Laternen:       draußen zieht ab und zu eine Laterne vorbei – ihr Licht streift quer durch das Abteil
 // - Runde:          die Strecke ist ein Kreis. Nach "lap" Fahrsekunden ist der Zug wieder am selben Punkt:
 //                   dieselben Laternen an denselben Stellen, und an der Nahtstelle der Runde ein Tunnel.
@@ -18,6 +19,8 @@ const BUMP_FREQUENCY = 9;   // Hz – wie schnell ein Stoß nachschwingt
 const BUMP_DECAY = 0.09;    // Sekunden – wie schnell er abklingt
 const AXLE_GAP = 0.13;      // Sekunden zwischen "ta" und "dam" (zwei Achsen)
 const LIGHT_LEAD = 0.45;    // Fahrsekunden: so früh fällt das Licht einer Laterne schon ins Abteil
+const LIGHTS_OFF = [[0, 1], [0.07, 0.15], [0.13, 0.8], [0.2, 0]];                    // Flackern beim Ausgehen
+const LIGHTS_ON = [[0, 0], [0.15, 0.7], [0.24, 0.05], [0.42, 0.9], [0.5, 0.6], [0.6, 1]]; // … und beim Angehen
 const SWEEPS = {            // Lichtstreifen, die quer durch das Abteil wandern
   lantern: { duration: 0.9, color: '170, 190, 255', strength: 0.14 },
   tunnelLamp: { duration: 0.55, color: '255, 165, 85', strength: 0.07 },
@@ -42,6 +45,9 @@ export class TrainMotion {
     this.nextSqueal = randomBetween(settings.squealEvery);
     this.inTunnel = this.tunnelAt(this.distance);
     this.tunnel = this.inTunnel ? 1 : 0; // weich übergeblendet: 0 = draußen, 1 = ganz im Tunnel
+    this.lightsOn = !(settings.lightsOutInTunnel && this.inTunnel);
+    this.lightsSwitched = -99;             // wann das Licht zuletzt aus- oder angegangen ist
+    this.lights = this.lightsOn ? 1 : 0;   // Helligkeit der Lampen: 1 = an, 0 = aus
     this.shakeY = 0;          // aktuelle Verschiebung des Bildes in Pixeln
     this.roll = 0;            // Neigung der Welt draußen (Bogenmaß)
     this.bob = 0;             // Verschiebung der Welt draußen nach oben/unten (Pixel)
@@ -50,6 +56,7 @@ export class TrainMotion {
     this.onBump = null;       // (Stärke) bei jedem Schienenstoß
     this.onTunnel = null;     // (true/false) beim Hineinfahren und Herausfahren
     this.onSqueal = null;     // (Dauer in Sekunden) wenn die Räder in der Kurve quietschen
+    this.onLights = null;     // (true/false) wenn das Licht an- oder ausgeht
   }
 
   // Die wievielte Runde? Gezählt wird jeweils mitten im Tunnel.
@@ -73,14 +80,25 @@ export class TrainMotion {
     return mod(distance + length / 2, this.lapLength) < length;
   }
 
+  // Wie viele Laternen pro Runde auf einer Seite ('left' oder 'right') vorbeikommen
+  lanternCount(side) {
+    return this.lanterns.filter((lantern) => lantern.side === side).length;
+  }
+
   // Fahrsekunden bis zur nächsten Tunneleinfahrt
   get tunnelAhead() {
     return mod(this.lapLength - this.settings.tunnel.length / 2 - this.lapTime, this.lapLength);
   }
 
-  // Zum Ausprobieren (Debug, Taste T): ein paar Sekunden vor den Tunnel springen
-  skipToTunnel() {
-    this.distance += mod(this.tunnelAhead - 4, this.lapLength);
+  // Ein paar Sekunden vor den Tunnel springen (Debug-Taste T, oder wenn Joseph auf der Bank wartet)
+  skipToTunnel(secondsBefore = 4) {
+    this.distance += mod(this.tunnelAhead - secondsBefore, this.lapLength);
+    this.sweeps = [];
+  }
+
+  // Von vorn beginnen: Runde 1, so viele Fahrsekunden nach der Mitte des Tunnels
+  restartAt(seconds) {
+    this.distance = seconds;
     this.sweeps = [];
   }
 
@@ -100,6 +118,15 @@ export class TrainMotion {
       this.onTunnel?.(inTunnel);
     }
     this.tunnel += ((inTunnel ? 1 : 0) - this.tunnel) * Math.min(1, dt * 5);
+
+    // Im Tunnel geht das Licht aus (mit kurzem Flackern), danach wieder an
+    const lightsOn = !(this.settings.lightsOutInTunnel && inTunnel);
+    if (lightsOn !== this.lightsOn) {
+      this.lightsOn = lightsOn;
+      this.lightsSwitched = t;
+      this.onLights?.(lightsOn);
+    }
+    this.lights = pattern(lightsOn ? LIGHTS_ON : LIGHTS_OFF, t - this.lightsSwitched);
 
     // Schienenstöße: "ta" … "dam"
     if (this.speed > 0 && t >= this.nextJoint) {
@@ -167,16 +194,22 @@ export class TrainMotion {
     this.onBump?.(strength);
   }
 
-  // Über allem (auch über Joseph): Lampenlicht, Flackern und Lichtstreifen von Laternen und Tunnellampen.
-  drawFront(ctx, width, height) {
-    const lampLevel = 1 - this.flicker;
+  // Über allem (auch über Joseph): Lampenlicht und Flackern
+  drawLamps(ctx, width, height) {
+    const lampLevel = (1 - this.flicker) * this.lights;
     for (const lamp of this.settings.lamps) {
       glow(ctx, lamp.x, lamp.y, lamp.radius, [255, 196, 110], lamp.strength * lampLevel, 'screen');
     }
-    if (this.flicker > 0) {
-      ctx.fillStyle = `rgba(12, 6, 20, ${0.22 * this.flicker})`;
+    const flicker = this.flicker * this.lights; // ist das Licht schon aus, flackert nichts mehr
+    if (flicker > 0) {
+      ctx.fillStyle = `rgba(12, 6, 20, ${0.22 * flicker})`;
       ctx.fillRect(0, 0, width, height);
     }
+  }
+
+  // Lichtstreifen von Laternen und Tunnellampen – sie kommen von draußen und sind auch zu sehen,
+  // wenn im Abteil das Licht aus ist.
+  drawSweeps(ctx, height) {
     for (const sweep of this.sweeps) {
       const { duration, color, strength } = SWEEPS[sweep.kind];
       const progress = (this.time - sweep.start) / duration;
@@ -194,6 +227,13 @@ export class TrainMotion {
       ctx.restore();
     }
   }
+}
+
+// Wert eines Ablaufs [[Zeit, Wert], …] zum Zeitpunkt t (zwischen zwei Punkten wird umgeschaltet, nicht überblendet)
+function pattern(steps, t) {
+  let value = steps[0][1];
+  for (const [time, level] of steps) if (t >= time) value = level;
+  return value;
 }
 
 // Wo in der Runde Laternen stehen – zufällig verteilt, aber jede Runde gleich (fester Startwert).
