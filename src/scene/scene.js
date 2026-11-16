@@ -19,6 +19,8 @@ const CLICK_MARKER_DURATION = 0.45; // Sekunden
 // Anklickbare Stellen (hotspots) und kleine Bilder im Raum (props) können Bedingungen haben:
 // - when: 'merker'   nur sichtbar, solange dieser Merker im Spielstand gesetzt ist ('!merker' = nicht gesetzt)
 // - inDark: true     nur im Dunkeln zu sehen (wenn im Tunnel das Licht aus ist)
+// - glows: 'merker'  (nur hotspots) leuchtet selbst und ist deshalb auch im Dunkeln ohne Taschenlampe zu finden,
+//                    solange die Bedingung gilt – z. B. der Bildschirm, solange er Strom hat
 export class Scene {
   constructor(data) {
     this.data = data;
@@ -78,8 +80,9 @@ export class Scene {
   // Welche anklickbare Stelle liegt unter dem Punkt? Die erste passende in der Liste gewinnt.
   // Im Dunkeln findet Joseph nur etwas, wo seine Taschenlampe hinleuchtet.
   hotspotAt(point) {
-    if (this.isDark && !Darkness.inBeam(point, this.beam)) return null;
-    return this.hotspots.find((hotspot) => this.isActive(hotspot) && pointInPolygon(point, hotspot.area)) ?? null;
+    const lit = !this.isDark || Darkness.inBeam(point, this.beam);
+    const found = (hotspot) => (lit || (hotspot.glows && this.isActive({ when: hotspot.glows })));
+    return this.hotspots.find((hotspot) => this.isActive(hotspot) && found(hotspot) && pointInPolygon(point, hotspot.area)) ?? null;
   }
 
   // Mitte einer anklickbaren Stelle (damit Joseph sich dorthin drehen kann)
@@ -95,6 +98,7 @@ export class Scene {
     const animation = await loadAnimation(name);
     const before = { animation: spot.player.animation, off: spot.off };
     spot.off = false;
+    spot.playing = true; // so lange hat die Animation Vorrang vor einem eigenen Bild (paintSpot)
     spot.glowColor = glowColor;
     spot.glowStrength = glowStrength;
     spot.player.setAnimation(animation);
@@ -104,7 +108,17 @@ export class Scene {
     spot.player.onEnd = null;
     spot.player.setAnimation(before.animation);
     spot.off = before.off;
+    spot.playing = false;
     spot.glowColor = spot.glowStrength = undefined;
+  }
+
+  // Lässt eine animierte Stelle etwas Eigenes zeigen statt ihrer Animation, z. B. das Kamerabild
+  // auf dem Bildschirm. painter = (ctx, x, y, width, height) => { … } oder null (wieder die Animation).
+  paintSpot(id, painter, { glowColor } = {}) {
+    const spot = this.animations.find((s) => s.id === id);
+    if (!spot) return;
+    spot.painter = painter;
+    spot.painterGlow = painter ? glowColor : undefined;
   }
 
   // Schaltet eine animierte Stelle aus (z. B. Bildschirm ohne Strom) oder wieder an
@@ -150,9 +164,22 @@ export class Scene {
     this.outside?.drawLight(ctx);
     this.motion?.drawLamps(ctx, GAME_WIDTH, GAME_HEIGHT);
     if (this.darkLevel > 0) {
-      this.darkness.draw(ctx, this.darkLevel, { windows: this.outside?.windows, lights: this.glowingSpots(), beam: this.beam });
+      const glass = this.outside ? (pane) => this.drawGlass(pane, player) : null;
+      this.darkness.draw(ctx, this.darkLevel, { glass, lights: this.glowingSpots(), beam: this.beam });
     }
     this.motion?.drawSweeps(ctx, GAME_HEIGHT);
+  }
+
+  // Nur die Fensterscheiben: die Außenwelt, aus der alles weggenommen wird, was im Abteil davor liegt
+  // (Wände und Rahmen des Hintergrundbilds, kleine Bilder, Joseph). Für die Dunkelheit im Tunnel.
+  drawGlass(ctx, player) {
+    this.outside.draw(ctx);
+    ctx.globalCompositeOperation = 'destination-out';
+    const { x, y, width, height } = this.data.background;
+    ctx.drawImage(this.background, x, y, width, height);
+    this.drawProps(ctx);
+    player.draw(ctx, this);
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   drawProps(ctx) {
@@ -171,6 +198,8 @@ export class Scene {
       if (spot.off) {
         ctx.fillStyle = '#060807'; // ausgeschaltet: dunkle Mattscheibe
         ctx.fillRect(spot.x, spot.y, spot.width, spot.height);
+      } else if (spot.painter && !spot.playing) {
+        spot.painter(ctx, spot.x, spot.y, spot.width, spot.height);
       } else {
         spot.player.draw(ctx, spot.x, spot.y, spot.width, spot.height);
       }
@@ -182,7 +211,7 @@ export class Scene {
     for (const spot of this.animations) {
       if (!spot.glow || spot.off) continue;
       const { x, y, radius } = spot.glow;
-      const color = spot.glowColor ?? spot.glow.color;
+      const color = spot.glowColor ?? (spot.playing ? undefined : spot.painterGlow) ?? spot.glow.color;
       const strength = spot.glowStrength ?? spot.glow.strength;
       const flicker = 0.6 + 0.4 * Math.abs(Math.sin(spot.player.frameIndex * 12.9898)); // je Frame etwas anders
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);

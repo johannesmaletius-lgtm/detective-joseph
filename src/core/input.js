@@ -5,6 +5,7 @@ import { DOUBLE_CLICK } from '../config.js';
 //
 // Andere Teile des Spiels melden sich so an:
 //   input.on('click', (click) => { ... click.x, click.y, click.double, click.right ... })
+//   input.on('release', (point) => { ... })   Maustaste losgelassen (zum Ziehen, z. B. Puzzleteile)
 //   input.on('key', (key) => { ... })
 //
 // Rechtsklick (click.right = true) heißt im Spiel "anschauen". Auf dem Mac geht auch
@@ -12,7 +13,7 @@ import { DOUBLE_CLICK } from '../config.js';
 export class Input {
   constructor(canvas, screen) {
     this.mouse = { x: 0, y: 0, inside: false };
-    this.listeners = { click: [], key: [] };
+    this.listeners = { click: [], release: [], key: [] };
     this.lastClick = null; // für die Doppelklick-Erkennung
 
     canvas.addEventListener('pointermove', (event) => {
@@ -28,8 +29,14 @@ export class Input {
       const position = screen.toGame(event.clientX, event.clientY);
       this.mouse = { ...position, inside: true };
       const right = event.button === 2 || event.ctrlKey;
+      canvas.setPointerCapture?.(event.pointerId); // beim Ziehen die Maus auch außerhalb des Bildes verfolgen
       this.emit('click', { ...position, right, double: !right && this.isDoubleClick(position) });
     });
+
+    canvas.addEventListener('pointerup', (event) => {
+      this.emit('release', screen.toGame(event.clientX, event.clientY));
+    });
+    canvas.addEventListener('pointercancel', () => this.emit('release', { x: this.mouse.x, y: this.mouse.y }));
 
     // Das Rechtsklick-Menü des Browsers ausschalten – die rechte Maustaste brauchen wir zum Anschauen.
     canvas.addEventListener('contextmenu', (event) => event.preventDefault());

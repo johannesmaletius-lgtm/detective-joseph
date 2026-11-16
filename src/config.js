@@ -16,6 +16,7 @@ export const KEYS = {
   toggleSound: 'm', // Ton an/aus
   skipToTunnel: 't', // nur in der Debug-Ansicht: Zug springt kurz vor den Tunnel
   notebook: 'n',    // Notizbuch öffnen und schließen
+  hint: 'h',        // Joseph gibt einen Tipp
   close: 'escape',  // Fenster schließen, Gegenstand loslassen
   skip: ' ',        // Leertaste: Sprechtext überspringen
 };

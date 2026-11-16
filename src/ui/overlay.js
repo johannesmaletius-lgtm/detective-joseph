@@ -6,6 +6,7 @@ import { COLORS, FONTS, drawPaper, outlinedText, roundedRect, wrapText } from '.
 //
 //   await overlay.fadeTo(1, 1.5);                  // 1,5 Sekunden lang schwarz werden
 //   await overlay.showCard({ kind: 'paper', lines: ['…'] });
+//   await overlay.showCard({ draw: (ctx, card) => { … } });   // selbst gezeichnete Karte (siehe cards.js)
 
 export class Overlay {
   constructor() {
@@ -67,6 +68,11 @@ export class Overlay {
     if (card.kind === 'hand') drawHand(ctx, card);
     if (card.kind === 'paper') drawLetter(ctx, card);
     if (card.kind === 'end') drawEnd(ctx, card);
+    if (card.draw) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+      ctx.fillRect(0, 0, 1280, 720);
+      card.draw(ctx, card);
+    }
     if (card.age > 1.2) {
       ctx.globalAlpha = 0.55 + 0.35 * Math.sin(card.age * 3);
       ctx.font = FONTS.small;
@@ -78,17 +84,57 @@ export class Overlay {
   }
 }
 
-function drawTitle(ctx, { title, subtitle }) {
-  ctx.fillStyle = '#000';
+function drawTitle(ctx, { title, subtitle, age }) {
+  const night = ctx.createLinearGradient(0, 0, 0, 720);
+  night.addColorStop(0, '#05040c');
+  night.addColorStop(1, '#0d0a1c');
+  ctx.fillStyle = night;
   ctx.fillRect(0, 0, 1280, 720);
+
+  // Die Ringbahn von oben: ein Gleiskreis, in der Mitte das rote Licht des Turms, ein Zug dreht seine Runden
+  const cx = 640, cy = 350, rx = 430, ry = 190;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(217, 164, 65, 0.22)';
+  ctx.lineWidth = 2;
+  for (const grow of [-7, 7]) {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx + grow, ry + grow * 0.45, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(217, 164, 65, 0.16)';
+  for (let i = 0; i < 90; i++) { // Schwellen
+    const a = (i / 90) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * (rx - 11), cy + Math.sin(a) * (ry - 5));
+    ctx.lineTo(cx + Math.cos(a) * (rx + 11), cy + Math.sin(a) * (ry + 5));
+    ctx.stroke();
+  }
+  const turn = age * 0.35;
+  for (let i = 0; i < 5; i++) { // fünf erleuchtete Wagen
+    const a = turn - i * 0.085;
+    const x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 26);
+    glow.addColorStop(0, `rgba(255, 205, 120, ${i === 0 ? 0.95 : 0.6})`);
+    glow.addColorStop(1, 'rgba(255, 205, 120, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x - 26, y - 26, 52, 52);
+  }
+  const blink = Math.max(0, Math.sin(age * 2.4)) ** 6;
+  const red = ctx.createRadialGradient(cx, cy - 122, 0, cx, cy - 122, 60);
+  red.addColorStop(0, `rgba(255, 70, 60, ${0.25 + 0.6 * blink})`);
+  red.addColorStop(1, 'rgba(255, 70, 60, 0)');
+  ctx.fillStyle = red;
+  ctx.fillRect(cx - 60, cy - 182, 120, 120);
+  ctx.restore();
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.font = FONTS.title;
   ctx.fillStyle = COLORS.brass;
-  ctx.fillText(title, 640, 310);
+  ctx.fillText(title, 640, 320);
   ctx.font = FONTS.subtitle;
   ctx.fillStyle = '#c9b48f';
-  ctx.fillText(subtitle, 640, 380);
+  ctx.fillText(subtitle, 640, 386);
 }
 
 // Schrift auf Josephs Handrücken: eine gezeichnete Hand (Handrücken, vier Finger, Daumen)
@@ -133,22 +179,31 @@ function drawHand(ctx, { text }) {
   ctx.restore();
 }
 
+// Ein handgeschriebenes Blatt. Jede Zeile in "lines" ist ein Absatz; das Blatt wächst mit dem Text.
 function drawLetter(ctx, { lines, signature }) {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
   ctx.fillRect(0, 0, 1280, 720);
-  drawPaper(ctx, 370, 110, 540, 460, -0.03);
-  ctx.save();
-  ctx.translate(640, 340);
-  ctx.rotate(-0.03);
   ctx.font = FONTS.hand;
+  const textWidth = 500;
+  const rows = lines.flatMap((line, i) => [...wrapText(ctx, line, textWidth), ...(i < lines.length - 1 ? [''] : [])]);
+  const rowHeight = (row) => (row === '' ? 14 : 34);
+  const textHeight = rows.reduce((sum, row) => sum + rowHeight(row), 0) + (signature ? 46 : 0);
+  const height = Math.max(380, textHeight + 90);
+  drawPaper(ctx, 640 - (textWidth + 100) / 2, 348 - height / 2, textWidth + 100, height, -0.02);
+  ctx.save();
+  ctx.translate(640, 348);
+  ctx.rotate(-0.02);
   ctx.fillStyle = COLORS.ink;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  const rows = lines.flatMap((line) => wrapText(ctx, line, 440));
-  rows.forEach((row, i) => ctx.fillText(row, -220, -180 + i * 40));
+  let y = -height / 2 + 44;
+  for (const row of rows) {
+    ctx.fillText(row, -textWidth / 2, y);
+    y += rowHeight(row);
+  }
   if (signature) {
     ctx.textAlign = 'right';
-    ctx.fillText(signature, 220, 150);
+    ctx.fillText(signature, textWidth / 2, y + 10);
   }
   ctx.restore();
 }

@@ -3,14 +3,15 @@
 //
 // Aufruf (im Projektordner):  node tools/make-items.mjs
 // Schreibt:
-//   assets/items/letter.png, knife.png, ticket.png, flashlight-empty.png, flashlight.png, battery.png
+//   assets/items/letter.png, key.png, knife.png, pieces.png, sheet.png, binoculars.png,
+//                flashlight-empty.png, flashlight-half.png, flashlight.png, battery.png
 //                                         Inventar-Bilder, je 128 × 128, mit dunklem Umriss
 //   assets/ui/notebook.png               Knopf für das Notizbuch (oben rechts im Bild)
 //   assets/scenes/train-compartment/letter-in-slot.png   Brief, der aus dem Schlitz am Schaltpult ragt
 //   assets/scenes/train-compartment/scratches.png        eingeritzte Striche in der Tür (nur im Dunkeln sichtbar)
 //
-// Die Striche zeigen, wie viele Laternen pro Runde links und rechts vorbeifahren – das ist der Code
-// für die Tür. Gezählt wird mit denselben Einstellungen wie im Spiel (src/scene/trainCompartment.js).
+// Die Striche zeigen, wie viele Laternen pro Runde links und rechts vorbeifahren – das sind zwei der
+// vier Ziffern für die Tür. Gezählt wird mit denselben Einstellungen wie im Spiel (src/scene/trainCompartment.js).
 // Wer dort lap, tunnel oder lanternEvery ändert, muss dieses Werkzeug neu laufen lassen.
 
 import fs from 'node:fs';
@@ -24,10 +25,14 @@ fs.mkdirSync('assets/items', { recursive: true });
 fs.mkdirSync('assets/ui', { recursive: true });
 
 icon('assets/items/letter.png', drawLetter);
+icon('assets/items/key.png', drawKey);
 icon('assets/items/knife.png', drawKnife);
-icon('assets/items/ticket.png', drawTicket);
-icon('assets/items/flashlight-empty.png', (p) => drawFlashlight(p, false));
-icon('assets/items/flashlight.png', (p) => drawFlashlight(p, true));
+icon('assets/items/pieces.png', drawPieces);
+icon('assets/items/sheet.png', drawSheet);
+icon('assets/items/binoculars.png', drawBinoculars);
+icon('assets/items/flashlight-empty.png', (p) => drawFlashlight(p, 0));
+icon('assets/items/flashlight-half.png', (p) => drawFlashlight(p, 1));
+icon('assets/items/flashlight.png', (p) => drawFlashlight(p, 2));
 icon('assets/items/battery.png', drawBattery);
 icon('assets/ui/notebook.png', drawNotebook);
 makeLetterInSlot();
@@ -96,19 +101,78 @@ function drawKnife(p) {
   fillCircle(p, 54, 76, 3.5, hex('#d9c08a'));
 }
 
-function drawTicket(p) {
-  const at = turn(64, 64, 0.18);
-  fillPolygon(p, at([[16, 38], [112, 38], [112, 90], [16, 90]]), hex('#e9c779'));
-  fillPolygon(p, at([[16, 38], [112, 38], [112, 52], [16, 52]]), hex('#b03a2e'));   // roter Streifen
-  for (let i = 0; i < 4; i++) line(p, at([[28, 62 + i * 7], [74 - i * 9, 62 + i * 7]]), 2, hex('#6b4a2a'));
-  const [cx, cy] = at([[92, 72]])[0];
-  fillCircle(p, cx, cy, 11, hex('#e9c779'));
-  ring(p, cx, cy, 11, 2, hex('#7a2a22'));                                           // Stempel
-  const [hx, hy] = at([[100, 44]])[0];
-  fillCircle(p, hx, hy, 4, hex('#2a1c12'));                                         // gelochter Punkt
+// Kleiner Schlüssel mit Papieranhänger ("Werkzeug")
+function drawKey(p) {
+  const brass = hex('#d9a441'), dark = hex('#9a6f22');
+  ring(p, 40, 44, 17, 9, brass);                                                    // Griff
+  ring(p, 40, 44, 21, 2, dark);
+  fillPolygon(p, [[52, 53], [58, 47], [104, 93], [98, 99]], brass);                 // Schaft
+  fillPolygon(p, [[52, 53], [55, 50], [101, 96], [98, 99]], dark);
+  fillPolygon(p, [[86, 87], [98, 75], [103, 80], [91, 92]], brass);                 // Bart
+  fillPolygon(p, [[96, 97], [108, 85], [113, 90], [101, 102]], brass);
+  // Anhänger an einer Schnur
+  line(p, [[30, 58], [26, 76], [34, 88]], 2, hex('#6b4a2a'));
+  const at = turn(40, 100, -0.3);
+  fillPolygon(p, at([[18, 88], [60, 88], [66, 100], [60, 112], [18, 112]]), hex('#efe2c0'));
+  line(p, at([[24, 96], [50, 96]]), 2, hex('#4a3a2a'));
+  line(p, at([[24, 104], [44, 104]]), 2, hex('#4a3a2a'));
 }
 
-function drawFlashlight(p, on) {
+// Drei Papierfetzen, übereinandergelegt
+function drawPieces(p) {
+  const paper = hex('#e6d5a9'), light = hex('#f3e9cc'), ink = hex('#4a3a2a');
+  fillPolygon(p, [[14, 44], [58, 30], [66, 48], [72, 78], [44, 92], [22, 80]], paper);
+  line(p, [[26, 54], [52, 46]], 2, ink);
+  line(p, [[30, 66], [58, 58]], 2, ink);
+  fillPolygon(p, [[60, 22], [108, 30], [112, 62], [96, 70], [78, 60], [64, 64]], light);
+  ring(p, 88, 44, 11, 2, ink);                                                      // ein Stück vom Gleiskreis
+  fillPolygon(p, [[48, 70], [84, 64], [112, 76], [108, 108], [70, 112], [44, 100]], paper);
+  for (let i = 0; i < 3; i++) {
+    fillCircle(p, 60, 80 + i * 10, 3, ink);                                         // Punkte und Striche der Signaltabelle
+    fillPolygon(p, [[70, 78 + i * 10], [88 - i * 6, 78 + i * 10], [88 - i * 6, 83 + i * 10], [70, 83 + i * 10]], ink);
+  }
+  line(p, [[14, 44], [58, 30], [66, 48]], 1.5, hex('#fff8e4'));
+}
+
+// Das zusammengesetzte Blatt: links der Gleiskreis mit dem Turm, rechts die Signaltabelle
+function drawSheet(p) {
+  const at = turn(64, 64, -0.07);
+  const ink = hex('#33261a');
+  fillPolygon(p, at([[12, 28], [116, 28], [116, 100], [12, 100]]), hex('#ead9ae'));
+  fillPolygon(p, at([[12, 28], [116, 28], [116, 38], [12, 38]]), hex('#33261a'));   // Kopfzeile
+  const [cx, cy] = at([[40, 70]])[0];
+  ring(p, cx, cy, 19, 3, ink);                                                      // Gleiskreis
+  fillCircle(p, cx, cy, 4, hex('#b3261e'));                                         // Turmlicht
+  for (let i = 0; i < 4; i++) {
+    const [[x0, y0], [x1, y1], [x2, y2]] = at([[72, 50 + i * 12], [80, 50 + i * 12], [80 + 8 + i * 5, 50 + i * 12]]);
+    fillCircle(p, x0, y0, 3, ink);
+    stroke(p, x1, y1, x2 + 8, y2, 5, 5, ink);
+  }
+  line(p, at([[47, 28], [45, 100]]), 1.5, hex('#8a7552'));                          // Risse
+  line(p, at([[82, 28], [84, 100]]), 1.5, hex('#8a7552'));
+  line(p, at([[12, 62], [116, 66]]), 1.5, hex('#8a7552'));
+}
+
+// Fernglas, leicht schräg von oben
+function drawBinoculars(p) {
+  const body = hex('#3a3f46'), edge = hex('#6c757f'), glass = hex('#7fb6d6');
+  for (const dx of [0, 40]) {
+    fillPolygon(p, [[22 + dx, 52], [50 + dx, 52], [54 + dx, 104], [18 + dx, 104]], body);   // Rohr
+    fillPolygon(p, [[22 + dx, 52], [29 + dx, 52], [26 + dx, 104], [18 + dx, 104]], edge);   // Glanzkante
+    fillPolygon(p, [[20 + dx, 96], [52 + dx, 96], [54 + dx, 110], [18 + dx, 110]], hex('#23272c')); // großes Ende
+    ellipse(p, 36 + dx, 110, 18, 6, 0, glass);                                              // Linse
+    ellipse(p, 31 + dx, 109, 6, 2.5, 0, hex('#d8f0ff'));
+    fillPolygon(p, [[26 + dx, 30], [46 + dx, 30], [50 + dx, 54], [22 + dx, 54]], hex('#23272c')); // Okular
+    fillPolygon(p, [[28 + dx, 22], [44 + dx, 22], [46 + dx, 32], [26 + dx, 32]], edge);
+  }
+  fillPolygon(p, [[48, 58], [64, 58], [64, 80], [48, 80]], hex('#59606a'));                  // Mittelsteg
+  fillCircle(p, 56, 66, 8, hex('#b8352c'));                                                  // Stellrad
+  fillCircle(p, 54, 64, 3, hex('#e2685c'));
+}
+
+// batteries: 0 = leer, 1 = eine Batterie drin (noch dunkel), 2 = leuchtet
+function drawFlashlight(p, batteries) {
+  const on = batteries >= 2;
   if (on) {
     for (let r = 24; r > 0; r -= 2) fillCircle(p, 98, 30, r, hex('#ffe9a0'), 0.07); // Lichtschein
   }
@@ -122,6 +186,11 @@ function drawFlashlight(p, on) {
   fillPolygon(p, [[66, 50], [70, 54], [90, 30], [84, 24]], hex('#e3e8ec'));
   ellipse(p, 95, 34, 15, 8, -0.78, on ? hex('#fff3b0') : hex('#2b3540'));
   if (!on) fillCircle(p, 91, 31, 2.5, hex('#9fb3c4'));                              // Glanz auf dem Glas
+  if (batteries === 1) {
+    // eine Batterie schaut hinten aus dem offenen Griff, daneben ein leeres Fach
+    fillPolygon(p, [[6, 106], [14, 114], [22, 106], [14, 98]], hex('#c9822f'));
+    fillPolygon(p, [[22, 92], [30, 100], [36, 94], [28, 86]], hex('#14171a'));
+  }
 }
 
 function drawBattery(p) {
@@ -159,7 +228,7 @@ function makeLetterInSlot() {
 function makeScratches() {
   const train = new TrainMotion(trainCompartment.train);
   const left = train.lanternCount('left'), right = train.lanternCount('right');
-  console.log(`Laternen pro Runde: links ${left}, rechts ${right} → Code ${left}${right}`);
+  console.log(`Laternen pro Runde: links ${left}, rechts ${right} (die beiden mittleren Ziffern des Türschlosses)`);
   const p = new Picture(140, 64);
   const scratch = (x0, y0, x1, y1) => {
     stroke(p, x0 + 1, y0 + 1, x1 + 1, y1 + 1, 2.6, 2, hex('#1c120a', 0.8)); // Schattenkante

@@ -245,11 +245,12 @@ Am besten in dieser Reihenfolge, jede Erkenntnis ein kleines Aha:
 
 ## Einstiegsrätsel für das erste Abteil (passt zu allen Versionen)
 
-> **Umgesetzt** – mit Vorschlag 1 („Ringbahn“) in `src/story/wagon1.js`. Abweichungen vom Entwurf hier:
-> Die Batterie steckt hinter einer festgeschraubten Klappe am Schaltpult (aufschrauben mit dem Taschenmesser
-> aus dem Rucksack), und die Strichliste ist in die Tür geritzt. Dazu kommen der Brief, der nach dem Tunnel
-> wieder im Schlitz steckt, Schritte im Dunkeln, der Totenkopf auf dem Bildschirm und die Durchsage
-> „nächster Halt: Ringbahnhof“.
+> **Umgesetzt und ausgebaut** – mit Vorschlag 1 („Ringbahn“) in `src/story/wagon1.js`. Aus dem kurzen
+> Einstiegsrätsel unten ist eine Rätselkette für etwa 20 Minuten geworden: Die Tür hat jetzt vier Rädchen mit
+> vier Zeichen (Tunnel, Laterne links, Laterne rechts, Turm). Dazu kommen ein zerrissener Fahrplan zum
+> Zusammensetzen, ein Zahlenquadrat für das Kofferschloss, das Turmlicht als Morsezeichen (Fernglas), ein
+> Verteilerkasten mit Tunnelkamera und die „Botschaften an sich selbst“ aus Vorschlag 4: Was Joseph wegnimmt,
+> ist nach dem Tunnel wieder da – so bekommt er die zweite Batterie. Die Lösung steht im README.
 
 Ein kurzes Rätsel, das genau die nächsten Schritte im Fahrplan abdeckt (Schritt 3: anklickbare Objekte, Schritt 4:
 Inventar und Tür):

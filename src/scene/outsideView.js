@@ -2,6 +2,7 @@ import { GAME_WIDTH } from '../config.js';
 import { loadImage } from '../core/assets.js';
 import { loadAnimation } from '../animation/animation.js';
 import { AnimationPlayer } from '../animation/animationPlayer.js';
+import { morseSignal } from '../effects/morse.js';
 
 // Die Außenwelt hinter den Zugfenstern.
 //
@@ -11,6 +12,8 @@ import { AnimationPlayer } from '../animation/animationPlayer.js';
 // Sie besteht aus Ebenen (von hinten nach vorne). Jede Ebene ist eines von fünf Dingen:
 // - ein durchlaufendes Bild   { image, y, speed }      z. B. Wald – zieht mit Perspektive vorbei
 // - ein stehendes Bild        { image, x, y }          z. B. der Turm in der Mitte des Kreises
+//                             mit blink: { x, y, color, every }  blinkt gleichmäßig,
+//                             mit blink: { x, y, color, morse: '3', unit }  blinkt eine Ziffer im Morsecode
 // - der Himmel                { image, y, turning }    dreht sich einmal pro Runde mit
 // - ein Ding am Himmel        { image, y, bearing }    z. B. der Mond – wandert, weil der Zug im Kreis fährt
 // - eine Frame-Animation      { animation, y }         flach, ohne Perspektive (für eigene gemalte Frames)
@@ -36,6 +39,13 @@ export class OutsideView {
     this.referenceDistance = referenceDistance;
     this.windows = windows.map((window) => ({ ...window, side: window.to <= vanishingPoint.x ? 'left' : 'right', light: 1 }));
     this.layers = layers.map((layer) => ({ ...layer }));
+    // Lichtsignale (id der Ebene → Signal), damit die Geschichte weiß, was z. B. der Turm blinkt
+    this.signals = {};
+    for (const layer of this.layers) {
+      if (!layer.blink?.morse) continue;
+      layer.signal = morseSignal(layer.blink.morse, layer.blink.unit);
+      if (layer.id) this.signals[layer.id] = layer.signal;
+    }
     this.windowLight = windowLight;
     this.train = STANDING;
     this.time = 0;
@@ -201,7 +211,9 @@ export class OutsideView {
     if (!layer.blink) return;
     const { x, y, color, every } = layer.blink;
     const phase = (this.time % every) / every;
-    const on = phase < 0.2 ? Math.sin((Math.PI * phase) / 0.2) : 0; // kurz aufleuchten, dann lange dunkel
+    const on = layer.signal
+      ? layer.signal.level(this.time)                                  // Morsezeichen
+      : phase < 0.2 ? Math.sin((Math.PI * phase) / 0.2) : 0;          // kurz aufleuchten, dann lange dunkel
     if (on > 0) {
       glow(ctx, layer.x + x, layer.y + y, 16, color, 0.55 * on, 'lighter');
       glow(ctx, layer.x + x, layer.y + y, 2.5, [255, 210, 200], on, 'lighter');

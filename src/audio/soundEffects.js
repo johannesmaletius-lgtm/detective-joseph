@@ -119,6 +119,54 @@ const EFFECTS = {
     for (let i = 0; i < 4; i++) fx.noise(t + i * 0.12, { frequency: 3000 + i * 200, q: 5, gain: 0.18, duration: 0.05 });
     fx.noise(t + 0.6, { frequency: 1200, q: 4, gain: 0.3, duration: 0.08 });
   },
+  // Kabelstück im Verteilerkasten drehen: trockenes Klacken
+  rotate(fx, t) {
+    fx.noise(t, { frequency: 1900, q: 7, gain: 0.3, duration: 0.035 });
+    fx.noise(t + 0.03, { frequency: 700, q: 3, gain: 0.16, duration: 0.05 });
+  },
+  // Strom fließt: Summen, das hochläuft, dann ein Relais
+  power(fx, t) {
+    fx.tone(t, { frequency: 70, to: 220, type: 'sawtooth', gain: 0.07, attack: 0.05, duration: 0.7 });
+    fx.tone(t + 0.1, { frequency: 440, to: 880, type: 'sine', gain: 0.06, attack: 0.05, duration: 0.6 });
+    fx.noise(t + 0.75, { frequency: 1500, q: 6, gain: 0.35, duration: 0.05 });
+  },
+  // Puzzleteil rastet ein: Papier klatscht auf den Tisch
+  snap(fx, t) {
+    fx.noise(t, { frequency: 1400, q: 1.2, gain: 0.3, duration: 0.06 });
+    fx.noise(t, { type: 'lowpass', frequency: 260, gain: 0.3, duration: 0.07, brown: true });
+  },
+  // Papier raschelt (Fetzen aufheben, Heft aufschlagen)
+  paper(fx, t) {
+    fx.noise(t, { frequency: 3400, q: 0.6, gain: 0.14, attack: 0.03, duration: 0.14 });
+    fx.noise(t + 0.13, { frequency: 2400, q: 0.8, gain: 0.1, attack: 0.03, duration: 0.16 });
+  },
+  // Kette rasselt
+  chain(fx, t) {
+    for (let i = 0; i < 7; i++) fx.noise(t + i * 0.06 + Math.random() * 0.03, { frequency: 3200 + Math.random() * 1800, q: 9, gain: 0.16, duration: 0.05, pan: -0.5 });
+  },
+  // Deckel oder Kiste wird aufgehebelt: Holz knarzt
+  creak(fx, t) {
+    fx.tone(t, { frequency: 150, to: 310, type: 'sawtooth', gain: 0.06, attack: 0.05, duration: 0.4 });
+    fx.noise(t + 0.4, { type: 'lowpass', frequency: 420, gain: 0.4, duration: 0.09, brown: true });
+  },
+  // Schlüssel dreht sich im Schloss
+  key(fx, t) {
+    fx.noise(t, { frequency: 3600, q: 8, gain: 0.2, duration: 0.03 });
+    fx.noise(t + 0.16, { frequency: 2100, q: 7, gain: 0.28, duration: 0.04 });
+    fx.noise(t + 0.3, { frequency: 900, q: 4, gain: 0.3, duration: 0.07 });
+  },
+  // Rätsel gelöst: drei helle Töne nach oben
+  success(fx, t) {
+    [523, 659, 784].forEach((frequency, i) => {
+      fx.tone(t + i * 0.11, { frequency, type: 'triangle', gain: 0.11, duration: 0.32 });
+      fx.tone(t + i * 0.11, { frequency: frequency * 2, type: 'sine', gain: 0.04, duration: 0.22 });
+    });
+  },
+  // Etwas Wichtiges entdeckt: ein tiefer, unheimlicher Ton
+  dread(fx, t) {
+    fx.tone(t, { frequency: 98, to: 92, type: 'sawtooth', gain: 0.07, attack: 0.3, duration: 1.8 });
+    fx.tone(t, { frequency: 147, to: 139, type: 'sine', gain: 0.07, attack: 0.3, duration: 1.8 });
+  },
 };
 
 // Lautstärke-Hüllkurve: schnell lauter, dann ausklingen

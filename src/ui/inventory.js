@@ -1,7 +1,8 @@
 import { loadImage } from '../core/assets.js';
 import { ITEMS } from '../story/items.js';
 
-// Die Inventarleiste mit 5 Plätzen.
+// Die Inventarleiste mit 5 Plätzen. Hat Joseph mehr als 5 Gegenstände dabei, erscheinen links und
+// rechts kleine Pfeile zum Weiterschieben.
 //
 // Sie liegt versteckt am unteren Bildrand (nur ihre Oberkante schaut heraus) und fährt herein,
 // sobald die Maus an den unteren Rand kommt – oder kurz, wenn Joseph etwas Neues einsteckt.
@@ -17,6 +18,9 @@ const SLOT_CENTERS = [307, 491, 676, 859, 1044]; // Mitte der Plätze im Bild de
 const SLOT_CENTER_Y = 128;
 const SLOT_SIZE = 130;             // Größe eines Platzes im Bild der Leiste
 const SHOW_ZONE = 46;              // so nah am unteren Rand fährt die Leiste heraus
+const EDGE = 26;                   // so hoch ist der Nietenstreifen an der Oberkante (Spielpixel)
+const ARROW_CENTERS = [214, 1137]; // Mitte der Pfeile zum Weiterschieben im Bild der Leiste (x)
+const ARROW_REACH = 34;            // so nah am Pfeil zählt ein Klick (im Bild der Leiste)
 
 export class Inventory {
   constructor() {
@@ -27,6 +31,7 @@ export class Inventory {
     this.slide = 0;        // 0 = versteckt, 1 = ganz herausgefahren
     this.revealTime = 0;   // so lange (Sekunden) bleibt sie noch von selbst draußen
     this.flash = null;     // { index, age }: neu eingesteckter Gegenstand leuchtet kurz auf
+    this.offset = 0;       // so viele Gegenstände sind nach links aus der Leiste geschoben
   }
 
   async load() {
@@ -54,15 +59,32 @@ export class Inventory {
   }
 
   add(id) {
-    if (this.has(id) || this.items.length >= SLOTS) return;
+    if (this.has(id)) return;
     this.items.push(id);
     this.flash = { index: this.items.length - 1, age: 0 };
+    this.offset = Math.max(0, this.items.length - SLOTS); // das Neue soll zu sehen sein
     this.reveal(2.6);
   }
 
   remove(id) {
     this.items = this.items.filter((item) => item !== id);
     if (this.selected === id) this.selected = null;
+    this.offset = Math.min(this.offset, Math.max(0, this.items.length - SLOTS));
+  }
+
+  // Pfeil unter dem Punkt: −1 = nach links schieben, +1 = nach rechts, 0 = kein Pfeil
+  arrowAt(point) {
+    if (!this.contains(point) || this.items.length <= SLOTS) return 0;
+    const left = (1280 - WIDTH) / 2;
+    const y = this.top + SLOT_CENTER_Y * this.scale;
+    const hit = (cx) => Math.hypot(point.x - (left + cx * this.scale), point.y - y) <= ARROW_REACH * this.scale;
+    if (hit(ARROW_CENTERS[0]) && this.offset > 0) return -1;
+    if (hit(ARROW_CENTERS[1]) && this.offset < this.items.length - SLOTS) return 1;
+    return 0;
+  }
+
+  scroll(direction) {
+    this.offset = Math.min(Math.max(0, this.offset + direction), Math.max(0, this.items.length - SLOTS));
   }
 
   // Ersetzt einen Gegenstand an derselben Stelle (z. B. leere Taschenlampe → Taschenlampe)
@@ -71,6 +93,7 @@ export class Inventory {
     if (index < 0) return this.add(newId);
     this.items[index] = newId;
     this.flash = { index, age: 0 };
+    this.offset = Math.min(Math.max(this.offset, index - SLOTS + 1), index);
     this.reveal(2);
   }
 
@@ -93,9 +116,11 @@ export class Inventory {
     return this.slide > 0.6;
   }
 
+  // Die Leiste "zählt" erst ein Stück unter ihrer Oberkante: Der schmale Nietenstreifen oben lässt Klicks
+  // durch, damit man Dinge am Boden (z. B. das zerrissene Papier) auch bei offener Leiste erreicht.
   containsBar(point) {
     const left = (1280 - WIDTH) / 2;
-    return point.x >= left && point.x <= left + WIDTH && point.y >= this.top;
+    return point.x >= left && point.x <= left + WIDTH && point.y >= this.top + EDGE;
   }
 
   // Liegt der Punkt auf der (herausgefahrenen) Leiste?
@@ -107,7 +132,7 @@ export class Inventory {
   itemAt(point) {
     if (!this.contains(point)) return null;
     const index = this.slotRects().findIndex((r) => point.x >= r.x && point.x <= r.x + r.size && point.y >= r.y && point.y <= r.y + r.size);
-    return this.items[index] ?? null;
+    return index < 0 ? null : this.items[this.offset + index] ?? null;
   }
 
   slotRects() {
@@ -120,6 +145,33 @@ export class Inventory {
     }));
   }
 
+  // Pfeile zum Weiterschieben (nur bei mehr als 5 Gegenständen)
+  drawArrows(ctx, left) {
+    if (this.items.length <= SLOTS) return;
+    const y = this.top + SLOT_CENTER_Y * this.scale;
+    [-1, 1].forEach((direction, i) => {
+      const active = direction < 0 ? this.offset > 0 : this.offset < this.items.length - SLOTS;
+      const x = left + ARROW_CENTERS[i] * this.scale;
+      ctx.save();
+      ctx.globalAlpha = active ? 1 : 0.25;
+      ctx.beginPath();
+      ctx.arc(x, y, 11, 0, Math.PI * 2);
+      ctx.fillStyle = '#2a1c12';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#d9a441';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x - 3 * direction, y - 6);
+      ctx.lineTo(x + 5 * direction, y);
+      ctx.lineTo(x - 3 * direction, y + 6);
+      ctx.closePath();
+      ctx.fillStyle = '#d9a441';
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
   draw(ctx) {
     if (!this.bar) return;
     const left = (1280 - WIDTH) / 2;
@@ -130,7 +182,9 @@ export class Inventory {
     ctx.restore();
     if (this.slide <= 0.02) return;
 
-    this.slotRects().forEach((rect, index) => {
+    this.drawArrows(ctx, left);
+    this.slotRects().forEach((rect, slot) => {
+      const index = this.offset + slot;
       const id = this.items[index];
       if (!id) return;
       const flash = this.flash?.index === index ? 1 - this.flash.age / 1.2 : 0;

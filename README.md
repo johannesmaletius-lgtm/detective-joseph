@@ -2,11 +2,22 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Wagen 1 ist spielbar – mit Geschichte und Tutorial.** Joseph wacht in einem Nachtzug auf und weiß
-nicht, wie er hineingekommen ist. Auf seiner Hand steht in seiner eigenen Schrift: *NICHT EINSCHLAFEN*. Er
-findet einen Brief, durchsucht einen Rucksack, bastelt sich eine Taschenlampe – und muss im dunklen Tunnel
-herausfinden, wie das Zahlenschloss der Tür aufgeht. Die Geschichte folgt Vorschlag 1 („Ringbahn“) aus
-[`docs/story-ideen.md`](docs/story-ideen.md).
+**Stand: Wagen 1 ist spielbar – etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps.** Joseph wacht
+in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seiner Hand steht in seiner eigenen
+Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
+vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
+Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/story-ideen.md).
+
+Die Rätsel im Abteil (Lösung weiter unten):
+
+- **Zerrissener Fahrplan:** sechs Papierfetzen im Abteil finden und mit der Maus zusammensetzen
+- **Rätselheft und Koffer:** ein halb gelöstes Zahlenquadrat ergibt die drei Ziffern für das Kofferschloss
+- **Fernglas und Turm:** das rote Turmlicht blinkt eine Ziffer – die Tabelle dazu steht auf dem Fahrplan
+- **Verteilerkasten:** Kabelstücke drehen, bis das Bild der Tunnelkamera auf dem Bildschirm erscheint
+- **Die Zeitschleife:** Was Joseph im Abteil wegnimmt, ist nach dem Tunnel wieder da – so kommt er an eine
+  zweite Batterie für die Taschenlampe
+- **Im Dunkeln:** Im Tunnel geht das Licht aus; nur mit der Taschenlampe findet man die Kratzer in der Tür
+- **Das Türschloss:** vier Rädchen, vier Zeichen – Tunnel, Laterne links, Laterne rechts, Turm
 
 Der Zug fährt:
 Vor den Fenstern zieht eine nächtliche Landschaft **mit Perspektive** vorbei (durch die hinteren Fenster
@@ -42,9 +53,11 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 | Maus an den unteren Rand | Inventar fährt heraus |
 | Linksklick auf einen Gegenstand im Inventar | Joseph nimmt ihn in die Hand – dann auf etwas im Abteil klicken (benutzen) oder auf einen anderen Gegenstand (kombinieren) |
 | Rechtsklick auf einen Gegenstand | anschauen / lesen (mit einem Gegenstand in der Hand: loslassen) |
-| Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß |
+| Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß (bei vielen Notizen: blättern) |
+| Taste **H** oder „Tipp“ im Notizbuch | Joseph gibt einen Tipp – je öfter man fragt, desto deutlicher |
 | **Leertaste** oder Klick | Sprechtext überspringen |
-| **Esc** | Notizbuch / Zahlenschloss schließen, Gegenstand loslassen |
+| In einer Nahansicht (Schloss, Puzzle, Verteilerkasten …) | Linksklick bedient sie, beim Puzzle mit gedrückter Maustaste ziehen |
+| **Esc** oder Rechtsklick | Nahansicht / Notizbuch schließen, Gegenstand loslassen |
 | Taste **M** | Ton an/aus (der Ton startet mit dem ersten Klick) |
 | Taste **D** | Debug-Ansicht: Laufbereich, anklickbare Stellen, Fenster, Koordinaten, Zug (Runde, Tunnel), Merker der Geschichte |
 | Taste **G** | Koordinaten-Raster (50-Pixel-Schritte) |
@@ -81,24 +94,33 @@ detective-joseph/
     ├── main.js                Einstieg: Spiel erzeugen, erste Szene mit ihrer Geschichte laden, starten
     ├── config.js              Zentrale Einstellungen (1280 × 720, Doppelklick, Tasten)
     ├── story/
-    │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Ende
+    │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Tipps, Ende
     │   ├── tutorial.js        Die Tutorial-Schritte (Hinweisschild oben)
     │   ├── items.js           Katalog der Gegenstände (Name, Bild, Beschreibung, Kombinationen)
     │   └── story.js           Führt die Geschichte aus: say, note, give, cutscene … (Befehle fürs Drehbuch)
+    ├── puzzles/               NAHANSICHTEN: Rätsel und Dinge, die man aus der Nähe ansieht
+    │   ├── view.js            Grundgerüst für alle Nahansichten (öffnen, schließen, Klicks)
+    │   ├── jigsaw.js          Papierpuzzle: der zerrissene Fahrplan
+    │   ├── wires.js           Verteilerkasten: Kabelstücke drehen
+    │   ├── binoculars.js      Blick durchs Fernglas auf den Turm, Joseph schreibt das Blinken mit
+    │   ├── crt.js             der Bildschirm in groß: aus, Rauschen oder Kamerabild
+    │   └── cameraFeed.js      das Bild der Tunnelkamera (Tunnel, Ziffer, Zug, Gestalt)
     ├── ui/
     │   ├── cursor.js          Mauszeiger: Zeigefinger, Auge, Hand, Sprechblase, Gegenstand
-    │   ├── inventory.js       Inventarleiste mit 5 Plätzen
+    │   ├── inventory.js       Inventarleiste mit 5 Plätzen (bei mehr Gegenständen: Pfeile)
     │   ├── speech.js          Sprechtexte über den Köpfen
-    │   ├── notebook.js        Notizbuch (Knopf + aufgeschlagene Seiten)
-    │   ├── codeLock.js        Zahlenschloss in Nahansicht
+    │   ├── notebook.js        Notizbuch (Knopf, aufgeschlagene Seiten, blättern, Tipp-Knopf)
+    │   ├── codeLock.js        Zahlenschloss in Nahansicht (Türschloss mit Zeichen, Kofferschloss)
+    │   ├── cards.js           gezeichnete Blätter: Signaltafel, Rätselheft, Detektivakte
+    │   ├── symbols.js         die vier Zeichen vom Türschloss: Tunnel, Laternen, Turm
     │   ├── hints.js           Hinweisschild für das Tutorial
-    │   ├── overlay.js         Abblenden und Karten: Titelbild, Hand, Brief, Ende
+    │   ├── overlay.js         Abblenden und Karten: Titelbild, Hand, Brief, Ende, eigene Blätter
     │   └── text.js            Schriften, Zeilenumbruch, Text mit Umriss
     ├── core/
     │   ├── game.js            Spiel-Schleife (~60× pro Sekunde) und wohin ein Klick geht
     │   ├── screen.js          Zeichenfläche: 1280 × 720 logisch, scharf in jeder Fenstergröße
     │   ├── camera.js          Kamera ohne Zoom, mit leichtem Rumpeln (Oberfläche bleibt ruhig)
-    │   ├── input.js           Maus (links/rechts) + Tastatur, Doppelklick-Erkennung
+    │   ├── input.js           Maus (links/rechts, ziehen) + Tastatur, Doppelklick-Erkennung
     │   └── assets.js          Lädt Bilder – jedes nur einmal (Cache)
     ├── animation/
     │   ├── animations.js      KATALOG aller Frame-Animationen (Pfad, Anzahl, fps, Schleife)
@@ -110,10 +132,11 @@ detective-joseph/
     │   └── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
     ├── effects/
     │   ├── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Licht aus, Laternen
+    │   ├── morse.js           Blinksignal des Turms (eine Ziffer im Morsecode)
     │   └── darkness.js        Dunkelheit im Tunnel mit Lichtkegel der Taschenlampe
     ├── audio/
     │   ├── trainSound.js      Fahrgeräusch, „Klack“, Tunnel-Hall, Quietschen – ohne Sounddateien
-    │   └── soundEffects.js    kurze Geräusche: Aufheben, Schloss, Schritte, Licht, Bildschirm …
+    │   └── soundEffects.js    kurze Geräusche: Aufheben, Schloss, Schritte, Licht, Papier, Kabel, Strom …
     ├── navigation/
     │   ├── walkArea.js        Begehbarer Bereich, Kollision und Wegsuche (A*)
     │   └── geometry.js        Mathe-Helfer für Punkte, Linien und Vielecke
@@ -128,12 +151,13 @@ detective-joseph/
 `trainCompartment.js` mit ihrer Geschichte aus `wagon1.js` und stellt Joseph auf seine Startposition.
 In jedem Bild zeichnet die Szene von hinten nach vorne: Außenwelt → Bildschirm → Hintergrund (mit
 durchsichtigen Scheiben) → kleine Bilder (Brief, Kratzer) → Joseph → Fensterlicht und Lampen →
-Dunkelheit (im Tunnel) → Lichtstreifen. Darüber kommt die Oberfläche: Sprechtexte, Tutorial,
-Inventar, Notizbuch, Zahlenschloss, Karten und zuletzt der Mauszeiger.
+Dunkelheit (im Tunnel) → Lichtstreifen. Darüber kommt die Oberfläche: Tutorial, Inventar, die offene
+Nahansicht (Zahlenschloss oder Rätsel), Sprechtexte, Notizbuch, Karten und zuletzt der Mauszeiger.
 
 Ein Klick auf den Boden: Joseph fragt den begehbaren Bereich (`walkArea.js`) nach einem Weg und läuft ihn
 ab. Ein Klick auf eine anklickbare Stelle: `story.js` lässt Joseph hinlaufen und führt dann die passende
-Reaktion aus `wagon1.js` aus.
+Reaktion aus `wagon1.js` aus. Öffnet die Reaktion eine Nahansicht (`story.view('wires')`), gehen alle
+Klicks an diese, bis sie wieder zu ist.
 
 ## Animationen (PNG-Sequenzen)
 
@@ -191,22 +215,46 @@ jar: {
 
 Für mehr als Text gibt es Funktionen mit Befehlen (erklärt oben in `src/story/story.js`):
 `say`, `note` (Notizbuch), `give` / `remove` / `has` (Inventar), `flags` (Merker), `wait`,
-`cutscene`, `sound`, `fadeOut` / `fadeIn`.
+`cutscene`, `sound`, `fadeOut` / `fadeIn`, `card` (Brief oder gezeichnetes Blatt zeigen),
+`view` (Nahansicht öffnen) und `codeLock` (Zahlenschloss).
 
 **Eine neue anklickbare Stelle:** In `trainCompartment.js` unter `hotspots` eintragen – Umriss (`area`),
 Standplatz (`walkTo`, `facing`) und Name. Mit **D** sieht man alle Stellen als orange Rahmen, mit **G**
 das Raster zum Ablesen der Koordinaten. Dann in `wagon1.js` unter `hotspots` die Reaktionen ergänzen.
 Mit `when: 'merker'` erscheint eine Stelle nur, solange der Merker gesetzt ist, mit `inDark: true` nur
-im Dunkeln.
+im Dunkeln. `glows: 'merker'` heißt: Die Stelle leuchtet selbst und ist auch im Dunkeln ohne Taschenlampe
+zu finden (der Bildschirm).
 
 **Neue Gegenstände:** in `src/story/items.js` (Name, Bild, Beschreibung, was sich kombinieren lässt).
 
 **Tutorial:** Die Hinweise und wann sie kommen stehen in `src/story/tutorial.js`.
 
-**Der Code der Tür** ist die Zahl der Laternen pro Runde – erst links, dann rechts (gerade 7 und 8, also 78).
-Er wird aus denselben Einstellungen berechnet, nach denen die Laternen fahren. Wer `lap`, `tunnel` oder
-`lanternEvery` ändert, ändert damit auch den Code; danach `node tools/make-items.mjs` ausführen, damit die
-eingeritzten Striche wieder stimmen (das Werkzeug zählt die Laternen selbst).
+**Tipps:** Was Joseph bei Taste **H** sagt, steht ganz unten in `wagon1.js` (`currentGoal`): zu jedem
+Rätsel eine Liste von Sätzen, vom sanften Schubs bis zur Lösung.
+
+**Ein neues Rätsel in Nahansicht:** eine Klasse in `src/puzzles/` anlegen, die `View` erweitert (am
+einfachsten `wires.js` kopieren), in `src/core/game.js` unter `views` eintragen und in der Geschichte mit
+`await story.view('name')` öffnen.
+
+### Lösung von Wagen 1
+
+Die Tür braucht vier Ziffern – in der Reihenfolge der Zeichen auf dem Schloss: **5 – 7 – 8 – 3**.
+
+| Zeichen | Ziffer | Woher |
+| --- | --- | --- |
+| Tunnel | 5 | Verteilerkasten (links neben der Tür) lösen, dann den Bildschirm ansehen: Die Tunnelkamera zeigt eine große 5 an der Wand. Einstellbar: `TUNNEL_DIGIT` in `wagon1.js`. |
+| Laterne links / rechts | 7 und 8 | Laternen pro Runde zählen – oder im Tunnel mit der Taschenlampe die Kratzer in der Tür finden. Wird aus den Zug-Einstellungen berechnet (`lap`, `tunnel`, `lanternEvery`); wer sie ändert, führt danach `node tools/make-items.mjs` aus, damit die eingeritzten Striche wieder stimmen. |
+| Turm | 3 | Mit dem Fernglas am Fenster das Turmlicht ansehen (kurz, kurz, kurz, lang, lang) und auf der Signaltafel nachschlagen. Einstellbar: `blink.morse` beim Turm in `trainCompartment.js`. |
+
+Der Weg dorthin: Brief lesen → Rucksack (Taschenlampe, Schlüssel) → Schlüssel an der Werkzeugkiste
+(Taschenmesser, erster Fetzen) → Fetzen sammeln: Boden vorne links (2), unter der Zeitung, unter der Kiste
+vorne rechts, Zigarrenkiste (mit dem Messer aufhebeln) → Rechtsklick auf die Fetzen: zusammensetzen →
+Rätselheft auf der rechten Bank: die eingekreisten Felder sind 2, 4, 3 → Kofferschloss **243** → Fernglas.
+Für die Taschenlampe: Messer an der Klappe des Schaltpults → Batterie → in die Lampe; auf einer Sitzbank auf
+den Tunnel warten; danach ist die Klappe wieder zu → noch eine Batterie holen → Lampe geht. Im nächsten
+Tunnel die Tür ableuchten.
+
+Wer das Kamerabild beobachtet, während der Zug durch den Tunnel fährt, sieht noch etwas …
 
 ## Werkzeuge (`tools/`)
 
@@ -218,7 +266,7 @@ Platzhalter neu erzeugen oder verändern willst – aufrufen jeweils im Projekto
 | `node tools/cut-glass.mjs` | Hintergrund mit durchsichtigen Scheiben (aus `assets/reference/train-compartment-original.png`) |
 | `node tools/make-outside.mjs` | Himmel, Mond, Wolken, Hügel, Turm, Baumreihe, Wald und den Streifen der nahen Stämme |
 | `node tools/make-tv-noise.mjs` | die 20 Frames TV-Rauschen |
-| `node tools/make-items.mjs` | Gegenstände fürs Inventar, Notizbuch-Knopf, Brief im Schlitz, eingeritzte Striche (zählt dafür die Laternen) |
+| `node tools/make-items.mjs` | Gegenstände fürs Inventar (Brief, Schlüssel, Messer, Fetzen, Signaltafel, Fernglas, Taschenlampe, Batterie), Notizbuch-Knopf, Brief im Schlitz, eingeritzte Striche (zählt dafür die Laternen) |
 | `node tools/make-joseph-walk.mjs` | Josephs Laufanimation (4 Richtungen × 8 Frames) aus seinen Standbildern |
 
 ## Zug-Gefühl anpassen
@@ -276,5 +324,6 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Schritt 3:** Anklickbare Objekte + Cursor-System (anschauen, benutzen, sprechen)
 - [x] **Schritt 4:** Inventar mit 5 Plätzen, Gegenstände benutzen und kombinieren
 - [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
+- [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
 - [ ] **Wagen 2:** der Speisewagen (siehe `docs/story-ideen.md`, Vorschlag 1)
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), Spielstand speichern, echte Sounds

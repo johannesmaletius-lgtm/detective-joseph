@@ -13,8 +13,11 @@ import { Hints } from '../ui/hints.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
 import { Overlay } from '../ui/overlay.js';
+import { Jigsaw } from '../puzzles/jigsaw.js';
+import { Wires } from '../puzzles/wires.js';
+import { Binoculars } from '../puzzles/binoculars.js';
+import { Crt } from '../puzzles/crt.js';
 import { Story } from '../story/story.js';
-import { ITEMS } from '../story/items.js';
 import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED } from '../config.js';
 
 // Das Herz des Spiels.
@@ -23,8 +26,8 @@ import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED } from '../config.js';
 // (Mauszeiger, Inventar, Sprechtexte, Notizbuch …) und die Geschichte. Ruft ca. 60-mal pro Sekunde
 // update() (Spiellogik) und draw() (Zeichnen) auf.
 //
-// Ein Klick geht der Reihe nach an: Karte (Titelbild, Brief …) → Zahlenschloss → Notizbuch →
-// Zwischensequenz (Klick überspringt nur den Satz) → Notizbuch-Knopf → Inventar → Abteil.
+// Ein Klick geht der Reihe nach an: Karte (Titelbild, Brief …) → Nahansicht (Zahlenschloss, Rätsel) →
+// Notizbuch → Zwischensequenz (Klick überspringt nur den Satz) → Notizbuch-Knopf → Inventar → Abteil.
 export class Game {
   constructor(canvas) {
     this.screen = new Screen(canvas);
@@ -44,12 +47,29 @@ export class Game {
     this.speech = new Speech();
     this.hints = new Hints();
     this.notebook = new Notebook();
-    this.codeLock = new CodeLock();
     this.overlay = new Overlay();
-    this.codeLock.onSound = (name) => this.effects.play(name);
+
+    // Nahansichten: Zahlenschloss und Rätsel (immer höchstens eine ist offen), siehe src/puzzles/
+    this.views = {
+      lock: new CodeLock(),
+      jigsaw: new Jigsaw(),
+      wires: new Wires(),
+      binoculars: new Binoculars(),
+      crt: new Crt(),
+    };
+    for (const view of Object.values(this.views)) {
+      view.onSound = (name) => this.effects.play(name);
+      view.onSkip = () => this.speech.skip();
+    }
 
     this.input.on('click', (click) => this.handleClick(click));
+    this.input.on('release', (point) => this.view?.pointerUp(point));
     this.input.on('key', (key) => this.handleKey(key));
+  }
+
+  // Die Nahansicht, die gerade offen ist (oder null)
+  get view() {
+    return Object.values(this.views).find((view) => view.isOpen) ?? null;
   }
 
   // Lädt eine Szene samt Bildern, stellt Joseph an seine Startposition und bereitet die Geschichte vor.
@@ -104,8 +124,8 @@ export class Game {
 
     this.speech.update(dt);
     this.hints.update(dt);
-    this.notebook.update(dt);
-    this.codeLock.update(dt);
+    this.notebook.update(dt, this.input.mouse);
+    for (const view of Object.values(this.views)) view.update(dt, this.input.mouse);
     this.overlay.update(dt);
     this.inventory.update(dt, this.input.mouse);
     this.updateCursor();
@@ -123,11 +143,11 @@ export class Game {
     ctx.restore();
 
     // 2) Benutzeroberfläche – bleibt fest auf dem Bildschirm
-    this.speech.draw(ctx);
     this.hints.draw(ctx);
     this.inventory.draw(ctx);
     this.notebook.drawButton(ctx, this.notebook.buttonContains(this.input.mouse));
-    this.codeLock.draw(ctx);
+    this.view?.draw(ctx);
+    this.speech.draw(ctx); // über der Nahansicht: Joseph kommentiert, was er dort sieht
     this.notebook.drawPage(ctx);
     this.overlay.draw(ctx);
     this.cursor.draw(ctx, this.input.mouse);
@@ -139,14 +159,15 @@ export class Game {
     const mouse = this.input.mouse;
     const selected = this.inventory.selected;
     const item = selected ? this.inventory.images[selected] : null;
-    const itemName = selected ? ITEMS[selected].name : '';
+    const itemName = selected ? this.story.itemName(selected) : '';
 
-    if (this.overlay.blocksInput || this.codeLock.isOpen || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
+    if (this.overlay.blocksInput || this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });
     if (this.inventory.contains(mouse)) {
       const id = this.inventory.itemAt(mouse);
-      const name = id ? ITEMS[id].name : '';
+      if (this.inventory.arrowAt(mouse)) return this.cursor.set({ kind: 'interact', label: 'weitere Gegenstände', item });
+      const name = id ? this.story.itemName(id) : '';
       const label = selected && id && id !== selected ? `${itemName} mit ${name} kombinieren` : name;
       return this.cursor.set({ kind: 'interact', label, item });
     }
@@ -162,8 +183,11 @@ export class Game {
   handleClick(click) {
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     if (this.overlay.blocksInput) return this.overlay.handleClick();
-    if (this.codeLock.isOpen) return this.codeLock.handleClick(click, click.right);
-    if (this.notebook.isOpen) return this.notebook.close();
+    if (this.view) return this.view.handleClick(click, click.right);
+    if (this.notebook.isOpen) {
+      if (this.notebook.handleClick(click) === 'hint') this.story.hint();
+      return;
+    }
     if (this.story.isBusy) return this.speech.skip();
     if (this.notebook.buttonContains(click)) return this.story.openNotebook();
     if (this.inventory.contains(click)) return this.clickInventory(click);
@@ -191,6 +215,8 @@ export class Game {
   clickInventory(click) {
     const id = this.inventory.itemAt(click);
     const selected = this.inventory.selected;
+    const arrow = this.inventory.arrowAt(click);
+    if (arrow) return this.inventory.scroll(arrow);
     if (click.right) {
       if (id) this.story.lookItem(id);
       else this.inventory.selected = null;
@@ -216,18 +242,33 @@ export class Game {
     if (key === KEYS.skipToTunnel && this.debug.enabled) this.scene.motion?.skipToTunnel();
     if (key === KEYS.skip) this.speech.skip();
     if (key === KEYS.close) {
-      this.codeLock.close(false);
+      this.view?.close();
       this.notebook.close();
       this.inventory.selected = null;
     }
-    if (key === KEYS.notebook && !this.story.inCutscene && !this.overlay.blocksInput && !this.codeLock.isOpen) {
+    const free = !this.story.inCutscene && !this.overlay.blocksInput && !this.view;
+    if (key === KEYS.notebook && free) {
       if (this.notebook.isOpen) this.notebook.close();
       else this.story.openNotebook();
     }
+    if (key === KEYS.hint && free && !this.story.isBusy) {
+      this.notebook.close();
+      this.story.hint();
+    }
   }
 
-  // Wenn im Tunnel das Licht ausgeht und Joseph keine Taschenlampe hat, sieht er das Zahlenschloss nicht mehr
-  closeWindowsInDark() {
-    if (!this.inventory.has('flashlight')) this.codeLock.close(false);
+  // Schließt jede offene Nahansicht (z. B. wenn eine Zwischensequenz beginnt)
+  closeViews() {
+    for (const view of Object.values(this.views)) view.close();
+  }
+
+  // Wenn im Tunnel das Licht ausgeht, sieht Joseph die meisten Nahansichten nicht mehr.
+  // Offen bleibt, was selbst leuchtet (der Bildschirm) – und das Zahlenschloss, wenn er eine Taschenlampe hat.
+  closeViewsInDark() {
+    for (const view of Object.values(this.views)) {
+      if (view.staysInDark) continue;
+      if (view === this.views.lock && this.inventory.has('flashlight')) continue;
+      view.close();
+    }
   }
 }

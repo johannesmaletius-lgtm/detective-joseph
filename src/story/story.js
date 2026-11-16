@@ -15,6 +15,13 @@ import { COLORS } from '../ui/text.js';
 //   await story.wait(1.5)               warten (Sekunden)
 //   await story.cutscene(async () => …) Zwischensequenz: Der Spieler kann so lange nicht eingreifen
 //   story.sound('pickup')               Geräusch abspielen (siehe src/audio/soundEffects.js)
+//   await story.card({ … })             Karte zeigen: Brief, gezeichnetes Blatt … (siehe src/ui/overlay.js)
+//   await story.view('wires')           Nahansicht öffnen: Rätsel, Zahlenschloss … (siehe src/puzzles/)
+//
+// Außerdem darf ein Drehbuch enthalten:
+//   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
+//   hint(story)                         Tipp, wenn der Spieler nicht weiterweiß (Taste H / Notizbuch)
+//   update(story, dt)                   wird in jedem Bild aufgerufen
 //
 // Reaktionen im Drehbuch dürfen ein Text, eine Liste von Texten oder eine Funktion sein:
 //   look: 'Nichts Besonderes.'
@@ -22,6 +29,7 @@ import { COLORS } from '../ui/text.js';
 //   use: async (story) => { … }
 
 const SPEAKER = { x: 452, y: 66 }; // Stimme aus dem Lautsprecher über dem Tisch
+const SUBTITLE = { x: 640, y: 664 }; // hier stehen Josephs Sätze, solange eine Nahansicht offen ist
 const NOPE = ['Das bringt nichts.', 'Das passt nicht zusammen.', 'Nein, so geht das nicht.'];
 
 export class Story {
@@ -49,12 +57,12 @@ export class Story {
 
   // ---------------------------------------------------------------- Befehle für das Drehbuch
   say(text) {
-    return this.game.speech.show(text, { anchor: () => this.headOf(this.player) });
+    return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : this.headOf(this.player)) });
   }
 
   // Jemand anderes spricht, z. B. die Lautsprecherstimme
   speak(text, { at = SPEAKER, color = COLORS.speaker } = {}) {
-    return this.game.speech.show(text, { anchor: () => at, color });
+    return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : at), color });
   }
 
   note(text) {
@@ -99,6 +107,7 @@ export class Story {
 
   async cutscene(play) {
     this.cancelAction();
+    this.game.closeViews();
     this.player.movement.stop();
     this.game.inventory.selected = null;
     this.scenes += 1;
@@ -122,7 +131,24 @@ export class Story {
   }
 
   codeLock(options) {
-    return this.game.codeLock.open(options);
+    return this.game.views.lock.open(options);
+  }
+
+  // Öffnet eine Nahansicht (siehe game.views) und wartet, bis sie wieder geschlossen wird
+  view(name, options) {
+    return this.game.views[name].open(options);
+  }
+
+  // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)
+  itemName(id) {
+    return this.script.itemName?.(this, id) ?? ITEMS[id].name;
+  }
+
+  // Tipp von Joseph, wenn der Spieler nicht weiterweiß
+  async hint() {
+    if (this.isBusy) return;
+    this.event('askedHint');
+    await this.respond(this.script.hint?.(this) ?? 'Ich sehe mich am besten noch einmal gründlich um.');
   }
 
   // Joseph läuft zu einem Punkt. Ergebnis: true = angekommen, false = unterwegs abgebrochen
@@ -165,6 +191,7 @@ export class Story {
       if (facing) this.player.facing = facing;
       resolve(true);
     }
+    this.script.update?.(this, dt);
     this.tutorial.update(dt, this, this.game.hints);
   }
 

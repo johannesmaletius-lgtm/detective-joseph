@@ -46,8 +46,11 @@ export const trainCompartment = {
       { image: 'assets/scenes/train-compartment/outside/hills.png', y: 150, speed: 14 },
       {
         // Der Turm steht in der Mitte des Kreises, den der Zug fährt – er bewegt sich nie.
+        // Sein rotes Licht blinkt eine Ziffer im Morsecode (morse) – sie gehört zum Türschloss, siehe wagon1.js.
+        // unit = Länge eines kurzen Blinkzeichens in Sekunden.
+        id: 'tower',
         image: 'assets/scenes/train-compartment/outside/tower.png', x: 224, y: 147,
-        blink: { x: 16, y: 6, color: [255, 70, 60], every: 2.6 },
+        blink: { x: 16, y: 6, color: [255, 70, 60], morse: '3', unit: 0.34 },
       },
       { image: 'assets/scenes/train-compartment/outside/treeline.png', y: 150, speed: 45 },
       { image: 'assets/scenes/train-compartment/outside/forest.png', y: 60, speed: 160 },
@@ -85,15 +88,18 @@ export const trainCompartment = {
   hotspots: [
     { id: 'letter', name: 'Brief', when: 'letterInSlot', area: [[748, 190], [784, 190], [784, 216], [748, 216]], walkTo: [790, 422], facing: 'back' },
     { id: 'scratches', name: 'Kratzer', inDark: true, area: [[598, 308], [682, 308], [682, 354], [598, 354]] }, // Joseph leuchtet von dort, wo er steht
-    { id: 'screen', name: 'Bildschirm', area: [[806, 168], [886, 168], [886, 243], [806, 243]], walkTo: [830, 424], facing: 'back' },
+    // glows: Der Bildschirm leuchtet selbst – man findet ihn auch im Dunkeln, solange er Strom hat
+    { id: 'screen', name: 'Bildschirm', glows: '!screenOff', area: [[806, 168], [886, 168], [886, 243], [806, 243]], walkTo: [830, 424], facing: 'back' },
     { id: 'panel', name: 'Schaltpult', area: [[734, 222], [790, 222], [790, 244], [898, 244], [898, 320], [734, 320]], walkTo: [810, 424], facing: 'back' },
     { id: 'door', name: 'Tür zum nächsten Wagen', area: [[556, 116], [730, 116], [732, 402], [553, 402]], walkTo: [640, 424], facing: 'back' },
     { id: 'speaker', name: 'Lautsprecher', cursor: 'talk', area: [[405, 72], [500, 72], [500, 156], [405, 156]], walkTo: [565, 432], facing: 'back' },
     { id: 'intercom', name: 'Sprechanlage', cursor: 'talk', area: [[510, 182], [542, 182], [542, 230], [510, 230]], walkTo: [570, 428], facing: 'back' },
-    { id: 'switches', name: 'Schalterkasten', area: [[410, 180], [456, 180], [456, 236], [410, 236]], walkTo: [560, 432], facing: 'back' },
+    { id: 'switches', name: 'Verteilerkasten', area: [[410, 180], [456, 180], [456, 236], [410, 236]], walkTo: [560, 432], facing: 'back' },
     { id: 'lamp', name: 'Lampe', cursor: 'look', area: [[606, 46], [672, 46], [672, 88], [606, 88]] },
     { id: 'jar', name: 'Grünes Glas', cursor: 'look', area: [[888, 38], [952, 38], [952, 114], [888, 114]] },
-    { id: 'suitcase', name: 'Koffer', cursor: 'look', area: [[205, 16], [326, 16], [326, 64], [205, 64]] },
+    { id: 'suitcase', name: 'Koffer', area: [[205, 16], [326, 16], [326, 64], [205, 64]], walkTo: [318, 642], facing: 'left' },
+    { id: 'cigarbox', name: 'Zigarrenkiste', area: [[420, 342], [476, 342], [476, 374], [420, 374]], walkTo: [522, 470], facing: 'left' },
+    { id: 'bottles', name: 'Flaschen', cursor: 'look', area: [[372, 306], [418, 306], [418, 374], [372, 374]] },
     { id: 'table', name: 'Tisch', area: [[376, 304], [506, 304], [506, 390], [376, 390]], walkTo: [522, 470], facing: 'left' },
     { id: 'backpack', name: 'Rucksack', area: [[163, 212], [246, 212], [250, 330], [234, 392], [174, 392], [161, 330]], walkTo: [400, 576], facing: 'left' },
     { id: 'newspaper', name: 'Zeitung', area: [[180, 458], [274, 458], [274, 496], [180, 496]], walkTo: [330, 640], facing: 'left' },
@@ -104,7 +110,7 @@ export const trainCompartment = {
     { id: 'window', name: 'Fenster', cursor: 'look', area: [[936, 162], [976, 162], [976, 260], [936, 260]] },
     { id: 'window', name: 'Fenster', cursor: 'look', area: [[1012, 138], [1087, 138], [1087, 272], [1012, 272]] },
     { id: 'window', name: 'Fenster', cursor: 'look', area: [[1142, 106], [1239, 106], [1239, 286], [1142, 286]] },
-    { id: 'papers', name: 'Papierfetzen', cursor: 'look', area: [[250, 598], [392, 598], [392, 642], [250, 642]] },
+    { id: 'papers', name: 'Zerrissenes Papier', area: [[250, 598], [392, 598], [392, 642], [250, 642]], walkTo: [372, 656], facing: 'left' },
     { id: 'toolbox', name: 'Werkzeugkiste', area: [[300, 516], [374, 516], [374, 564], [300, 564]], walkTo: [404, 584], facing: 'left' },
     { id: 'crate', name: 'Kiste', area: [[1116, 616], [1214, 616], [1214, 706], [1116, 706]], walkTo: [1086, 668], facing: 'right' },
     { id: 'extinguisher', name: 'Feuerlöscher', cursor: 'look', area: [[150, 674], [230, 674], [230, 720], [150, 720]] },

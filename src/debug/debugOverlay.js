@@ -78,8 +78,11 @@ export class DebugOverlay {
       const tunnel = motion.inTunnel ? 'im Tunnel' : `Tunnel in ${Math.round(motion.tunnelAhead / Math.max(motion.speed, 0.01))} s`;
       lines.push(`Runde   ${motion.lap}  ·  ${Math.round(motion.lapTime)} von ${motion.lapLength} s  ·  ${tunnel}`);
     }
-    const flags = Object.entries(game.story.flags).filter(([, value]) => value).map(([name, value]) => (value === true ? name : `${name}=${value}`));
-    lines.push(`Merker  ${flags.join(' ').slice(0, 90) || '–'}`);
+    // Merker der Geschichte: nur gesetzte Schalter und kleine Zähler (keine Zeitstempel und Listen)
+    const flags = Object.entries(game.story.flags)
+      .filter(([, value]) => value === true || (Number.isInteger(value) && value > 0 && value < 100))
+      .map(([name, value]) => (value === true ? name : `${name}=${value}`));
+    for (let i = 0; i < Math.max(1, flags.length); i += 7) lines.push(`${i === 0 ? 'Merker ' : '       '} ${flags.slice(i, i + 7).join(' ') || '–'}`);
     lines.push(`FPS     ${Math.round(this.fps)}`);
 
     ctx.save();
