@@ -2,35 +2,40 @@
 //
 // Aufruf (im Projektordner):  node tools/make-outside.mjs
 // Schreibt nach assets/scenes/train-compartment/outside/:
-//   sky.png                Himmel mit Mond und Sternen – steht still (sehr weit weg)
-//   clouds.png             Wolkenschleier – zieht ganz langsam vorbei
-//   hills.png              ferne Hügel mit Nebel – langsam
-//   treeline.png           dichte Baumreihe am Horizont – etwas schneller
-//   forest.png             Wald und verschneiter Boden – mittelschnell
-//   near/frame_001…020.png vorbeirauschende Stämme und ein Mast – schnell, als 20-Frame-Schleife
+//   sky.png        Himmel mit Sternen – dreht sich einmal pro Runde (der Zug fährt im Kreis)
+//   moon.png       Mondsichel mit Schein – wandert langsam von Fenster zu Fenster
+//   clouds.png     Wolkenschleier – zieht ganz langsam vorbei
+//   hills.png      ferne Hügel mit Nebel – langsam
+//   tower.png      ferner Turm in der Mitte des Kreises – steht immer still im selben Fenster
+//   treeline.png   dichte Baumreihe am Horizont – etwas schneller
+//   forest.png     Wald und verschneiter Boden – mittelschnell
+//   near.png       vorbeirauschende Stämme und Strommasten direkt neben den Gleisen – sehr schnell
 //
-// Alle Streifen (clouds, hills, forest) sind links und rechts nahtlos, damit sie sich endlos
-// wiederholen können. Größen und Positionen sind Spielkoordinaten (1280 × 720).
+// Alle Streifen (sky, clouds, hills, treeline, forest, near) sind links und rechts nahtlos, damit sie
+// sich endlos wiederholen können. Größen und Positionen sind Spielkoordinaten (1280 × 720).
 
 import fs from 'node:fs';
 import { Picture, blur, drawPicture, fillCircle, fillPolygon, hex, random, stroke } from './lib/raster.mjs';
 
 const OUT = 'assets/scenes/train-compartment/outside';
-fs.mkdirSync(`${OUT}/near`, { recursive: true });
+fs.mkdirSync(OUT, { recursive: true });
 
 const HORIZON = 206; // Augenhöhe im Bild (Spielkoordinate y)
 
 makeSky();
+makeMoon();
 makeClouds();
 makeHills();
+makeTower();
 makeTreeline();
 makeForest();
-makeNearFrames();
+makeNear();
 
-// ---------------------------------------------------------------- Himmel (1280 × 230, liegt bei y = 85)
+// ---------------------------------------------------------------- Himmel (1024 × 230, liegt bei y = 85)
+// Die Breite steht für einmal rundherum (360°): Pro Runde zieht der ganze Streifen einmal vorbei.
 function makeSky() {
   const top = 85;
-  const sky = new Picture(1280, 230);
+  const sky = new Picture(1024, 230);
   const high = hex('#150f3d'), low = hex('#4d3e97'), belowHorizon = hex('#3a2f7a');
   for (let y = 0; y < sky.height; y++) {
     const gameY = top + y;
@@ -38,24 +43,29 @@ function makeSky() {
     const color = gameY <= HORIZON ? mixColor(high, low, t ** 1.6) : belowHorizon;
     for (let x = 0; x < sky.width; x++) sky.blend(x, y, color);
   }
-  // Sterne
+  // Sterne (am Rand doppelt gezeichnet, damit der Streifen nahtlos bleibt)
   const rand = random(7);
-  for (let i = 0; i < 160; i++) {
-    const x = rand() * 1280, y = rand() * 95;
-    fillCircle(sky, x, y, 0.45 + rand() * 0.6, [0.85, 0.85, 1, 1], 0.35 + rand() * 0.6);
-  }
-  // Mondsichel mit Schein (sichtbar im großen rechten Fenster)
-  const moon = { x: 1204, y: 142 - top, r: 11 };
-  for (let y = 0; y < sky.height; y++) {
-    for (let x = 1100; x < 1280; x++) {
-      const d = Math.hypot(x + 0.5 - moon.x, y + 0.5 - moon.y);
-      sky.blend(x, y, [0.62, 0.58, 0.95, 1], 0.33 * Math.exp(-(d * d) / (2 * 26 * 26)));
-      const inMoon = clamp01(moon.r - d + 0.5);
-      const inShadow = clamp01(moon.r * 0.9 - Math.hypot(x + 0.5 - (moon.x + 5), y + 0.5 - (moon.y - 3)) + 0.5);
-      sky.blend(x, y, [0.97, 0.94, 0.84, 1], inMoon * (1 - inShadow));
-    }
+  for (let i = 0; i < 130; i++) {
+    const x = rand() * sky.width, y = rand() * 95, r = 0.45 + rand() * 0.6, opacity = 0.35 + rand() * 0.6;
+    for (const shift of [-sky.width, 0, sky.width]) fillCircle(sky, x + shift, y, r, [0.85, 0.85, 1, 1], opacity);
   }
   sky.save(`${OUT}/sky.png`);
+}
+
+// ---------------------------------------------------------------- Mond (128 × 128, Mitte = Mondmitte)
+function makeMoon() {
+  const moon = new Picture(128, 128);
+  const c = 64, r = 11;
+  for (let y = 0; y < moon.height; y++) {
+    for (let x = 0; x < moon.width; x++) {
+      const d = Math.hypot(x + 0.5 - c, y + 0.5 - c);
+      moon.blend(x, y, [0.62, 0.58, 0.95, 1], 0.33 * Math.exp(-(d * d) / (2 * 22 * 22)));
+      const inMoon = clamp01(r - d + 0.5);
+      const inShadow = clamp01(r * 0.9 - Math.hypot(x + 0.5 - (c + 5), y + 0.5 - (c - 3)) + 0.5);
+      moon.blend(x, y, [0.97, 0.94, 0.84, 1], inMoon * (1 - inShadow));
+    }
+  }
+  moon.save(`${OUT}/moon.png`);
 }
 
 // ---------------------------------------------------------------- Wolken (1024 × 110, bei y = 88)
@@ -84,6 +94,21 @@ function makeHills() {
   }
   blur(hills, 1, 1, { wrap: true });
   hills.save(`${OUT}/hills.png`);
+}
+
+// ---------------------------------------------------------------- Turm (32 × 64, Fuß knapp unter dem Horizont)
+// Steht in der Mitte des Kreises, den der Zug fährt – deshalb bewegt er sich nie.
+// Das blinkende Licht auf der Spitze zeichnet das Spiel selbst (siehe trainCompartment.js).
+function makeTower() {
+  const tower = new Picture(32, 64);
+  const color = hex('#1c1550');
+  fillPolygon(tower, [[13, 14], [19, 14], [22, 64], [10, 64]], color);   // schlanker Schaft
+  fillPolygon(tower, [[9, 13], [23, 13], [23, 15], [9, 15]], color);     // Galerie
+  fillPolygon(tower, [[12, 8], [20, 8], [20, 13], [12, 13]], color, 0.9); // Laternenraum
+  fillPolygon(tower, [[11, 8], [16, 3], [21, 8]], color);                 // spitzes Dach
+  fillPolygon(tower, [[15.5, 0], [16.5, 0], [16.5, 4], [15.5, 4]], color); // Antenne
+  blur(tower, 0.6, 0.6, { passes: 1 });
+  tower.save(`${OUT}/tower.png`);
 }
 
 // ---------------------------------------------------------------- Baumreihe am Horizont (1024 × 70, bei y = 150)
@@ -148,43 +173,52 @@ function makeForest() {
   forest.save(`${OUT}/forest.png`);
 }
 
-// ---------------------------------------------------------------- Nahe Stämme (20 Frames à 640 × 230, bei y = 85)
-function makeNearFrames() {
-  const PERIOD = 1100, FRAMES = 20, STEP = PERIOD / FRAMES; // 55 Pixel pro Frame
-  const strip = new Picture(PERIOD, 230);
+// ---------------------------------------------------------------- Nahe Stämme und Masten (4400 × 230, bei y = 85)
+// Ein langer Streifen statt einzelner Frames: Das Spiel schiebt ihn stufenlos weiter, so ruckelt
+// nichts. Masten und Stämme stehen unregelmäßig, damit man das Muster nicht wiedererkennt.
+function makeNear() {
+  const W = 4400;
+  const strip = new Picture(W, 230);
   const dark = hex('#0c0822');
+  const poles = [260, 1380, 2390, 3520]; // Strommasten
+  const trunks = [ // [x, Breite] – einzelne Stämme und Gruppen, dazwischen freie Sicht
+    [610, 46], [672, 28], [1690, 72], [1960, 36], [2018, 54], [2870, 64], [3150, 30],
+    [3880, 58], [3964, 34], [4160, 44],
+  ];
   const shapes = (dx) => {
-    // zwei Baumstämme direkt neben den Gleisen
-    fillPolygon(strip, [[120 + dx, -5], [168 + dx, -5], [182 + dx, 235], [110 + dx, 235]], dark, 0.95);
-    fillPolygon(strip, [[610 + dx, -5], [690 + dx, -5], [705 + dx, 235], [598 + dx, 235]], dark, 0.95);
-    // Strommast
-    fillPolygon(strip, [[905 + dx, -5], [921 + dx, -5], [923 + dx, 235], [903 + dx, 235]], dark, 0.95);
-    fillPolygon(strip, [[875 + dx, 20], [951 + dx, 20], [951 + dx, 27], [875 + dx, 27]], dark, 0.95);
+    for (const [x, w] of trunks) {
+      fillPolygon(strip, [[x + dx, -5], [x + w + dx, -5], [x + w * 1.25 + dx, 235], [x - w * 0.15 + dx, 235]], dark, 0.95);
+    }
+    for (const x of poles) {
+      fillPolygon(strip, [[x - 8 + dx, -5], [x + 8 + dx, -5], [x + 10 + dx, 235], [x - 10 + dx, 235]], dark, 0.95);
+      fillPolygon(strip, [[x - 38 + dx, 20], [x + 38 + dx, 20], [x + 38 + dx, 27], [x - 38 + dx, 27]], dark, 0.95);
+    }
     // Büsche und Schneewehen am Boden
-    for (const [x, r] of [[40, 26], [260, 34], [330, 22], [470, 30], [800, 38], [1010, 28]]) {
+    for (const [x, r] of [[40, 26], [260, 34], [330, 22], [470, 30], [800, 38], [1010, 28], [1240, 30], [1530, 24],
+      [1850, 36], [2230, 28], [2600, 34], [2760, 22], [3060, 30], [3330, 38], [3700, 26], [4040, 32], [4300, 24]]) {
       fillCircle(strip, x + dx, 222, r, hex('#120c2c'), 0.9);
     }
-    for (const [x, w] of [[200, 90], [520, 120], [760, 70], [980, 110]]) ellipse(strip, x + dx, 190, w, 5, hex('#8d95e0'), 0.35);
+    for (const [x, w] of [[200, 90], [520, 120], [760, 70], [980, 110], [1450, 140], [2120, 90], [2480, 120],
+      [3000, 80], [3420, 130], [3800, 70], [4250, 100]]) {
+      ellipse(strip, x + dx, 190, w, 5, hex('#8d95e0'), 0.35);
+    }
   };
-  for (const dx of [-PERIOD, 0, PERIOD]) shapes(dx);
-  blur(strip, 16, 0, { wrap: true }); // starke Bewegungsunschärfe
+  for (const dx of [-W, 0, W]) shapes(dx);
+  blur(strip, 14, 0, { wrap: true }); // starke Bewegungsunschärfe
 
   // Leitungen: hängen zwischen den Masten durch und bleiben scharf (sie laufen parallel zum Zug)
-  for (let x = 0; x < PERIOD; x++) {
-    const t = ((x - 913 + PERIOD) % PERIOD) / PERIOD; // 0 am Mast
-    for (const base of [22, 30]) {
-      const y = base + 16 * Math.sin(Math.PI * t);
-      for (let dy = -1; dy <= 1; dy++) strip.blend(x, Math.round(y) + dy, dark, dy === 0 ? 0.85 : 0.35);
+  poles.forEach((from, i) => {
+    const to = poles[(i + 1) % poles.length] + (i + 1 === poles.length ? W : 0);
+    const sag = 16 * ((to - from) / 1100);
+    for (let x = from; x < to; x++) {
+      const t = (x - from) / (to - from);
+      for (const base of [22, 30]) {
+        const y = base + sag * Math.sin(Math.PI * t);
+        for (let dy = -1; dy <= 1; dy++) strip.blend(x % W, Math.round(y) + dy, dark, dy === 0 ? 0.85 : 0.35);
+      }
     }
-  }
-
-  for (let i = 0; i < FRAMES; i++) {
-    const frame = new Picture(640, 230);
-    const offset = Math.round(i * STEP);
-    drawPicture(frame, strip, -offset, 0);
-    drawPicture(frame, strip, -offset + PERIOD, 0);
-    frame.save(`${OUT}/near/frame_${String(i + 1).padStart(3, '0')}.png`);
-  }
+  });
+  strip.save(`${OUT}/near.png`);
 }
 
 // ---------------------------------------------------------------- Hilfsfunktionen

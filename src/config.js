@@ -14,9 +14,15 @@ export const KEYS = {
   toggleDebug: 'd', // Laufbereich, Weg und Koordinaten anzeigen
   toggleGrid: 'g',  // Koordinaten-Raster anzeigen
   toggleSound: 'm', // Ton an/aus
+  skipToTunnel: 't', // nur in der Debug-Ansicht: Zug springt kurz vor den Tunnel
+  notebook: 'n',    // Notizbuch öffnen und schließen
+  hint: 'h',        // Joseph gibt einen Tipp
+  close: 'escape',  // Fenster schließen, Gegenstand loslassen
+  skip: ' ',        // Leertaste: Sprechtext überspringen
 };
 
 // Adress-Zusätze zum Testen, z. B. http://localhost:8150/?debug&mute
 const params = new URLSearchParams(location.search);
 export const DEBUG_AT_START = params.has('debug'); // Debug-Ansicht sofort an
 export const START_MUTED = params.has('mute');     // ohne Ton starten
+export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
