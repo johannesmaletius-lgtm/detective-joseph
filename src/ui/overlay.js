@@ -1,4 +1,5 @@
 import { COLORS, FONTS, drawPaper, outlinedText, roundedRect, wrapText } from './text.js';
+import { loadImage } from '../core/assets.js';
 
 // Alles, was sich über das ganze Bild legt:
 // - Abblenden ins Schwarze und wieder zurück
@@ -65,7 +66,7 @@ export class Overlay {
     ctx.save();
     ctx.globalAlpha = Math.min(1, card.age / 0.35);
     if (card.kind === 'title') drawTitle(ctx, card);
-    if (card.kind === 'hand') drawHand(ctx, card);
+    if (card.kind === 'hand') drawHand(ctx);
     if (card.kind === 'paper') drawLetter(ctx, card);
     if (card.kind === 'end') drawEnd(ctx, card);
     if (card.draw) {
@@ -137,46 +138,19 @@ function drawTitle(ctx, { title, subtitle, age }) {
   ctx.fillText(subtitle, 640, 386);
 }
 
-// Schrift auf Josephs Handrücken: eine gezeichnete Hand (Handrücken, vier Finger, Daumen)
-function drawHand(ctx, { text }) {
+// Josephs Arm mit der Schrift auf dem Handgelenk (gezeichnetes Bild, weißer Hintergrund ist transparent).
+// Das Bild ist vorab geladen; solange es fehlt, bleibt der Bildschirm nur schwarz.
+const HAND_IMAGE = 'assets/ui/hand-inscription.png';
+let handImage = null;
+loadImage(HAND_IMAGE).then((image) => { handImage = image; }).catch(() => {});
+
+// Der Text steckt schon im Bild ("Nicht einschlafen"), deshalb wird "text" hier nicht mehr gezeichnet.
+function drawHand(ctx) {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.82)';
   ctx.fillRect(0, 0, 1280, 720);
-  ctx.save();
-  ctx.translate(600, 400);
-  ctx.rotate(-0.1);
-  const skin = ctx.createLinearGradient(0, -220, 0, 200);
-  skin.addColorStop(0, '#e6bb93');
-  skin.addColorStop(1, '#b07a52');
-  const parts = [
-    ...[[-150, -30], [-55, -48], [40, -46], [130, -24]].map(([x, angle]) => ({ x, y: -150, width: 78, height: 230, angle: angle / 300 })),
-    { x: 230, y: 40, width: 80, height: 190, angle: 1.0 },  // Daumen
-    { x: -10, y: 40, width: 420, height: 250, angle: 0, radius: 90 }, // Handrücken
-  ];
-  for (const pass of ['outline', 'fill']) {
-    for (const part of parts) {
-      ctx.save();
-      ctx.translate(part.x, part.y);
-      ctx.rotate(part.angle);
-      roundedRect(ctx, -part.width / 2, -part.height / 2, part.width, part.height, part.radius ?? part.width / 2.2);
-      if (pass === 'outline') {
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = '#3a2112';
-        ctx.stroke();
-      } else {
-        ctx.fillStyle = skin;
-        ctx.fill();
-      }
-      ctx.restore();
-    }
-  }
-  ctx.font = FONTS.handBig;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(30, 40, 90, 0.9)';
-  const fit = Math.min(1, 350 / ctx.measureText(text).width); // passt auf den Handrücken
-  ctx.scale(fit, fit);
-  ctx.fillText(text, -10 / fit, 60 / fit);
-  ctx.restore();
+  if (!handImage) return;
+  const w = 880, h = (handImage.height / handImage.width) * w;
+  ctx.drawImage(handImage, 640 - w / 2, 360 - h / 2, w, h);
 }
 
 // Ein handgeschriebenes Blatt. Jede Zeile in "lines" ist ein Absatz; das Blatt wächst mit dem Text.
