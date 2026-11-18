@@ -3,7 +3,7 @@ import { loadImage } from '../core/assets.js';
 
 // Alles, was sich über das ganze Bild legt:
 // - Abblenden ins Schwarze und wieder zurück
-// - Karten, die man wegklickt: Titelbild, Handschrift auf Josephs Hand, ein Brief, das Ende
+// - Karten, die man wegklickt: Titelbild, Handschrift auf Josephs Arm, ein Brief, das Ende
 //
 //   await overlay.fadeTo(1, 1.5);                  // 1,5 Sekunden lang schwarz werden
 //   await overlay.showCard({ kind: 'paper', lines: ['…'] });

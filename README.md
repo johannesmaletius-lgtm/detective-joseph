@@ -3,7 +3,7 @@
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
 **Stand: Wagen 1 ist spielbar – etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps.** Joseph wacht
-in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seiner Hand steht in seiner eigenen
+in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm steht in seiner eigenen
 Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
 vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
 Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/story-ideen.md).
@@ -114,7 +114,7 @@ detective-joseph/
     │   ├── cards.js           gezeichnete Blätter: Signaltafel, Rätselheft, Detektivakte
     │   ├── symbols.js         die vier Zeichen vom Türschloss: Tunnel, Laternen, Turm
     │   ├── hints.js           Hinweisschild für das Tutorial
-    │   ├── overlay.js         Abblenden und Karten: Titelbild, Hand, Brief, Ende, eigene Blätter
+    │   ├── overlay.js         Abblenden und Karten: Titelbild, Arm, Brief, Ende, eigene Blätter
     │   └── text.js            Schriften, Zeilenumbruch, Text mit Umriss
     ├── core/
     │   ├── game.js            Spiel-Schleife (~60× pro Sekunde) und wohin ein Klick geht

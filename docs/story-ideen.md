@@ -31,7 +31,7 @@ Danach beginnt alles von vorn, und nur Joseph erinnert sich. Er hat so viele Run
 herauszufinden, wer es war.
 
 **Warum er sich nicht erinnert:** Er hat diese Runde schon hundertmal erlebt. Der Tunnel löscht jedes Mal alles,
-auch sein Gedächtnis. Diesmal ist etwas schiefgegangen, und ein Rest ist geblieben: Auf seinem Handrücken steht in
+auch sein Gedächtnis. Diesmal ist etwas schiefgegangen, und ein Rest ist geblieben: Auf seinem Unterarm steht in
 seiner eigenen Schrift **„NICHT EINSCHLAFEN“**.
 
 **Regeln der Schleife**
