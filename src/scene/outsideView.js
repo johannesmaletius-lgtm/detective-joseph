@@ -13,7 +13,7 @@ import { morseSignal } from '../effects/morse.js';
 // - ein durchlaufendes Bild   { image, y, speed }      z. B. Wald – zieht mit Perspektive vorbei
 // - ein stehendes Bild        { image, x, y }          z. B. der Turm in der Mitte des Kreises
 //                             mit blink: { x, y, color, every }  blinkt gleichmäßig,
-//                             mit blink: { x, y, color, morse: '3', unit }  blinkt eine Ziffer im Morsecode
+//                             mit blink: { x, y, color, morse: 'DREI', unit }  blinkt ein Wort im Morsealphabet
 // - der Himmel                { image, y, turning }    dreht sich einmal pro Runde mit
 // - ein Ding am Himmel        { image, y, bearing }    z. B. der Mond – wandert, weil der Zug im Kreis fährt
 // - eine Frame-Animation      { animation, y }         flach, ohne Perspektive (für eigene gemalte Frames)

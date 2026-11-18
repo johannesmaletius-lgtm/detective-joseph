@@ -11,7 +11,7 @@
 //   assets/scenes/train-compartment/scratches.png        eingeritzte Striche in der Tür (nur im Dunkeln sichtbar)
 //
 // Die Striche zeigen, wie viele Laternen pro Runde links und rechts vorbeifahren – das sind zwei der
-// vier Ziffern für die Tür. Gezählt wird mit denselben Einstellungen wie im Spiel (src/scene/trainCompartment.js).
+// vier Ziffern für die Tür. (Welche Gruppe welche Seite ist, verrät nur das eingeritzte Turmzeichen.) Gezählt wird mit denselben Einstellungen wie im Spiel (src/scene/trainCompartment.js).
 // Wer dort lap, tunnel oder lanternEvery ändert, muss dieses Werkzeug neu laufen lassen.
 
 import fs from 'node:fs';
@@ -224,11 +224,13 @@ function makeLetterInSlot() {
   p.save('assets/scenes/train-compartment/letter-in-slot.png');
 }
 
-// Strichlisten, mit einem Messer in die Tür geritzt: Laternen links, Laternen rechts (2-fache Auflösung: 140 × 64)
+// Strichlisten, mit einem Messer in die Tür geritzt (2-fache Auflösung: 140 × 64): zwei Gruppen ohne Pfeile.
+// Vorne die Laternen rechts, dahinter die Laternen links – unter dieser Gruppe ist ein kleiner Turm
+// eingeritzt. Wer weiß, durch welche Fenster der Turm zu sehen ist, weiß, welche Zahl zu welcher Seite gehört.
 function makeScratches() {
   const train = new TrainMotion(trainCompartment.train);
   const left = train.lanternCount('left'), right = train.lanternCount('right');
-  console.log(`Laternen pro Runde: links ${left}, rechts ${right} (die beiden mittleren Ziffern des Türschlosses)`);
+  console.log(`Laternen pro Runde: links ${left} (mit Turm), rechts ${right} (die beiden mittleren Ziffern des Türschlosses)`);
   const p = new Picture(140, 64);
   const scratch = (x0, y0, x1, y1) => {
     stroke(p, x0 + 1, y0 + 1, x1 + 1, y1 + 1, 2.6, 2, hex('#1c120a', 0.8)); // Schattenkante
@@ -242,11 +244,11 @@ function makeScratches() {
       else scratch(x - 26, 30, x - 1, 10); // jeder fünfte Strich quer
     }
   };
-  tally(6, left);
-  tally(74, right);
-  // Pfeile darunter: ← und →
-  scratch(10, 52, 40, 52); scratch(10, 52, 18, 46); scratch(10, 52, 18, 58);
-  scratch(80, 52, 110, 52); scratch(110, 52, 102, 46); scratch(110, 52, 102, 58);
+  tally(6, right);
+  tally(74, left);
+  // Unter der zweiten Gruppe: ein kleiner Turm mit Licht
+  scratch(85, 63, 90, 50); scratch(99, 63, 94, 50); scratch(87, 58, 97, 58);
+  scratch(92, 48, 92, 46); scratch(88, 47, 85, 44); scratch(96, 47, 99, 44);
   p.save('assets/scenes/train-compartment/scratches.png');
 }
 

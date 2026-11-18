@@ -3,18 +3,29 @@ import { drawMarks } from '../ui/cards.js';
 import { roundedRect } from '../ui/text.js';
 
 // Nahansicht "Fernglas": Joseph beobachtet den Turm in der Mitte des Gleiskreises.
-// Das rote Licht blinkt eine Ziffer im Morsecode (siehe src/effects/morse.js) – unten schreibt
-// Joseph mit, was er sieht: Punkt = kurz, Strich = lang.
+// Das rote Licht blinkt ein Wort im Morsealphabet (siehe src/effects/morse.js). Mitschreiben muss der
+// Spieler selbst: mit den Knöpfen unten (oder Tasten K = kurz, L = lang, B = Buchstabe zu Ende,
+// Rückschritt = löschen). Ob ein Zeichen kurz oder lang war und wo ein Buchstabe endet, erkennt man nur
+// an der Dauer des Lichts und der Pausen.
 //
-//   const watched = await binoculars.open({ signal, clock: () => scene.outside.time });
-//   // true, wenn Joseph das Signal einmal von Anfang bis Ende gesehen hat
+//   const transcript = await binoculars.open({ signal, clock: () => scene.outside.time });
+//   // z. B. '-.. / .-. / . / ..' – was der Spieler mitgeschrieben hat ('' = nichts)
 //
 // signal = morseSignal(…), clock liefert die Zeit, nach der auch das Licht im Abteilfenster blinkt.
+// Die Mitschrift bleibt erhalten, wenn man das Fernglas absetzt.
 
 const LENSES = [{ x: 510, y: 330 }, { x: 770, y: 330 }];
 const LENS_RADIUS = 262;
 const HORIZON = 440;
 const TOWER = { x: 640, base: HORIZON + 6, top: 205 };
+const BUTTONS = [
+  { id: 'short', label: '•  kurz', key: 'K' },
+  { id: 'long', label: '▬  lang', key: 'L' },
+  { id: 'next', label: '/  Buchstabe zu Ende', key: 'B', wide: true },
+  { id: 'back', label: '⌫  zurück', key: '←' },
+  { id: 'clear', label: 'alles weg', key: '' },
+];
+const BUTTON = { y: 614, height: 44, width: 132, wide: 236, gap: 12 };
 
 export class Binoculars extends View {
   constructor() {
@@ -22,37 +33,76 @@ export class Binoculars extends View {
     this.signal = null;
     this.clock = () => 0;
     this.time = 0;
-    this.lastPhase = 0;
-    this.started = false;   // ein Signal hat von vorn begonnen, während Joseph hinsah
-    this.watched = false;   // … und er hat es bis zum Ende gesehen
+    this.letters = [''];   // die Mitschrift: ein Eintrag pro Buchstabe, z. B. ['-..', '.-']
+    this.pressed = null;   // Knopf, der gerade kurz aufleuchtet
+    this.pressAge = 0;
     this.trunks = [];       // Baumstämme, die nah am Zug durchs Bild wischen
     this.nextTrunk = 0.6;
     this.stars = makeStars();
-    this.help = 'Punkt = kurzes Licht, Strich = langes Licht  ·  Rechtsklick oder Esc: zurück';
+    this.help = 'Mitschreiben: Knöpfe oder Tasten K (kurz), L (lang), B (Buchstabe zu Ende), Rückschritt  ·  Rechtsklick oder Esc: zurück';
+  }
+
+  // Die Mitschrift als Text, Buchstaben durch " / " getrennt
+  get transcript() {
+    return this.letters.filter(Boolean).join(' / ');
   }
 
   result() {
-    return this.watched;
+    return this.transcript;
   }
 
   onOpen({ signal, clock }) {
     this.signal = signal;
     this.clock = clock;
-    this.lastPhase = signal.phase(clock());
-    this.started = false;
-    this.watched = false;
     this.trunks = [];
+  }
+
+  contains() {
+    return true;
+  }
+
+  buttonRect(index) {
+    const widths = BUTTONS.map((button) => (button.wide ? BUTTON.wide : BUTTON.width));
+    const total = widths.reduce((sum, width) => sum + width, 0) + BUTTON.gap * (BUTTONS.length - 1);
+    let x = 640 - total / 2;
+    for (let i = 0; i < index; i++) x += widths[i] + BUTTON.gap;
+    return { x, y: BUTTON.y, width: widths[index], height: BUTTON.height };
+  }
+
+  pointerDown(point) {
+    BUTTONS.forEach((button, i) => {
+      const r = this.buttonRect(i);
+      if (point.x >= r.x && point.x <= r.x + r.width && point.y >= r.y && point.y <= r.y + r.height) this.press(button.id);
+    });
+  }
+
+  keyDown(key) {
+    const keys = { k: 'short', '.': 'short', l: 'long', '-': 'long', b: 'next', '/': 'next', enter: 'next', backspace: 'back', delete: 'back' };
+    if (!keys[key]) return false;
+    this.press(keys[key]);
+    return true;
+  }
+
+  press(id) {
+    const last = this.letters.length - 1;
+    if (id === 'short') this.letters[last] += '.';
+    if (id === 'long') this.letters[last] += '-';
+    if (id === 'next' && this.letters[last]) this.letters.push('');
+    if (id === 'back') {
+      if (this.letters[last]) this.letters[last] = this.letters[last].slice(0, -1);
+      else if (last > 0) this.letters.pop();
+    }
+    if (id === 'clear') this.letters = [''];
+    this.pressed = id;
+    this.pressAge = 0;
+    this.sound(id === 'clear' ? 'paper' : 'wheel');
   }
 
   update(dt) {
     super.update(dt);
     if (!this.isOpen) return;
     this.time += dt;
-    const phase = this.signal.phase(this.clock());
-    if (phase < this.lastPhase) this.started = true; // das Signal beginnt von vorn
-    this.lastPhase = phase;
-    const end = this.signal.flashes[this.signal.flashes.length - 1].end;
-    if (this.started && phase >= end) this.watched = true;
+    this.pressAge += dt;
 
     // Stämme rauschen vorbei (der Zug fährt ja)
     this.nextTrunk -= dt;
@@ -102,6 +152,7 @@ export class Binoculars extends View {
     }
 
     this.drawNotes(ctx);
+    this.drawButtons(ctx);
     ctx.restore();
     this.drawHelp(ctx);
   }
@@ -231,15 +282,14 @@ export class Binoculars extends View {
     ctx.restore();
   }
 
-  // Zettel am oberen Rand: Joseph schreibt mit
+  // Zettel am oberen Rand: die Mitschrift des Spielers
   drawNotes(ctx) {
-    const marks = this.signal.marksUntil(this.clock());
-    const width = 500, height = 50, x = 640 - width / 2, y = 8;
+    const width = 720, height = 54, x = 640 - width / 2, y = 8;
     ctx.save();
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
     ctx.shadowBlur = 16;
     ctx.translate(640, y + height / 2);
-    ctx.rotate(-0.008);
+    ctx.rotate(-0.006);
     ctx.translate(-640, -(y + height / 2));
     const paper = ctx.createLinearGradient(0, y, 0, y + height);
     paper.addColorStop(0, '#f4e9cc');
@@ -252,14 +302,57 @@ export class Binoculars extends View {
     ctx.font = '20px "Noteworthy", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Ich schreibe mit:', x + 18, y + height / 2);
-    const left = x + 190;
-    if (marks.length > 0) {
-      drawMarks(ctx, marks.map((mark) => (mark === 'lang' ? '-' : '.')).join(''), left, y + height / 2, '#27408f', 1.5);
-    } else {
-      ctx.fillStyle = 'rgba(51, 38, 26, 0.5)';
-      ctx.fillText(this.signal.phase(this.clock()) < 0.4 ? '…' : '(Pause – gleich von vorn)', left, y + height / 2);
+    ctx.fillText('Mitschrift:', x + 16, y + height / 2);
+    const left = x + 130, room = width - 150;
+    // Breite der Mitschrift bei Maßstab 1 – passt sie nicht, wird sie kleiner
+    const markWidth = (marks) => [...marks].reduce((sum, mark) => sum + (mark === '-' ? 19 : 14), 0);
+    const natural = this.letters.reduce((sum, letter) => sum + markWidth(letter) + 30, 0);
+    const scale = Math.min(1.3, room / Math.max(1, natural));
+    let cursor = left;
+    this.letters.forEach((letter, i) => {
+      drawMarks(ctx, letter, cursor, y + height / 2, '#27408f', scale);
+      cursor += markWidth(letter) * scale;
+      if (i < this.letters.length - 1) {
+        ctx.strokeStyle = 'rgba(51, 38, 26, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cursor + 10 * scale, y + 14);
+        ctx.lineTo(cursor + 4 * scale, y + height - 14);
+        ctx.stroke();
+        cursor += 18 * scale;
+      }
+    });
+    // Schreibmarke
+    if (Math.floor(this.time * 2) % 2 === 0) {
+      ctx.fillStyle = 'rgba(39, 64, 143, 0.7)';
+      ctx.fillRect(cursor + 3, y + 14, 2, height - 28);
     }
+    ctx.restore();
+  }
+
+  // Knöpfe unten: kurz, lang, Buchstabe zu Ende, zurück, alles weg
+  drawButtons(ctx) {
+    ctx.save();
+    BUTTONS.forEach((button, i) => {
+      const r = this.buttonRect(i);
+      const lit = this.pressed === button.id ? Math.max(0, 1 - this.pressAge / 0.25) : 0;
+      roundedRect(ctx, r.x, r.y, r.width, r.height, 8);
+      ctx.fillStyle = lit > 0 ? `rgba(${Math.round(60 + 180 * lit)}, ${Math.round(48 + 150 * lit)}, 36, 0.95)` : 'rgba(40, 30, 22, 0.92)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#d9a441';
+      ctx.stroke();
+      ctx.fillStyle = '#f3e2bf';
+      ctx.font = 'bold 16px "Trebuchet MS", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(button.label, r.x + r.width / 2, r.y + r.height / 2 - (button.key ? 5 : 0));
+      if (button.key) {
+        ctx.font = '11px "Trebuchet MS", sans-serif';
+        ctx.fillStyle = 'rgba(243, 226, 191, 0.6)';
+        ctx.fillText(`Taste ${button.key}`, r.x + r.width / 2, r.y + r.height - 9);
+      }
+    });
     ctx.restore();
   }
 }

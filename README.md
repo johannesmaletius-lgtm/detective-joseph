@@ -2,22 +2,39 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Wagen 1 ist spielbar – etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps.** Joseph wacht
+**Stand: Wagen 1 ist spielbar – Rätsel für Experten (eher 60 Minuten als 20), mit Geschichte, Tutorial und gestuften Tipps.** Joseph wacht
 in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm steht in seiner eigenen
 Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
 vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
 Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/story-ideen.md).
 
-Die Rätsel im Abteil (Lösung weiter unten):
+Die Rätsel im Abteil (Lösung weiter unten). Sie sind bewusst schwer: Joseph spricht keine Lösungen aus,
+seine Notizen halten nur fest, was er sieht. Wer feststeckt, drückt **H** – die Tipps werden mit jeder Frage
+deutlicher, die letzte Stufe verrät die Lösung.
 
-- **Zerrissener Fahrplan:** sechs Papierfetzen im Abteil finden und mit der Maus zusammensetzen
-- **Rätselheft und Koffer:** ein halb gelöstes Zahlenquadrat ergibt die drei Ziffern für das Kofferschloss
-- **Fernglas und Turm:** das rote Turmlicht blinkt eine Ziffer – die Tabelle dazu steht auf dem Fahrplan
-- **Verteilerkasten:** Kabelstücke drehen, bis das Bild der Tunnelkamera auf dem Bildschirm erscheint
-- **Die Zeitschleife:** Was Joseph im Abteil wegnimmt, ist nach dem Tunnel wieder da – so kommt er an eine
-  zweite Batterie für die Taschenlampe
-- **Im Dunkeln:** Im Tunnel geht das Licht aus; nur mit der Taschenlampe findet man die Kratzer in der Tür
+- **Zerrissener Fahrplan:** zwölf Papierfetzen im Abteil finden, mit der Maus an ihren Platz schieben und
+  richtig herum drehen (kurzer Klick = Vierteldrehung)
+- **Rätselheft und Koffer:** ein 6 × 6-Zahlenquadrat mit unregelmäßigen Gebieten, nur sieben Zahlen vorgegeben,
+  direkt im Heft ausfüllbar. Drei eingekreiste Felder tragen Zeichen – das Kofferschloss dieselben, aber in
+  anderer Reihenfolge
+- **Fernglas und Turm:** das rote Turmlicht morst ein ganzes Wort. Mitschreiben muss man selbst (kurz, lang,
+  Buchstabe zu Ende) – übersetzen mit dem Morsealphabet auf dem Fahrplan
+- **Verteilerkasten:** nach den Regeln von „Net“: alle 35 Kabelstücke zu einem einzigen Netz drehen – keine
+  losen Enden, keine Schleifen
+- **Die Tunnelkamera:** Die Ziffer an der Tunnelwand ist nur zu lesen, solange unser eigener Zug mit seinen
+  erleuchteten Fenstern durchfährt – man muss im Dunkeln vor dem Bildschirm stehen
+- **Notstrom-Verriegelung:** 5 × 5 Leuchttasten („Lights Out“) – erst wenn alle aus sind, lässt sich die Klappe
+  am Schaltpult aufschrauben
+- **Die Zeitschleife:** Was Joseph im Abteil wegnimmt, ist nach dem Tunnel wieder da – auch die Verriegelung.
+  So kommt er an eine zweite Batterie für die Taschenlampe, muss dafür aber das Pult noch einmal lösen
+- **Im Dunkeln:** Im Tunnel geht das Licht aus; nur mit der Taschenlampe findet man die Kratzer in der Tür –
+  zwei Strichlisten ohne Pfeile, unter einer ein Turm
 - **Das Türschloss:** vier Rädchen, vier Zeichen – Tunnel, Laterne links, Laterne rechts, Turm
+
+Woher die Rätselformen kommen: „Net“ und „Flip“ (Lights Out) stammen aus
+[Simon Tathams Portable Puzzle Collection](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/) (MIT-Lizenz) –
+übernommen sind nur die Regeln, der Code ist neu geschrieben. Jigsaw-Sudoku und Morsealphabet sind klassische,
+freie Rätselformen.
 
 Der Zug fährt:
 Vor den Fenstern zieht eine nächtliche Landschaft **mit Perspektive** vorbei (durch die hinteren Fenster
@@ -56,7 +73,9 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 | Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß (bei vielen Notizen: blättern) |
 | Taste **H** oder „Tipp“ im Notizbuch | Joseph gibt einen Tipp – je öfter man fragt, desto deutlicher |
 | **Leertaste** oder Klick | Sprechtext überspringen |
-| In einer Nahansicht (Schloss, Puzzle, Verteilerkasten …) | Linksklick bedient sie, beim Puzzle mit gedrückter Maustaste ziehen |
+| In einer Nahansicht (Schloss, Puzzle, Verteilerkasten …) | Linksklick bedient sie, beim Puzzle mit gedrückter Maustaste ziehen (kurzer Klick dreht einen Fetzen) |
+| Im Rätselheft | Feld anklicken, dann Zahl am Rand – oder Tasten **1**–**6**, **Entf** löscht, Pfeiltasten wandern |
+| Am Fernglas | mitschreiben: **K** = kurz, **L** = lang, **B** = Buchstabe zu Ende, **Rückschritt** = löschen (oder die Knöpfe) |
 | **Esc** oder Rechtsklick | Nahansicht / Notizbuch schließen, Gegenstand loslassen |
 | Taste **M** | Ton an/aus (der Ton startet mit dem ersten Klick) |
 | Taste **D** | Debug-Ansicht: Laufbereich, anklickbare Stellen, Fenster, Koordinaten, Zug (Runde, Tunnel), Merker der Geschichte |
@@ -101,8 +120,10 @@ detective-joseph/
     ├── puzzles/               NAHANSICHTEN: Rätsel und Dinge, die man aus der Nähe ansieht
     │   ├── view.js            Grundgerüst für alle Nahansichten (öffnen, schließen, Klicks)
     │   ├── jigsaw.js          Papierpuzzle: der zerrissene Fahrplan
-    │   ├── wires.js           Verteilerkasten: Kabelstücke drehen
-    │   ├── binoculars.js      Blick durchs Fernglas auf den Turm, Joseph schreibt das Blinken mit
+    │   ├── wires.js           Verteilerkasten: Kabelstücke zu einem Netz drehen (Regeln von „Net“)
+    │   ├── sudoku.js          Rätselheft: 6 × 6-Zahlenquadrat mit unregelmäßigen Gebieten, zum Ausfüllen
+    │   ├── breaker.js         Notstrom-Verriegelung am Schaltpult: 5 × 5 Leuchttasten („Lights Out“)
+    │   ├── binoculars.js      Blick durchs Fernglas auf den Turm, der Spieler schreibt das Blinken selbst mit
     │   ├── crt.js             der Bildschirm in groß: aus, Rauschen oder Kamerabild
     │   └── cameraFeed.js      das Bild der Tunnelkamera (Tunnel, Ziffer, Zug, Gestalt)
     ├── ui/
@@ -111,8 +132,8 @@ detective-joseph/
     │   ├── speech.js          Sprechtexte über den Köpfen
     │   ├── notebook.js        Notizbuch (Knopf, aufgeschlagene Seiten, blättern, Tipp-Knopf)
     │   ├── codeLock.js        Zahlenschloss in Nahansicht (Türschloss mit Zeichen, Kofferschloss)
-    │   ├── cards.js           gezeichnete Blätter: Signaltafel, Rätselheft, Detektivakte
-    │   ├── symbols.js         die vier Zeichen vom Türschloss: Tunnel, Laternen, Turm
+    │   ├── cards.js           gezeichnete Blätter: Signaltafel (mit Morsealphabet), Detektivakte
+    │   ├── symbols.js         Zeichen auf den Schlössern: Tunnel, Laternen, Turm, Mond
     │   ├── hints.js           Hinweisschild für das Tutorial
     │   ├── overlay.js         Abblenden und Karten: Titelbild, Unterarm, Brief, Ende, eigene Blätter
     │   └── text.js            Schriften, Zeilenumbruch, Text mit Umriss
@@ -132,7 +153,7 @@ detective-joseph/
     │   └── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
     ├── effects/
     │   ├── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Licht aus, Laternen
-    │   ├── morse.js           Blinksignal des Turms (eine Ziffer im Morsecode)
+    │   ├── morse.js           Blinksignal des Turms (ein Wort im Morsealphabet)
     │   └── darkness.js        Dunkelheit im Tunnel mit Lichtkegel der Taschenlampe
     ├── audio/
     │   ├── trainSound.js      Fahrgeräusch, „Klack“, Tunnel-Hall, Quietschen – ohne Sounddateien
@@ -242,19 +263,29 @@ Die Tür braucht vier Ziffern – in der Reihenfolge der Zeichen auf dem Schloss
 
 | Zeichen | Ziffer | Woher |
 | --- | --- | --- |
-| Tunnel | 5 | Verteilerkasten (links neben der Tür) lösen, dann den Bildschirm ansehen: Die Tunnelkamera zeigt eine große 5 an der Wand. Einstellbar: `TUNNEL_DIGIT` in `wagon1.js`. |
-| Laterne links / rechts | 7 und 8 | Laternen pro Runde zählen – oder im Tunnel mit der Taschenlampe die Kratzer in der Tür finden. Wird aus den Zug-Einstellungen berechnet (`lap`, `tunnel`, `lanternEvery`); wer sie ändert, führt danach `node tools/make-items.mjs` aus, damit die eingeritzten Striche wieder stimmen. |
-| Turm | 3 | Mit dem Fernglas am Fenster das Turmlicht ansehen (kurz, kurz, kurz, lang, lang) und auf der Signaltafel nachschlagen. Einstellbar: `blink.morse` beim Turm in `trainCompartment.js`. |
+| Tunnel | 5 | Verteilerkasten (links neben der Tür) lösen, dann den Bildschirm ansehen, **während der Zug durch den Tunnel fährt**: Nur dann leuchten unsere Fenster die gemalte 5 an der Tunnelwand an. Einstellbar: `TUNNEL_DIGIT` in `wagon1.js`. |
+| Laterne links / rechts | 7 und 8 | Laternen pro Runde zählen – oder im Tunnel mit der Taschenlampe die Kratzer in der Tür finden: erst 8 Striche, dann 7 mit einem Turm darunter. Der Turm steht in den **linken** Fenstern → 7 ist links. Wird aus den Zug-Einstellungen berechnet (`lap`, `tunnel`, `lanternEvery`); wer sie ändert, führt danach `node tools/make-items.mjs` aus, damit die eingeritzten Striche wieder stimmen. |
+| Turm | 3 | Mit dem Fernglas am Fenster das Turmlicht mitschreiben: `–•• / •–• / • / ••` und mit dem Morsealphabet auf der Signaltafel übersetzen: **DREI**. Einstellbar: `blink.morse` beim Turm in `trainCompartment.js` (ein Zahlwort aus `NUMBER_WORDS` in `wagon1.js`, Umlaute als UE usw.). |
+
+Die Zwischenrätsel:
+
+- **Kofferschloss: 2 6 4.** Lösung des Zahlenquadrats (`src/puzzles/sudoku.js`):
+  `365214 / 142563 / 214356 / 536142 / 653421 / 421635`. Eingekreist: Turm = 6, Tunnel = 4, Mond = 2.
+  Das Schloss liest Mond – Turm – Tunnel.
+- **Notstrom-Verriegelung:** diese neun Tasten drücken (Reihe-Spalte): 1-2, 1-4, 2-1, 2-5, 3-3, 4-2, 5-1, 5-4, 5-5.
+- **Verteilerkasten:** Das Netz wird aus einem festen Startwert erzeugt (`SEED` in `wires.js`); jede Lösung
+  zählt, die alle Regeln erfüllt.
 
 Der Weg dorthin: Brief lesen → Rucksack (Taschenlampe, Schlüssel) → Schlüssel an der Werkzeugkiste
-(Taschenmesser, erster Fetzen) → Fetzen sammeln: Boden vorne links (2), unter der Zeitung, unter der Kiste
-vorne rechts, Zigarrenkiste (mit dem Messer aufhebeln) → Rechtsklick auf die Fetzen: zusammensetzen →
-Rätselheft auf der rechten Bank: die eingekreisten Felder sind 2, 4, 3 → Kofferschloss **243** → Fernglas.
-Für die Taschenlampe: Messer an der Klappe des Schaltpults → Batterie → in die Lampe; auf einer Sitzbank auf
-den Tunnel warten; danach ist die Klappe wieder zu → noch eine Batterie holen → Lampe geht. Im nächsten
-Tunnel die Tür ableuchten.
+(Taschenmesser, zwei Fetzen) → Fetzen sammeln: Boden vorne links (3), unter der Zeitung (2), unter der Kiste
+vorne rechts (2), Zigarrenkiste (3, mit dem Messer aufhebeln) → Rechtsklick auf die Fetzen: zusammensetzen →
+Rätselheft auf der rechten Bank lösen → Kofferschloss **264** → Fernglas. Für die Taschenlampe: Leuchttasten am
+Schaltpult alle ausschalten → Messer an der Klappe → Batterie → in die Lampe; auf einer Sitzbank auf den Tunnel
+warten; danach ist die Klappe wieder zu und verriegelt → Leuchttasten noch einmal → noch eine Batterie → Lampe
+geht. Im nächsten Tunnel die Tür ableuchten – und (mit Batterie im Bildschirm) einmal den Tunnel auf dem
+Kamerabild verfolgen.
 
-Wer das Kamerabild beobachtet, während der Zug durch den Tunnel fährt, sieht noch etwas …
+Wer das Kamerabild beobachtet, nachdem der Zug durch den Tunnel ist, sieht noch etwas …
 
 ## Werkzeuge (`tools/`)
 
@@ -325,5 +356,6 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Schritt 4:** Inventar mit 5 Plätzen, Gegenstände benutzen und kombinieren
 - [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
 - [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
-- [ ] **Wagen 2:** der Speisewagen (siehe `docs/story-ideen.md`, Vorschlag 1)
+- [x] **Wagen 1 für Experten:** zwölf drehbare Fetzen, Jigsaw-Sudoku, Morse-Wort zum Mitschreiben, Netz-Rätsel („Net“), Lights Out, Kamerabild nur im Zuglicht, Kratzer ohne Pfeile, Tipps neu gestuft
+- [ ] **Wagen 2:** der Speisewagen (siehe `docs/story-ideen.md`, Vorschlag 1 – dort passt ein Einstein-Rätsel)
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), Spielstand speichern, echte Sounds

@@ -2,13 +2,14 @@
 //
 //   drawSymbol(ctx, 'tower', x, y, 40, '#33261a');   // Mitte (x, y), Größe 40
 //
-// Zeichen: 'tunnel', 'lanternLeft', 'lanternRight', 'tower'
+// Zeichen: 'tunnel', 'lanternLeft', 'lanternRight', 'tower', 'moon'
 
 export const SYMBOL_NAMES = {
   tunnel: 'Tunnel',
   lanternLeft: 'Laterne links',
   lanternRight: 'Laterne rechts',
   tower: 'Turm',
+  moon: 'Mond',
 };
 
 export function drawSymbol(ctx, name, x, y, size, color) {
@@ -25,6 +26,7 @@ export function drawSymbol(ctx, name, x, y, size, color) {
   if (name === 'tower') tower(ctx);
   if (name === 'lanternLeft') lantern(ctx, -1);
   if (name === 'lanternRight') lantern(ctx, 1);
+  if (name === 'moon') moon(ctx);
   ctx.restore();
 }
 
@@ -106,4 +108,18 @@ function lantern(ctx, direction) {
   ctx.lineTo(ax + direction * 14, 6);
   ctx.lineTo(ax + direction * 8, 12);
   ctx.stroke();
+}
+
+// Mondsichel
+function moon(ctx) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, 16, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.beginPath();
+  ctx.arc(0, 0, 16, 0, Math.PI * 2);
+  ctx.moveTo(21, -5);
+  ctx.arc(8, -5, 13, 0, Math.PI * 2);
+  ctx.fill('evenodd');
+  ctx.restore();
 }

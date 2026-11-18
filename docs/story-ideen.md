@@ -49,6 +49,9 @@ seiner eigenen Schrift **„NICHT EINSCHLAFEN“**.
 2. **Speisewagen:** Der Koch serviert jede Runde dasselbe Menü, und ein Gast bekommt immer das vergiftete Glas.
    *Rätsel:* Herausfinden, wer wann welches Glas bekommt, und die Gläser vertauschen. *Interaktion:* Gespräche
    belauschen, beim Kellner bestellen.
+   *Für Experten:* als Einstein-Rätsel (klassisches Logikrätsel, frei verwendbar): Fünf Gäste, fünf Plätze, fünf
+   Getränke, fünf Uhrzeiten – aus belauschten Sätzen („Der Mann mit dem Hut sitzt links neben dem Rotwein …“)
+   muss Joseph ableiten, wer das vergiftete Glas bekommt. Jede Runde hört er ein paar Sätze mehr.
 3. **Schlafwagen:** Eine alte Dame spricht im Schlaf, jede Runde ein anderes Stück desselben Satzes. *Rätsel:* den
    Satz über mehrere Runden zusammensetzen. Weckt Joseph sie, gerät sie in Panik und zieht die Notbremse. Die
    funktioniert nicht.

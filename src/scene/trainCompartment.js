@@ -46,11 +46,11 @@ export const trainCompartment = {
       { image: 'assets/scenes/train-compartment/outside/hills.png', y: 150, speed: 14 },
       {
         // Der Turm steht in der Mitte des Kreises, den der Zug fährt – er bewegt sich nie.
-        // Sein rotes Licht blinkt eine Ziffer im Morsecode (morse) – sie gehört zum Türschloss, siehe wagon1.js.
-        // unit = Länge eines kurzen Blinkzeichens in Sekunden.
+        // Sein rotes Licht blinkt ein Wort im Morsealphabet (morse) – ein Zahlwort, das zum Türschloss gehört
+        // (siehe wagon1.js). unit = Länge eines kurzen Blinkzeichens in Sekunden.
         id: 'tower',
         image: 'assets/scenes/train-compartment/outside/tower.png', x: 224, y: 147,
-        blink: { x: 16, y: 6, color: [255, 70, 60], morse: '3', unit: 0.34 },
+        blink: { x: 16, y: 6, color: [255, 70, 60], morse: 'DREI', unit: 0.3 },
       },
       { image: 'assets/scenes/train-compartment/outside/treeline.png', y: 150, speed: 45 },
       { image: 'assets/scenes/train-compartment/outside/forest.png', y: 60, speed: 160 },

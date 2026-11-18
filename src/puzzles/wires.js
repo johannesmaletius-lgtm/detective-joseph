@@ -1,20 +1,29 @@
 import { View } from './view.js';
 import { roundedRect } from '../ui/text.js';
 
-// Rätsel "Verteilerkasten": Kabelstücke drehen, bis das Signal der Kamera am Bildschirm ankommt.
+// Rätsel "Verteilerkasten" – nach den Regeln von "Net" aus Simon Tathams Puzzle-Sammlung (MIT-Lizenz;
+// nur die Regeln sind übernommen, der Code ist neu):
 //
-//   const solved = await wires.open();     // true, sobald die Leitung steht
+//   const solved = await wires.open();     // true, sobald das Netz steht
 //
-// Das Brett besteht aus 5 × 4 Feldern. Auf jedem Feld liegt ein Kabelstück: gerade, Ecke oder
-// Abzweig. Ein Klick dreht es um eine Vierteldrehung. Alles, was mit dem Eingang (links, "KAMERA")
-// verbunden ist, leuchtet grün. Gelöst ist das Rätsel, wenn der Ausgang (rechts, "BILDSCHIRM") leuchtet.
+// Das Brett besteht aus 7 × 5 Feldern. Auf jedem Feld liegt ein Kabelstück: Endstück, gerade, Ecke,
+// Abzweig oder Kreuzung. Ein Klick dreht es um eine Vierteldrehung. Alles, was mit dem Eingang (links,
+// "KAMERA") verbunden ist, leuchtet grün. Gelöst ist das Rätsel erst, wenn
+//   – ALLE 35 Stücke zu einem einzigen Netz verbunden sind,
+//   – kein Kabel ins Leere zeigt (keine losen Enden, außer Eingang und Ausgang) und
+//   – es keine Schleife gibt,
+// und der Ausgang (rechts, "BILDSCHIRM") dazugehört. Ein Weg von links nach rechts genügt also nicht.
 // Der Stand bleibt erhalten, wenn man die Ansicht zwischendurch schließt.
+//
+// Das Netz wird beim Start aus einem festen Startwert erzeugt (ein zufälliger Baum über alle Felder),
+// dann wird jedes Stück zufällig verdreht. Es ist also immer lösbar und jedes Mal dasselbe Rätsel.
 
-const COLUMNS = 5, ROWS = 4;
-const TILE = 88;
-const BOARD = { x: 640 - (COLUMNS * TILE) / 2, y: 366 - (ROWS * TILE) / 2 };
-const SOURCE_ROW = 1; // der Eingang kommt von links in diese Reihe
-const TARGET_ROW = 2; // der Ausgang geht rechts aus dieser Reihe
+const COLUMNS = 7, ROWS = 5;
+const TILE = 78;
+const BOARD = { x: 640 - (COLUMNS * TILE) / 2, y: 372 - (ROWS * TILE) / 2 };
+const SOURCE_ROW = 2; // der Eingang kommt von links in diese Reihe
+const TARGET_ROW = 1; // der Ausgang geht rechts aus dieser Reihe
+const SEED = 2024;    // anderer Startwert = anderes Netz
 
 // Anschlüsse eines Kabelstücks als Bits: oben, rechts, unten, links
 const UP = 1, RIGHT = 2, DOWN = 4, LEFT = 8;
@@ -24,38 +33,64 @@ const SIDES = [
   { bit: DOWN, dx: 0, dy: 1, opposite: UP },
   { bit: LEFT, dx: -1, dy: 0, opposite: RIGHT },
 ];
-// Grundform (ungedreht): I = gerade (oben–unten), L = Ecke (oben–rechts), T = Abzweig (oben–rechts–unten)
-const SHAPES = { I: UP | DOWN, L: UP | RIGHT, T: UP | RIGHT | DOWN };
+// Grundformen (ungedreht): E = Endstück (oben), I = gerade (oben–unten), L = Ecke (oben–rechts),
+// T = Abzweig (oben–rechts–unten), X = Kreuzung (alle vier)
+const SHAPES = { E: UP, I: UP | DOWN, L: UP | RIGHT, T: UP | RIGHT | DOWN, X: UP | RIGHT | DOWN | LEFT };
 
-// Das Brett: Form und Drehung am Anfang (Vierteldrehungen im Uhrzeigersinn).
-// In "SOLUTION" steht eine Lösung – nur zur Kontrolle beim Bauen, das Spiel prüft die Leitung selbst.
-const LAYOUT = [
-  ['L', 'I', 'L', 'I', 'L'],
-  ['L', 'L', 'T', 'L', 'I'],
-  ['L', 'L', 'L', 'T', 'L'],
-  ['I', 'L', 'I', 'T', 'L'],
-];
-const START = [
-  [0, 0, 0, 0, 1],
-  [1, 2, 0, 3, 0],
-  [3, 0, 1, 2, 1],
-  [1, 2, 0, 1, 0],
-];
-export const SOLUTION = [
-  [1, 1, 2, 0, 1],
-  [3, 2, 0, 3, 0],
-  [3, 1, 3, 2, 1],
-  [1, 0, 1, 3, 3],
-];
+function rotate(mask, turns) {
+  for (let i = 0; i < turns % 4; i++) mask = ((mask << 1) & 15) | (mask >> 3);
+  return mask;
+}
+
+// Erzeugt das Netz: zufälliger Spannbaum (Prim) über alle Felder, plus Eingang und Ausgang.
+// Ergebnis: für jedes Feld Form und Drehung der Lösung.
+function generateNet(seed) {
+  const random = seededRandom(seed);
+  const masks = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(0));
+  const inTree = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(false));
+  const frontier = [];
+  const add = (x, y) => {
+    inTree[y][x] = true;
+    for (const side of SIDES) {
+      const nx = x + side.dx, ny = y + side.dy;
+      if (nx >= 0 && nx < COLUMNS && ny >= 0 && ny < ROWS && !inTree[ny][nx]) frontier.push({ x, y, side });
+    }
+  };
+  add(0, SOURCE_ROW);
+  while (frontier.length > 0) {
+    const { x, y, side } = frontier.splice(Math.floor(random() * frontier.length), 1)[0];
+    const nx = x + side.dx, ny = y + side.dy;
+    if (inTree[ny][nx]) continue;
+    masks[y][x] |= side.bit;
+    masks[ny][nx] |= side.opposite;
+    add(nx, ny);
+  }
+  masks[SOURCE_ROW][0] |= LEFT;
+  masks[TARGET_ROW][COLUMNS - 1] |= RIGHT;
+  return masks.map((row) => row.map((mask) => {
+    for (const [shape, base] of Object.entries(SHAPES)) {
+      for (let turns = 0; turns < 4; turns++) if (rotate(base, turns) === mask) return { shape, turns };
+    }
+    throw new Error(`Unbekanntes Kabelstück: ${mask}`);
+  }));
+}
+
+const NET = generateNet(SEED);
+// Eine Lösung (Drehungen) – nur zum Testen (wires.arrange(SOLUTION)), das Spiel prüft die Regeln selbst.
+export const SOLUTION = NET.map((row) => row.map((tile) => tile.turns));
 
 export class Wires extends View {
   constructor() {
     super();
-    this.tiles = LAYOUT.map((row, y) => row.map((shape, x) => ({ shape, turns: START[y][x], angle: START[y][x] * 90, powered: false })));
+    const random = seededRandom(SEED + 1);
+    this.tiles = NET.map((row) => row.map(({ shape, turns }) => {
+      const start = (turns + 1 + Math.floor(random() * 3)) % 4; // nie schon richtig gedreht
+      return { shape, turns: start, angle: start * 90, powered: false };
+    }));
     this.solved = false;
     this.solvedAge = 0;
     this.time = 0;
-    this.help = 'Klick: Kabelstück drehen  ·  Rechtsklick oder Esc: zurück';
+    this.help = 'Klick: Kabelstück drehen  ·  alle Stücke verbinden, keine losen Enden, keine Schleifen  ·  Rechtsklick oder Esc: zurück';
     this.trace();
   }
 
@@ -74,31 +109,43 @@ export class Wires extends View {
 
   // Welche Anschlüsse hat das Feld in seiner jetzigen Drehung?
   mask(tile) {
-    let mask = SHAPES[tile.shape];
-    for (let i = 0; i < tile.turns % 4; i++) mask = ((mask << 1) & 15) | (mask >> 3);
-    return mask;
+    return rotate(SHAPES[tile.shape], tile.turns);
   }
 
-  // Verfolgt die Leitung vom Eingang aus und merkt sich, welche Felder Strom haben.
+  // Ist dieser Anschluss ein offener Rand des Bretts, der so gewollt ist (Eingang oder Ausgang)?
+  isPort(x, y, bit) {
+    return (x === 0 && y === SOURCE_ROW && bit === LEFT) || (x === COLUMNS - 1 && y === TARGET_ROW && bit === RIGHT);
+  }
+
+  // Verfolgt das Netz vom Eingang aus, merkt sich, welche Felder Strom haben, und prüft die Regeln.
   trace() {
     for (const row of this.tiles) for (const tile of row) tile.powered = false;
     const first = this.tiles[SOURCE_ROW][0];
     if (!(this.mask(first) & LEFT)) return false;
     const queue = [[0, SOURCE_ROW]];
     first.powered = true;
+    let looseEnds = 0, links = 0, count = 1;
     while (queue.length > 0) {
       const [x, y] = queue.pop();
       const mask = this.mask(this.tiles[y][x]);
       for (const side of SIDES) {
         if (!(mask & side.bit)) continue;
         const neighbour = this.tiles[y + side.dy]?.[x + side.dx];
-        if (!neighbour || neighbour.powered || !(this.mask(neighbour) & side.opposite)) continue;
+        if (!neighbour || !(this.mask(neighbour) & side.opposite)) {
+          if (!this.isPort(x, y, side.bit)) looseEnds += 1;
+          continue;
+        }
+        links += 1; // jede Verbindung wird von beiden Seiten gezählt
+        if (neighbour.powered) continue;
         neighbour.powered = true;
+        count += 1;
         queue.push([x + side.dx, y + side.dy]);
       }
     }
     const last = this.tiles[TARGET_ROW][COLUMNS - 1];
-    return last.powered && Boolean(this.mask(last) & RIGHT);
+    const all = count === COLUMNS * ROWS;
+    const noLoops = links / 2 === count - 1;
+    return all && noLoops && looseEnds === 0 && last.powered && Boolean(this.mask(last) & RIGHT);
   }
 
   checkSolved() {
@@ -300,24 +347,36 @@ function drawWire(ctx, mask, lit, pulse) {
     ctx.shadowBlur = 16;
     path();
     ctx.strokeStyle = '#0d0907';
-    ctx.lineWidth = 18;
+    ctx.lineWidth = 17;
     ctx.stroke();
     ctx.restore();
   }
   path();
   ctx.strokeStyle = '#0d0907';
-  ctx.lineWidth = 18;
+  ctx.lineWidth = 17;
   ctx.stroke();
   path();
   ctx.strokeStyle = lit ? '#6dff8f' : '#b46a2c';
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 9;
   ctx.stroke();
   path();
   ctx.strokeStyle = lit ? 'rgba(235, 255, 235, 0.85)' : 'rgba(255, 205, 150, 0.5)';
   ctx.lineWidth = 3;
   ctx.stroke();
-  // Lötpunkt in der Mitte (bei Abzweigen) und Kontakte an den Enden
-  if (mask === SHAPES.T) {
+  // Endstück: dicker Stecker in der Mitte. Abzweig und Kreuzung: Lötpunkt.
+  if (mask === SHAPES.E) {
+    ctx.beginPath();
+    ctx.arc(0, 0, 13, 0, Math.PI * 2);
+    ctx.fillStyle = lit ? '#bfffcb' : '#8a4f22';
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#0d0907';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#0d0907';
+    ctx.fill();
+  } else if (mask === SHAPES.T || mask === SHAPES.X) {
     ctx.beginPath();
     ctx.arc(0, 0, 9, 0, Math.PI * 2);
     ctx.fillStyle = lit ? '#c8ffd0' : '#d9a86a';
@@ -331,6 +390,17 @@ function drawWire(ctx, mask, lit, pulse) {
     ctx.fillStyle = lit ? '#eaffea' : '#e2c08a';
     ctx.fillRect(side.dx * (half - 3) - 4, side.dy * (half - 3) - 4, 8, 8);
   }
+}
+
+// Pseudo-Zufallszahlen mit Startwert: gleiche Zahl → jedes Mal dieselbe Folge.
+function seededRandom(seed) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), s | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 function rivet(ctx, x, y) {

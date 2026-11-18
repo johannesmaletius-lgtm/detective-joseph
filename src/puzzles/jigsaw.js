@@ -3,25 +3,29 @@ import { pointInPolygon } from '../navigation/geometry.js';
 import { SHEET, drawSignalSheet } from '../ui/cards.js';
 import { COLORS, FONTS, outlinedText, roundedRect } from '../ui/text.js';
 
-// Rätsel "Zerrissener Fahrplan": Papierfetzen mit der Maus an die richtige Stelle ziehen.
+// Rätsel "Zerrissener Fahrplan": Papierfetzen mit der Maus an die richtige Stelle ziehen – und drehen.
 //
 //   const complete = await jigsaw.open({ count: 4 });   // so viele Fetzen hat Joseph schon gefunden
 //
-// Das Blatt (siehe drawSignalSheet in cards.js) ist in 3 × 2 Fetzen mit gezackten Rissen zerlegt.
-// Ein Fetzen rastet ein, sobald man ihn nah genug an seinem Platz loslässt. Wer noch nicht alle
-// Fetzen hat, kann die vorhandenen schon hinlegen – was liegt, bleibt liegen.
+// Das Blatt (siehe drawSignalSheet in cards.js) ist in 4 × 3 = 12 Fetzen mit gezackten Rissen zerlegt.
+// Die Fetzen liegen verdreht herum: Ein kurzer Klick (ohne Ziehen) dreht einen Fetzen um eine
+// Vierteldrehung. Er rastet nur ein, wenn er richtig herum liegt und man ihn nah genug an seinem Platz
+// loslässt. Wer noch nicht alle Fetzen hat, kann die vorhandenen schon hinlegen – was liegt, bleibt liegen.
 
-const COLUMNS = 3, ROWS = 2;
+const COLUMNS = 4, ROWS = 3;
 const TARGET = { x: 640 - SHEET.width / 2, y: 326 - SHEET.height / 2 }; // hier liegt das fertige Blatt
-const SNAP = 30;        // so nah am richtigen Platz rastet ein Fetzen ein (Pixel)
+const SNAP = 18;        // so nah am richtigen Platz rastet ein Fetzen ein (Pixel)
+const CLICK = 6;        // wer die Maus weniger weit bewegt, hat geklickt (drehen) statt gezogen
 const SHARP = 2;        // Fetzen werden in doppelter Auflösung vorgezeichnet (scharf auf Retina)
 const MARGIN = 6;
 // In dieser Reihenfolge tauchen die Fetzen auf (Nummern von links oben nach rechts unten)
-const FOUND_ORDER = [4, 1, 5, 0, 3, 2];
-// Hier liegen die Fetzen am Anfang herum (Mitte des Fetzens) – leicht verdreht
+const FOUND_ORDER = [5, 10, 1, 7, 2, 8, 0, 11, 6, 3, 9, 4];
+// Hier liegen die Fetzen am Anfang herum (Mitte des Fetzens), leicht schief und in Vierteldrehungen verdreht
 const SCATTER = [
-  { x: 176, y: 196, tilt: -0.22 }, { x: 1108, y: 182, tilt: 0.17 }, { x: 168, y: 498, tilt: 0.12 },
-  { x: 1112, y: 486, tilt: -0.15 }, { x: 250, y: 344, tilt: 0.3 }, { x: 1040, y: 338, tilt: -0.28 },
+  { x: 105, y: 178, tilt: -0.08, turns: 1 }, { x: 1175, y: 178, tilt: 0.07, turns: 2 }, { x: 255, y: 400, tilt: 0.09, turns: 3 },
+  { x: 1025, y: 590, tilt: -0.07, turns: 1 }, { x: 105, y: 590, tilt: 0.06, turns: 2 }, { x: 1175, y: 400, tilt: -0.09, turns: 3 },
+  { x: 255, y: 178, tilt: 0.08, turns: 2 }, { x: 1025, y: 178, tilt: -0.06, turns: 1 }, { x: 255, y: 590, tilt: -0.08, turns: 3 },
+  { x: 1175, y: 590, tilt: 0.07, turns: 2 }, { x: 105, y: 400, tilt: -0.05, turns: 1 }, { x: 1025, y: 400, tilt: 0.08, turns: 3 },
 ];
 
 export class Jigsaw extends View {
@@ -29,12 +33,12 @@ export class Jigsaw extends View {
     super();
     this.pieces = cutSheet();
     this.order = [];      // Zeichenreihenfolge: der zuletzt angefasste Fetzen liegt oben
-    this.drag = null;     // { piece, dx, dy }
+    this.drag = null;     // { piece, dx, dy, start, moved }
     this.mouse = { x: 0, y: 0 };
     this.complete = false;
     this.completeAge = 0;
     this.sheet = null;    // das ganze Blatt als Bild (entsteht beim ersten Öffnen)
-    this.help = 'Fetzen mit gedrückter Maustaste an ihren Platz ziehen  ·  Rechtsklick oder Esc: zurück';
+    this.help = 'Ziehen: Fetzen verschieben  ·  kurzer Klick: Fetzen drehen  ·  Rechtsklick oder Esc: zurück';
   }
 
   result() {
@@ -57,6 +61,8 @@ export class Jigsaw extends View {
       piece.y = spot.y - piece.center.y;
       piece.tilt = spot.tilt;
       piece.rest = spot.tilt;
+      piece.turns = spot.turns;
+      piece.spin = spot.turns * (Math.PI / 2);
       this.order.push(piece);
     });
   }
@@ -108,7 +114,8 @@ export class Jigsaw extends View {
       if (piece.placed) continue;
       // Punkt in die Koordinaten des Blattes umrechnen (Verschiebung und Drehung des Fetzens zurücknehmen)
       const dx = point.x - (piece.x + piece.center.x), dy = point.y - (piece.y + piece.center.y);
-      const cos = Math.cos(-piece.tilt), sin = Math.sin(-piece.tilt);
+      const angle = piece.tilt + piece.spin;
+      const cos = Math.cos(-angle), sin = Math.sin(-angle);
       const local = { x: piece.center.x + dx * cos - dy * sin, y: piece.center.y + dx * sin + dy * cos };
       if (pointInPolygon(local, piece.outline)) return piece;
     }
@@ -119,16 +126,32 @@ export class Jigsaw extends View {
     if (this.complete) return;
     const piece = this.pieceAt(point);
     if (!piece) return;
-    this.drag = { piece, dx: point.x - piece.x, dy: point.y - piece.y };
+    this.drag = { piece, dx: point.x - piece.x, dy: point.y - piece.y, start: { x: point.x, y: point.y }, moved: false };
     this.order = [...this.order.filter((other) => other !== piece), piece];
     this.sound('paper');
   }
 
-  pointerUp() {
+  pointerUp(point) {
     if (!this.drag) return;
-    const { piece } = this.drag;
+    const { piece, start, dx, dy } = this.drag;
+    const moved = this.drag.moved || (point && Math.hypot(point.x - start.x, point.y - start.y) > CLICK);
+    if (moved && point) {
+      piece.x = point.x - dx;
+      piece.y = point.y - dy;
+    }
     this.drag = null;
-    if (Math.hypot(piece.x - TARGET.x, piece.y - TARGET.y) <= SNAP) {
+    if (!moved) {
+      // Klick ohne Ziehen: eine Vierteldrehung im Uhrzeigersinn
+      piece.turns = (piece.turns + 1) % 4;
+      this.sound('rotate');
+      // Liegt er schon an seinem Platz und ist jetzt richtig herum? Dann rastet er ein.
+      if (piece.turns === 0 && Math.hypot(piece.x - TARGET.x, piece.y - TARGET.y) <= SNAP) {
+        this.place(piece);
+        this.sound('snap');
+      }
+      return;
+    }
+    if (piece.turns === 0 && Math.hypot(piece.x - TARGET.x, piece.y - TARGET.y) <= SNAP) {
       this.place(piece);
       this.sound('snap');
     } else {
@@ -143,6 +166,8 @@ export class Jigsaw extends View {
     piece.x = TARGET.x;
     piece.y = TARGET.y;
     piece.tilt = 0;
+    piece.turns = 0;
+    piece.spin = 0;
     piece.flash = 1;
     this.order = [piece, ...this.order.filter((other) => other !== piece)]; // liegt jetzt ganz unten
     if (this.pieces.every((other) => other.placed) && !this.complete) {
@@ -162,7 +187,16 @@ export class Jigsaw extends View {
       const dragged = this.drag?.piece === piece;
       const target = dragged ? 0 : piece.rest * 0.5; // in der Hand liegt der Fetzen gerade
       piece.tilt += (target - piece.tilt) * Math.min(1, dt * 12);
-      if (dragged) {
+      // Drehung weich nachführen (immer den kurzen Weg im Uhrzeigersinn)
+      const goal = piece.turns * (Math.PI / 2);
+      let delta = goal - piece.spin;
+      while (delta < -0.01) delta += Math.PI * 2;
+      if (delta > Math.PI * 1.5 + 0.01) delta -= Math.PI * 2;
+      piece.spin += delta * Math.min(1, dt * 16);
+      if (Math.abs(goal - piece.spin) < 0.002) piece.spin = goal;
+      piece.spin = ((piece.spin % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      if (dragged && !this.drag.moved && Math.hypot(this.mouse.x - this.drag.start.x, this.mouse.y - this.drag.start.y) > CLICK) this.drag.moved = true;
+      if (dragged && this.drag.moved) {
         piece.x = this.mouse.x - this.drag.dx;
         piece.y = this.mouse.y - this.drag.dy;
       }
@@ -225,7 +259,7 @@ export class Jigsaw extends View {
       const dragged = this.drag?.piece === piece;
       ctx.save();
       ctx.translate(piece.x + center.x, piece.y + center.y);
-      ctx.rotate(piece.tilt);
+      ctx.rotate(piece.tilt + piece.spin);
       if (!piece.placed) {
         ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
         ctx.shadowBlur = dragged ? 22 : 10;
@@ -320,7 +354,7 @@ function cutSheet() {
         outline,
         box,
         center: { x: box.x + box.width / 2, y: box.y + box.height / 2 },
-        x: 0, y: 0, tilt: 0, rest: 0, flash: 0,
+        x: 0, y: 0, tilt: 0, rest: 0, flash: 0, turns: 0, spin: 0,
         owned: false,
         placed: false,
         image: null,

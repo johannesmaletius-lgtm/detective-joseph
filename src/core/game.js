@@ -17,6 +17,8 @@ import { Jigsaw } from '../puzzles/jigsaw.js';
 import { Wires } from '../puzzles/wires.js';
 import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
+import { Sudoku } from '../puzzles/sudoku.js';
+import { Breaker } from '../puzzles/breaker.js';
 import { Story } from '../story/story.js';
 import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED } from '../config.js';
 
@@ -56,6 +58,8 @@ export class Game {
       wires: new Wires(),
       binoculars: new Binoculars(),
       crt: new Crt(),
+      sudoku: new Sudoku(),
+      breaker: new Breaker(),
     };
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
@@ -236,6 +240,8 @@ export class Game {
 
   handleKey(key) {
     this.sound.start();
+    // Eine offene Nahansicht darf Tasten selbst benutzen (z. B. Zahlen im Rätselheft), nur Esc nicht
+    if (key !== KEYS.close && !this.overlay.blocksInput && this.view?.keyDown?.(key)) return;
     if (key === KEYS.toggleDebug) this.debug.toggle();
     if (key === KEYS.toggleGrid) this.debug.toggleGrid();
     if (key === KEYS.toggleSound) this.sound.toggleMute();

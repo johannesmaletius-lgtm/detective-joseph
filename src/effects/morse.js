@@ -1,36 +1,48 @@
-// Lichtsignale: Das rote Licht auf dem Turm blinkt eine Ziffer im Morsecode – immer wieder.
+// Lichtsignale: Das rote Licht auf dem Turm blinkt ein Wort im Morsealphabet – immer wieder.
 //
-//   const signal = morseSignal('3', 0.34);      // Ziffer(n) und Länge eines kurzen Zeichens in Sekunden
+//   const signal = morseSignal('DREI', 0.3);    // Text (Buchstaben und Ziffern) und Länge eines kurzen Zeichens in Sekunden
 //   signal.level(time)                          // 0 = dunkel … 1 = hell
-//   signal.marksUntil(time)                     // z. B. ['kurz', 'kurz'] – was in dieser Runde schon geblinkt hat
+//   signal.phase(time)                          // Sekunden seit Beginn des Signals
 //
-// Kurz = 1 Einheit, lang = 3 Einheiten, dazwischen 1 Einheit Pause, am Ende eine lange Pause.
+// Wie beim echten Morsen: kurz = 1 Einheit, lang = 3 Einheiten, zwischen zwei Zeichen eines Buchstabens
+// 1 Einheit Pause, zwischen zwei Buchstaben 3 Einheiten, am Ende eine lange Pause, dann von vorn.
+// Wer mitschreiben will, muss also auch auf die Pausen achten.
 
-export const MORSE_DIGITS = {
+export const MORSE = {
+  A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..',
+  J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.',
+  S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..',
   1: '.----', 2: '..---', 3: '...--', 4: '....-', 5: '.....',
   6: '-....', 7: '--...', 8: '---..', 9: '----.', 0: '-----',
 };
 
-const PAUSE_UNITS = 9; // Pause, bevor das Signal von vorn beginnt
+const LETTER_GAP = 3;  // Einheiten Pause zwischen zwei Buchstaben
+const PAUSE_UNITS = 12; // Pause, bevor das Signal von vorn beginnt
 
-export function morseSignal(digits, unit = 0.34) {
-  const flashes = []; // { start, end, long }
+// Text → Morsezeichen, Buchstaben durch " / " getrennt, z. B. 'DREI' → '-.. / .-. / . / ..'
+export function toMorse(text) {
+  return [...String(text).toUpperCase()].filter((letter) => MORSE[letter]).map((letter) => MORSE[letter]).join(' / ');
+}
+
+export function morseSignal(text, unit = 0.3) {
+  const letters = [...String(text).toUpperCase()].filter((letter) => MORSE[letter]);
+  const flashes = []; // { start, end, long, letter }
   let t = 0;
-  for (const digit of String(digits)) {
-    for (const mark of MORSE_DIGITS[digit]) {
+  letters.forEach((letter, index) => {
+    for (const mark of MORSE[letter]) {
       const length = (mark === '-' ? 3 : 1) * unit;
-      flashes.push({ start: t, end: t + length, long: mark === '-' });
+      flashes.push({ start: t, end: t + length, long: mark === '-', letter: index });
       t += length + unit;
     }
-    t += 2 * unit; // etwas mehr Abstand zwischen zwei Ziffern
-  }
+    t += (LETTER_GAP - 1) * unit;
+  });
   const duration = t + PAUSE_UNITS * unit;
 
   return {
-    digits: String(digits),
+    text: letters.join(''),
+    morse: toMorse(text),
     flashes,
     duration,
-    // Stelle im Ablauf (Sekunden seit Beginn des Signals)
     phase: (time) => ((time % duration) + duration) % duration,
     level(time) {
       const p = this.phase(time);
@@ -41,10 +53,6 @@ export function morseSignal(digits, unit = 0.34) {
         }
       }
       return 0;
-    },
-    marksUntil(time) {
-      const p = this.phase(time);
-      return flashes.filter((flash) => flash.end <= p).map((flash) => (flash.long ? 'lang' : 'kurz'));
     },
   };
 }

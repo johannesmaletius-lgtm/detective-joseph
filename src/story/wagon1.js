@@ -1,6 +1,7 @@
 import { TUTORIAL_WAGON1 } from './tutorial.js';
 import { CameraFeed } from '../puzzles/cameraFeed.js';
-import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui/cards.js';
+import { drawCaseFile, drawSignalCard } from '../ui/cards.js';
+import { CIRCLES, circledValue } from '../puzzles/sudoku.js';
 
 // ============================================================================================
 //  WAGEN 1 – „Die Ringbahn“
@@ -15,24 +16,35 @@ import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui
 // DAS ZIEL: Die Tür nach vorne hat ein Schloss mit vier Rädchen. Über jedem Rädchen ist ein
 // Zeichen eingraviert – zu jedem gehört eine Ziffer:
 //
-//   Tunnel          5       groß an die Tunnelwand gemalt – zu sehen nur auf dem Bild der Tunnelkamera
-//   Laterne links   7       so viele Laternen stehen pro Runde links …
-//   Laterne rechts  8       … und rechts (zählen – oder im Dunkeln die Kratzer in der Tür finden)
-//   Turm            3       das rote Turmlicht blinkt die Ziffer im Morsecode
+//   Tunnel          5   an die Tunnelwand gemalt – auf dem Bild der Tunnelkamera nur zu lesen, solange
+//                       unser Zug durch den Tunnel fährt und seine Fenster die Wand beleuchten
+//   Laterne links   7   so viele Laternen stehen pro Runde links …
+//   Laterne rechts  8   … und rechts. Zählen – oder im Dunkeln die Kratzer in der Tür finden: zwei
+//                       Strichgruppen ohne Pfeile, unter einer ein Turm. Der Turm steht in den LINKEN Fenstern.
+//   Turm            3   das rote Turmlicht morst ein Wort: DREI (selbst mitschreiben, mit dem Morsealphabet
+//                       auf der Signaltafel übersetzen)
 //
-// DIE RÄTSEL (bis auf den Anfang in beliebiger Reihenfolge):
+// DIE RÄTSEL – Version für Experten (bis auf den Anfang in beliebiger Reihenfolge):
 //   1. Brief aus dem Schlitz lesen → Rucksack: Taschenlampe (leer) und kleiner Schlüssel
-//   2. Schlüssel → Werkzeugkiste: Taschenmesser und der erste Papierfetzen
-//   3. Sechs Papierfetzen sammeln (Boden ×2, unter der Zeitung, unter der Kiste, Werkzeugkiste,
-//      Zigarrenkiste – die geht nur mit dem Messer auf) und zusammensetzen → Signaltafel (Morsetabelle)
-//   4. Rätselheft: Zahlenquadrat lösen → drei Ziffern für das Kofferschloss → Fernglas (+ Josephs Akte)
-//   5. Fernglas am Fenster: Turmlicht mitschreiben, mit der Signaltafel übersetzen → Ziffer „Turm“
-//   6. Verteilerkasten: Kabelstücke drehen, bis das Kamerasignal am Bildschirm ankommt
-//      → Bildschirm ansehen: Tunnelkamera → Ziffer „Tunnel“
-//   7. Messer an der Klappe des Schaltpults → Batterie. Die Taschenlampe braucht aber ZWEI:
-//      Nach dem nächsten Tunnel ist die Klappe wieder zu und die Batterie wieder da – noch einmal holen.
-//   8. Im Tunnel (Licht aus) mit der Taschenlampe die Tür ableuchten → Kratzer: Laternen links / rechts
-//   9. Vier Ziffern am Türschloss → die Tür geht auf, Ende von Wagen 1
+//   2. Schlüssel → Werkzeugkiste: Taschenmesser und die ersten zwei Papierfetzen
+//   3. Zwölf Papierfetzen sammeln (Boden ×3, unter der Zeitung ×2, unter der Kiste ×2, Werkzeugkiste ×2,
+//      Zigarrenkiste ×3 – die geht nur mit dem Messer auf) und zusammensetzen: verschieben UND drehen
+//      → Signaltafel mit dem Morsealphabet
+//   4. Rätselheft: 6 × 6-Zahlenquadrat mit unregelmäßigen Gebieten, nur 7 Zahlen vorgegeben (src/puzzles/sudoku.js).
+//      Drei eingekreiste Felder tragen die Zeichen Turm, Tunnel, Mond. Das Kofferschloss hat dieselben
+//      Zeichen in anderer Reihenfolge (Mond, Turm, Tunnel) → 2 6 4 → Fernglas (+ Josephs Akte)
+//   5. Fernglas am Fenster: Turmlicht selbst mitschreiben (kurz, lang, Buchstabe zu Ende), übersetzen → „DREI“
+//   6. Verteilerkasten nach den Regeln von „Net“: alle 35 Kabelstücke zu EINEM Netz drehen, keine losen
+//      Enden, keine Schleifen → das Kamerabild kommt am Bildschirm an
+//   7. Im Tunnel vor dem Bildschirm stehen (er leuchtet selbst): Nur dann ist die Ziffer an der Wand zu lesen.
+//   8. Schaltpult: Die Notstrom-Klappe ist elektrisch verriegelt – „Lights Out“ (alle 25 Lampen aus,
+//      src/puzzles/breaker.js), dann mit dem Messer aufschrauben → Batterie. Die Taschenlampe braucht ZWEI:
+//      Nach dem Tunnel ist alles wieder wie vorher (Klappe zu, verriegelt, Batterie da) → noch einmal.
+//   9. Im Tunnel (Licht aus) mit der Taschenlampe die Tür ableuchten → Kratzer
+//  10. Vier Ziffern am Türschloss → die Tür geht auf, Ende von Wagen 1
+//
+// Joseph spricht keine Lösungen aus: Notizen halten fest, was er sieht, nicht was es bedeutet.
+// Wer feststeckt, drückt H – die Tipps werden mit jeder Frage deutlicher (ganz unten in dieser Datei).
 //
 // Jede anklickbare Stelle (siehe hotspots in src/scene/trainCompartment.js) hat hier ihre Reaktionen:
 //   look  = Rechtsklick (anschauen)    use = Linksklick (benutzen, nehmen, ansprechen)
@@ -40,11 +52,17 @@ import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui
 // Eine Reaktion ist ein Satz, eine Liste von Sätzen oder eine Funktion (story) => { … }.
 // Die Befehle für Funktionen (say, note, give, …) erklärt src/story/story.js.
 
-const NUMBERS = ['null', 'eine', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun'];
+const NUMBERS = ['null', 'eine', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf'];
 const FIRST_TUNNEL_IN = 60; // Fahrsekunden in der Runde beim Start: der erste Tunnel kommt nach gut einer Minute
 const TUNNEL_DIGIT = 5;     // die Ziffer an der Tunnelwand (Kamerabild)
-const PIECES = 6;           // in so viele Fetzen ist der Fahrplan zerrissen (siehe src/puzzles/jigsaw.js)
+const PIECES = 12;          // in so viele Fetzen ist der Fahrplan zerrissen (siehe src/puzzles/jigsaw.js)
 const LOCK_SYMBOLS = ['tunnel', 'lanternLeft', 'lanternRight', 'tower'];
+// Das Kofferschloss: dieselben Zeichen wie die eingekreisten Felder im Rätselheft – aber in dieser Reihenfolge
+const SUITCASE_SYMBOLS = ['moon', 'tower', 'tunnel'];
+const SUITCASE_CODE = SUITCASE_SYMBOLS.map((symbol) => circledValue(symbol)).join(''); // '264'
+const SYMBOL_WORDS = { tower: 'Turm', tunnel: 'Tunnel', moon: 'Mond' };
+// Zahlwörter, die der Turm morsen kann (siehe blink.morse in src/scene/trainCompartment.js)
+const NUMBER_WORDS = { NULL: 0, EINS: 1, ZWEI: 2, DREI: 3, VIER: 4, FUENF: 5, SECHS: 6, SIEBEN: 7, ACHT: 8, NEUN: 9 };
 
 const feed = new CameraFeed({ digit: TUNNEL_DIGIT }); // das Bild der Tunnelkamera
 
@@ -91,9 +109,10 @@ export const wagon1 = {
   update(story, dt) {
     feed.update(dt);
     if (!story.game.views.crt.isOpen || !cameraOn(story)) return;
-    if (story.motion.inTunnel && !story.flags.trainSeen) {
+    if (story.motion.inTunnel && story.motion.tunnel > 0.6 && !story.flags.trainSeen) {
       story.flags.trainSeen = true;
-      story.say('Das sind wir! Unser Zug fährt gerade an der Kamera vorbei.');
+      story.say('Das sind wir! Unser Zug – und seine Fenster leuchten die Tunnelwand an …');
+      story.note('Auf dem Kamerabild: Als unser Zug durch den Tunnel fuhr, beleuchteten seine Fenster die Tunnelwand. In dem gemalten Rahmen dort war etwas zu sehen.');
     }
     if (figureLevel(story) > 0.7 && !story.flags.figureSeen) {
       story.flags.figureSeen = true;
@@ -156,14 +175,11 @@ export const wagon1 = {
     panel: {
       look: async (story) => {
         if (story.flags.coverOpen) return story.say('Die Klappe unten ist offen. Das Batteriefach ist leer.');
-        await story.say('Knöpfe, Lämpchen, ein roter Drehknopf. Unten ist eine kleine Klappe – festgeschraubt. „Notstrom“ steht darauf.');
-        story.note('Am Schaltpult unter dem Bildschirm ist eine festgeschraubte Klappe: „Notstrom“.');
+        await story.say('Knöpfe, ein roter Drehknopf – und ein Feld mit fünf mal fünf Leuchttasten. Ein paar brennen.');
+        await story.say('Darunter eine kleine Klappe, festgeschraubt: „Notstrom“. Daneben: „Verriegelung“.');
+        story.note('Schaltpult unter dem Bildschirm: eine festgeschraubte Klappe „Notstrom“ und ein Feld mit 5 × 5 Leuchttasten, Aufschrift „Verriegelung“.');
       },
-      use: async (story) => {
-        if (story.flags.coverOpen) return story.say('Ohne Batterie leuchtet hier nichts mehr.');
-        await story.say('Ich drück ein paar Knöpfe. Nichts.');
-        await story.say('Interessant ist nur die Klappe unten. Aber die ist festgeschraubt.');
-      },
+      use: (story) => openBreaker(story),
       items: {
         knife: (story) => openCover(story),
         key: 'Der Schlüssel ist viel zu klein für diese Schrauben.',
@@ -217,7 +233,7 @@ export const wagon1 = {
         ? story.say('Die Werkzeugkiste. Ausgeräumt.')
         : story.say('Eine kleine Werkzeugkiste aus Blech. Mit einem Schloss dran.')),
       use: (story) => (story.flags.toolboxOpen
-        ? story.say('Leer. Das Messer und den Fetzen hab ich.')
+        ? story.say('Leer. Das Messer und die Fetzen hab ich.')
         : story.say('Abgeschlossen. Da müsste ein kleiner Schlüssel rein.')),
       items: {
         key: (story) => openToolbox(story),
@@ -240,7 +256,7 @@ export const wagon1 = {
           story.sound('creak');
           await story.wait(0.6);
           story.flags.pieceCigar = true;
-          await addPieces(story, 1, 'Keine Zigarren. Nur ein Papierfetzen.');
+          await addPieces(story, 3, 'Keine Zigarren. Nur Papierfetzen – drei Stück.');
         },
         key: 'Die Kiste hat kein Schloss. Der Deckel klemmt einfach.',
       },
@@ -267,7 +283,7 @@ export const wagon1 = {
         if (story.flags.pieceNews) return story.say('Die Zeitung nehme ich nicht mit. Aber die Schlagzeile merke ich mir.');
         await story.say('Ich heb die Zeitung mal an …');
         story.flags.pieceNews = true;
-        await addPieces(story, 1, 'Darunter lag ein Papierfetzen.');
+        await addPieces(story, 2, 'Darunter lagen zwei Papierfetzen.');
       },
     },
 
@@ -276,14 +292,14 @@ export const wagon1 = {
       use: async (story) => {
         if (story.flags.pieceFloor) return story.say('Der Rest ist nur noch Konfetti.');
         story.flags.pieceFloor = true;
-        await addPieces(story, 2, 'Zwei Fetzen sind groß genug, um etwas zu erkennen. Die nehme ich mit.');
+        await addPieces(story, 3, 'Drei Fetzen sind groß genug, um etwas zu erkennen. Die nehme ich mit.');
       },
     },
 
     crate: {
       look: async (story) => {
         await story.say('Eine schwere Kiste. Zugenagelt.');
-        if (!story.flags.pieceCrate) await story.say('Darunter klemmt ein Stück Papier.');
+        if (!story.flags.pieceCrate) await story.say('Darunter klemmt Papier.');
       },
       use: async (story) => {
         if (story.flags.pieceCrate) return story.say('Zugenagelt. Und viel zu schwer zum Tragen.');
@@ -291,24 +307,24 @@ export const wagon1 = {
         story.sound('creak');
         await story.wait(0.7);
         story.flags.pieceCrate = true;
-        await addPieces(story, 1, '… und zieh den Papierfetzen darunter heraus.');
+        await addPieces(story, 2, '… und zieh die zwei Papierfetzen darunter heraus.');
       },
       items: { knife: 'Mit dem Messer bekomme ich die Nägel nicht raus.' },
     },
 
     magazine: {
       look: (story) => (story.flags.magazineRead
-        ? story.say('Das Rätselheft mit dem halb gelösten Zahlenquadrat.')
+        ? story.say(story.flags.sudokuSolved ? 'Das Rätselheft. Das letzte Zahlenquadrat ist gelöst.' : 'Das Rätselheft mit dem verwinkelten Zahlenquadrat.')
         : story.say('Ein Rätselheft. Zerlesen, voller Eselsohren.')),
-      use: (story) => readMagazine(story),
+      use: (story) => openMagazine(story),
     },
 
     suitcase: {
       look: async (story) => {
         if (story.flags.suitcaseOpen) return story.say('Mein Koffer. Offen und leer.');
         await story.say('Ein roter Koffer auf der Gepäckablage, mit einer Kette gesichert.');
-        await story.say('An der Kette hängt ein Schloss mit drei Rädchen. Und ein Anhänger: „J.“');
-        story.note('Der rote Koffer auf der Ablage trägt einen Anhänger „J.“ – meiner? Er hängt an einer Kette mit Zahlenschloss: drei Ziffern.');
+        await story.say('An der Kette hängt ein Schloss mit drei Rädchen. Über den Rädchen: ein Mond, ein Turm, ein Tunnel.');
+        story.note('Der rote Koffer auf der Ablage trägt einen Anhänger „J.“ – meiner? Kette mit Zahlenschloss: drei Rädchen, darüber die Zeichen Mond, Turm, Tunnel (in dieser Reihenfolge).');
       },
       use: (story) => openSuitcase(story),
       items: {
@@ -438,9 +454,19 @@ function towerSignal(story) {
   return story.scene.outside.signals.tower;
 }
 
+// Die Ziffer, die der Turm morst (das Zahlwort als Zahl)
+function towerDigit(story) {
+  return NUMBER_WORDS[towerSignal(story).text];
+}
+
 // Die vier Ziffern für die Tür: Tunnel, Laternen links, Laternen rechts, Turm
 function doorCode(story) {
-  return `${TUNNEL_DIGIT}${story.motion.lanternCount('left')}${story.motion.lanternCount('right')}${towerSignal(story).digits}`;
+  return `${TUNNEL_DIGIT}${story.motion.lanternCount('left')}${story.motion.lanternCount('right')}${towerDigit(story)}`;
+}
+
+// Hat der Spieler das Turmlicht richtig mitgeschrieben?
+function towerTranscribed(story) {
+  return Boolean(story.flags.towerTranscript) && story.flags.towerTranscript === towerSignal(story).morse;
 }
 
 // ============================================================================================
@@ -454,8 +480,8 @@ async function readLetter(story) {
     lines: [
       'Joseph. Du hast wieder alles vergessen.',
       'Die Tür will vier Zahlen. Ich habe sie dort versteckt, wo der Tunnel sie nicht löschen kann.',
-      'Die Laternen sind gezählt und in die Tür geritzt – du siehst sie erst, wenn das Licht aus ist.',
-      'Der Turm spricht. Im Tunnel wacht ein Auge.',
+      'Was ich gezählt habe, steht im Holz der Tür. Lesen kannst du es nur ohne Licht.',
+      'Der Turm spricht. Im Tunnel wacht ein Auge – aber es sieht nur, was wir ihm zeigen.',
       'Fang beim Rucksack an. Und merk dir: Was du bei dir trägst, bleibt.',
     ],
     signature: '– J.',
@@ -464,7 +490,7 @@ async function readLetter(story) {
   story.flags.letterRead = true;
   await story.say('Das ist … meine Schrift. Aber das hab ich nie geschrieben.');
   await story.say('Oder?');
-  story.note('Brief in meiner Schrift: Die Tür will vier Zahlen. „Die Laternen sind in die Tür geritzt – zu sehen erst, wenn das Licht aus ist. Der Turm spricht. Im Tunnel wacht ein Auge. Fang beim Rucksack an. Was du bei dir trägst, bleibt.“');
+  story.note('Brief in meiner Schrift: „Die Tür will vier Zahlen. Was ich gezählt habe, steht im Holz der Tür – lesen nur ohne Licht. Der Turm spricht. Im Tunnel wacht ein Auge – es sieht nur, was wir ihm zeigen. Fang beim Rucksack an. Was du bei dir trägst, bleibt.“');
 }
 
 // Das Schloss an der Tür: vier Rädchen, vier Zeichen
@@ -496,7 +522,7 @@ async function openDoor(story) {
   await story.cutscene(async () => {
     story.flags.doorOpen = true;
     const left = story.motion.lanternCount('left'), right = story.motion.lanternCount('right');
-    await story.say(`Tunnel ${word(TUNNEL_DIGIT)}. ${word(left, true)} Laternen links, ${word(right)} rechts. Und der Turm sagt: ${word(Number(towerSignal(story).digits))}.`);
+    await story.say(`Tunnel ${word(TUNNEL_DIGIT)}. ${word(left, true)} Laternen links, ${word(right)} rechts. Und der Turm sagt: ${towerSignal(story).text}.`);
     await story.say('Ich hab mir den Weg selbst hinterlassen. Ich war also wirklich schon einmal hier …');
     story.sound('door');
     await story.wait(1);
@@ -526,7 +552,7 @@ async function openToolbox(story) {
   await story.say('Der Schlüssel passt!');
   story.give('knife');
   await story.say('Ein Taschenmesser. Die Spitze ist ganz stumpf.');
-  await addPieces(story, 1, 'Und ganz unten klemmt ein Papierfetzen.');
+  await addPieces(story, 2, 'Und ganz unten klemmen zwei Papierfetzen.');
   story.note('In der Werkzeugkiste: ein Taschenmesser mit stumpfer Spitze.');
 }
 
@@ -542,8 +568,8 @@ async function addPieces(story, count, line) {
   }
   await story.say(line);
   if (story.flags.pieces >= PIECES) {
-    await story.say('Sechs Fetzen. Das müssten alle sein – jetzt kann ich sie zusammensetzen.');
-    story.note('Ich habe alle sechs Fetzen des zerrissenen Fahrplans.');
+    await story.say('Zwölf Fetzen. Das müssten alle sein – jetzt kann ich sie zusammensetzen.');
+    story.note('Ich habe alle zwölf Fetzen des zerrissenen Fahrplans.');
   } else if (first) {
     await story.say('Ein Stück von einem Fahrplan. Solche Fetzen liegen hier überall – ich sollte sie sammeln.');
     story.note('Im Abteil liegen die Fetzen eines zerrissenen Fahrplans verstreut: am Boden, unter Dingen, in Dingen.');
@@ -565,22 +591,35 @@ async function openJigsaw(story) {
   story.game.inventory.replace('pieces', 'sheet');
   await story.say('Ein Fahrplan der Ringbahn. Abfahrt: Ringbahnhof. Ankunft: Ringbahnhof.');
   await story.say('Die Strecke ist ein Kreis – mit einem Turm genau in der Mitte.');
-  await story.say('Und rechts eine Tabelle: „Lichtsignale des Turms“. Für jede Ziffer ein Blinkzeichen.');
-  story.note('Der Fahrplan ist zusammengesetzt (Signaltafel im Inventar): Die Ringbahn fährt im Kreis um einen Turm. Der Turm blinkt Ziffern – die Tabelle steht auf der Signaltafel.');
+  await story.say('Und rechts eine Tabelle: „Lichtsignale des Turms“. Für jeden Buchstaben ein Blinkzeichen.');
+  story.note('Der Fahrplan ist zusammengesetzt (Signaltafel im Inventar): Die Ringbahn fährt im Kreis um einen Turm. Auf der Tafel: das Morsealphabet, „Lichtsignale des Turms“. Handschriftlich: „Er buchstabiert eine Zahl!“');
 }
 
 // ============================================================================================
 //  Rätselheft, Koffer, Fernglas
 // ============================================================================================
 
-async function readMagazine(story) {
+async function openMagazine(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln kann ich nicht lesen.');
   story.sound('paper');
-  await story.card({ draw: drawPuzzlePage });
-  if (story.flags.magazineRead) return;
-  story.flags.magazineRead = true;
-  await story.say('Alle Rätsel im Heft sind gelöst – in meiner Handschrift.');
-  await story.say('Nur das letzte nicht. Drei Felder sind eingekreist, und am Rand steht: „Koffer“.');
-  story.note('Rätselheft, letzte Seite: ein halb gelöstes Zahlenquadrat (1 bis 4, jede Zahl einmal pro Reihe, Spalte und Kästchen). Drei Felder sind eingekreist – ①, ②, ③ – daneben steht „Koffer“.');
+  const watching = story.view('sudoku');
+  if (!story.flags.magazineRead) {
+    story.flags.magazineRead = true;
+    await story.say('Alle Rätsel im Heft sind gelöst – in meiner Handschrift. Nur das letzte nicht.');
+    await story.say('Fünf Sterne. Drei Felder sind rot eingekreist, mit kleinen Zeichen. Am Rand: „Koffer!“');
+    story.note('Rätselheft, letzte Seite: ein verwinkeltes Zahlenquadrat (6 × 6, Zahlen 1–6, jede einmal pro Reihe, Spalte und Gebiet), nur sieben Zahlen vorgegeben. Drei Felder sind rot eingekreist und mit Zeichen markiert: Turm, Tunnel, Mond. Am Rand: „Koffer!“');
+  }
+  const solved = await watching;
+  if (inTunnel(story)) return;
+  const sudoku = story.game.views.sudoku;
+  if (solved && !story.flags.sudokuSolved) {
+    story.flags.sudokuSolved = true;
+    const values = CIRCLES.map(({ symbol }) => `${SYMBOL_WORDS[symbol]} ${circledValue(symbol)}`).join(', ');
+    await story.say('Gelöst. Jede Reihe, jede Spalte, jedes Gebiet – alles geht auf.');
+    story.note(`Zahlenquadrat gelöst. Die eingekreisten Felder: ${values}.`);
+  } else if (!solved && sudoku.full) {
+    await story.say('Alles ausgefüllt … aber irgendwo stimmt etwas nicht. Eine Zahl steht doppelt.');
+  }
 }
 
 async function openSuitcase(story) {
@@ -592,17 +631,18 @@ async function openSuitcase(story) {
     id: 'suitcase',
     digits: 3,
     style: 'steel',
+    symbols: SUITCASE_SYMBOLS,
     check: (code) => {
       tries += 1;
-      return code === SUDOKU_CODE;
+      return code === SUITCASE_CODE;
     },
   });
   if (!opened) {
     if (tries === 0 || inTunnel(story)) return;
     await story.say('Falsch. Die Kette hält.');
     await story.say(story.flags.magazineRead
-      ? 'Im Rätselheft stand „Koffer“ neben drei eingekreisten Feldern. Die muss ich ausrechnen.'
-      : 'Drei Ziffern. Wenn der Koffer mir gehört, habe ich sie mir bestimmt irgendwo aufgeschrieben.');
+      ? 'Mond, Turm, Tunnel … dieselben Zeichen wie an den Kreisen im Rätselheft.'
+      : 'Drei Ziffern unter drei Zeichen. Wenn der Koffer mir gehört, habe ich sie mir bestimmt irgendwo notiert.');
     return;
   }
   story.flags.suitcaseOpen = true;
@@ -633,29 +673,28 @@ async function lookOutside(story) {
   }
 }
 
-// Fernglas am Fenster: das Turmlicht beobachten
+// Fernglas am Fenster: das Turmlicht beobachten und selbst mitschreiben
 async function watchTower(story) {
   if (inTunnel(story)) return story.say('Im Tunnel sehe ich nur Wand.');
   const signal = towerSignal(story);
   const watching = story.view('binoculars', { signal, clock: () => story.scene.outside.time });
   if (!story.flags.towerLooked) {
     story.flags.towerLooked = true;
-    await story.say('Der Turm – ganz nah. Das rote Licht blinkt … mal kurz, mal lang.');
+    await story.say('Der Turm – ganz nah. Das rote Licht blinkt … mal kurz, mal lang. Und die Pausen sind verschieden lang.');
+    await story.say('Ich sollte mitschreiben. Genau.');
   }
-  const watched = await watching;
+  const transcript = await watching;
+  if (!transcript || transcript === story.flags.towerTranscript) return;
+  story.flags.towerTranscript = transcript;
+  story.note(`Meine Mitschrift vom Turmlicht: ${prettyMorse(transcript)}   (• kurz, – lang, / Buchstabe zu Ende)`);
   if (inTunnel(story)) return;
-  if (!watched) {
-    if (!story.flags.towerSeen) await story.say('Ich sollte länger hinsehen – bis das Signal einmal ganz durchgelaufen ist.');
-    return;
-  }
-  if (story.flags.towerSeen) return;
-  story.flags.towerSeen = true;
-  const marks = signal.flashes.map((flash) => (flash.long ? 'lang' : 'kurz'));
-  story.note(`Turmlicht durchs Fernglas: ${marks.join(' – ')}. Dann eine Pause, dann wieder von vorn.`);
-  await story.say(`${marks.join(', ')}. Immer dasselbe Zeichen.`.replace(/^./, (letter) => letter.toUpperCase()));
-  await story.say(story.flags.jigsawDone
-    ? 'Das kann ich auf der Signaltafel nachschlagen.'
-    : 'Das ist ein Signal. Aber ohne Tabelle kann ich es nicht lesen.');
+  // Joseph sagt nicht, ob die Mitschrift stimmt – das zeigt sich erst beim Übersetzen.
+  await story.say(story.flags.jigsawDone ? 'Notiert. Jetzt mit der Signaltafel übersetzen.' : 'Notiert. Aber ohne Tabelle kann ich das nicht lesen.');
+}
+
+// '-.. / .-.' → '–•• / •–•'
+function prettyMorse(morse) {
+  return [...morse].map((mark) => (mark === '.' ? '•' : mark === '-' ? '–' : mark)).join('');
 }
 
 // ============================================================================================
@@ -723,9 +762,9 @@ async function watchScreen(story) {
   } else if (!story.flags.feedSeen) {
     story.flags.feedSeen = true;
     await story.say('Eine Kamera. Sie hängt in einem Tunnel …');
-    await story.say(`An der Tunnelwand steht eine riesige ${word(TUNNEL_DIGIT, true)}.`);
+    await story.say('Links an der Wand ist ein Rahmen aufgemalt. Was drinsteht? Viel zu dunkel.');
     await story.say('Und die Uhr im Bild steht still: 00:00:00.');
-    story.note(`Kamerabild aus dem Tunnel („Im Tunnel wacht ein Auge“): An der Tunnelwand steht groß die Ziffer ${TUNNEL_DIGIT}. Die Uhr im Bild steht auf 00:00:00.`);
+    story.note('Kamerabild aus dem Tunnel („Im Tunnel wacht ein Auge“): Links an der Tunnelwand ist ein Rahmen aufgemalt – zu dunkel, um zu lesen, was darin steht. Die Uhr im Bild steht auf 00:00:00.');
   }
   await watching;
 }
@@ -742,11 +781,35 @@ async function seeFigure(story) {
 //  Schaltpult: Klappe, Batterie – und der Trick mit dem Tunnel
 // ============================================================================================
 
+// Die Leuchttasten am Schaltpult: Notstrom-Verriegelung ("Lights Out")
+async function openBreaker(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln … die Tasten leuchten zwar, aber ich will nicht blind drücken.');
+  if (story.flags.coverOpen) return story.say('Die Klappe ist offen. Hier gibt es nichts mehr zu tun.');
+  if (story.flags.panelUnlocked) return story.say('Alle Lampen sind aus, die Verriegelung ist frei. Jetzt noch die Schrauben.');
+  const watching = story.view('breaker');
+  if (!story.flags.breakerLooked) {
+    story.flags.breakerLooked = true;
+    await story.say('„Klappe wird frei, wenn alle Lampen erloschen sind.“ Mal sehen …');
+  }
+  const unlocked = await watching;
+  if (!unlocked || inTunnel(story)) return;
+  story.flags.panelUnlocked = true;
+  await story.say('Klack. Der Magnet hinter der Klappe lässt los.');
+  story.note(story.flags.batteries
+    ? 'Die Verriegelung am Schaltpult ist wieder gelöst.'
+    : 'Notstrom-Verriegelung am Schaltpult gelöst: Alle Leuchttasten sind aus. Eine Taste schaltet sich selbst und ihre vier Nachbarn um. Die Klappe ist aber noch festgeschraubt.');
+}
+
 // Messer an der Klappe des Schaltpults → Batterie (der Bildschirm geht aus)
 async function openCover(story) {
   if (story.flags.coverOpen) return story.say('Die Klappe ist schon offen. Das Fach ist leer.');
   if (story.has('flashlight')) return story.say('Meine Taschenlampe hat ihre zwei Batterien. Diese hier bleibt drin – sonst geht der Bildschirm aus.');
   if (story.has('battery')) return story.say('Ich habe schon eine lose Batterie in der Tasche. Erst einmal die verbauen.');
+  if (!story.flags.panelUnlocked) {
+    await story.say('Die Schrauben gehen auf … aber die Klappe rührt sich nicht. Da hält etwas von innen – ein Magnet.');
+    await story.say('„Verriegelung“. Die Leuchttasten darüber.');
+    return;
+  }
   const again = (story.flags.batteries ?? 0) > 0;
   await story.say(again ? 'Die Schrauben sitzen wieder fest. Also noch einmal …' : 'Die Messerspitze passt in die Schrauben …');
   story.sound('screw');
@@ -771,16 +834,16 @@ async function openCover(story) {
 //  Tunnel
 // ============================================================================================
 
-// Im Dunkeln mit der Taschenlampe an der Tür gefunden
+// Im Dunkeln mit der Taschenlampe an der Tür gefunden: zwei Strichgruppen ohne Pfeile, unter der zweiten ein Turm.
+// Welche Gruppe zu welcher Seite gehört, sagt Joseph nicht – der Turm steht in den linken Fenstern.
 async function readScratches(story) {
   const left = story.motion.lanternCount('left'), right = story.motion.lanternCount('right');
   await story.say('Kratzer im Holz. Frisch – im Lampenlicht sieht man sie gar nicht.');
-  await story.say(`${word(left, true)} Striche, ein Pfeil nach links. ${word(right, true)} Striche, ein Pfeil nach rechts.`);
+  await story.say(`Zwei Gruppen Striche. Vorne ${word(right)}. Dahinter ${word(left)} – und darunter ist ein kleiner Turm eingeritzt.`);
   if (!story.flags.seenScratches) {
     story.flags.seenScratches = true;
-    story.note(`In die Tür geritzt: ${left} Striche mit Pfeil nach links, ${right} Striche mit Pfeil nach rechts. Die Laternen!`);
+    story.note(`In die Tür geritzt, nur im Dunkeln zu sehen: zwei Strichlisten ohne Pfeile. Erst ${right} Striche, dann ${left} Striche mit einem kleinen Turm darunter.`);
   }
-  await story.say(`Die Laternen: ${word(left)} links, ${word(right)} rechts. Zwei Zeichen vom Türschloss.`);
   if (story.has('knife')) await story.say('Und die Spitze meines Messers ist stumpf … Das hab ich selbst geritzt.');
 }
 
@@ -829,6 +892,8 @@ async function afterTunnel(story) {
   story.flags.letterInSlot = true;
   story.flags.coverOpen = false;
   story.flags.screenOff = false;
+  story.flags.panelUnlocked = false;
+  story.game.views.breaker.reset(); // die Leuchttasten brennen wieder wie am Anfang
   refreshScreen(story);
 
   await story.idle();
@@ -874,10 +939,10 @@ async function afterTunnel(story) {
     await story.cutscene(async () => {
       story.faceToward({ x: 820, y: 280 });
       await story.say('Der Bildschirm läuft wieder?!');
-      await story.say('Und die Klappe am Schaltpult ist wieder zugeschraubt. Als hätte ich sie nie geöffnet.');
+      await story.say('Und die Klappe am Schaltpult ist wieder zugeschraubt. Die Leuchttasten brennen wieder – genau wie vorhin.');
       await story.say('Wenn alles zurückspringt … dann steckt dahinter jetzt wieder eine Batterie.');
     });
-    story.note('Nach dem Tunnel war die Klappe am Schaltpult wieder zugeschraubt und der Bildschirm lief wieder – obwohl ich die Batterie bei mir trage. Dann liegt dahinter jetzt noch eine!');
+    story.note('Nach dem Tunnel war die Klappe am Schaltpult wieder zugeschraubt und verriegelt, die Leuchttasten brannten wie am Anfang, und der Bildschirm lief wieder – obwohl ich die Batterie bei mir trage.');
   }
 }
 
@@ -893,10 +958,12 @@ function nextHint(story) {
   return lines[level];
 }
 
-// Woran Joseph gerade arbeiten sollte – und was er dazu sagt, wenn man ihn mehrmals fragt
+// Woran Joseph gerade arbeiten sollte – und was er dazu sagt, wenn man ihn mehrmals fragt.
+// Die letzte Stufe verrät jeweils die Lösung; davor gibt es nur Schubser in die richtige Richtung.
 function currentGoal(story) {
   const f = story.flags;
   const left = story.motion.lanternCount('left'), right = story.motion.lanternCount('right');
+  const signal = towerSignal(story);
 
   if (!story.has('letter') && !f.letterRead) {
     return { id: 'letter', lines: ['Am Schaltpult rechts neben der Tür steckt ein Brief. Damit sollte ich anfangen.'] };
@@ -913,30 +980,33 @@ function currentGoal(story) {
     const missing = [
       !f.pieceFloor && 'Vorne links auf dem Boden liegt zerrissenes Papier. Das sollte ich aufheben.',
       !f.pieceNews && 'Auf der linken Sitzbank liegt eine Zeitung. Darunter schaut eine Papierecke hervor.',
-      !f.pieceCrate && 'Unter der Kiste vorne rechts klemmt ein Stück Papier.',
+      !f.pieceCrate && 'Unter der Kiste vorne rechts klemmt Papier.',
       !f.pieceCigar && 'In der Zigarrenkiste auf dem Tisch raschelt etwas. Der Deckel klemmt – mit der Messerklinge ginge er auf.',
     ].filter(Boolean);
-    return { id: `pieces${f.pieces}`, lines: ['Überall liegen Fetzen eines Fahrplans: am Boden, unter Dingen, in Dingen. Sechs müssten es sein.', missing[0]] };
+    return { id: `pieces${f.pieces}`, lines: ['Überall liegen Fetzen eines Fahrplans: am Boden, unter Dingen, in Dingen. Zwölf müssten es sein.', missing[0]] };
   }
   if (!f.jigsawDone) {
     return { id: 'jigsaw', lines: [
-      'Ich habe alle sechs Fetzen. Rechtsklick auf die Papierfetzen im Inventar, dann kann ich sie zusammensetzen.',
-      'Die Fetzen mit gedrückter Maustaste in den gestrichelten Rahmen ziehen. Am besten mit den Ecken anfangen – die haben zwei gerade Kanten.',
+      'Ich habe alle zwölf Fetzen. Rechtsklick auf die Papierfetzen im Inventar, dann kann ich sie zusammensetzen.',
+      'Die Fetzen liegen verdreht: Ein kurzer Klick dreht einen Fetzen, mit gedrückter Maustaste schiebe ich ihn. Er rastet nur ein, wenn er richtig herum liegt.',
+      'Mit den vier Ecken anfangen – sie haben zwei gerade Kanten. Die Schrift muss waagerecht stehen, dann stimmt die Drehung.',
     ] };
   }
   if (!f.suitcaseOpen) {
     return { id: 'suitcase', lines: [
-      'Der rote Koffer auf der Gepäckablage trägt mein Zeichen. Für sein Schloss brauche ich drei Ziffern.',
-      'Auf der rechten Sitzbank liegt ein Rätselheft. Auf der letzten Seite steht „Koffer“ – neben drei eingekreisten Feldern.',
-      'Das Zahlenquadrat: In der zweiten Reihe fehlt nur noch die 2, ganz rechts. Dann bleibt rechts oben nur die 3 – und so geht es weiter.',
-      'Die eingekreisten Felder der Reihe nach: ① ist 2, ② ist 4, ③ ist 3.',
+      'Der rote Koffer auf der Gepäckablage trägt mein Zeichen. Sein Schloss hat drei Rädchen – darüber Mond, Turm und Tunnel.',
+      'Auf der rechten Sitzbank liegt ein Rätselheft. Im letzten Zahlenquadrat sind drei Felder eingekreist – mit genau diesen Zeichen.',
+      'Das Zahlenquadrat: Gebiete sind die dick umrandeten Flächen. Frag bei jeder Zahl: Wo in dieser Reihe, Spalte oder diesem Gebiet kann sie überhaupt noch hin? Oft bleibt nur ein Feld.',
+      'Ein Anfang: Wohin gehört die 5 in der Spalte ganz rechts? Oben stehen schon 4 und 3, Reihe 3 hat ihre 5 schon – und das Gebiet mit dieser 5 reicht rechts bis in Reihe 5 hinunter. Bleibt nur ein Feld. Danach die 5 in den anderen Spalten.',
+      `Die eingekreisten Felder: Turm ${circledValue('tower')}, Tunnel ${circledValue('tunnel')}, Mond ${circledValue('moon')}. Am Koffer stehen die Zeichen aber in der Reihenfolge Mond, Turm, Tunnel: ${SUITCASE_CODE}.`,
     ] };
   }
   if (!f.wiresDone) {
     return { id: 'wires', lines: [
       'Der Brief sagt: Im Tunnel wacht ein Auge. In meiner Akte steht: eine Kamera – und der Verteilerkasten. Das ist der Blechkasten links neben der Tür.',
-      'Im Verteilerkasten die Kabelstücke drehen, bis eine grüne Leitung vom Eingang „Kamera“ links bis zum Ausgang „Bildschirm“ rechts reicht.',
-      'Vom Eingang erst nach oben, oben entlang zwei Felder nach rechts, in der mittleren Spalte zwei Felder nach unten, ein Feld nach links, eins nach unten – und dann unten entlang bis ganz rechts und hoch zum Ausgang.',
+      'Ein Weg von „Kamera“ zu „Bildschirm“ reicht nicht: ALLE Kabelstücke müssen zu einem Netz verbunden sein, kein Kabel darf ins Leere zeigen, und es darf keine Schleife geben.',
+      'Vom Rand her denken: Ein Kabel darf nie aus dem Kasten herauszeigen. Ecken in den Ecken des Kastens haben nur eine richtige Drehung. Und zwei Endstücke nebeneinander dürfen nie nur einander verbinden – sonst sind sie vom Rest abgeschnitten.',
+      'Kreuzungen muss man nie drehen. Gerade Stücke am Rand müssen am Rand entlanglaufen. Von dort aus arbeitet sich das Netz nach innen fast von allein.',
     ] };
   }
   if (!f.feedSeen) {
@@ -944,18 +1014,35 @@ function currentGoal(story) {
       ? 'Das Signal steht, aber der Bildschirm ist aus – seine Batterie habe ich in der Tasche. Nach dem nächsten Tunnel ist alles wieder an seinem Platz. Auf einer Sitzbank kann ich warten.'
       : 'Das Signal steht. Ich sollte mir den Bildschirm rechts neben der Tür aus der Nähe ansehen.'] };
   }
-  if (!f.towerSeen) {
+  if (!f.trainSeen) {
+    return { id: 'tunnelDigit', lines: [
+      'An der Tunnelwand ist ein Rahmen aufgemalt, aber er ist viel zu dunkel. Der Brief sagt: Das Auge sieht nur, was wir ihm zeigen.',
+      'Was bringt Licht in den Tunnel? Unser eigener Zug – seine Fenster sind erleuchtet. Ich muss auf den Bildschirm sehen, während wir durch den Tunnel fahren.',
+      'Kurz vor dem Tunnel den Bildschirm aus der Nähe ansehen und offen lassen – er leuchtet auch im Dunkeln. Der Bildschirm braucht dafür seine Batterie.',
+    ] };
+  }
+  if (!towerTranscribed(story)) {
     return { id: 'tower', lines: [
       'Der Brief sagt: Der Turm spricht. Sein rotes Licht blinkt – mit dem Fernglas könnte ich es genau sehen.',
-      'Fernglas im Inventar anklicken, dann ein Fenster. Und so lange hinsehen, bis das Signal einmal ganz durchgelaufen ist.',
+      'Fernglas im Inventar anklicken, dann ein Fenster. Mitschreiben mit den Knöpfen unten: kurz, lang – und „Buchstabe zu Ende“, wenn die Pause länger ist.',
+      'Ein langes Licht dauert dreimal so lange wie ein kurzes. Zwischen den Zeichen eines Buchstabens ist die Pause kurz, zwischen zwei Buchstaben dreimal so lang. Ganz am Ende kommt eine lange Pause – dort fängt das Wort von vorn an.',
+      `Das Turmlicht ist: ${prettyMorse(signal.morse)}.`,
     ] };
   }
   if (!story.has('flashlight')) {
     if (story.has('battery')) return { id: 'combine', lines: ['Die Batterie gehört in die Taschenlampe: Batterie im Inventar anklicken, dann die Taschenlampe.'] };
+    if (!f.panelUnlocked && !f.coverOpen) {
+      return { id: f.batteries ? 'breaker2' : 'breaker', lines: [
+        'Für den dunklen Tunnel brauche ich Licht – und die Taschenlampe braucht Batterien. Am Schaltpult ist eine Klappe „Notstrom“, verriegelt über die Leuchttasten.',
+        'Jede Taste schaltet sich selbst und ihre Nachbarn oben, unten, links und rechts um. Alle Lampen müssen aus sein.',
+        'Ein bewährter Weg: Zeile für Zeile von oben nach unten. Brennt in einer Zeile eine Lampe, drücke die Taste direkt darunter. So wandern alle Lampen in die unterste Zeile.',
+        'Brennen am Ende noch Lampen in der untersten Zeile, verrät ihr Muster, welche Tasten der obersten Zeile man zuerst drücken muss – dann noch einmal von oben nach unten. Oder einfach: Diese neun Tasten drücken (Reihe, Spalte): 1-2, 1-4, 2-1, 2-5, 3-3, 4-2, 5-1, 5-4, 5-5.',
+      ] };
+    }
     if (!f.batteries) {
       return { id: 'battery1', lines: [
-        'Für den dunklen Tunnel brauche ich Licht. Die Taschenlampe braucht Batterien – am Schaltpult ist unten eine Klappe: „Notstrom“.',
-        'Die Messerspitze passt in die Schrauben der Klappe: Taschenmesser im Inventar anklicken, dann das Schaltpult.',
+        'Die Verriegelung ist frei. Jetzt noch die Schrauben der Klappe.',
+        'Die Messerspitze passt in die Schrauben: Taschenmesser im Inventar anklicken, dann das Schaltpult.',
       ] };
     }
     if (f.coverOpen) {
@@ -966,22 +1053,23 @@ function currentGoal(story) {
       ] };
     }
     return { id: 'battery2', lines: [
-      'Die Klappe am Schaltpult ist wieder zugeschraubt. Ob dahinter wieder eine Batterie liegt?',
+      'Die Verriegelung ist wieder frei. Ob hinter der Klappe wieder eine Batterie liegt?',
       'Noch einmal mit dem Taschenmesser die Klappe am Schaltpult öffnen – dann habe ich die zweite Batterie.',
     ] };
   }
   if (!f.seenScratches) {
     return { id: 'scratches', lines: [
-      'Der Brief sagt: Die Laternen sind in die Tür geritzt – zu sehen erst, wenn das Licht aus ist. Im Tunnel geht es aus. Auf einer Sitzbank kann ich darauf warten.',
+      'Der Brief sagt: Was ich gezählt habe, steht im Holz der Tür – lesen nur ohne Licht. Im Tunnel geht das Licht aus. Auf einer Sitzbank kann ich darauf warten.',
       'Im Tunnel mit der Taschenlampe die Tür ableuchten – der Lichtkegel folgt dem Mauszeiger. Die Kratzer sind in der unteren Hälfte, unter dem gelb-schwarzen Streifen.',
       `Oder ich zähle selbst: eine ganze Runde lang die Laternen, links und rechts getrennt. Es sind ${left} und ${right}.`,
     ] };
   }
   return { id: 'door', lines: [
-    'Ich habe alles beisammen: Tunnel, Laterne links, Laterne rechts, Turm. Es steht in meinem Notizbuch – jetzt zur Tür.',
+    'Vier Zeichen, vier Ziffern: Tunnel, Laterne links, Laterne rechts, Turm. Was ich dafür brauche, steht in meinem Notizbuch.',
+    'Die Kratzer haben keine Pfeile. Aber unter einer Gruppe ist ein Turm – durch welche Fenster sehe ich den Turm?',
     f.jigsawDone
-      ? 'Das Turmlicht muss ich noch übersetzen: Blinkzeichen aus dem Notizbuch mit der Signaltafel vergleichen (Rechtsklick auf die Signaltafel).'
-      : 'Für das Turmlicht brauche ich die Tabelle vom Fahrplan.',
-    `Tunnel: ${TUNNEL_DIGIT}. Laternen links: ${left}. Laternen rechts: ${right}. Und das Turmlicht (${towerSignal(story).flashes.map((flash) => (flash.long ? 'lang' : 'kurz')).join('-')}) ist die ${towerSignal(story).digits}.`,
+      ? 'Das Turmlicht übersetzen: Mitschrift aus dem Notizbuch Buchstabe für Buchstabe mit dem Morsealphabet auf der Signaltafel vergleichen (Rechtsklick auf die Signaltafel). Es ist ein Zahlwort.'
+      : 'Für das Turmlicht brauche ich das Morsealphabet vom Fahrplan.',
+    `Der Turm steht in den linken Fenstern: links ${left}, rechts ${right}. Tunnel: ${TUNNEL_DIGIT}. Das Turmlicht morst ${signal.text} – also ${towerDigit(story)}. Zusammen: ${doorCode(story)}.`,
   ] };
 }

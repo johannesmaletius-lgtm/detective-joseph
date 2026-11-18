@@ -1,9 +1,9 @@
-import { MORSE_DIGITS } from '../effects/morse.js';
+import { MORSE } from '../effects/morse.js';
 import { drawSymbol } from './symbols.js';
 import { roundedRect, wrapText } from './text.js';
 
 // Gezeichnete Blätter, die Joseph in die Hand nimmt: die Signaltafel der Ringbahn (auch das Bild
-// für das Papierpuzzle), eine Seite aus dem Rätselheft und seine Detektivakte.
+// für das Papierpuzzle) und seine Detektivakte. (Das Rätselheft ist eine eigene Nahansicht: src/puzzles/sudoku.js)
 //
 // Anzeigen als Karte (siehe overlay.js):
 //   await story.card({ draw: (ctx) => drawSignalCard(ctx) });
@@ -67,7 +67,7 @@ export function drawSignalSheet(ctx) {
   ctx.save();
   ctx.translate(318, 388);
   ctx.rotate(-0.04);
-  ctx.fillText('Der Turm sendet eine Zahl!', 0, 0);
+  ctx.fillText('Er buchstabiert eine Zahl!', 0, 0);
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(236, -8);
@@ -107,14 +107,6 @@ function drawRouteMap(ctx, cx, cy, radius) {
   ctx.textAlign = 'left';
   ctx.fillText('TUNNEL', cx - 4, cy + radius + 39);
 
-  // Laternen (kleine Kreise) innen und außen am Gleis
-  for (const [angle, inner] of [[-2.7, true], [-2.2, false], [-1.5, true], [-0.9, false], [-0.3, false], [0.5, true], [2.6, true], [3.4, false]]) {
-    const r = radius + (inner ? -17 : 17);
-    ctx.beginPath();
-    ctx.arc(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r, 3.4, 0, Math.PI * 2);
-    ctx.fillStyle = INK;
-    ctx.fill();
-  }
   // Turm in der Mitte
   drawSymbol(ctx, 'tower', cx, cy - 4, 46, INK);
   ctx.beginPath();
@@ -194,21 +186,23 @@ function drawSignalTable(ctx, x, y, width, height) {
   ctx.textBaseline = 'middle';
   ctx.fillText('LICHTSIGNALE DES TURMS', x + width / 2, y + 16);
 
-  const rowHeight = 35;
-  const columns = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 0]];
-  columns.forEach((digits, column) => {
-    const left = x + 12 + column * (width / 2);
-    digits.forEach((digit, row) => {
-      const cy = y + 54 + row * rowHeight;
-      ctx.fillStyle = INK;
-      ctx.font = `bold 22px ${PRINT}`;
-      ctx.textAlign = 'left';
-      ctx.fillText(String(digit), left, cy + 1);
-      drawMarks(ctx, MORSE_DIGITS[digit], left + 28, cy, INK);
-    });
+  // Das Morsealphabet in drei Spalten
+  const rowHeight = 20;
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const columnWidth = width / 3;
+  letters.forEach((letter, i) => {
+    const column = Math.floor(i / 9), row = i % 9;
+    const left = x + 10 + column * columnWidth;
+    const cy = y + 48 + row * rowHeight;
+    ctx.fillStyle = INK;
+    ctx.font = `bold 15px ${PRINT}`;
+    ctx.textAlign = 'left';
+    ctx.fillText(letter, left, cy + 1);
+    drawMarks(ctx, MORSE[letter], left + 20, cy, INK, 0.62);
   });
   ctx.lineWidth = 1;
-  line(ctx, x + width / 2, y + 36, x + width / 2, y + 216);
+  line(ctx, x + columnWidth, y + 36, x + columnWidth, y + 214);
+  line(ctx, x + 2 * columnWidth, y + 36, x + 2 * columnWidth, y + 214);
   line(ctx, x + 8, y + 220, x + width - 8, y + 220);
   // Legende
   ctx.fillStyle = INK;
@@ -261,130 +255,11 @@ export function drawSignalCard(ctx) {
   ctx.strokeStyle = 'rgba(70, 45, 20, 0.35)';
   ctx.lineWidth = 1.2;
   ctx.setLineDash([7, 4]);
-  line(ctx, 206, 0, 214, SHEET.height);
-  line(ctx, 408, 0, 402, SHEET.height);
-  line(ctx, 0, 206, SHEET.width, 214);
-  ctx.restore();
-}
-
-// ============================================================================================
-//  Rätselheft: das letzte, halb gelöste Zahlenquadrat
-// ============================================================================================
-// 0 = leeres Feld. PRINTED = gedruckt, WRITTEN = von Joseph eingetragen, CIRCLES = eingekreiste Felder ①②③.
-// Lösung:  2 4 1 3 / 1 3 4 2 / 4 2 3 1 / 3 1 2 4   →   ① = 2, ② = 4, ③ = 3
-const PRINTED = [
-  [0, 4, 1, 0],
-  [1, 0, 4, 0],
-  [4, 0, 3, 0],
-  [0, 0, 0, 0],
-];
-const WRITTEN = [
-  [2, 0, 0, 0],
-  [0, 3, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-];
-const CIRCLES = [
-  { row: 2, column: 1, label: '①' },
-  { row: 3, column: 3, label: '②' },
-  { row: 3, column: 0, label: '③' },
-];
-export const SUDOKU_CODE = '243';
-
-export function drawPuzzlePage(ctx) {
-  const width = 580, height = 620;
-  ctx.save();
-  ctx.translate(640, 336);
-  ctx.rotate(0.015);
-  ctx.translate(-width / 2, -height / 2);
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-  ctx.shadowBlur = 26;
-  ctx.shadowOffsetY = 8;
-  const paper = ctx.createLinearGradient(0, 0, 0, height);
-  paper.addColorStop(0, '#f3ecd8');
-  paper.addColorStop(1, '#e2d6b6');
-  ctx.fillStyle = paper;
-  ctx.fillRect(0, 0, width, height);
-  ctx.shadowColor = 'transparent';
-
-  // Kopfzeile
-  ctx.fillStyle = INK;
-  ctx.textBaseline = 'alphabetic';
-  ctx.textAlign = 'left';
-  ctx.font = `bold 13px ${PRINT}`;
-  ctx.fillText('RÄTSELFREUND  ·  Heft für lange Fahrten', 34, 40);
-  ctx.textAlign = 'right';
-  ctx.fillText('Seite 41', width - 34, 40);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = INK;
-  line(ctx, 34, 50, width - 34, 50);
-  ctx.textAlign = 'left';
-  ctx.font = `bold 28px ${PRINT}`;
-  ctx.fillText('Zahlenquadrat', 34, 92);
-  ctx.font = `14px ${PRINT}`;
-  wrapText(ctx, 'In jede Reihe, in jede Spalte und in jedes der vier dick umrandeten Kästchen gehören die Zahlen 1, 2, 3 und 4 – jede genau einmal.', width - 68)
-    .forEach((row, i) => ctx.fillText(row, 34, 118 + i * 19));
-
-  // Das Quadrat
-  const cell = 84, left = 34, top = 176;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.fillRect(left, top, cell * 4, cell * 4);
-  ctx.strokeStyle = INK;
-  for (let i = 0; i <= 4; i++) {
-    ctx.lineWidth = i % 2 === 0 ? 4 : 1.2;
-    line(ctx, left + i * cell, top, left + i * cell, top + cell * 4);
-    line(ctx, left, top + i * cell, left + cell * 4, top + i * cell);
-  }
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let row = 0; row < 4; row++) {
-    for (let column = 0; column < 4; column++) {
-      const x = left + column * cell + cell / 2, y = top + row * cell + cell / 2;
-      if (PRINTED[row][column]) {
-        ctx.font = `bold 46px ${PRINT}`;
-        ctx.fillStyle = INK;
-        ctx.fillText(String(PRINTED[row][column]), x, y + 3);
-      } else if (WRITTEN[row][column]) {
-        ctx.font = `48px ${HAND}`;
-        ctx.fillStyle = BLUE_INK;
-        ctx.fillText(String(WRITTEN[row][column]), x + 2, y + 2);
-      }
-    }
-  }
-  // Eingekreiste Felder (roter Stift, etwas krakelig)
-  ctx.strokeStyle = RED_PENCIL;
-  ctx.fillStyle = RED_PENCIL;
-  for (const { row, column, label } of CIRCLES) {
-    const x = left + column * cell + cell / 2, y = top + row * cell + cell / 2;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(x, y, 31, 28, 0.3, 0.3, Math.PI * 2 + 0.7);
-    ctx.stroke();
-    ctx.font = `bold 19px ${PRINT}`;
-    ctx.fillText(label, x + 29, y - 28);
-  }
-
-  // Rand: Josephs Notizen
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = BLUE_INK;
-  ctx.font = `22px ${HAND}`;
-  ctx.save();
-  ctx.translate(396, 236);
-  ctx.rotate(0.05);
-  ctx.fillText('Koffer:', 0, 0);
-  ctx.restore();
-  ctx.fillStyle = RED_PENCIL;
-  ctx.font = `bold 26px ${PRINT}`;
-  ctx.fillText('① ② ③', 396, 276);
-  ctx.fillStyle = BLUE_INK;
-  ctx.font = `19px ${HAND}`;
-  ['Bin zu müde.', 'Rest später.', '', 'NICHT', 'EINSCHLAFEN!'].forEach((row, i) => ctx.fillText(row, 396, 336 + i * 27));
-  ctx.fillStyle = INK;
-  ctx.font = `12px ${PRINT}`;
-  ctx.fillText('Die Auflösung steht im nächsten Heft.', 34, 566);
-  ctx.textAlign = 'right';
-  ctx.fillText('– 41 –', width - 34, 590);
+  line(ctx, 146, 0, 156, SHEET.height);
+  line(ctx, 304, 0, 296, SHEET.height);
+  line(ctx, 452, 0, 446, SHEET.height);
+  line(ctx, 0, 136, SHEET.width, 144);
+  line(ctx, 0, 284, SHEET.width, 278);
   ctx.restore();
 }
 

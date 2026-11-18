@@ -9,6 +9,9 @@
 //
 // train  = der Zug rauscht gerade durch den Tunnel (0 = nein, 1 = ja)
 // figure = jemand steht im Tunnel (0 = niemand, 1 = deutlich zu sehen)
+//
+// Die Ziffer an der Tunnelwand ist nur zu lesen, solange der Zug durchfährt (train > 0): Dann beleuchten
+// seine Fenster die Wand. Sonst ist dort nur ein dunkler Rahmen zu ahnen.
 
 export const FEED = { width: 240, height: 180 };
 const VP = { x: 150, y: 78 };       // Fluchtpunkt: das Ende des Tunnels
@@ -136,7 +139,10 @@ export class CameraFeed {
     // Die Ziffer: groß auf die linke Wand gemalt, in einem Rahmen
     const near = { x: VP.x - HALF_WIDTH * 0.97, top: VP.y - 4, bottom: VP.y + 58 };
     const far = { x: VP.x - HALF_WIDTH * 0.58, top: VP.y - 2, bottom: VP.y + 35 };
-    const bright = Math.min(1, 0.85 + 0.6 * train);
+    // Ohne Licht ist der Rahmen an der Wand kaum zu ahnen. Lesen kann man die Ziffer nur, wenn unser Zug
+    // vorbeifährt und seine erleuchteten Fenster die Wand streifen.
+    const sweep = 0.7 + 0.3 * Math.abs(Math.sin(t * 8.2));
+    const bright = 0.16 + 0.84 * train * sweep;
     ctx.strokeStyle = GREEN(0.8 * bright);
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -151,7 +157,7 @@ export class CameraFeed {
     ctx.font = 'bold 44px "Trebuchet MS", "Arial", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = GREEN(0.95 * bright);
+    ctx.fillStyle = GREEN(train > 0 ? 0.95 * bright : 0.035);
     ctx.fillText(this.digit, 0, 0);
     ctx.restore();
   }
@@ -164,9 +170,11 @@ export class CameraFeed {
     ctx.lineTo(VP.x + 5, VP.y - 6);
     ctx.lineTo(VP.x + 96, VP.y - 86);
     ctx.lineTo(VP.x + 96, FEED.height);
-    ctx.lineTo(VP.x - 74, FEED.height);
-    ctx.lineTo(VP.x - 74, VP.y - 86);
+    ctx.lineTo(VP.x - 66, FEED.height);
+    ctx.lineTo(VP.x - 66, VP.y - 86);
     ctx.fill();
+    ctx.save();
+    ctx.clip(); // die Fenster gehören zum Wagen, nicht an die Tunnelwand
     for (let i = 0; i < 9; i++) {
       const p = (t * 2.6 + i / 9) % 1;
       const s = 0.1 + p * p * 1.5;
@@ -174,6 +182,7 @@ export class CameraFeed {
       ctx.fillRect(VP.x - 58 * s, VP.y - 34 * s, 22 * s, 20 * s);
       ctx.fillRect(VP.x - 30 * s, VP.y - 34 * s, 22 * s, 20 * s);
     }
+    ctx.restore();
     ctx.fillStyle = GREEN(0.1 * train * (0.5 + 0.5 * Math.sin(t * 40)));
     ctx.fillRect(0, 0, FEED.width, FEED.height);
   }
