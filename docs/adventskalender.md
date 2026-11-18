@@ -32,7 +32,7 @@ In jeder Runde verschwindet im Tunnel ein Fahrgast. Der Schaffner ruft sie per L
 ## Auflösung (entschieden)
 
 - **Joseph ist selbst der Schaffner, nur jünger.** Er hat in der Schleife vergessen, wer er ist. **Der andere Joseph ist sein späteres Ich – der Schaffner**, der schon versteht, was zu tun ist.
-- Der andere Joseph/Schaffner Er bringt die Fahrgäste in den Tunnel, weil sie dort aus der Zeitschleife entkommen, wieder altern und weiterleben können. Der Tunnel ist der Ausweg, nicht die Gefahr.
+- Er bringt die Fahrgäste in den Tunnel, weil sie dort aus der Zeitschleife entkommen, wieder altern und weiterleben können. Der Tunnel ist der Ausweg, nicht die Gefahr.
 - Josephs „Rettungen“ (z. B. Herr Tick in Tür 11) halten die Fahrgäste in Wahrheit in der Schleife fest – das versteht Joseph erst am Ende.
 - **Am 24.** versteht Joseph alles, geht zurück ins Schaffnerabteil, evakuiert alle Fahrgäste und bringt den Zug zum Entgleisen, damit niemand mehr einsteigen kann.
 - **Schluss:** Joseph wacht als erwachsener Schaffner auf, mit seiner Tochter Mira und seiner Frau, und sie feiern Weihnachten.
