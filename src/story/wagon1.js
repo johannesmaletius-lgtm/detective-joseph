@@ -6,7 +6,7 @@ import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui
 //  WAGEN 1 – „Die Ringbahn“
 // ============================================================================================
 //
-// Joseph wacht in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seiner Hand
+// Joseph wacht in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm
 // steht in seiner eigenen Schrift: NICHT EINSCHLAFEN. Der Zug fährt im Kreis. In jeder Runde geht
 // im Tunnel das Licht aus – und danach ist im Abteil alles wieder so wie vorher. Nur was Joseph
 // bei sich trägt, bleibt. Ein früherer Joseph hat deshalb Hinweise hinterlassen, die der Tunnel
@@ -75,8 +75,8 @@ export const wagon1 = {
       await story.say('… Hm?');
       await story.say('Ein Zug. Mitten in der Nacht.');
       await story.say('Wie bin ich hier reingekommen?');
-      await story.say('Auf meiner Hand steht etwas. In meiner Schrift …');
-      await story.card({ kind: 'hand', text: 'NICHT EINSCHLAFEN' });
+      await story.say('Auf meinem Unterarm steht etwas. In meiner Schrift …');
+      await story.card({ kind: 'hand' });
       await story.say('„Nicht einschlafen.“ Na gut. Ich bin wach. Hellwach.');
     });
     start(story);
@@ -410,7 +410,7 @@ export const wagon1 = {
 function start(story) {
   story.flags.startedAt = performance.now();
   story.note('Aufgewacht in einem Nachtzug. Keine Ahnung, wie ich hergekommen bin.');
-  story.note('Auf meiner Hand, in meiner Schrift: NICHT EINSCHLAFEN.');
+  story.note('Auf meinem Unterarm, in meiner Schrift: Nicht einschlafen.');
 }
 
 // Ist es dunkel – oder wird es das gerade (der Zug ist schon im Tunnel, das Licht flackert noch)?
