@@ -456,8 +456,8 @@ export const luggageCar = {
 
   hotspots: [
     { id: 'suitcase7', name: 'Koffer Nr. 7', area: boxArea({ x: SUITCASE7.x, y: [SUITCASE7.y[0], SUITCASE7.y[1] + 30], z: SUITCASE7.z }), walkTo: floor(-108, 0.5), facing: 'left' },
-    { id: 'stack', name: 'Kofferstapel', area: boxArea({ x: [-257, -150], y: [0, 230], z: [0.6, 0.9] }), walkTo: floor(-120, 0.74), facing: 'left' },
     ...[2, 4, 1, 3].map((number) => ({ id: `crate${number}`, name: `Kiste ${number}`, area: boxArea(CRATES[number]), walkTo: floor(-105, 0.5), facing: 'left' })),
+    { id: 'stack', name: 'Kofferstapel', area: boxArea({ x: [-257, -150], y: [0, 230], z: [0.6, 0.9] }), walkTo: floor(-120, 0.74), facing: 'left' },
     { id: 'cage', name: 'Käfig', cursor: 'talk', area: boxArea({ x: [CAGE.X - CAGE.radius - 8, CAGE.X + CAGE.radius + 8], y: [CAGE.Y, CAGE.Y + CAGE.height + 12], z: [CAGE.Z - 0.01, CAGE.Z + 0.01] }), walkTo: floor(140, 0.62), facing: 'right' },
     { id: 'trunk', name: 'Schrankkoffer', area: boxArea(TRUNK), walkTo: floor(140, 0.8), facing: 'right' },
     { id: 'locker', name: 'Dienstschrank', area: rect(LOCKER_FRONT.x0, LOCKER_FRONT.y0, LOCKER_FRONT.x1 - LOCKER_FRONT.x0, LOCKER_FRONT.y1 - LOCKER_FRONT.y0), walkTo: floor(-90, 0.94), facing: 'back' },
