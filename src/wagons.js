@@ -8,6 +8,8 @@ import { lostAndFound } from './scene/lostAndFound.js';
 import { wagon6 } from './story/wagon6.js';
 import { barCar } from './scene/barCar.js';
 import { wagon7 } from './story/wagon7.js';
+import { cinemaCar } from './scene/cinemaCar.js';
+import { wagon8 } from './story/wagon8.js';
 
 // Alle Wagen, die es schon gibt: Nummer → Szene (Daten) und Drehbuch (Geschichte).
 // Starten mit einem bestimmten Wagen: http://localhost:8150/?wagen=4
@@ -18,4 +20,5 @@ export const WAGONS = {
   5: { scene: sleepingCar, script: wagon5 },
   6: { scene: lostAndFound, script: wagon6 },
   7: { scene: barCar, script: wagon7 },
+  8: { scene: cinemaCar, script: wagon8 },
 };
