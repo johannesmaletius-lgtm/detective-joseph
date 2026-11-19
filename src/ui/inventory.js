@@ -1,4 +1,5 @@
 import { loadImage } from '../core/assets.js';
+import { paintIcon } from '../core/paint.js';
 import { ITEMS } from '../story/items.js';
 
 // Die Inventarleiste mit 5 Plätzen. Hat Joseph mehr als 5 Gegenstände dabei, erscheinen links und
@@ -36,7 +37,7 @@ export class Inventory {
 
   async load() {
     this.bar = await loadImage(BAR);
-    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, await loadImage(item.image)]));
+    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, this.images[id] ?? (item.paint ? paintIcon(item.paint) : await loadImage(item.image))]));
     this.images = Object.fromEntries(entries);
   }
 

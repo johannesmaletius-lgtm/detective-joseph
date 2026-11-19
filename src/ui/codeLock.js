@@ -9,6 +9,7 @@ import { drawSymbol } from './symbols.js';
 //     digits: 4,
 //     symbols: ['tunnel', 'lanternLeft', 'lanternRight', 'tower'],  // (optional) Zeichen über den Rädchen
 //     style: 'brass',                               // 'brass' (Messing) oder 'steel' (Stahl, z. B. am Koffer)
+//     alphabet: '0123456789',                       // (optional) was auf den Rädchen steht, z. B. Buchstaben
 //     check: (code) => code === '5783',
 //   });
 //
@@ -37,8 +38,9 @@ export class CodeLock extends View {
     this.help = 'Pfeile oder Rädchen: Zahl drehen  ·  Bügel: öffnen  ·  Rechtsklick: zurück';
   }
 
-  onOpen({ id = 'lock', digits = 2, check, symbols = null, style = 'brass' }) {
+  onOpen({ id = 'lock', digits = 2, check, symbols = null, style = 'brass', alphabet = '0123456789' }) {
     this.check = check;
+    this.alphabet = alphabet;
     this.unlocked = 0;
     this.shake = 0;
     this.symbols = symbols;
@@ -48,7 +50,7 @@ export class CodeLock extends View {
   }
 
   get code() {
-    return this.wheels.map((wheel) => wheel.value).join('');
+    return this.wheels.map((wheel) => this.alphabet[wheel.value]).join('');
   }
 
   // Maße des Schlosskörpers – breiter bei mehr Rädchen, höher mit Zeichen
@@ -83,7 +85,8 @@ export class CodeLock extends View {
       if (up || down || onWheel) {
         const wheel = this.wheels[i];
         const step = down ? -1 : 1;
-        wheel.value = (wheel.value + step + 10) % 10;
+        const count = this.alphabet.length;
+        wheel.value = (wheel.value + step + count) % count;
         wheel.roll = step;
         this.sound('wheel');
         return;
@@ -192,10 +195,12 @@ export class CodeLock extends View {
       ctx.font = 'bold 56px "Trebuchet MS", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      const count = this.alphabet.length;
+      if (count > 10) ctx.font = 'bold 48px "Trebuchet MS", sans-serif';
       for (const offset of [-1, 0, 1]) {
-        const digit = (wheel.value + offset + 10) % 10; // oben die kleinere, unten die größere Zahl
+        const sign = this.alphabet[(wheel.value + offset + count) % count]; // oben das vorige, unten das nächste Zeichen
         ctx.fillStyle = offset === 0 ? '#1d140c' : 'rgba(29, 20, 12, 0.45)';
-        ctx.fillText(String(digit), x, y + (offset + wheel.roll) * 62);
+        ctx.fillText(sign, x, y + (offset + wheel.roll) * 62);
       }
       ctx.restore();
       arrow(ctx, x, y - WHEEL.height / 2 - 30, -1);

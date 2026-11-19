@@ -17,9 +17,14 @@ import { COLORS } from '../ui/text.js';
 //   story.sound('pickup')               Geräusch abspielen (siehe src/audio/soundEffects.js)
 //   await story.card({ … })             Karte zeigen: Brief, gezeichnetes Blatt … (siehe src/ui/overlay.js)
 //   await story.view('wires')           Nahansicht öffnen: Rätsel, Zahlenschloss … (siehe src/puzzles/)
+//   await story.choose(['A', 'B'])      Auswahl im Gespräch: Ergebnis 0, 1 … oder -1 (abgebrochen)
+//   await story.speak('…', { at })      jemand anderes spricht (Farbe und Stelle wählbar)
+//   await story.goToWagon(2)            durch die Tür in den nächsten Wagen
 //
 // Außerdem darf ein Drehbuch enthalten:
 //   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
+//   prepare(story)                      wer direkt in diesem Wagen anfängt (Spielstand, ?wagen=3), bekommt hier
+//                                       die Sachen, die er aus den Wagen davor hätte
 //   hint(story)                         Tipp, wenn der Spieler nicht weiterweiß (Taste H / Notizbuch)
 //   update(story, dt)                   wird in jedem Bild aufgerufen
 //
@@ -83,8 +88,8 @@ export class Story {
     return this.game.inventory.has(id);
   }
 
-  sound(name) {
-    this.game.effects.play(name);
+  sound(name, ...args) {
+    this.game.effects.play(name, ...args);
   }
 
   // Für das Tutorial: merken, dass etwas passiert ist
@@ -139,6 +144,20 @@ export class Story {
     return this.game.views[name].open(options);
   }
 
+  // Auswahl im Gespräch (siehe src/ui/choice.js)
+  async choose(options, title) {
+    this.busy += 1;
+    try {
+      return await this.game.views.choice.open({ options, title });
+    } finally {
+      this.busy -= 1;
+    }
+  }
+
+  goToWagon(number) {
+    return this.game.goToWagon(number);
+  }
+
   // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)
   itemName(id) {
     return this.script.itemName?.(this, id) ?? ITEMS[id].name;
@@ -173,7 +192,8 @@ export class Story {
   }
 
   // ---------------------------------------------------------------- Ablauf
-  async begin({ skipIntro = false } = {}) {
+  async begin({ skipIntro = false, fresh = false } = {}) {
+    if (fresh) await this.script.prepare?.(this);
     await this.script.setup?.(this);
     if (skipIntro) await this.script.skipIntro?.(this);
     else await this.script.intro?.(this);

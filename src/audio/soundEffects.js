@@ -11,10 +11,10 @@ export class SoundEffects {
     this.sound = trainSound;
   }
 
-  play(name) {
+  play(name, ...args) {
     const context = this.sound.context;
     if (!context || context.state !== 'running') return;
-    EFFECTS[name]?.(this, context.currentTime);
+    EFFECTS[name]?.(this, context.currentTime, ...args);
   }
 
   // Gefiltertes Rauschen: Rascheln, Klicken, Zischen, Poltern
@@ -161,6 +161,111 @@ const EFFECTS = {
       fx.tone(t + i * 0.11, { frequency, type: 'triangle', gain: 0.11, duration: 0.32 });
       fx.tone(t + i * 0.11, { frequency: frequency * 2, type: 'sine', gain: 0.04, duration: 0.22 });
     });
+  },
+  // ---------------------------------------------------------------- Wagen 2 bis 4
+  // Tischglocke: „Ding!“
+  bell(fx, t) {
+    fx.tone(t, { frequency: 2093, type: 'sine', gain: 0.16, duration: 1.4 });
+    fx.tone(t, { frequency: 2637, type: 'sine', gain: 0.07, duration: 1.1 });
+    fx.tone(t, { frequency: 4186, type: 'sine', gain: 0.03, duration: 0.6 });
+  },
+  // Gläser stoßen an
+  clink(fx, t) {
+    for (const [delay, frequency, pan] of [[0, 3100, -0.3], [0.05, 3500, 0.2], [0.13, 2900, 0.4]]) {
+      fx.tone(t + delay, { frequency, type: 'sine', gain: 0.07, duration: 0.5, pan });
+      fx.tone(t + delay, { frequency: frequency * 1.51, type: 'sine', gain: 0.03, duration: 0.3, pan });
+    }
+  },
+  // Jemand ringt nach Luft – und etwas fällt um
+  gasp(fx, t) {
+    fx.noise(t, { frequency: 900, q: 1.5, gain: 0.18, attack: 0.05, duration: 0.5, pan: 0.4 });
+    fx.noise(t + 0.9, { type: 'lowpass', frequency: 300, gain: 0.5, duration: 0.2, brown: true, pan: 0.4 });
+    fx.tone(t + 0.95, { frequency: 2600, to: 2400, type: 'sine', gain: 0.05, duration: 0.4, pan: 0.4 });
+  },
+  // Ein Takt Walzer (3/4): Bass – Akkord – Akkord, darüber die Melodie. bar = Nummer des Takts
+  waltz(fx, t, bar = 0) {
+    const beat = 0.42;
+    const chords = [[196, 247, 294], [196, 247, 294], [220, 262, 330], [147, 185, 220]];
+    const bass = [98, 98, 110, 73];
+    const melody = [[392, 494, 587], [523, 494, 440], [440, 523, 659], [587, 494, 392]];
+    const i = bar % 4;
+    fx.tone(t, { frequency: bass[i], type: 'triangle', gain: 0.1, duration: 0.35, pan: -0.5 });
+    for (const beatIndex of [1, 2]) {
+      for (const frequency of chords[i]) fx.tone(t + beatIndex * beat, { frequency, type: 'triangle', gain: 0.03, duration: 0.18, pan: -0.5 });
+    }
+    melody[i].forEach((frequency, n) => fx.tone(t + n * beat, { frequency, type: 'square', gain: 0.025, duration: 0.34, pan: -0.5 }));
+    fx.noise(t, { frequency: 6000, q: 0.5, gain: 0.02, duration: beat * 3, pan: -0.5 }); // Knistern der Platte
+  },
+  // Ein Takt Marschmusik (laut und schief)
+  march(fx, t, bar = 0) {
+    const beat = 0.3;
+    const melody = [[523, 523, 659, 523], [784, 659, 523, 392], [440, 494, 523, 587], [659, 587, 523, 523]];
+    melody[bar % 4].forEach((frequency, n) => {
+      fx.tone(t + n * beat, { frequency: frequency * 1.012, type: 'sawtooth', gain: 0.03, duration: 0.2, pan: -0.5 });
+      if (n % 2 === 0) fx.noise(t + n * beat, { type: 'lowpass', frequency: 200, gain: 0.35, duration: 0.1, brown: true, pan: -0.5 });
+    });
+  },
+  // Rollladen rasselt herunter oder hoch
+  shutter(fx, t) {
+    for (let i = 0; i < 9; i++) fx.noise(t + i * 0.045, { frequency: 1800 + i * 90, q: 3, gain: 0.12, duration: 0.03, pan: -0.4 });
+    fx.noise(t + 0.45, { type: 'lowpass', frequency: 500, gain: 0.3, duration: 0.07, brown: true, pan: -0.4 });
+  },
+  // Schritte im Takt: jemand tanzt in der Küche
+  stomp(fx, t) {
+    for (const delay of [0, 0.42, 0.84]) fx.noise(t + delay, { type: 'lowpass', frequency: 180, gain: delay ? 0.12 : 0.22, duration: 0.07, brown: true, pan: -0.5 });
+  },
+  // Die Notbremse: Kreischen der Räder, ein Ruck
+  brake(fx, t) {
+    fx.tone(t, { frequency: 2200, to: 1500, type: 'sawtooth', gain: 0.05, attack: 0.1, duration: 2.6 });
+    fx.tone(t, { frequency: 3300, to: 2500, type: 'square', gain: 0.02, attack: 0.1, duration: 2.4 });
+    fx.noise(t, { frequency: 2500, q: 2, gain: 0.12, attack: 0.1, duration: 2.6 });
+    fx.noise(t + 0.4, { type: 'lowpass', frequency: 160, gain: 0.6, duration: 0.5, brown: true });
+  },
+  // Etwas fällt herunter (Hutschachtel)
+  thud(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 240, gain: 0.55, duration: 0.18, brown: true });
+    fx.noise(t + 0.02, { frequency: 1200, q: 1, gain: 0.1, duration: 0.08 });
+  },
+  // leises Schnarchen
+  snore(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 260, gain: 0.12, attack: 0.5, duration: 0.9, brown: true, pan: -0.5 });
+    fx.tone(t + 0.1, { frequency: 70, to: 62, type: 'sawtooth', gain: 0.025, attack: 0.4, duration: 0.9, pan: -0.5 });
+  },
+  // Rollo schnellt hoch
+  blind(fx, t) {
+    for (let i = 0; i < 6; i++) fx.noise(t + i * 0.035, { frequency: 2600 - i * 200, q: 2, gain: 0.12, duration: 0.03, pan: 0.5 });
+    fx.noise(t + 0.24, { frequency: 900, q: 3, gain: 0.25, duration: 0.05, pan: 0.5 });
+  },
+  // Spiegel / etwas Magisches erscheint
+  shimmer(fx, t) {
+    [1319, 1568, 1976, 2637].forEach((frequency, i) => fx.tone(t + i * 0.09, { frequency, type: 'sine', gain: 0.05, duration: 0.9 }));
+  },
+  // Papagei: „Krah!“
+  squawk(fx, t) {
+    fx.tone(t, { frequency: 1500, to: 2400, type: 'sawtooth', gain: 0.05, duration: 0.08, pan: 0.5 });
+    fx.tone(t + 0.09, { frequency: 2300, to: 1300, type: 'sawtooth', gain: 0.06, duration: 0.18, pan: 0.5 });
+    fx.noise(t, { frequency: 3000, q: 2, gain: 0.08, duration: 0.25, pan: 0.5 });
+  },
+  // Flügelschlagen
+  flutter(fx, t) {
+    for (let i = 0; i < 8; i++) fx.noise(t + i * 0.07, { frequency: 1400, q: 0.8, gain: 0.1, duration: 0.04, pan: 0.5 });
+  },
+  // Klopfen an Holz
+  knock(fx, t) {
+    for (const delay of [0, 0.22, 0.44]) {
+      fx.noise(t + delay, { frequency: 700, q: 3, gain: 0.35, duration: 0.05 });
+      fx.noise(t + delay, { type: 'lowpass', frequency: 220, gain: 0.3, duration: 0.06, brown: true });
+    }
+  },
+  // Antwort von drinnen: dumpfer
+  knockBack(fx, t) {
+    for (const delay of [0, 0.3]) fx.noise(t + delay, { type: 'lowpass', frequency: 260, gain: 0.35, duration: 0.07, brown: true, pan: 0.5 });
+  },
+  // Schwere Schiebetür
+  slide(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 400, gain: 0.3, attack: 0.1, duration: 1.2, brown: true });
+    fx.noise(t, { frequency: 1600, q: 4, gain: 0.05, attack: 0.1, duration: 1.1 });
+    fx.noise(t + 1.25, { type: 'lowpass', frequency: 200, gain: 0.5, duration: 0.15, brown: true });
   },
   // Etwas Wichtiges entdeckt: ein tiefer, unheimlicher Ton
   dread(fx, t) {

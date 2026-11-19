@@ -43,6 +43,12 @@ seiner eigenen Schrift **„NICHT EINSCHLAFEN“**.
 
 **Die Abteile**
 
+> **Umgesetzt (Teil 1):** Wagen 1–4 – erstes Abteil, Speisewagen, Schlafwagen, Gepäckwagen – stehen in
+> `src/story/wagon1.js` bis `wagon4.js`. Abweichend vom Entwurf: Im Speisewagen wird Herr Brandt (der Schaffner)
+> jede Runde vergiftet, und Joseph rettet ihn, indem er das Glas über den Tunnel bei sich trägt. Im Schlafwagen
+> führt Frau Adlers Satz zum Wort im Spiegel (nur im Mondlicht). Im Gepäckwagen ersetzt Kasimir, ihr Papagei,
+> die Detektivakte – und am Ende steigt der zweite Joseph aus dem Schrankkoffer und verschwindet im Postwagen.
+
 1. **Erstes Abteil (das jetzige):** Der Totenkopf-Bildschirm zeigt nur Rauschen. Mit der richtigen Tastenfolge am
    grünen Pult erscheint für einen Moment das Bild einer Überwachungskamera, und die Kamera hängt im Tunnel. Der Brief
    über dem Pult ist an „J.“ adressiert und in Josephs eigener Schrift geschrieben.
