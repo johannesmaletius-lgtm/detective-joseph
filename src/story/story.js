@@ -17,6 +17,11 @@ import { COLORS } from '../ui/text.js';
 //   story.sound('pickup')               Geräusch abspielen (siehe src/audio/soundEffects.js)
 //   await story.card({ … })             Karte zeigen: Brief, gezeichnetes Blatt … (siehe src/ui/overlay.js)
 //   await story.view('wires')           Nahansicht öffnen: Rätsel, Zahlenschloss … (siehe src/puzzles/)
+//   story.finish()                      Wagen geschafft: Spielstand speichern, zurück zum Adventskalender
+//
+// Außerdem darf ein Drehbuch festlegen:
+//   startItems: ['flashlight']          Gegenstände, die Joseph zu Beginn sicher dabeihat (zusätzlich zu dem,
+//                                       was er aus dem letzten geschafften Wagen mitbringt, siehe items.js: keep)
 //
 // Außerdem darf ein Drehbuch enthalten:
 //   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
@@ -147,6 +152,16 @@ export class Story {
 
   fadeIn(seconds = 1) {
     return this.game.overlay.fadeTo(0, seconds);
+  }
+
+  // Wagen geschafft (meist nach der Abschlusskarte): Der Spielstand wird gespeichert, dann kommt der Kalender
+  finish() {
+    this.game.finishDoor();
+  }
+
+  // Die Tür des Adventskalenders, die gerade gespielt wird (1–24)
+  get door() {
+    return this.game.door;
   }
 
   card(card) {

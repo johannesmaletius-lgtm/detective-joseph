@@ -26,4 +26,11 @@ const params = new URLSearchParams(location.search);
 export const DEBUG_AT_START = params.has('debug'); // Debug-Ansicht sofort an
 export const START_MUTED = params.has('mute');     // ohne Ton starten
 export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
-export const START_WAGON = Number(params.get('wagen') ?? 1); // mit welchem Wagen das Spiel beginnt (?wagen=4)
+
+// Adventskalender (siehe src/advent/):
+//   ?test               alle 24 Türen offen, unabhängig vom Datum (dazu ein Knopf „Spielstand löschen“)
+//   ?datum=2026-12-05   so tun, als wäre heute dieser Tag
+//   ?tuer=2             ohne Kalender direkt in diese Tür (gut mit &skipintro)
+export const TEST_MODE = params.has('test');
+export const FAKE_DATE = params.get('datum');
+export const START_DOOR = Number(params.get('tuer') ?? params.get('wagen')) || null; // ?wagen=N geht auch

@@ -1,5 +1,3 @@
-import { WAGONS } from '../wagons.js';
-
 // Helfer, die alle Wagen ab Wagen 4 benutzen: Tunnel zählen, Zahlwörter, Anfang und Ende eines
 // Wagens, auf den Tunnel warten, Tipps.
 
@@ -47,6 +45,7 @@ export async function wagonIntro(story, { number, title, lines = [], firstTunnel
 
 // Mit ?skipintro: gleich hell
 export function skipIntro(story, firstTunnelIn = 70) {
+  story.game.overlay.fade = 0;
   story.motion.restartAt(story.motion.lapLength - story.motion.settings.tunnel.length / 2 - firstTunnelIn);
   story.flags.startedAt = performance.now();
 }
@@ -75,29 +74,16 @@ export function hintFor(story, goal) {
   return goal.lines[level];
 }
 
-// Das Ende eines Wagens: abblenden, Endkarte, dann weiter in den nächsten Wagen (falls es ihn schon gibt)
+// Das Ende eines Wagens: abblenden, Endkarte, dann zurück zum Adventskalender (der Spielstand wird gespeichert)
 export async function finishWagon(story, { number, title, lines = [], nextTitle }) {
   await story.fadeOut(1.6);
   const minutes = Math.max(1, Math.round((performance.now() - (story.flags.startedAt ?? performance.now())) / 60000));
-  const next = WAGONS[number + 1];
-  saveProgress(number);
   await story.card({
     kind: 'end',
     title,
     lines: [...lines, `Gelöst in Runde ${story.lap} – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`,
-      next ? '' : `Weiter geht es ${nextTitle ?? 'im nächsten Wagen'} – bald.`],
-    continueText: next ? `Klicken: weiter zu Wagen ${number + 1}` : 'Klicken, um zum Anfang zurückzukehren',
+      number < 24 ? `Morgen geht es weiter – ${nextTitle ?? 'im nächsten Wagen'}.` : ''],
+    continueText: 'Klicken, um zum Adventskalender zurückzukehren',
   });
-  if (next) await story.game.goToWagon(number + 1);
-  else location.href = location.pathname;
-}
-
-// Merkt sich im Browser, wie weit Joseph schon gekommen ist
-function saveProgress(number) {
-  try {
-    const best = Number(localStorage.getItem('detective-joseph-wagon') ?? 0);
-    if (number > best) localStorage.setItem('detective-joseph-wagon', String(number));
-  } catch {
-    // Ohne Speicher (z. B. privates Fenster) geht es auch
-  }
+  story.finish();
 }

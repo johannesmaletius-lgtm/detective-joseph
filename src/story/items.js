@@ -3,6 +3,7 @@
 // name:   so heißt er im Spiel (steht am Mauszeiger)
 // image:  Bild im Inventar (128 × 128, transparenter Hintergrund – siehe tools/make-items.mjs)
 // look:   was Joseph sagt, wenn man ihn anschaut (Rechtsklick im Inventar)
+// keep:   true = Joseph nimmt ihn in den nächsten Wagen mit (alles andere bleibt im Wagen zurück)
 //
 // Was ein Gegenstand in einer bestimmten Situation bewirkt (z. B. Messer + Klappe), steht in der
 // Geschichte des jeweiligen Wagens, z. B. src/story/wagon1.js. Dort kann auch stehen, was beim
@@ -53,6 +54,7 @@ export const ITEMS = {
   },
   flashlight: {
     name: 'Taschenlampe',
+    keep: true,
     image: 'assets/items/flashlight.png',
     look: 'Die Taschenlampe geht. Wenn es dunkel wird, schalte ich sie ein.',
   },
