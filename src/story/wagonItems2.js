@@ -135,6 +135,27 @@ export const WAGON_ITEMS_2 = {
     },
     look: 'Eine Lupe vom Lesetisch.',
   },
+  holeyPaper: {
+    name: 'Zeitung mit Löchern',
+    icon: (ctx) => paper(ctx, 14, 16, 100, 96, -0.04, (c) => {
+      c.fillStyle = INK;
+      c.fillRect(8, 8, 84, 8);
+      c.fillStyle = '#2a1f16';
+      c.fillRect(10, 22, 30, 10);
+      c.fillRect(48, 22, 20, 10);
+      c.fillStyle = '#6d665c';
+      c.fillRect(8, 40, 46, 32);
+      lines(c, 60, 44, 32, 4, 8);
+    }, '#e8e0cc'),
+    look: 'Die Zeitung vom 25. Dezember – mit Löchern, wo jemand Wörter herausgeschnitten hat.',
+  },
+  snippets: {
+    name: 'Papierschnipsel',
+    icon: (ctx) => {
+      for (let i = 0; i < 5; i++) paper(ctx, 20 + (i % 3) * 26, 24 + Math.floor(i / 3) * 40 + (i % 2) * 8, 38, 18, (i - 2) * 0.25, (c) => lines(c, 4, 8, 30, 1, 6), '#e8e0cc');
+    },
+    look: 'Ausgeschnittene Wörter aus dem Papierkorb.',
+  },
   pressPhoto: {
     name: 'Zeitung vom 25. Dezember',
     keep: true,
