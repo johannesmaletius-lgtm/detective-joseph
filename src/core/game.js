@@ -20,6 +20,9 @@ import { Crt } from '../puzzles/crt.js';
 import { Sentence } from '../puzzles/sentence.js';
 import { Mirror } from '../puzzles/mirror.js';
 import { Choice } from '../ui/choice.js';
+import { PictureView } from '../puzzles/picture.js';
+import { ArrangeView } from '../puzzles/arrange.js';
+import { DialogueView } from '../ui/dialogue.js';
 import { Story } from '../story/story.js';
 import { WAGONS, loadProgress, saveProgress } from '../story/wagons.js';
 import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED, START_WAGON } from '../config.js';
@@ -63,7 +66,11 @@ export class Game {
       sentence: new Sentence(),
       mirror: new Mirror(),
       choice: new Choice(),
+      picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
+      arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
+      dialogue: new DialogueView(), // Gesprächsauswahl
     };
+    this.wagon = 1; // Nummer des aktuellen Wagens (siehe src/wagons.js)
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
       view.onSkip = () => this.speech.skip();
@@ -97,7 +104,10 @@ export class Game {
     if (scene.motion) {
       if (previous) scene.motion.continueFrom(previous);
       scene.motion.onBump = (strength) => this.sound.clack(strength);
-      scene.motion.onSqueal = (duration) => this.sound.squeal(duration);
+      scene.motion.onSqueal = (duration) => {
+        this.sound.squeal(duration);
+        this.story.onSqueal(duration);
+      };
       scene.motion.onTunnel = (inside) => {
         this.sound.tunnel(inside);
         this.story.onTunnel(inside);
@@ -109,7 +119,7 @@ export class Game {
     this.player.enterScene(scene);
   }
 
-  // Lädt einen Wagen (1 bis 4, siehe src/story/wagons.js)
+  // Lädt einen Wagen (1 bis 8, siehe src/story/wagons.js)
   async loadWagon(number) {
     const wagon = WAGONS[number];
     this.wagon = number;
@@ -117,9 +127,22 @@ export class Game {
   }
 
   // Joseph geht durch die Tür in den nächsten Wagen. Der Spielstand merkt sich, wie weit er gekommen ist.
+  // Die Wagen 2 und 3 nehmen mit, was Joseph bei sich trägt (packFor). Ab Wagen 4 legt das Drehbuch fest,
+  // was er dabeihat (startItems) und womit das Notizbuch beginnt (recap).
   async goToWagon(number) {
+    const wagon = WAGONS[number];
+    if (!wagon) {
+      location.href = location.pathname;
+      return;
+    }
     saveProgress(number);
     this.overlay.fade = 1;
+    this.closeViews();
+    this.speech.finish();
+    if (wagon.script.startItems) {
+      this.inventory.clear();
+      this.notebook.clear();
+    }
     await this.loadWagon(number);
     await this.story.begin();
   }
@@ -216,8 +239,8 @@ export class Game {
     const itemName = selected ? this.story.itemName(selected) : '';
 
     this.overlay.hover = this.overlay.optionAt(mouse);
-    if (this.overlay.blocksInput) return this.cursor.set({ kind: 'interact' });
-    if (this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
+    if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
+    if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });
     if (this.inventory.contains(mouse)) {

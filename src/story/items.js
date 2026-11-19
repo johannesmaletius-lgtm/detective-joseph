@@ -14,6 +14,8 @@ import {
 // Geschichte des jeweiligen Wagens, z. B. src/story/wagon1.js. Dort kann auch stehen, was beim
 // Anschauen passiert (z. B. öffnet sich bei den Papierfetzen das Puzzle).
 
+import { WAGON_COMBINATIONS, WAGON_ITEMS } from './wagonItems.js';
+
 export const ITEMS = {
   letter: {
     name: 'Brief',
@@ -95,7 +97,7 @@ export const ITEMS = {
   vierkant: {
     name: 'Vierkantschlüssel',
     paint: paintVierkant,
-    look: 'Herrn Brandts Vierkantschlüssel. Damit öffnet ein Schaffner im Zug fast jede Tür und jede Klappe.',
+    look: 'Ein Vierkantschlüssel, wie ihn Schaffner haben. Damit öffnet man im Zug fast jede Tür und jede Klappe.',
   },
 
   // ---------------------------------------------------------------- Wagen 3: Schlafwagen
@@ -132,9 +134,9 @@ export const ITEMS = {
     look: 'Ein altes Foto: zwei Männer auf einem Bahnsteig. Beide sehen aus wie ich.',
   },
   padlockKey: {
-    name: 'Schlüssel „Postwagen“',
+    name: 'Schlüssel „Speisewagen“',
     paint: paintPadlockKey,
-    look: 'Ein Vorhängeschloss-Schlüssel. Auf dem Anhänger: „Postwagen“.',
+    look: 'Ein Vorhängeschloss-Schlüssel. Auf dem Anhänger: „Speisewagen“.',
   },
 };
 
@@ -152,6 +154,10 @@ export const COMBINATIONS = [
     say: ['Zweite Batterie rein, Deckel zu …', 'Licht! Die Taschenlampe geht.'],
   },
 ];
+
+// Gegenstände und Kombinationen ab Wagen 4 (Bilder im Code gezeichnet)
+Object.assign(ITEMS, WAGON_ITEMS);
+COMBINATIONS.push(...WAGON_COMBINATIONS);
 
 export function findCombination(a, b) {
   return COMBINATIONS.find(({ items }) => (items[0] === a && items[1] === b) || (items[0] === b && items[1] === a));

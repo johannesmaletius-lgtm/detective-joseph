@@ -7,7 +7,7 @@ import {
 // Szene 4: der Gepäckwagen.
 //
 // Links: ein Stapel Koffer (darunter Koffer Nr. 7 – „Detektei J.“) und vier nummerierte Kisten.
-// Hinten links der Dienstschrank (Vierkantschloss), in der Mitte die Schiebetür zum Postwagen
+// Hinten links der Dienstschrank (Vierkantschloss), in der Mitte die Schiebetür zum Speisewagen
 // (Vorhängeschloss), rechts Postsäcke. Rechts: ein großer Schrankkoffer und der Käfig von Kasimir,
 // dem Papagei – unter einem Tuch. Von der Decke hängt eine schwingende Lampe.
 // Reaktionen: src/story/wagon4.js
@@ -106,7 +106,7 @@ function paintLockerAndDoor(ctx) {
   ctx.lineWidth = 3;
   ctx.strokeStyle = OUTLINE;
   ctx.stroke();
-  sign(ctx, 'POSTWAGEN', x + w / 2, y + 40, { font: 'bold 16px "Trebuchet MS", sans-serif', color: '#2b2118' });
+  sign(ctx, 'SPEISEWAGEN', x + w / 2, y + 40, { font: 'bold 16px "Trebuchet MS", sans-serif', color: '#2b2118' });
   // Ein Posthorn
   const px = x + w / 2, py = y + 82;
   ctx.beginPath();
@@ -461,7 +461,7 @@ export const luggageCar = {
     { id: 'cage', name: 'Käfig', cursor: 'talk', area: boxArea({ x: [CAGE.X - CAGE.radius - 8, CAGE.X + CAGE.radius + 8], y: [CAGE.Y, CAGE.Y + CAGE.height + 12], z: [CAGE.Z - 0.01, CAGE.Z + 0.01] }), walkTo: floor(140, 0.62), facing: 'right' },
     { id: 'trunk', name: 'Schrankkoffer', area: boxArea(TRUNK), walkTo: floor(140, 0.8), facing: 'right' },
     { id: 'locker', name: 'Dienstschrank', area: rect(LOCKER_FRONT.x0, LOCKER_FRONT.y0, LOCKER_FRONT.x1 - LOCKER_FRONT.x0, LOCKER_FRONT.y1 - LOCKER_FRONT.y0), walkTo: floor(-90, 0.94), facing: 'back' },
-    { id: 'door', name: 'Tür zum Postwagen', area: rect(...onBackWall(DOOR.x, DOOR.y)), walkTo: floor(20, 0.97), facing: 'back' },
+    { id: 'door', name: 'Tür zum Speisewagen', area: rect(...onBackWall(DOOR.x, DOOR.y)), walkTo: floor(20, 0.97), facing: 'back' },
     { id: 'sacks', name: 'Postsäcke', area: boxArea({ x: [100, 250], y: [0, 80], z: [0.86, 1] }), walkTo: floor(96, 0.88), facing: 'back' },
     { id: 'stand', name: 'Kiste „Lebende Tiere“', cursor: 'look', area: boxArea(STAND) },
     { id: 'lamp', name: 'Lampe', cursor: 'look', area: rect(lampPosition(0).topX - 50, lampPosition(0).topY, 100, 110) },

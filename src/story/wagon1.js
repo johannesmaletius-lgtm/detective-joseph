@@ -500,12 +500,12 @@ async function openDoor(story) {
     story.sound('door');
     await story.wait(1);
     await story.fadeOut(1.6);
-    story.note('Die Tür ist offen. Weiter nach vorne – zum Speisewagen.');
+    story.note('Die Tür ist offen. Weiter nach vorne – zum Schlafwagen.');
     const minutes = Math.max(1, Math.round((performance.now() - story.flags.startedAt) / 60000));
     await story.card({
       kind: 'end',
       title: 'Wagen 1 geschafft',
-      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Weiter geht es im Speisewagen.'],
+      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Weiter geht es im Schlafwagen.'],
       continueText: 'Klicken zum Weiterspielen',
     });
   });

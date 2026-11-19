@@ -223,7 +223,7 @@ export function drawMailLetter(ctx) {
   ctx.font = `25px ${HAND}`;
   const text = [
     'Wenn du das liest, bist du im Gepäckwagen. Gut.',
-    'Er versteckt sich im Schrankkoffer. Er kommt erst raus, wenn die Tür zum Postwagen offen ist.',
+    'Er versteckt sich im Schrankkoffer. Er kommt erst raus, wenn die Tür zum Speisewagen offen ist.',
     'Hab keine Angst vor ihm. Er ist nur müde.',
   ];
   let ty = y + 150;

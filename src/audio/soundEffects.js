@@ -272,6 +272,68 @@ const EFFECTS = {
     fx.tone(t, { frequency: 98, to: 92, type: 'sawtooth', gain: 0.07, attack: 0.3, duration: 1.8 });
     fx.tone(t, { frequency: 147, to: 139, type: 'sine', gain: 0.07, attack: 0.3, duration: 1.8 });
   },
+
+  // ---- ab Wagen 4
+  // leises Klicken (Kärtchen ablegen, Auswahl)
+  click(fx, t) {
+    fx.noise(t, { frequency: 2600, q: 3, gain: 0.14, duration: 0.025 });
+  },
+  // falsch: ein dumpfes Brummen
+  wrong(fx, t) {
+    fx.tone(t, { frequency: 150, to: 120, type: 'square', gain: 0.05, duration: 0.25 });
+  },
+  // Gläser klirren
+  glass(fx, t) {
+    fx.tone(t, { frequency: 2350, type: 'sine', gain: 0.07, duration: 0.6 });
+    fx.tone(t + 0.01, { frequency: 3520, type: 'sine', gain: 0.04, duration: 0.45 });
+  },
+  // Joseph schnuppert
+  sniff(fx, t) {
+    fx.noise(t, { frequency: 1800, q: 0.7, gain: 0.08, duration: 0.18, attack: 0.05 });
+    fx.noise(t + 0.28, { frequency: 2000, q: 0.7, gain: 0.08, duration: 0.22, attack: 0.05 });
+  },
+  // Tischglocke: "Ding!"
+  bell(fx, t) {
+    fx.tone(t, { frequency: 1760, type: 'sine', gain: 0.16, duration: 1.4 });
+    fx.tone(t, { frequency: 4400, type: 'sine', gain: 0.05, duration: 0.7 });
+  },
+  // Registrierkasse: Rattern und Klingeln
+  register(fx, t) {
+    for (let i = 0; i < 5; i++) fx.noise(t + i * 0.06, { frequency: 1500, q: 5, gain: 0.18, duration: 0.03 });
+    fx.tone(t + 0.36, { frequency: 2093, type: 'triangle', gain: 0.14, duration: 0.9 });
+    fx.noise(t + 0.4, { type: 'lowpass', frequency: 600, gain: 0.35, duration: 0.15, brown: true });
+  },
+  // Schublade
+  drawer(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 700, gain: 0.25, duration: 0.35, attack: 0.05, brown: true });
+  },
+  // Musikbox: eine kleine Melodie
+  jukebox(fx, t) {
+    const melody = [392, 440, 494, 587, 494, 440, 392, 330, 349, 392, 440, 392];
+    melody.forEach((frequency, i) => {
+      fx.tone(t + i * 0.32, { frequency, type: 'triangle', gain: 0.07, duration: 0.28 });
+      if (i % 2 === 0) fx.tone(t + i * 0.32, { frequency: frequency / 2, type: 'sine', gain: 0.05, duration: 0.5 });
+    });
+  },
+  // Münze fällt
+  coin(fx, t) {
+    fx.tone(t, { frequency: 3100, type: 'sine', gain: 0.08, duration: 0.15 });
+    fx.tone(t + 0.12, { frequency: 2900, type: 'sine', gain: 0.06, duration: 0.15 });
+    fx.noise(t + 0.25, { frequency: 2500, q: 6, gain: 0.12, duration: 0.05 });
+  },
+  // Filmprojektor rattert
+  projector(fx, t) {
+    for (let i = 0; i < 24; i++) fx.noise(t + i * 0.055, { frequency: 2200, q: 3, gain: 0.09, duration: 0.02 });
+  },
+  // Ein Schrei (Oma Ilse wacht auf) – ein hoher, kurzer Ton
+  shriek(fx, t) {
+    fx.tone(t, { frequency: 880, to: 1320, type: 'sawtooth', gain: 0.05, attack: 0.05, duration: 0.5 });
+  },
+  // Notbremse: Rucken und Zischen
+  brake(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 300, gain: 0.5, duration: 0.3, brown: true });
+    fx.noise(t + 0.2, { frequency: 5000, q: 0.5, gain: 0.12, duration: 1.4, attack: 0.1 });
+  },
 };
 
 // Lautstärke-Hüllkurve: schnell lauter, dann ausklingen
