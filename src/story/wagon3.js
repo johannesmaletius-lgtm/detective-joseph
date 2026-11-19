@@ -1,6 +1,6 @@
 import { MIRROR_CENTER, MOON_WINDOW } from '../scene/sleepingCar.js';
 import { P } from '../scene/wagonPainter.js';
-import { VOICES, finishWagon, giveStartItems, hintFor, inTunnel, tunnels, waitForTunnel } from './common.js';
+import { VOICES, packFor, finishWagon, hintFor, inTunnel, tunnels, waitForTunnel } from './common.js';
 
 // ============================================================================================
 //  WAGEN 3 – Der Schlafwagen
@@ -51,12 +51,12 @@ export const wagon3 = {
   },
 
   prepare(story) {
-    giveStartItems(story, ['flashlight', 'knife', 'binoculars', 'sheet', 'letter', 'vierkant']);
     story.note('Hinter mir liegen das erste Abteil und der Speisewagen. Herrn Brandt habe ich das Leben gerettet – und seinen Vierkantschlüssel bekommen.');
   },
 
   setup(story) {
     story.flags.startedAt = performance.now();
+    story.flags.packed = packFor(story, ['flashlight', 'vierkant']);
     story.flags.heard = [];
   },
 
@@ -76,7 +76,7 @@ export const wagon3 = {
     f.blind += Math.sign(blindTarget - f.blind) * Math.min(Math.abs(blindTarget - f.blind), dt * 4);
     if (f.hatboxDown && f.hatboxFall < 1) f.hatboxFall = Math.min(1, f.hatboxFall + dt * 2.2);
     // Mondlicht auf dem Spiegel: nur wenn das Rollo oben ist und der Mond in diesem Fenster steht
-    const lit = f.blindUp && !story.motion.inTunnel && story.scene.outside.moonWindow()?.from === MOON_WINDOW.from;
+    const lit = f.blindUp && !story.motion.inTunnel && moonNearWindow(story);
     f.moonlight += ((lit ? 1 : 0) - f.moonlight) * Math.min(1, dt * 1.5);
     if (f.moonlight > 0.6 && !f.moonNoticed && !story.isBusy && !story.game.view) {
       f.moonNoticed = true;
@@ -511,6 +511,15 @@ async function watchMirror(story) {
   story.note('Im Mondlicht stand im Spiegel ein Wort in Spiegelschrift: SCHAL. Fünf Buchstaben – wie am Gitter.');
 }
 
+// Steht der Mond im (oder knapp am) freien Fenster? Etwas großzügig, damit Joseph Zeit hat, zum Spiegel zu gehen.
+const MOON_MARGIN = 45;
+function moonNearWindow(story, heading) {
+  const outside = story.scene.outside;
+  const moon = outside.layers.find((layer) => layer.bearing !== undefined);
+  const x = outside.skyObjectX(moon, heading);
+  return x > MOON_WINDOW.from - MOON_MARGIN && x < MOON_WINDOW.to + MOON_MARGIN;
+}
+
 // Auf dem Stuhl warten: auf den Tunnel – oder bis der Mond in das freie Fenster schaut
 async function sitDown(story) {
   const f = story.flags;
@@ -525,11 +534,10 @@ async function sitDown(story) {
 async function waitForMoon(story) {
   if (story.flags.moonlight > 0.5) return story.say('Der Mond scheint doch gerade herein!');
   const motion = story.motion;
-  const outside = story.scene.outside;
   let ahead = null;
   for (let d = 0.5; d < motion.lapLength; d += 0.25) {
     const heading = (((motion.lapTime + d) % motion.lapLength) / motion.lapLength) * 360;
-    if (outside.moonWindow(heading)?.from === MOON_WINDOW.from) {
+    if (moonNearWindow(story, heading)) {
       ahead = d;
       break;
     }
@@ -542,7 +550,7 @@ async function waitForMoon(story) {
   await story.cutscene(async () => {
     await story.say('Ich setz mich und sehe zum Fenster. Der Mond wandert … ganz langsam …');
     await story.fadeOut(1);
-    motion.advance(Math.max(0, ahead - 0.5));
+    motion.advance(ahead + 1);
     await story.wait(0.6);
     story.fadeIn(1);
     await story.wait(0.8);

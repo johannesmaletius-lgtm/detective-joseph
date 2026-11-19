@@ -2,13 +2,28 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Wagen 1 ist spielbar – etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps.** Joseph wacht
+**Stand: Die ersten vier Wagen sind spielbar – vom Erwachen im Abteil bis zum Ende von Teil 1 im Gepäckwagen.**
+Wagen 1 (Abteil) mit Tutorial, dazu Speisewagen, Schlafwagen und Gepäckwagen – jeweils mit eigener Rätselkette,
+Gesprächen, Tipps (Taste H) und der Zeitschleife als wichtigstem Werkzeug. Joseph wacht
 in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm steht in seiner eigenen
 Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
 vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
 Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/story-ideen.md).
 
-Die Rätsel im Abteil (Lösung weiter unten):
+### Die vier Wagen
+
+| Wagen | Ort | Worum es geht |
+| --- | --- | --- |
+| 1 | Das erste Abteil | Vier Zahlen für die Tür – Fahrplan-Puzzle, Rätselheft, Turmlicht, Tunnelkamera, Taschenlampe (Tutorial) |
+| 2 | Der Speisewagen | Im Tunnel wird an Tisch 4 angestoßen – und Herrn Brandts Glas ist vergiftet. Den Koch ablenken, das Glas retten, den Vierkantschlüssel bekommen |
+| 3 | Der Schlafwagen | Frau Adler murmelt im Schlaf, jede Runde ein anderes Stück eines Satzes. Satz zusammensetzen, Rollo hoch, auf den Mond warten – das Wort im Spiegel |
+| 4 | Der Gepäckwagen | Kasimir, der Papagei, plappert alles nach. Koffer Nr. 7 öffnen – und an der Tür zum Postwagen wartet der andere Joseph (Ende von Teil 1) |
+
+Wer durch eine Tür geht, landet im nächsten Wagen; der Zug fährt dabei einfach weiter (gleiche Runde, gleiche
+Stelle der Strecke). Das Spiel merkt sich im Browser, welchen Wagen Joseph zuletzt betreten hat – auf dem
+Titelbild steht dann **„Weiterspielen“**.
+
+Die Rätsel im ersten Abteil (Lösung weiter unten):
 
 - **Zerrissener Fahrplan:** sechs Papierfetzen im Abteil finden und mit der Maus zusammensetzen
 - **Rätselheft und Koffer:** ein halb gelöstes Zahlenquadrat ergibt die drei Ziffern für das Kofferschloss
@@ -64,7 +79,11 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 | Taste **T** | nur in der Debug-Ansicht: der Zug springt kurz vor den Tunnel |
 
 Adress-Zusätze zum Testen: <http://localhost:8150/?debug> (Debug-Ansicht an), `?mute` (ohne Ton),
-`?skipintro` (ohne Titelbild und Anfangsszene), kombiniert z. B. `?debug&mute&skipintro`.
+`?skipintro` (ohne Titelbild und Anfangsszene), `?wagen=3` (gleich im dritten Wagen beginnen – Joseph hat dann
+die Sachen dabei, die er aus den Wagen davor bräuchte), kombiniert z. B. `?wagen=2&debug&mute&skipintro`.
+
+In Gesprächen (Koch, Frau Adler, Kasimir) erscheint unten eine Auswahl: Satz anklicken. Rechtsklick oder Esc
+beendet das Gespräch.
 
 ## Projektstruktur
 
@@ -94,7 +113,13 @@ detective-joseph/
     ├── main.js                Einstieg: Spiel erzeugen, erste Szene mit ihrer Geschichte laden, starten
     ├── config.js              Zentrale Einstellungen (1280 × 720, Doppelklick, Tasten)
     ├── story/
+    │   ├── wagons.js          Liste der Wagen (Szene + Geschichte) und der gespeicherte Spielstand
     │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Tipps, Ende
+    │   ├── wagon2.js          … Wagen 2: Speisewagen (Koch, Grammophon, Tisch 4, das vergiftete Glas)
+    │   ├── wagon3.js          … Wagen 3: Schlafwagen (Frau Adler, Satz-Puzzle, Hutschachtel, Mond und Spiegel)
+    │   ├── wagon4.js          … Wagen 4: Gepäckwagen (Kasimir, Kisten, Koffer Nr. 7, Finale)
+    │   ├── common.js          Helfer für alle Wagen: warten, Tipps, Fenster, Wagen-Ende, Stimmenfarben
+    │   ├── itemPaint.js       gemalte Inventar-Bilder der neuen Gegenstände
     │   ├── tutorial.js        Die Tutorial-Schritte (Hinweisschild oben)
     │   ├── items.js           Katalog der Gegenstände (Name, Bild, Beschreibung, Kombinationen)
     │   └── story.js           Führt die Geschichte aus: say, note, give, cutscene … (Befehle fürs Drehbuch)
@@ -104,20 +129,25 @@ detective-joseph/
     │   ├── wires.js           Verteilerkasten: Kabelstücke drehen
     │   ├── binoculars.js      Blick durchs Fernglas auf den Turm, Joseph schreibt das Blinken mit
     │   ├── crt.js             der Bildschirm in groß: aus, Rauschen oder Kamerabild
+    │   ├── sentence.js        Satz-Puzzle: Kärtchen in die richtige Reihenfolge bringen (Schlafwagen)
+    │   ├── mirror.js          der Spiegel im Schlafwagen – im Mondlicht erscheint ein Wort
     │   └── cameraFeed.js      das Bild der Tunnelkamera (Tunnel, Ziffer, Zug, Gestalt)
     ├── ui/
     │   ├── cursor.js          Mauszeiger: Zeigefinger, Auge, Hand, Sprechblase, Gegenstand
     │   ├── inventory.js       Inventarleiste mit 5 Plätzen (bei mehr Gegenständen: Pfeile)
     │   ├── speech.js          Sprechtexte über den Köpfen
     │   ├── notebook.js        Notizbuch (Knopf, aufgeschlagene Seiten, blättern, Tipp-Knopf)
-    │   ├── codeLock.js        Zahlenschloss in Nahansicht (Türschloss mit Zeichen, Kofferschloss)
+    │   ├── codeLock.js        Zahlen- und Buchstabenschloss in Nahansicht (Türschloss, Koffer, Gitter)
+    │   ├── choice.js          Auswahl im Gespräch (Sätze zum Anklicken)
+    │   ├── cards2.js          gezeichnete Blätter der Wagen 2–4: Menütafel, Bon, Frachtliste, Brief, Foto
     │   ├── cards.js           gezeichnete Blätter: Signaltafel, Rätselheft, Detektivakte
     │   ├── symbols.js         die vier Zeichen vom Türschloss: Tunnel, Laternen, Turm
     │   ├── hints.js           Hinweisschild für das Tutorial
     │   ├── overlay.js         Abblenden und Karten: Titelbild, Unterarm, Brief, Ende, eigene Blätter
     │   └── text.js            Schriften, Zeilenumbruch, Text mit Umriss
     ├── core/
-    │   ├── game.js            Spiel-Schleife (~60× pro Sekunde) und wohin ein Klick geht
+    │   ├── game.js            Spiel-Schleife (~60× pro Sekunde), wohin ein Klick geht, Wagenwechsel, Titelbild
+    │   ├── paint.js           Bilder mit Code malen (Hintergründe, Inventar-Bilder) und kleine Malhelfer
     │   ├── screen.js          Zeichenfläche: 1280 × 720 logisch, scharf in jeder Fenstergröße
     │   ├── camera.js          Kamera ohne Zoom, mit leichtem Rumpeln (Oberfläche bleibt ruhig)
     │   ├── input.js           Maus (links/rechts, ziehen) + Tastatur, Doppelklick-Erkennung
@@ -129,7 +159,11 @@ detective-joseph/
     ├── scene/
     │   ├── scene.js           Allgemeine Szene: Zeichenreihenfolge, anklickbare Stellen, Dunkelheit
     │   ├── outsideView.js     Außenwelt hinter den Fenstern (Ebenen mit Perspektive, Mond, Tunnel)
-    │   └── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
+    │   ├── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
+    │   ├── wagonPainter.js    malt Wagen in Zentralperspektive (Raumkoordinaten X/Y/Z → Bildpunkte)
+    │   ├── diningCar.js       Speisewagen: Daten + gemalter Hintergrund + bewegliche Teile
+    │   ├── sleepingCar.js     Schlafwagen: dito
+    │   └── luggageCar.js      Gepäckwagen: dito
     ├── effects/
     │   ├── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Licht aus, Laternen
     │   ├── morse.js           Blinksignal des Turms (eine Ziffer im Morsecode)
@@ -195,6 +229,13 @@ die alten Dateien ersetzen – oder neuen Ordner anlegen und `path`, `frameCount
   (Gegenstände 128 × 128 mit transparentem Hintergrund). Die Gegenstände sind Platzhalter aus
   `tools/make-items.mjs`; Mauszeiger und Inventarleiste sind deine Bilder.
 - PNG, WebP und JPG funktionieren gleichermaßen – nur den Dateinamen im Code anpassen.
+- **Wagen 2 bis 4 sind (noch) mit Code gemalt** (`src/scene/diningCar.js` usw. mit `wagonPainter.js`). Eigene
+  Hintergründe: In der Szenen-Datei `background: { paint: … }` durch `background: { src: 'assets/…png', x: 0,
+  y: 0, width: 1280, height: 720 }` ersetzen – Fensterscheiben durchsichtig lassen (die Fenster sitzen an
+  denselben Stellen wie im ersten Abteil). Bewegliche Teile (Gläser, Rollladen, Frau Adler, Kasimir …) sind
+  `props` mit `paint`-Funktion; sie können auch durch Bilder (`image`) ersetzt werden.
+- **Neue Gegenstände** (Kurbel, Vierkant, Hutnadel, Brecheisen …) sind in `src/story/itemPaint.js` gemalt. Eigenes
+  Bild: in `src/story/items.js` beim Gegenstand `image: 'assets/items/….png'` statt `paint` eintragen.
 
 ## Die Geschichte bearbeiten
 
@@ -255,6 +296,44 @@ den Tunnel warten; danach ist die Klappe wieder zu → noch eine Batterie holen 
 Tunnel die Tür ableuchten.
 
 Wer das Kamerabild beobachtet, während der Zug durch den Tunnel fährt, sieht noch etwas …
+
+### Lösung von Wagen 2 (Speisewagen)
+
+Tür zum Schlafwagen: Vierkantschloss – der Schlüssel gehört Herrn Brandt (Platz 2 an Tisch 4).
+
+1. Mit dem Koch reden (Durchreiche hinten links). Er passt auf die Gläser auf: „Finger weg!“ – und er liebt den
+   Ringbahn-Walzer.
+2. Einen Tunnel abwarten (Tisch 4 oder Bank): Im Dunkeln stoßen Stimmen an, Herrn Brandts Glas leuchtet grün
+   (Probe 41), er röchelt – und ist verschwunden. Danach serviert der Koch alles neu.
+3. Mantel an der Garderobe → Kurbel. Kurbel ans Grammophon. Auf dem Teller liegt ein Marsch (den hasst der Koch);
+   Schublade darunter → Schallplatte „Ringbahn-Walzer“ → aufs Grammophon → anstellen.
+4. Der Koch tanzt hinter dem Rollladen: jetzt das Glas von **Platz 2** nehmen und bis zum Tunnel behalten.
+5. Im Tunnel sucht Herr Brandt sein Glas – und legt zum Dank seinen Vierkantschlüssel auf den Teller.
+6. Vierkant an die Tür. (Nebenbei: Den Koch nach dem Gift fragen → der Bon ist mit „J.“ unterschrieben.)
+
+### Lösung von Wagen 3 (Schlafwagen)
+
+Gitter zum Gepäckwagen: Buchstabenschloss **S C H A L**.
+
+1. Frau Adler zuhören (Linksklick → „Zuhören“). Jede Runde murmelt sie ein anderes Stück – nach jedem Tunnel noch
+   einmal zuhören (auf dem Stuhl kann man warten), bis alle sieben Stücke auf dem Zettel stehen.
+2. Rechtsklick auf den Zettel: „Das Wort für das Gitter steht im Spiegel, wenn der Mond ins Fenster schaut.
+   Aber nur, wenn das Rollo oben ist.“
+3. Leiter zum oberen Bett: Zettel vom früheren Joseph – Licht weckt sie, dann zieht sie die Notbremse.
+4. Taschenlampe auf Frau Adler → sie schreit, zieht die Notbremse, der Ruck wirft die Hutschachtel herunter →
+   Hutnadel mit Haken.
+5. Hutnadel an das Rollo am mittleren rechten Fenster → Rollo hoch.
+6. Auf dem Stuhl warten, „bis der Mond ins Fenster schaut“ → dann den Spiegel ansehen: SCHAL in Spiegelschrift.
+
+### Lösung von Wagen 4 (Gepäckwagen)
+
+Tür zum Postwagen: Vorhängeschloss – der Schlüssel liegt in Koffer Nr. 7 (Zahlenschloss **4 1 7**).
+
+1. Vierkant an den Dienstschrank (hinten links) → Brecheisen und Frachtliste („Kiste 3: Futter für Kasimir“).
+2. Brecheisen an Kiste 3 → Vogelfutter.
+3. Käfig: Tuch abnehmen, Vogelfutter geben → Kasimir plappert: „Koffer sieben! Vier – eins – sieben! Psst!“
+4. Koffer Nr. 7 (liegt oben auf den Kisten) mit 417 öffnen → Foto und Schlüssel „Postwagen“.
+5. Schlüssel an die Tür → Finale. (Nebenbei: Brief aus „Runde 43“ in den Postsäcken, Klopfen am Schrankkoffer.)
 
 ## Werkzeuge (`tools/`)
 
@@ -325,5 +404,10 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Schritt 4:** Inventar mit 5 Plätzen, Gegenstände benutzen und kombinieren
 - [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
 - [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
-- [ ] **Wagen 2:** der Speisewagen (siehe `docs/story-ideen.md`, Vorschlag 1)
-- [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), Spielstand speichern, echte Sounds
+- [x] **Wagen 2:** der Speisewagen – Koch, Grammophon, das vergiftete Glas, Gespräche mit Auswahl
+- [x] **Wagen 3:** der Schlafwagen – Frau Adler, Satz-Puzzle über mehrere Runden, Notbremse, Mond und Spiegel
+- [x] **Wagen 4:** der Gepäckwagen – Kasimir der Papagei, Kisten, Koffer Nr. 7, Finale von Teil 1
+- [x] Wagenwechsel, Spielstand (welcher Wagen), Titelbild mit „Weiterspielen“, `?wagen=N`
+- [ ] Gemalte Hintergründe für die Wagen 2–4 (jetzt mit Code gezeichnet)
+- [ ] **Teil 2:** Postwagen, Schaffnerabteil, der Tunnel (siehe `docs/story-ideen.md`)
+- [ ] Später: echte Sounds, Musik

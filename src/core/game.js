@@ -174,7 +174,7 @@ export class Game {
     // Taschenlampe: leuchtet im Dunkeln dorthin, wo die Maus ist
     const mouse = this.camera.screenToWorld(this.input.mouse);
     const flashlight = this.scene.darkLevel > 0 && this.inventory.has('flashlight') && this.input.mouse.inside;
-    this.scene.beam = flashlight ? mouse : null;
+    this.scene.beam = this.story.beamAt ?? (flashlight ? mouse : null); // in Zwischensequenzen darf die Geschichte selbst leuchten
 
     this.speech.update(dt);
     this.hints.update(dt);
@@ -215,7 +215,8 @@ export class Game {
     const item = selected ? this.inventory.images[selected] : null;
     const itemName = selected ? this.story.itemName(selected) : '';
 
-    if (this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.overlay.optionAt(mouse) ?? '' });
+    this.overlay.hover = this.overlay.optionAt(mouse);
+    if (this.overlay.blocksInput) return this.cursor.set({ kind: 'interact' });
     if (this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });

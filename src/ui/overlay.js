@@ -16,6 +16,7 @@ export class Overlay {
     this.fade = 0;      // 0 = klar, 1 = ganz schwarz
     this.fading = null; // { from, to, duration, age, resolve }
     this.card = null;   // { kind, …, age, resolve }
+    this.hover = null;  // Knopf unter der Maus (setzt das Spiel)
   }
 
   get blocksInput() {
@@ -53,7 +54,7 @@ export class Overlay {
   // Knöpfe einer Karte (unten in der Mitte, untereinander)
   buttons() {
     const options = this.card?.options ?? [];
-    return options.map((label, i) => ({ label, x: 640 - 230, y: 470 + i * 62, width: 460, height: 48 }));
+    return options.map((label, i) => ({ label, x: 640 - 290, y: 466 + i * 62, width: 580, height: 48 }));
   }
 
   optionAt(point) {
@@ -96,12 +97,12 @@ export class Overlay {
     if (card.options) {
       for (const button of this.buttons()) {
         roundedRect(ctx, button.x, button.y, button.width, button.height, 10);
-        ctx.fillStyle = 'rgba(40, 24, 12, 0.85)';
+        ctx.fillStyle = button.label === this.hover ? 'rgba(110, 70, 26, 0.95)' : 'rgba(40, 24, 12, 0.85)';
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = COLORS.brass;
         ctx.stroke();
-        ctx.font = FONTS.speech;
+        ctx.font = 'bold 20px "Trebuchet MS", "Avenir Next", "Segoe UI", system-ui, sans-serif';
         ctx.fillStyle = COLORS.joseph;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';

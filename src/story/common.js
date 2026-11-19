@@ -72,10 +72,18 @@ export async function finishWagon(story, { number, next, nextName }) {
   await story.goToWagon(next);
 }
 
-// Was Joseph aus den Wagen davor bei sich trägt, wenn man direkt in einem späteren Wagen anfängt
-export function giveStartItems(story, items) {
-  for (const id of items) story.game.inventory.add(id);
-  story.game.inventory.revealTime = 0;
+// Beim Betreten eines Wagens: Joseph behält nur, was er noch braucht (keep). Wer direkt in diesem Wagen
+// anfängt (Spielstand, ?wagen=3), bekommt genau diese Sachen. Ergebnis: true, wenn etwas zurückblieb.
+export function packFor(story, keep) {
+  const inventory = story.game.inventory;
+  const dropped = inventory.items.filter((id) => !keep.includes(id));
+  for (const id of dropped) inventory.remove(id);
+  for (const id of keep) inventory.add(id);
+  inventory.flash = null;
+  inventory.revealTime = 0;
+  inventory.offset = 0;
+  if (dropped.length > 0) story.game.notebook.add('Was ich nicht mehr brauche, habe ich im letzten Wagen gelassen. Was ich weiß, steht hier im Notizbuch.', story.lap);
+  return dropped.length > 0;
 }
 
 // Farben für Stimmen

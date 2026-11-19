@@ -105,7 +105,7 @@ export class Mirror extends View {
     ctx.fillRect(x - RADIUS.x, y - RADIUS.y, RADIUS.x * 2, RADIUS.y * 2);
     for (let i = 0; i < 40; i++) {
       const fx = x - RADIUS.x + ((i * 97) % (RADIUS.x * 2)), fy = y - RADIUS.y + ((i * 53) % (RADIUS.y * 2));
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
       ctx.beginPath();
       ctx.arc(fx, fy, 20 + (i % 5) * 8, 0, Math.PI * 2);
       ctx.fill();

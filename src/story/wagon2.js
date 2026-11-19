@@ -1,6 +1,6 @@
 import { SEATS, glassBase } from '../scene/diningCar.js';
 import { drawBon, drawMenuBoard } from '../ui/cards2.js';
-import { VOICES, WINDOW_ITEMS, finishWagon, giveStartItems, hintFor, inTunnel, lookOutside, tunnels, waitForTunnel } from './common.js';
+import { VOICES, packFor, WINDOW_ITEMS, finishWagon, hintFor, inTunnel, lookOutside, tunnels, waitForTunnel } from './common.js';
 
 // ============================================================================================
 //  WAGEN 2 – Der Speisewagen
@@ -41,12 +41,12 @@ export const wagon2 = {
 
   // Wer direkt hier anfängt, hat die Sachen aus Wagen 1 dabei
   prepare(story) {
-    giveStartItems(story, ['flashlight', 'knife', 'binoculars', 'sheet', 'letter']);
     story.note('Wagen 1 liegt hinter mir: Tunnel 5, Laternen 7 und 8, Turm 3. Die Tür ging auf.');
   },
 
   setup(story) {
     story.flags.startedAt = performance.now();
+    story.flags.packed = packFor(story, ['flashlight']);
   },
 
   async intro(story) {
