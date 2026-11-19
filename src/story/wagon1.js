@@ -64,9 +64,8 @@ export const wagon1 = {
 
   // ---------------------------------------------------------------- Anfang
   async intro(story) {
-    story.game.overlay.fade = 1;
+    story.game.overlay.fade = 1; // das Titelbild zeigt das Spiel vorher (siehe Game.begin)
     await story.cutscene(async () => {
-      await story.card({ kind: 'title', title: 'Detective Joseph', subtitle: 'Die Ringbahn', continueText: 'Klicken zum Starten' });
       story.motion.restartAt(FIRST_TUNNEL_IN); // die Zeit auf dem Titelbild zählt nicht
       story.player.facing = 'front';
       await story.wait(0.6);
@@ -505,12 +504,12 @@ async function openDoor(story) {
     const minutes = Math.max(1, Math.round((performance.now() - story.flags.startedAt) / 60000));
     await story.card({
       kind: 'end',
-      title: 'Ende von Wagen 1',
-      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Weiter geht es im Speisewagen – bald.'],
-      continueText: 'Klicken, um noch einmal von vorn zu spielen',
+      title: 'Wagen 1 geschafft',
+      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Weiter geht es im Speisewagen.'],
+      continueText: 'Klicken zum Weiterspielen',
     });
-    location.reload();
   });
+  await story.goToWagon(2);
 }
 
 // ============================================================================================

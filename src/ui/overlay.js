@@ -8,6 +8,8 @@ import { COLORS, FONTS, drawPaper, outlinedText, roundedRect, wrapText } from '.
 //   await overlay.fadeTo(1, 1.5);                  // 1,5 Sekunden lang schwarz werden
 //   await overlay.showCard({ kind: 'paper', lines: ['…'] });
 //   await overlay.showCard({ draw: (ctx, card) => { … } });   // selbst gezeichnete Karte (siehe cards.js)
+//   const i = await overlay.showCard({ kind: 'title', …, options: ['Neues Spiel', 'Weiterspielen'] });
+//                                                  // mit Knöpfen: Ergebnis ist der angeklickte Knopf (0, 1 …)
 
 export class Overlay {
   constructor() {
@@ -34,12 +36,29 @@ export class Overlay {
     });
   }
 
-  // Ein Klick schließt die Karte (erst nach einer kleinen Pause, damit man sie nicht aus Versehen überspringt)
-  handleClick() {
+  // Ein Klick schließt die Karte (erst nach einer kleinen Pause, damit man sie nicht aus Versehen überspringt).
+  // Hat die Karte Knöpfe, schließt nur ein Klick auf einen Knopf.
+  handleClick(point) {
     if (!this.card || this.card.age < 0.6) return;
+    let result;
+    if (this.card.options) {
+      result = this.buttons().findIndex((button) => point && inside(point, button));
+      if (result < 0) return;
+    }
     const { resolve } = this.card;
     this.card = null;
-    resolve();
+    resolve(result);
+  }
+
+  // Knöpfe einer Karte (unten in der Mitte, untereinander)
+  buttons() {
+    const options = this.card?.options ?? [];
+    return options.map((label, i) => ({ label, x: 640 - 230, y: 470 + i * 62, width: 460, height: 48 }));
+  }
+
+  optionAt(point) {
+    if (!this.card?.options || this.card.age < 0.6) return null;
+    return this.buttons().find((button) => inside(point, button))?.label ?? null;
   }
 
   update(dt) {
@@ -73,6 +92,21 @@ export class Overlay {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
       ctx.fillRect(0, 0, 1280, 720);
       card.draw(ctx, card);
+    }
+    if (card.options) {
+      for (const button of this.buttons()) {
+        roundedRect(ctx, button.x, button.y, button.width, button.height, 10);
+        ctx.fillStyle = 'rgba(40, 24, 12, 0.85)';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = COLORS.brass;
+        ctx.stroke();
+        ctx.font = FONTS.speech;
+        ctx.fillStyle = COLORS.joseph;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(button.label, 640, button.y + button.height / 2 + 1);
+      }
     }
     if (card.age > 1.2) {
       ctx.globalAlpha = 0.55 + 0.35 * Math.sin(card.age * 3);
@@ -189,4 +223,8 @@ function drawEnd(ctx, { title, lines }) {
   ctx.font = FONTS.subtitle;
   ctx.fillStyle = '#c9b48f';
   lines.forEach((line, i) => ctx.fillText(line, 640, 350 + i * 42));
+}
+
+function inside(point, { x, y, width, height }) {
+  return point.x >= x && point.x <= x + width && point.y >= y && point.y <= y + height;
 }

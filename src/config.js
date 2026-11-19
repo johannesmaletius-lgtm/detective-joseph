@@ -26,3 +26,4 @@ const params = new URLSearchParams(location.search);
 export const DEBUG_AT_START = params.has('debug'); // Debug-Ansicht sofort an
 export const START_MUTED = params.has('mute');     // ohne Ton starten
 export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
+export const START_WAGON = Number(params.get('wagen')) || null; // z. B. ?wagen=3: gleich im dritten Wagen beginnen
