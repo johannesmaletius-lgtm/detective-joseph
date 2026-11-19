@@ -2,9 +2,9 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Wagen 1 und Wagen 4–8 sind spielbar** (Adventskalender „Die Ringbahn“, Planung in
-[`docs/adventskalender.md`](docs/adventskalender.md)). Wagen 2 und 3 fehlen noch – Wagen 4 startet man deshalb
-direkt über die Adresse (siehe [Wagen 4–8](#wagen-48)). **Wagen 1:** etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps. Joseph wacht
+**Stand: Wagen 1 und Wagen 4–16 sind spielbar** (Adventskalender „Die Ringbahn“, Planung in
+[`docs/adventskalender.md`](docs/adventskalender.md)). Wagen 2 und 3 fehlen noch. Zum Ausprobieren alle Türen
+öffnen: <http://localhost:8150/?test> (siehe [Wagen 4–8](#wagen-48) und [Wagen 9–16](#wagen-916)). **Wagen 1:** etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps. Joseph wacht
 in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm steht in seiner eigenen
 Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
 vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
@@ -76,7 +76,8 @@ Das Spiel beginnt mit dem Adventskalender „Die Ringbahn“: 24 Wagen, jeden Ta
 | Taste **G** | Koordinaten-Raster (50-Pixel-Schritte) |
 | Taste **T** | nur in der Debug-Ansicht: der Zug springt kurz vor den Tunnel |
 
-Adress-Zusätze zum Testen: <http://localhost:8150/?wagen=4> (mit Wagen 4 beginnen – geht für 1, 4, 5, 6, 7, 8),
+Adress-Zusätze zum Testen: <http://localhost:8150/?test> (alle Türen des Kalenders offen),
+<http://localhost:8150/?test&tuer=9> (gleich in Tür 9 – geht für 1 und 4–16, `?wagen=9` geht auch),
 <http://localhost:8150/?debug> (Debug-Ansicht an), `?mute` (ohne Ton),
 `?skipintro` (ohne Titelbild und Anfangsszene), kombiniert z. B. `?debug&mute&skipintro`.
 
@@ -95,8 +96,8 @@ detective-joseph/
 │   │   ├── letter-in-slot.png Brief, der aus dem Schlitz am Schaltpult ragt
 │   │   ├── scratches.png      eingeritzte Striche in der Tür (nur im Dunkeln zu sehen)
 │   │   └── outside/           Außenwelt: sky, moon, clouds, hills, tower, treeline, forest, near
-│   ├── scenes/wagon-04 … wagon-08/  Hintergründe der Wagen 4–8 (Fenster durchsichtig) und Rätselbilder
-│   ├── characters/bruno, herr-k, barkeeper/  Figuren: front/left/right/talk.webp
+│   ├── scenes/wagon-04 … wagon-16/  Hintergründe der Wagen 4–16 (Fenster durchsichtig) und Rätselbilder
+│   ├── characters/bruno, herr-k, barkeeper, tick, moll, mira/  Figuren: front/left/right/talk.webp
 │   ├── animations/
 │   │   ├── tv-noise/          TV-Rauschen: frame_001 … frame_020.png
 │   │   └── tv-skull/          Totenkopf erscheint auf dem Bildschirm (15 Frames, aus deinem Bogen)
@@ -109,14 +110,13 @@ detective-joseph/
 ├── tools/                     Werkzeuge, die Platzhalter-Grafiken erzeugen (siehe unten)
 └── src/
     ├── main.js                Einstieg: Spiel erzeugen, den Wagen (?wagen=N) mit seiner Geschichte laden, starten
-    ├── wagons.js              LISTE ALLER WAGEN: Nummer → Szene + Geschichte
     ├── config.js              Zentrale Einstellungen (1280 × 720, Doppelklick, Tasten)
     ├── story/
     │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Tipps, Ende
     │   ├── tutorial.js        Die Tutorial-Schritte (Hinweisschild oben)
-    │   ├── wagon4.js … wagon8.js  DIE GESCHICHTEN der Wagen 4–8 (oben in jeder Datei: die Rätselkette)
+    │   ├── wagon4.js … wagon16.js  DIE GESCHICHTEN der Wagen 4–16 (oben in jeder Datei: die Rätselkette)
     │   ├── wagonCommon.js     Helfer für alle Wagen: Anfang (Titelkarte), Ende (weiter zum nächsten Wagen), Tipps
-    │   ├── art/               im Code gezeichnete Blätter und Nahansichten der Wagen 4–8
+    │   ├── art/               im Code gezeichnete Blätter und Nahansichten der Wagen 4–16
     │   ├── items.js           Katalog der Gegenstände (Name, Bild, Beschreibung, Kombinationen)
     │   ├── wagonItems.js      Gegenstände ab Wagen 4 (Bilder im Code gezeichnet)
     │   └── story.js           Führt die Geschichte aus: say, note, give, cutscene … (Befehle fürs Drehbuch)
@@ -156,6 +156,7 @@ detective-joseph/
     │   ├── outsideView.js     Außenwelt hinter den Fenstern (Ebenen mit Perspektive, Mond, Tunnel)
     │   ├── trainCompartment.js  DATEN des Zugabteils: Bild, Laufbereich, anklickbare Stellen, Außenwelt …
     │   ├── diningCar.js, sleepingCar.js, lostAndFound.js, barCar.js, cinemaCar.js  DATEN der Wagen 4–8
+    │   ├── mirrorCar.js, speakerCar.js, clockCar.js, musicSalon.js, chapelCar.js, newspaperCar.js, playroom.js, radioRoom.js  DATEN der Wagen 9–16
     │   ├── wagonKit.js        gemeinsame Einstellungen aller Wagen (Außenwelt, Zugfahrt, Perspektive)
     │   └── character.js       andere Figuren (Bruno, Herr K. …): Pose, Größe, Sprechen, anklickbar
     ├── effects/
@@ -286,8 +287,8 @@ Wer das Kamerabild beobachtet, während der Zug durch den Tunnel fährt, sieht n
 
 ## Wagen 4–8
 
-Starten: <http://localhost:8150/?wagen=4> (oder 5, 6, 7, 8). Am Ende eines Wagens geht es direkt in den
-nächsten. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
+Starten: über den Kalender (<http://localhost:8150/?test>) oder direkt <http://localhost:8150/?test&tuer=4> (oder 5–8).
+Am Ende eines Wagens geht es zurück zum Adventskalender. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
 später Foto, Taschenuhr, Bierdeckel); das Notizbuch beginnt mit „Was bisher geschah“. Jeder Wagen hat Tipps
 auf Taste **H**. Die ganze Rätselkette steht oben in der jeweiligen Datei `src/story/wagonN.js`.
 
@@ -307,7 +308,26 @@ den Szenendateien unter `outside` stehen. Alles andere (Blätter, Schlösser, Fl
 in Wagen 5) ist im Code gezeichnet (`src/story/art/`) – das Foto könnte später durch ein ChatGPT-Bild ersetzt werden.
 
 **Neuen Wagen anlegen:** Szenendatei in `src/scene/` (am einfachsten `cinemaCar.js` kopieren), Geschichte in
-`src/story/` (z. B. `wagon8.js` kopieren) und beide in `src/wagons.js` eintragen.
+`src/story/` (z. B. `wagon8.js` kopieren) und beide in `src/advent/doors.js` bei der Tür eintragen (`load`).
+
+## Wagen 9–16
+
+Starten: <http://localhost:8150/?test&tuer=9> (oder 10–16). Gegenstände ab Wagen 9 stehen in
+`src/story/wagonItems2.js`; die im Code gezeichneten Nahansichten in `src/story/art/wagon9.js` … `wagon16.js`.
+
+| Wagen | Ort, Figuren | Rätsel (kurz) | Code(s) |
+| --- | --- | --- | --- |
+| 9 | Spiegelwagen | Zwei Hebel, zu weit auseinander. Das Spiegelbild wiederholt die letzte Runde spiegelverkehrt: in einer Runde rechts ziehen, nach dem Tunnel zur selben Zeit wieder rechts ziehen, wenn links das Spiegelbild zieht. Kratzer in Spiegelschrift (im Spiegel gegenüber lesbar): „Er ist eine Runde zu spät“. Lichtstrahl über 4 Standspiegel ins Glasauge: A \, B \, C /, D / | – |
+| 10 | Lautsprecherwagen, Stimme des Schaffners | Sicherungen: dünnes Kabel – kleine Sicherung (4 → 20 A, 1 → 6 A, 6 → 25 A, 1,5 → 10 A, 2,5 → 16 A); Tonband 108; bei 19 cm/s abspielen, dann rückwärts: „… wie die anderen. Elf ist der Nächste.“ | Schrank **11** |
+| 11 | Uhrenwagen, Herr Tick | Die Rundenuhr (oben rechts, Mond am Zeiger, Ruf bei 50); Gespräch; Herrn Ticks Zettel; Standuhr :45, Kuckucksuhr :35 stellen, Tunnel abwarten, auf dem Sofa bis zum Ruf warten → beide schlagen beim Ruf. Herr Tick gibt das Zahnrad | – |
+| 12 | Musiksalon, Herr Moll | 3 Notenstücke (Klavierbank, Teppichecke, Hülle „Weihnachtsfeier · Zug 24“); Kreuze über den Noten: H – A – Es – E → Spieldose **HASE** → Klavierschlüssel; viermal im Takt der Schienenstöße klopfen; Schluss = Anfang rückwärts: D – H – A – G | Spieldose **HASE** |
+| 13 | Kapelle (3. Advent) | 12 Kerzen in der Reihenfolge der Wagen 1–12 → Papier und Bleistift; Gedenktafel abreiben (… Mira … und J.); Laterne am Kranz anzünden, über den Abrieb halten → H, E, I, M; Opferstock → Familienfoto; Glocken G – A – H (groß, rechts, links) → Tür | Opferstock **HEIM** |
+| 14 | Zeitungswagen | Kreuzworträtsel (ILSE, KLAVIER eintragen, LOKFÜHRER → SCHAFFNER) → **WEICHE**; Zeitung vom 25.12. + Schnipsel aus dem Papierkorb (BAHNHOF und „gerettet“ passen nicht); Lupe + Pressefoto: 23:47 | Archiv **WEICHE**, Tür **2347** |
+| 15 | Spielzimmer, Mira | „Ich sehe was“: Trommel, Schaukelpferd, Fenster; Modellbahn: 14 Wagen in der Reihenfolge 1–14 → roter Schlüssel im Spielzeugtunnel; Puppenhaus: Schaffner auf den Bahnsteig, Frau und Mädchen in den Zug → Miras Zeichnung, Rückseite „Heiligabend“ | Tür **2412** |
+| 16 | Funkraum | Antenne nach links (zum Turm in der Mitte des Kreises); Logbuch 120, 135, 165, 210, 270 → **345** kHz; Kopfhörer; Morsefunkspruch „Weiche 7 falsch“, am Ende ..--- ...-- ....- .---- (Morsetafel an der Wand) | Frequenz **345**, Tür **2341** |
+
+Neu dafür: Buchstabenschlösser (`codeLock` mit `alphabet`), Töne (`story.tone(frequenz)`), Helfer `tryCode` und
+`roundProgress` in `src/story/wagonCommon.js`, `box()` und `windowSpots()` in `src/scene/wagonKit.js`.
 
 ## Werkzeuge (`tools/`)
 
@@ -321,7 +341,7 @@ Platzhalter neu erzeugen oder verändern willst – aufrufen jeweils im Projekto
 | `node tools/make-tv-noise.mjs` | die 20 Frames TV-Rauschen |
 | `node tools/make-items.mjs` | Gegenstände fürs Inventar (Brief, Schlüssel, Messer, Fetzen, Signaltafel, Fernglas, Taschenlampe, Batterie), Notizbuch-Knopf, Brief im Schlitz, eingeritzte Striche (zählt dafür die Laternen) |
 | `node tools/make-joseph-walk.mjs` | Josephs Laufanimation (4 Richtungen × 8 Frames) aus seinen Standbildern |
-| `python3 tools/prepare-wagons.py` | Hintergründe, Figuren und Rätselbilder der Wagen 4–8 aus `assets/reference/` (braucht Pillow) |
+| `python3 tools/prepare-wagons.py` | Hintergründe, Figuren und Rätselbilder der Wagen 4–16 aus `assets/reference/` (braucht Pillow) |
 
 ## Zug-Gefühl anpassen
 
@@ -382,5 +402,7 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagenwechsel, Figuren, Gespräche:** `?wagen=N`, weiter zum nächsten Wagen, Bruno/Herr K./Barkeeper, Gesprächsauswahl
 - [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/adventskalender.md`)
 - [ ] **Wagen 2 und 3:** Gepäckwagen, Postwagen
-- [ ] **Wagen 9–24**, Türchen-Sperre nach Datum, Spielstand speichern, Online stellen
+- [x] **Adventskalender:** Kalender als Startbild, Türchen-Sperre nach Datum, Spielstand
+- [x] **Wagen 9–16:** Spiegelwagen, Lautsprecherwagen, Uhrenwagen, Musiksalon, Kapelle, Zeitungswagen, Spielzimmer, Funkraum
+- [ ] **Wagen 17–24**, Online stellen
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds

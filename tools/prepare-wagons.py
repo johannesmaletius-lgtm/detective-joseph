@@ -189,7 +189,7 @@ def prepare_picture(src, dest, width=1280):
 
 
 if __name__ == '__main__':
-    for number in (4, 5, 6, 7, 8):
+    for number in range(4, 17):
         prepare_background(number)
     prepare_sheet(REF / 'tuer-04' / 'tuer-04-bruno.webp', 'bruno')
     prepare_sheet(REF / 'tuer-07' / 'tuer-07-herr-k.webp', 'herr-k')
@@ -197,3 +197,8 @@ if __name__ == '__main__':
     prepare_picture(REF / 'tuer-05' / 'tuer-05-abteil-k.webp', SCENES / 'wagon-05' / 'abteil-k.webp')
     prepare_picture(REF / 'tuer-06' / 'tuer-06-regal.webp', SCENES / 'wagon-06' / 'regal.webp')
     prepare_picture(REF / 'tuer-08' / 'tuer-08-standbild.webp', SCENES / 'wagon-08' / 'standbild.webp')
+    prepare_sheet(REF / 'tuer-11' / 'tuer-11-tick.webp', 'tick')
+    prepare_sheet(REF / 'tuer-12' / 'tuer-12-moll.webp', 'moll')
+    prepare_sheet(REF / 'tuer-15' / 'tuer-15-mira.webp', 'mira')
+    prepare_picture(REF / 'tuer-13' / 'tuer-13-familienfoto.webp', SCENES / 'wagon-13' / 'familienfoto.webp', width=540)
+    prepare_picture(REF / 'tuer-14' / 'tuer-14-pressefoto.webp', SCENES / 'wagon-14' / 'pressefoto.webp', width=900)

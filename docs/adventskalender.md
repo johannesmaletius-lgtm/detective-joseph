@@ -94,11 +94,24 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 - Testen: `?test` (alle Türen offen + Knopf „Spielstand löschen“), `?datum=2026-12-05` (anderes Datum), `?tuer=2&skipintro` (direkt in eine Tür).
 - Ein Wagen, den man mittendrin verlässt, beginnt beim nächsten Mal von vorn.
 
-**Noch zu bauen:** Wagen 2–24 umsetzen, Gesprächssystem, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
+**Wagen 1 und 4–16 sind gebaut** (Lösungen im README). Wagen 4–8 aus der parallelen Session sind mit dem Kalender zusammengeführt (sie enden jetzt mit `story.finish()`).
+
+Kleine Abweichungen vom Plan in Wagen 9–16:
+- Tür 9: Die Kratzer sind ein Hinweis („Er ist eine Runde zu spät“), kein Code. Die Tür öffnet das Glasauge (Lichtstrahl).
+- Tür 10: Das Tonband muss erst mit der richtigen Geschwindigkeit (19 cm/s), dann rückwärts laufen. Sicherungen nach Kabeldicke.
+- Tür 11: Die Rundenuhr zeigt den Ruf (bei 50 von 60). Standuhr 1½-mal, Kuckucksuhr halb so schnell; sie laufen ab dem Tunnel. Herr Tick öffnet die Tür.
+- Tür 12: Die Kreuze ergeben „HASE“ (Miras Stoffhase) – das Wort für die Spieldose mit dem Klavierschlüssel. Schluss = Anfang rückwärts (D H A G). Beim letzten Ton geht die Tür auf.
+- Tür 13: Statt der Münze aus dem Barwagen hat der Opferstock ein Buchstabenschloss: Die Laterne (am Kranz angezündet) wirft rote Punkte auf H-E-I-M im Abrieb. Glocken G – A – H öffnen die Tür. Auf der Tafel stehen auch Lokführer und Funker.
+- Tür 14: Lösungswort des Kreuzworträtsels ist WEICHE. Die Zeitung gibt es nur einmal im Archiv.
+- Tür 15: Mira nennt ihren Hasen „Hoppel“; Türcode „Heiligabend“ = 2412 (Rückseite der Zeichnung).
+- Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
+- Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
+
+**Noch zu bauen:** Wagen 2, 3 und 17–24 umsetzen, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
 
-**Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Es ist noch **kein Code** für die Wagen 2–24 geschrieben.
+**Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Code: Wagen 1 und 4–16 sind gebaut, es fehlen Wagen 2, 3 und 17–24 (Stand 19.11. abends).
 
 **Wo was liegt**
 - Planung und Entscheidungen: dieses Dokument
