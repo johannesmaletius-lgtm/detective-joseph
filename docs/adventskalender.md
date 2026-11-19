@@ -88,4 +88,31 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 
 ## Noch zu bauen (Code)
 
-Wagenwechsel, Türchen-Sperre nach Datum (mit Test-Schalter), Spielstand speichern, Wagen 2–13 umsetzen, Gesprächssystem, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik), Online stellen (GitHub Pages).
+Wagenwechsel, Türchen-Sperre nach Datum (mit Test-Schalter), Spielstand speichern, Inventar über Wagen hinweg (Münze, Zahnrad, Kopfhörer, Kelle, Fotos, Miras Karte …), Wagen 2–24 umsetzen, Gesprächssystem, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
+
+## Übergabe für die nächste Session
+
+**Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Es ist noch **kein Code** für die Wagen 2–24 geschrieben.
+
+**Wo was liegt**
+- Planung und Entscheidungen: dieses Dokument
+- Erzählung, Hintergrund, Korrekturen: `docs/geschichte.md`
+- Grafiken: `assets/reference/tuer-XX/tuer-XX-<name>.webp` (Joseph: `assets/reference/joseph/joseph-sheet.webp`, Stil-Referenz: `assets/reference/train-compartment-original.png`)
+- Planungsseite: https://claude.ai/artifact/PJZU72QAUCiWMff7BHSQmT. Vor dem Ändern mit dem Artifact-Tool lesen (`action: read`, dann `path: index.html` für die Datei) und unter derselben Adresse neu veröffentlichen. Reiter: Grafik-Blöcke 1–4 mit allen ChatGPT-Befehlen, Geschichte, Türen 1–24, Entscheidungen. Haken pro Bild in der Datenbank der Seite (Sammlung `bilder`, Dokument = Bild-ID wie `t17-hintergrund`, Feld `erledigt: true`).
+- Code von Wagen 1: `src/` (Szenen, Rätsel, Story), Start mit `start.command` bzw. `server.js`
+
+**Arbeitsweise mit Johannes**
+- Immer nur eine Frage, Antworten A/B/C, kurz.
+- Bilder, die er schickt: prüfen, unter `assets/reference/tuer-XX/` speichern, committen, pushen, auf der Planungsseite abhaken.
+- ChatGPT bekommt nur die fertigen Bild-Befehle, nie die Planungsanweisungen (sonst will es selbst GitHub und Browser benutzen).
+
+**Hinweise für die Umsetzung der Grafiken**
+- Magenta-Fenster (#FF00FF) füllt der Code mit der Landschaft, Cyan-Flächen (#00FFFF) mit Spiegelbild/Leinwand. Magenta in Türfenstern dunkel machen.
+- Kapelle (13): Buntglasfenster sind innen magenta → selbst farbig füllen (für das Laternen-Rätsel).
+- Pressefoto (14) und Schlussbild (24): Uhrzeiger auf 23:47 selbst einsetzen.
+- Tunnelfoto (19): Kilometerstein mit „24,7“ beschriften. Spind-Foto (21): Dienstnummer aufs Ärmelabzeichen.
+- Wartungsgang (23): einige Lampen abdunkeln, Lücke für Herrn Ticks Zahnrad einzeichnen.
+- Heizer (21) und anderer Joseph (22): beide Seitenansichten schauen nach rechts → eine spiegeln. Für die Enthüllung gibt es den anderen Joseph auch ohne Mütze.
+- Schaffnerabteil (18): Schlüsselbrett hat 8 Umrisse → Rätsel mit 8 Schlüsseln.
+
+**Vorgeschlagene Reihenfolge für den Code:** 1. Wagenwechsel + Türchen-Sperre nach Datum (mit Test-Schalter) + Spielstand speichern, 2. Wagen 2 (Gepäckwagen) als Vorlage für alle weiteren, 3. Wagen für Wagen bis 24, 4. Online stellen.
