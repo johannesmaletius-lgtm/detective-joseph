@@ -22,9 +22,14 @@ import { COLORS } from '../ui/text.js';
 // Außerdem darf ein Drehbuch festlegen:
 //   startItems: ['flashlight']          Gegenstände, die Joseph zu Beginn sicher dabeihat (zusätzlich zu dem,
 //                                       was er aus dem letzten geschafften Wagen mitbringt, siehe items.js: keep)
+//   await story.choose(['A', 'B'])      Auswahl im Gespräch: Ergebnis 0, 1 … oder -1 (abgebrochen)
+//   await story.speak('…', { at })      jemand anderes spricht (Farbe und Stelle wählbar)
+//   await story.goToWagon(2)            durch die Tür in den nächsten Wagen
 //
 // Außerdem darf ein Drehbuch enthalten:
 //   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
+//   prepare(story)                      wer direkt in diesem Wagen anfängt (Spielstand, ?wagen=3), bekommt hier
+//                                       die Sachen, die er aus den Wagen davor hätte
 //   hint(story)                         Tipp, wenn der Spieler nicht weiterweiß (Taste H / Notizbuch)
 //   update(story, dt)                   wird in jedem Bild aufgerufen
 //
@@ -83,11 +88,6 @@ export class Story {
     return this.scene.character(id);
   }
 
-  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
-  choose(options) {
-    return this.game.views.dialogue.open({ options });
-  }
-
   // Jemand anderes spricht, z. B. die Lautsprecherstimme
   speak(text, { at = SPEAKER, color = COLORS.speaker } = {}) {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : at), color });
@@ -116,8 +116,8 @@ export class Story {
     this.game.effects.note(frequency, options);
   }
 
-  sound(name) {
-    this.game.effects.play(name);
+  sound(name, ...args) {
+    this.game.effects.play(name, ...args);
   }
 
   // Für das Tutorial: merken, dass etwas passiert ist
@@ -182,6 +182,23 @@ export class Story {
     return this.game.views[name].open(options);
   }
 
+  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht.
+  // Ohne Überschrift: Auswahlleiste der Adventskalender-Wagen (src/ui/dialogue.js);
+  // mit Überschrift (Teil 1, z. B. 'Der Koch'): Kasten aus src/ui/choice.js
+  async choose(options, title) {
+    if (!title) return this.game.views.dialogue.open({ options });
+    this.busy += 1;
+    try {
+      return await this.game.views.choice.open({ options, title });
+    } finally {
+      this.busy -= 1;
+    }
+  }
+
+  goToWagon(number) {
+    return this.game.goToWagon(number);
+  }
+
   // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)
   itemName(id) {
     return this.script.itemName?.(this, id) ?? ITEMS[id].name;
@@ -216,11 +233,12 @@ export class Story {
   }
 
   // ---------------------------------------------------------------- Ablauf
-  async begin({ skipIntro = false } = {}) {
+  async begin({ skipIntro = false, fresh = false } = {}) {
     for (const id of this.script.startItems ?? []) this.game.inventory.add(id);
     this.game.inventory.revealTime = 0;
     for (const text of this.script.recap ?? []) this.game.notebook.add(text, 0);
     this.game.notebook.unread = 0;
+    if (fresh) await this.script.prepare?.(this);
     await this.script.setup?.(this);
     if (skipIntro) await this.script.skipIntro?.(this);
     else await this.script.intro?.(this);

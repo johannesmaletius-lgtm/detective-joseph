@@ -25,7 +25,11 @@ import { ITEMS } from '../story/items.js';
 import { Calendar } from '../advent/calendar.js';
 import { SaveGame } from '../advent/save.js';
 import { doorInfo, today } from '../advent/doors.js';
-import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, TEST_MODE } from '../config.js';
+import { Sentence } from '../puzzles/sentence.js';
+import { Mirror } from '../puzzles/mirror.js';
+import { Choice } from '../ui/choice.js';
+import { WAGONS, loadProgress, saveProgress } from '../story/teil1.js';
+import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, START_WAGON, TEIL1, TEST_MODE } from '../config.js';
 
 // Das Herz des Spiels.
 //
@@ -55,6 +59,7 @@ export class Game {
     this.calendar = new Calendar();
     this.save = new SaveGame();
     this.door = null;     // Tür, die gerade gespielt wird
+    this.teil1 = TEIL1;   // ältere Fassung „Teil 1“ ohne Kalender (?teil1)
     this.finished = null; // beendet den laufenden Wagen (setzt playDoor)
 
     // Benutzeroberfläche
@@ -75,6 +80,9 @@ export class Game {
       picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
       arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
       dialogue: new DialogueView(), // Gesprächsauswahl
+      sentence: new Sentence(),     // Teil 1: Satz-Puzzle (Schlafwagen)
+      mirror: new Mirror(),         // Teil 1: Mondlicht-Spiegel
+      choice: new Choice(),         // Teil 1: Auswahl im Gespräch mit Überschrift
     };
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
@@ -142,17 +150,29 @@ export class Game {
   }
 
   // Lädt eine Szene samt Bildern, stellt Joseph an seine Startposition und bereitet die Geschichte vor.
-  // carried = was Joseph aus früheren Wagen mitbringt: { items: ['flashlight'], notes: [{ door, text }] }
-  async loadScene(sceneData, script, carried = { items: [], notes: [] }) {
+  // carried = was Joseph aus früheren Wagen mitbringt: { items: ['flashlight'], notes: [{ door, text }] }.
+  // Ohne carried (Teil 1, durch die Tür in den nächsten Wagen) behält Joseph Inventar und Notizbuch,
+  // und der Zug fährt einfach weiter (gleiche Stelle, gleiche Runde).
+  async loadScene(sceneData, script, carried = null) {
     const scene = new Scene(sceneData);
     await Promise.all([scene.load(), this.prepare()]);
-    this.inventory.clear(carried.items);
-    this.notebook.clear(carried.notes);
+    const previous = this.scene?.motion;
+    this.story?.cancelAction();
+    this.closeViews();
+    this.notebook.close();
+    this.speech.finish();
+    this.hints.hide();
+    this.inventory.selected = null;
+    if (carried) {
+      this.inventory.clear(carried.items);
+      this.notebook.clear(carried.notes);
+    }
     this.overlay.card = null;
     this.scene = scene;
     this.story = new Story(this, script);
     scene.flags = this.story.flags;
     if (scene.motion) {
+      if (previous) scene.motion.continueFrom(previous);
       scene.motion.onBump = (strength) => this.sound.clack(strength);
       scene.motion.onSqueal = (duration) => {
         this.sound.squeal(duration);
@@ -169,17 +189,72 @@ export class Game {
     this.player.enterScene(scene);
   }
 
+  // Lädt einen Wagen (1 bis 4, siehe src/story/wagons.js)
+  async loadWagon(number) {
+    const wagon = WAGONS[number];
+    this.wagon = number;
+    await this.loadScene(wagon.scene, wagon.script);
+  }
+
+  // Joseph geht durch die Tür in den nächsten Wagen. Der Spielstand merkt sich, wie weit er gekommen ist.
+  async goToWagon(number) {
+    saveProgress(number);
+    this.overlay.fade = 1;
+    await this.loadWagon(number);
+    await this.story.begin();
+  }
+
   start() {
     requestAnimationFrame((time) => {
       this.lastTime = time;
       requestAnimationFrame(this.loop);
     });
-    this.run();
+    if (this.teil1) this.begin();
+    else this.run();
   }
 
   // Ist gerade der Kalender zu sehen (oder wird ein Wagen geladen)?
   get inCalendar() {
-    return this.calendar.isOpen || !this.scene;
+    return !this.teil1 && (this.calendar.isOpen || !this.scene);
+  }
+
+  // ---------------------------------------------------------------- Teil 1 (ältere Fassung, ?teil1)
+  // Lädt einen Wagen von Teil 1 (1 bis 4, siehe src/story/teil1.js)
+  async loadWagon(number) {
+    const wagon = WAGONS[number];
+    this.wagon = number;
+    await this.loadScene(wagon.scene, wagon.script);
+  }
+
+  // Joseph geht durch die Tür in den nächsten Wagen. Der Spielstand merkt sich, wie weit er gekommen ist.
+  async goToWagon(number) {
+    saveProgress(number);
+    this.overlay.fade = 1;
+    await this.loadWagon(number);
+    await this.story.begin();
+  }
+
+  // Titelbild – und wer schon weiter war, kann dort weiterspielen
+  async begin() {
+    const fresh = this.wagon > 1; // direkt in einem späteren Wagen begonnen: Joseph bekommt seine Sachen
+    if (SKIP_INTRO) return this.story.begin({ skipIntro: true, fresh });
+    this.overlay.fade = 1;
+    const saved = loadProgress();
+    const offer = !START_WAGON && saved > 1 && WAGONS[saved];
+    const options = offer ? ['Neues Spiel', `Weiterspielen: Wagen ${saved} – ${WAGONS[saved].name}`] : null;
+    const choice = await this.overlay.showCard({
+      kind: 'title',
+      title: 'Detective Joseph',
+      subtitle: 'Die Ringbahn · Teil 1 (ältere Fassung)',
+      continueText: options ? 'Wähle aus' : 'Klicken zum Starten',
+      options,
+    });
+    if (offer && choice === 1) {
+      await this.loadWagon(saved);
+      return this.story.begin({ fresh: true });
+    }
+    if (offer) saveProgress(1);
+    return this.story.begin({ fresh });
   }
 
   loop = (time) => {
@@ -208,7 +283,7 @@ export class Game {
     // Taschenlampe: leuchtet im Dunkeln dorthin, wo die Maus ist
     const mouse = this.camera.screenToWorld(this.input.mouse);
     const flashlight = this.scene.darkLevel > 0 && this.inventory.has('flashlight') && this.input.mouse.inside;
-    this.scene.beam = flashlight ? mouse : null;
+    this.scene.beam = this.story.beamAt ?? (flashlight ? mouse : null); // in Zwischensequenzen darf die Geschichte selbst leuchten
 
     this.speech.update(dt);
     this.hints.update(dt);
@@ -259,6 +334,7 @@ export class Game {
     const item = selected ? this.inventory.images[selected] : null;
     const itemName = selected ? this.story.itemName(selected) : '';
 
+    this.overlay.hover = this.overlay.optionAt(mouse);
     if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
     if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
@@ -281,7 +357,7 @@ export class Game {
 
   handleClick(click) {
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
-    if (this.overlay.blocksInput) return this.overlay.handleClick();
+    if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {

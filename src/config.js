@@ -34,3 +34,8 @@ export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangs
 export const TEST_MODE = params.has('test');
 export const FAKE_DATE = params.get('datum');
 export const START_DOOR = Number(params.get('tuer') ?? params.get('wagen')) || null; // ?wagen=N geht auch
+
+// Die ältere Fassung „Teil 1“ (Wagen 1–4: Speisewagen, Schlafwagen, Gepäckwagen) ohne Adventskalender:
+//   ?teil1              starten, ?teil1&wagen=3 gleich im dritten Wagen
+export const TEIL1 = params.has('teil1');
+export const START_WAGON = Number(params.get('wagen')) || null;

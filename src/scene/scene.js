@@ -6,6 +6,7 @@ import { WalkArea } from '../navigation/walkArea.js';
 import { pointInPolygon } from '../navigation/geometry.js';
 import { TrainMotion } from '../effects/trainMotion.js';
 import { Darkness } from '../effects/darkness.js';
+import { paintCanvas } from '../core/paint.js';
 import { OutsideView } from './outsideView.js';
 import { Character } from './character.js';
 
@@ -22,6 +23,12 @@ const CLICK_MARKER_DURATION = 0.45; // Sekunden
 // - inDark: true     nur im Dunkeln zu sehen (wenn im Tunnel das Licht aus ist)
 // - glows: 'merker'  (nur hotspots) leuchtet selbst und ist deshalb auch im Dunkeln ohne Taschenlampe zu finden,
 //                    solange die Bedingung gilt – z. B. der Bildschirm, solange er Strom hat
+//
+// Hintergrund: entweder ein Bild (background.src) oder mit Code gemalt (background.paint, siehe core/paint.js).
+// Kleine Bilder (props) können statt `image` auch `paint: (ctx, scene) => { … }` haben – dann werden sie in
+// jedem Bild neu gemalt (z. B. eine schlafende Dame, die atmet). Weitere Angaben für props:
+// - depth: y        steht auf dem Boden bei y: Ist Joseph weiter hinten (kleineres y), wird es VOR ihm gezeichnet
+// - light: { x, y, radius } oder (scene) => …   leuchtet und bleibt im Dunkeln sichtbar
 export class Scene {
   constructor(data) {
     this.data = data;
@@ -39,14 +46,16 @@ export class Scene {
     this.clickMarker = null;
     this.flags = {};      // Merker aus dem Spielstand (setzt das Spiel, siehe story.js)
     this.beam = null;     // Lichtkegel der Taschenlampe { x, y } oder null (setzt das Spiel)
+    this.time = 0;        // Sekunden seit dem Betreten der Szene (für gemalte Animationen)
   }
 
   async load() {
     const spots = this.data.animations ?? [];
+    const { background: bg } = this.data;
     const [background, players, props] = await Promise.all([
-      loadImage(this.data.background.src),
+      bg.paint ? paintCanvas(bg.width, bg.height, bg.paint) : loadImage(bg.src),
       Promise.all(spots.map(async (spot) => (spot.animation ? new AnimationPlayer(await loadAnimation(spot.animation)) : null))),
-      Promise.all((this.data.props ?? []).map(async (prop) => ({ ...prop, picture: await loadImage(prop.image) }))),
+      Promise.all((this.data.props ?? []).map(async (prop) => ({ ...prop, picture: prop.image ? await loadImage(prop.image) : null }))),
       this.outside?.load(),
       ...this.characters.map((character) => character.load()),
     ]);
@@ -146,6 +155,7 @@ export class Scene {
   }
 
   update(dt) {
+    this.time += dt;
     this.motion?.update(dt);
     this.outside?.update(dt, this.motion);
     for (const spot of this.animations) spot.player?.update(dt);
@@ -167,12 +177,14 @@ export class Scene {
     const { x, y, width, height } = this.data.background;
     ctx.drawImage(this.background, x, y, width, height);
 
-    // 3) Dinge davor: kleine Bilder, Animationen, Lichtschein, Klick-Markierung, Joseph
-    this.drawProps(ctx);
+    // 3) Dinge davor: kleine Bilder, Animationen, Lichtschein, Klick-Markierung, Joseph –
+    //    und was vorne auf dem Boden steht, vor Joseph
+    this.drawProps(ctx, (prop) => !this.inFront(prop, player));
     this.drawAnimations(ctx, 'front');
     this.drawGlows(ctx);
     this.drawClickMarker(ctx);
     this.drawFigures(ctx, player);
+    this.drawProps(ctx, (prop) => this.inFront(prop, player));
 
     // 4) Licht und Flackern liegen über allem – auch über Joseph
     this.outside?.drawLight(ctx);
@@ -203,12 +215,18 @@ export class Scene {
     for (const figure of figures) figure.draw(ctx, this);
   }
 
-  drawProps(ctx) {
+  // Steht ein kleines Bild vor Joseph? (nur Dinge mit depth = Bodenhöhe)
+  inFront(prop, player) {
+    return prop.depth !== undefined && prop.depth > player.y;
+  }
+
+  drawProps(ctx, filter = () => true) {
     for (const prop of this.props) {
-      if (!this.isActive(prop)) continue;
+      if (!this.isActive(prop) || !filter(prop)) continue;
       ctx.save();
       if (prop.inDark) ctx.globalAlpha = this.darkLevel;
-      ctx.drawImage(prop.picture, prop.x, prop.y, prop.width, prop.height);
+      if (prop.paint) prop.paint(ctx, this);
+      else ctx.drawImage(prop.picture, prop.x, prop.y, prop.width, prop.height);
       ctx.restore();
     }
   }
@@ -248,9 +266,15 @@ export class Scene {
 
   // Was im Dunkeln selbst leuchtet (bleibt in der Dunkelheit ausgespart)
   glowingSpots() {
-    return this.animations
+    const spots = this.animations
       .filter((spot) => spot.glow && !spot.off)
       .map((spot) => ({ x: spot.glow.x, y: spot.glow.y, radius: spot.glow.radius * (spot.glowStrength ? 1.4 : 0.7) }));
+    for (const prop of this.props) {
+      if (!prop.light || !this.isActive(prop)) continue;
+      const light = typeof prop.light === 'function' ? prop.light(this) : prop.light;
+      if (light) spots.push(...[].concat(light));
+    }
+    return spots;
   }
 
   drawClickMarker(ctx) {

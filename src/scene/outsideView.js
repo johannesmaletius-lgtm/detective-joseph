@@ -186,14 +186,27 @@ export class OutsideView {
   // Ein einzelnes Ding am Himmel (der Mond) in Richtung "bearing" (Grad).
   // Es wandert mit dem Himmel und taucht nacheinander in allen Fenstern auf.
   drawSkyObject(ctx, layer) {
+    // Richtung vom Zug aus: 0° = geradeaus, 90° = links, −90° = rechts, ±180° = hinten
+    const x = this.skyObjectX(layer);
+    ctx.drawImage(layer.picture, x - layer.picture.width / 2, layer.y - layer.picture.height / 2);
+  }
+
+  // Wo (x im Bild) steht ein Ding am Himmel gerade? heading = Fahrtrichtung in Grad (Standard: jetzt)
+  skyObjectX(layer, heading = this.train.heading) {
     const { x: vx } = this.vanishingPoint;
     const ref = this.referenceDistance;
-    // Richtung vom Zug aus: 0° = geradeaus, 90° = links, −90° = rechts, ±180° = hinten
-    const relative = mod(layer.bearing - this.train.heading + 180, 360) - 180;
-    const x = relative > 0
+    const relative = mod(layer.bearing - heading + 180, 360) - 180;
+    return relative > 0
       ? vx - ref - (relative - 90) * this.pixelsPerDegree
       : vx + ref + (-relative - 90) * this.pixelsPerDegree;
-    ctx.drawImage(layer.picture, x - layer.picture.width / 2, layer.y - layer.picture.height / 2);
+  }
+
+  // In welchem Fenster steht der Mond? (Fenster aus der Liste oder null)
+  moonWindow(heading) {
+    const moon = this.layers.find((layer) => layer.bearing !== undefined);
+    if (!moon) return null;
+    const x = this.skyObjectX(moon, heading);
+    return this.windows.find((window) => x > window.from + 6 && x < window.to - 6) ?? null;
   }
 
   // Wohin der Himmel auf einer Seite gerade verschoben ist. Genau seitlich (90°) blickt man im

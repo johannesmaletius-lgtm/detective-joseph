@@ -1,4 +1,5 @@
 import { loadImage } from '../core/assets.js';
+import { paintIcon } from '../core/paint.js';
 import { ITEMS } from '../story/items.js';
 
 // Die Inventarleiste mit 5 Plätzen. Hat Joseph mehr als 5 Gegenstände dabei, erscheinen links und
@@ -36,8 +37,8 @@ export class Inventory {
 
   async load() {
     this.bar = await loadImage(BAR);
-    // Gegenstände ab Wagen 4 sind im Code gezeichnet (icon), die aus Wagen 1 sind Bilder (image)
-    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, item.icon ? drawIcon(item.icon) : await loadImage(item.image)]));
+    // Gegenstände ab Wagen 4 sind im Code gezeichnet (icon oder paint), die aus Wagen 1 sind Bilder (image)
+    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, this.images[id] ?? (item.icon ? drawIcon(item.icon) : item.paint ? paintIcon(item.paint) : await loadImage(item.image))]));
     this.images = Object.fromEntries(entries);
   }
 

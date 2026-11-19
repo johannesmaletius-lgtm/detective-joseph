@@ -85,7 +85,8 @@ export class CodeLock extends View {
       if (up || down || onWheel) {
         const wheel = this.wheels[i];
         const step = down ? -1 : 1;
-        wheel.value = (wheel.value + step + this.alphabet.length) % this.alphabet.length;
+        const count = this.alphabet.length;
+        wheel.value = (wheel.value + step + count) % count;
         wheel.roll = step;
         this.sound('wheel');
         return;
@@ -194,11 +195,12 @@ export class CodeLock extends View {
       ctx.font = 'bold 56px "Trebuchet MS", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      const count = this.alphabet.length;
+      if (count > 10) ctx.font = 'bold 48px "Trebuchet MS", sans-serif';
       for (const offset of [-1, 0, 1]) {
-        const n = this.alphabet.length;
-        const digit = this.alphabet[(wheel.value + offset + n) % n]; // oben das kleinere, unten das größere Zeichen
+        const sign = this.alphabet[(wheel.value + offset + count) % count]; // oben das vorige, unten das nächste Zeichen
         ctx.fillStyle = offset === 0 ? '#1d140c' : 'rgba(29, 20, 12, 0.45)';
-        ctx.fillText(digit, x, y + (offset + wheel.roll) * 62);
+        ctx.fillText(sign, x, y + (offset + wheel.roll) * 62);
       }
       ctx.restore();
       arrow(ctx, x, y - WHEEL.height / 2 - 30, -1);

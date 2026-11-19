@@ -1,7 +1,13 @@
+import {
+  paintBon, paintCrank, paintCrowbar, paintGlass, paintHatpin, paintManifest, paintPadlockKey, paintPhoto, paintRecord,
+  paintNoteSheet, paintSeeds, paintVierkant,
+} from './itemPaint.js';
+
 // Katalog aller Gegenstände, die Joseph einstecken kann.
 //
 // name:   so heißt er im Spiel (steht am Mauszeiger)
 // image:  Bild im Inventar (128 × 128, transparenter Hintergrund – siehe tools/make-items.mjs)
+// paint:  statt image: das Bild wird mit Code gemalt (siehe itemPaint.js)
 // look:   was Joseph sagt, wenn man ihn anschaut (Rechtsklick im Inventar)
 // keep:   true = Joseph nimmt ihn in den nächsten Wagen mit (alles andere bleibt im Wagen zurück)
 //
@@ -63,6 +69,77 @@ export const ITEMS = {
     name: 'Batterie',
     image: 'assets/items/battery.png',
     look: 'Eine dicke Batterie. Hoffentlich ist noch Saft drin.',
+  },
+
+  // ---------------------------------------------------------------- Wagen 2: Speisewagen
+  crank: {
+    name: 'Kurbel',
+    paint: paintCrank,
+    look: 'Eine Handkurbel mit Holzgriff. Sie gehört zu einem Grammophon.',
+  },
+  record: {
+    name: 'Schallplatte „Ringbahn-Walzer“',
+    paint: paintRecord,
+    look: 'Eine Schallplatte mit rotem Etikett: „Ringbahn-Walzer – zum Tanzen in der Kurve“.',
+  },
+  glass: {
+    name: 'Glas',
+    paint: (ctx) => paintGlass(ctx, { wine: 'rgba(232, 200, 110, 0.85)' }),
+    look: 'Ein Weinglas vom Tisch 4.',
+  },
+  teil1PoisonGlass: {
+    name: 'Glas mit Probe 41',
+    paint: (ctx) => paintGlass(ctx, { glowing: true }),
+    look: 'Herrn Brandts Rotwein. Im Dunkeln leuchtet er grün. Den trinkt keiner – auch ich nicht.',
+  },
+  bon: {
+    name: 'Bon aus der Küche',
+    paint: paintBon,
+    look: 'Der Bestellzettel für Tisch 4. Unterschrieben mit „J.“',
+  },
+  vierkant: {
+    name: 'Vierkantschlüssel',
+    paint: paintVierkant,
+    look: 'Herrn Brandts Vierkantschlüssel. Damit öffnet ein Schaffner im Zug fast jede Tür und jede Klappe.',
+  },
+
+  // ---------------------------------------------------------------- Wagen 3: Schlafwagen
+  sleepNotes: {
+    name: 'Zettel: Frau Adlers Worte',
+    paint: paintNoteSheet,
+    look: 'Was Frau Adler im Schlaf murmelt.',
+  },
+  hatpin: {
+    name: 'Hutnadel',
+    paint: paintHatpin,
+    look: 'Eine lange Hutnadel mit violettem Glaskopf. Die Spitze ist zu einem kleinen Haken umgebogen.',
+  },
+
+  // ---------------------------------------------------------------- Wagen 4: Gepäckwagen
+  crowbar: {
+    name: 'Brecheisen',
+    paint: paintCrowbar,
+    look: 'Ein rotes Brecheisen. Damit bekommt man jede Kiste auf.',
+  },
+  seeds: {
+    name: 'Vogelfutter',
+    paint: paintSeeds,
+    look: 'Eine Tüte Vogelfutter. „Für Kasimir – nicht mehr als eine Handvoll pro Runde.“',
+  },
+  manifest: {
+    name: 'Frachtliste',
+    paint: paintManifest,
+    look: 'Die Frachtliste des Gepäckwagens.',
+  },
+  teil1Photo: {
+    name: 'Foto',
+    paint: paintPhoto,
+    look: 'Ein altes Foto: zwei Männer auf einem Bahnsteig. Beide sehen aus wie ich.',
+  },
+  padlockKey: {
+    name: 'Schlüssel „Postwagen“',
+    paint: paintPadlockKey,
+    look: 'Ein Vorhängeschloss-Schlüssel. Auf dem Anhänger: „Postwagen“.',
   },
 };
 
