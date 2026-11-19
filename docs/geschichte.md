@@ -149,7 +149,7 @@ Joseph steht auf und zündet die letzte Kerze am Baum an.
 
 ---
 
-## Korrekturen an den bisherigen Türen (damit alles zusammenpasst)
+## Korrekturen an den bisherigen Türen (übernommen)
 
 1. **Tür 4 (Speisewagen):** Joseph hält das Glas für Gift. In Wahrheit ist es ein Schlaftrunk, der nach Bittermandel riecht. Das kommt erst in Tür 22 oder 24 heraus. Das Rätsel bleibt gleich.
 2. **Tür 12 (Musiksalon):** Moll hat das Lied „für die Frau und die Tochter des Schaffners“ gespielt, nicht für den Schaffner selbst, denn der war am Bahnhof.
