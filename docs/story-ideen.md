@@ -48,6 +48,13 @@ seiner eigenen Schrift **„NICHT EINSCHLAFEN“**.
 > jede Runde vergiftet, und Joseph rettet ihn, indem er das Glas über den Tunnel bei sich trägt. Im Schlafwagen
 > führt Frau Adlers Satz zum Wort im Spiegel (nur im Mondlicht). Im Gepäckwagen ersetzt Kasimir, ihr Papagei,
 > die Detektivakte – und am Ende steigt der zweite Joseph aus dem Schrankkoffer und verschwindet im Postwagen.
+>
+> **Umgesetzt (Teil 2):** Wagen 5–7 in `src/story/wagon5.js` bis `wagon7.js`. Im Postwagen liegen die Briefe nach
+> Runden sortiert in Fächern; Brandt (als Stimme aus dem Lautsprecher) öffnet nur für eine Fahrkarte mit dem Stempel
+> der laufenden Runde, und die Tinte hat der andere Joseph, der im Dunkeln am Sortiertisch schreibt. Im
+> Schaffnerabteil ist der Fahrplan ein Kreis (jeder Halt 23:59); Joseph stellt am Stellpult die Ausfahrt und hält den
+> Zug mit der Notbremse im Tunnel an. Das Finale: Weiche 7 ist eine Rückfallweiche – wer sie hält, bleibt zurück
+> (das ist dem anderen Joseph in Runde 7 passiert). Die Lösung: zwei Schals, verknotet. „Wir zwei. Nie wieder getrennt.“
 
 1. **Erstes Abteil (das jetzige):** Der Totenkopf-Bildschirm zeigt nur Rauschen. Mit der richtigen Tastenfolge am
    grünen Pult erscheint für einen Moment das Bild einer Überwachungskamera, und die Kamera hängt im Tunnel. Der Brief

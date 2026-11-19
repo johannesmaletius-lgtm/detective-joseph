@@ -4,7 +4,7 @@ import { drawMailLetter, drawManifest, drawPhoto } from '../ui/cards2.js';
 import { VOICES, packFor, WINDOW_ITEMS, hintFor, inTunnel, lookOutside, tunnels } from './common.js';
 
 // ============================================================================================
-//  WAGEN 4 – Der Gepäckwagen (Ende von Teil 1)
+//  WAGEN 4 – Der Gepäckwagen (Ende von Teil 1, danach geht es im Postwagen weiter)
 // ============================================================================================
 //
 // Koffer, Kisten, Postsäcke – und Kasimir, Frau Adlers Papagei, unter einem Tuch. Kasimir merkt sich
@@ -510,11 +510,11 @@ async function finale(story) {
     await story.card({
       kind: 'end',
       title: 'Ende von Teil 1',
-      lines: ['Joseph hat sich selbst getroffen – den Joseph, der nie schläft.', 'Fortsetzung folgt: Der Postwagen.'],
-      continueText: 'Klicken, um zum Titelbild zurückzukehren',
+      lines: ['Joseph hat sich selbst getroffen – den Joseph, der nie schläft.', 'Teil 2: Der Postwagen.'],
+      continueText: 'Klicken zum Weiterspielen',
     });
-    location.reload();
   });
+  await story.goToWagon(5);
 }
 
 // ============================================================================================

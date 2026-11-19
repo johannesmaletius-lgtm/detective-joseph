@@ -176,3 +176,79 @@ export function paintNoteSheet(ctx) {
 }
 
 export { OUTLINE };
+
+// ---------------------------------------------------------------- Wagen 5 bis 7
+
+export function paintTicket(ctx, { stamped = false } = {}) {
+  ctx.translate(64, 64);
+  ctx.rotate(-0.25);
+  poly(ctx, [[-52, -28], [52, -28], [52, 28], [-52, 28]], '#e9d7a8', NO);
+  line(ctx, [[22, -24], [22, 24]], 'rgba(107, 74, 42, 0.7)', 2);
+  ctx.fillStyle = '#2b2118';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('RINGBAHN', -46, -8);
+  for (const y of [4, 14]) line(ctx, [[-46, y], [10, y]], 'rgba(43, 33, 24, 0.5)', 2);
+  if (stamped) {
+    ctx.beginPath();
+    ctx.ellipse(36, 0, 14, 11, 0, 0, Math.PI * 2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#2c3f9a';
+    ctx.stroke();
+    ctx.fillStyle = '#2c3f9a';
+    ctx.fillRect(30, -3, 12, 6);
+  }
+}
+
+export function paintPen(ctx) {
+  ctx.translate(64, 64);
+  ctx.rotate(-0.8);
+  poly(ctx, [[-50, -8], [24, -8], [24, 8], [-50, 8]], '#1d2a3a', NO);
+  poly(ctx, [[24, -7], [46, 0], [24, 7]], '#c9a24a', NO);
+  line(ctx, [[30, 0], [44, 0]], '#5a3a12', 1.5);
+  poly(ctx, [[-30, -10], [-26, -10], [-26, 12], [-30, 12]], '#c9a24a', NO);
+  line(ctx, [[-46, -4], [18, -4]], 'rgba(255, 255, 255, 0.35)', 2.5);
+}
+
+export function paintSwitchKey(ctx) {
+  ctx.translate(64, 64);
+  ctx.rotate(-0.6);
+  // großer Bartschlüssel mit Anhänger „W7“
+  circle(ctx, -32, 0, 20, '#8d8d8d', NO);
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  circle(ctx, -32, 0, 8, '#000', NO);
+  ctx.restore();
+  poly(ctx, [[-14, -5], [50, -5], [50, 5], [-14, 5]], '#8d8d8d', NO);
+  poly(ctx, [[34, 5], [50, 5], [50, 22], [34, 22]], '#8d8d8d', NO);
+  line(ctx, [[-46, -8], [-24, -16]], 'rgba(255, 255, 255, 0.5)', 3);
+  poly(ctx, [[-62, 16], [-34, 22], [-38, 46], [-66, 40]], '#c0392b', NO);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText('W7', -60, 37);
+}
+
+export function paintScarf(ctx, { color = '#ece2c4', stripe = '#b3261e', double = false } = {}) {
+  const draw = (dx, dy, fill, band) => {
+    ctx.save();
+    ctx.translate(dx, dy);
+    ctx.beginPath();
+    ctx.moveTo(20, 30);
+    ctx.quadraticCurveTo(64, 10, 104, 34);
+    ctx.lineTo(96, 52);
+    ctx.quadraticCurveTo(64, 30, 28, 48);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    poly(ctx, [[60, 38], [78, 40], [72, 110], [54, 106]], fill, NO);
+    for (const y of [70, 84]) line(ctx, [[57, y], [75, y + 2]], band, 4);
+    for (let i = 0; i < 4; i++) line(ctx, [[56 + i * 5, 106], [55 + i * 5, 116]], fill, 2);
+    ctx.restore();
+  };
+  if (double) {
+    draw(-10, 0, color, stripe);
+    draw(12, 6, '#d9cfb0', '#27408f');
+    ellipse(ctx, 74, 46, 12, 9, '#c9bf9e', NO);
+    return;
+  }
+  draw(0, 0, color, stripe);
+}

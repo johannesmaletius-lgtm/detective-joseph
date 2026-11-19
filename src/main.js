@@ -1,5 +1,5 @@
 // Einstiegspunkt: Spiel erzeugen, ersten Wagen laden, loslegen.
-// Mit ?wagen=2 (3, 4) in der Adresse beginnt das Spiel gleich in einem späteren Wagen.
+// Mit ?wagen=2 (3 … 7) in der Adresse beginnt das Spiel gleich in einem späteren Wagen.
 
 import { Game } from './core/game.js';
 import { START_WAGON } from './config.js';

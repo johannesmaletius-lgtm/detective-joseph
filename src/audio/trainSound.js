@@ -16,6 +16,7 @@ export class TrainSound {
     this.context = null;
     this.muted = muted;
     this.inTunnel = false;
+    this.rolling = 1; // 1 = volle Fahrt, 0 = der Zug steht
   }
 
   // Darf mehrfach aufgerufen werden – startet nur beim ersten Mal (und nicht, solange stumm).
@@ -47,7 +48,7 @@ export class TrainSound {
     echoFilter.connect(this.master);
 
     // Fahrgeräusch (Rumpeln + Zischen) – im Tunnel lauter
-    this.body = gain(context, 1);
+    this.body = gain(context, this.bodyLevel());
     this.body.connect(this.master);
     this.body.connect(this.echo);
 
@@ -107,7 +108,7 @@ export class TrainSound {
     const context = this.context;
     if (!context) return;
     const now = context.currentTime;
-    this.body.gain.setTargetAtTime(inside ? 1.7 : 1, now, inside ? 0.08 : 0.25);
+    this.body.gain.setTargetAtTime(this.bodyLevel(), now, inside ? 0.08 : 0.25);
     this.echo.gain.setTargetAtTime(inside ? 0.6 : 0, now, inside ? 0.08 : 0.3);
     if (quiet || context.state !== 'running') return;
 
@@ -116,6 +117,16 @@ export class TrainSound {
     const whoompGain = envelope(context, now, inside ? 1.1 : 0.5, 0.03, 0.7);
     whoomp.connect(lowpass(context, 260)).connect(whoompGain).connect(this.master);
     whoomp.start(now, Math.random() * 3, 0.8);
+  }
+
+  // Wie laut der Zug rollt: 1 = volle Fahrt, 0 = er steht (dann bleibt nur ein leises Brummen)
+  setRolling(amount) {
+    this.rolling = amount;
+    if (this.context) this.body.gain.setTargetAtTime(this.bodyLevel(), this.context.currentTime, 0.6);
+  }
+
+  bodyLevel() {
+    return (this.inTunnel ? 1.7 : 1) * (0.12 + 0.88 * this.rolling);
   }
 
   // Räder quietschen in der Kurve: hoher, leicht zitternder Ton, der an- und abschwillt

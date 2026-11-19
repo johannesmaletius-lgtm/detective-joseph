@@ -2,15 +2,16 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Die ersten vier Wagen sind spielbar – vom Erwachen im Abteil bis zum Ende von Teil 1 im Gepäckwagen.**
-Wagen 1 (Abteil) mit Tutorial, dazu Speisewagen, Schlafwagen und Gepäckwagen – jeweils mit eigener Rätselkette,
+**Stand: Alle sieben Wagen sind spielbar – vom Erwachen im Abteil bis zum Ende im Tunnel.**
+Teil 1: Wagen 1 (Abteil) mit Tutorial, dazu Speisewagen, Schlafwagen und Gepäckwagen. Teil 2: Postwagen,
+Schaffnerabteil und das Finale draußen im Tunnel an Weiche 7 – jeweils mit eigener Rätselkette,
 Gesprächen, Tipps (Taste H) und der Zeitschleife als wichtigstem Werkzeug. Joseph wacht
 in einem Nachtzug auf und weiß nicht, wie er hineingekommen ist. Auf seinem Unterarm steht in seiner eigenen
 Schrift: *NICHT EINSCHLAFEN*. Ein Brief in seiner eigenen Handschrift verrät: Die Tür zum nächsten Wagen will
 vier Zahlen – und ein früherer Joseph hat sie dort versteckt, wo der Tunnel sie nicht löschen kann. Die
 Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/story-ideen.md).
 
-### Die vier Wagen
+### Die sieben Wagen
 
 | Wagen | Ort | Worum es geht |
 | --- | --- | --- |
@@ -18,6 +19,9 @@ Geschichte folgt Vorschlag 1 („Ringbahn“) aus [`docs/story-ideen.md`](docs/s
 | 2 | Der Speisewagen | Im Tunnel wird an Tisch 4 angestoßen – und Herrn Brandts Glas ist vergiftet. Den Koch ablenken, das Glas retten, den Vierkantschlüssel bekommen |
 | 3 | Der Schlafwagen | Frau Adler murmelt im Schlaf, jede Runde ein anderes Stück eines Satzes. Satz zusammensetzen, Rollo hoch, auf den Mond warten – das Wort im Spiegel |
 | 4 | Der Gepäckwagen | Kasimir, der Papagei, plappert alles nach. Koffer Nr. 7 öffnen – und an der Tür zum Postwagen wartet der andere Joseph (Ende von Teil 1) |
+| 5 | Der Postwagen | Briefe aus allen Runden. Brandt öffnet nur für eine Fahrkarte mit dem Stempel DIESER Runde – die Tinte hat der andere Joseph, im Dunkeln am Sortiertisch |
+| 6 | Das Schaffnerabteil | Der Fahrplan ist ein Kreis. Weichenschlüssel aus dem Schlüsselkasten, Fahrstraße am Stellpult, Durchsage an den ganzen Zug – und die Notbremse im Tunnel |
+| 7 | Der Tunnel | Draußen vor der Lok: Weiche 7 springt zurück, sobald man loslässt. Allein geht es nicht (Finale) |
 
 Wer durch eine Tür geht, landet im nächsten Wagen; der Zug fährt dabei einfach weiter (gleiche Runde, gleiche
 Stelle der Strecke). Das Spiel merkt sich im Browser, welchen Wagen Joseph zuletzt betreten hat – auf dem
@@ -79,11 +83,11 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 | Taste **T** | nur in der Debug-Ansicht: der Zug springt kurz vor den Tunnel |
 
 Adress-Zusätze zum Testen: <http://localhost:8150/?debug> (Debug-Ansicht an), `?mute` (ohne Ton),
-`?skipintro` (ohne Titelbild und Anfangsszene), `?wagen=3` (gleich im dritten Wagen beginnen – Joseph hat dann
+`?skipintro` (ohne Titelbild und Anfangsszene), `?wagen=3` (gleich im dritten Wagen beginnen, 1 bis 7 – Joseph hat dann
 die Sachen dabei, die er aus den Wagen davor bräuchte), kombiniert z. B. `?wagen=2&debug&mute&skipintro`.
 
-In Gesprächen (Koch, Frau Adler, Kasimir) erscheint unten eine Auswahl: Satz anklicken. Rechtsklick oder Esc
-beendet das Gespräch.
+In Gesprächen (Koch, Frau Adler, Kasimir, Herr Brandt, der andere Joseph) erscheint unten eine Auswahl: Satz
+anklicken. Rechtsklick oder Esc beendet das Gespräch.
 
 ## Projektstruktur
 
@@ -117,7 +121,10 @@ detective-joseph/
     │   ├── wagon1.js          DIE GESCHICHTE von Wagen 1: Intro, alle Reaktionen, Rätsel, Tunnel, Tipps, Ende
     │   ├── wagon2.js          … Wagen 2: Speisewagen (Koch, Grammophon, Tisch 4, das vergiftete Glas)
     │   ├── wagon3.js          … Wagen 3: Schlafwagen (Frau Adler, Satz-Puzzle, Hutschachtel, Mond und Spiegel)
-    │   ├── wagon4.js          … Wagen 4: Gepäckwagen (Kasimir, Kisten, Koffer Nr. 7, Finale)
+    │   ├── wagon4.js          … Wagen 4: Gepäckwagen (Kasimir, Kisten, Koffer Nr. 7, Ende von Teil 1)
+    │   ├── wagon5.js          … Wagen 5: Postwagen (Fächer, Rundenzähler, Stempelmaschine, der Schreiber im Dunkeln)
+    │   ├── wagon6.js          … Wagen 6: Schaffnerabteil (Sprechanlage, Schlüsselkasten, Stellpult, Notbremse)
+    │   ├── wagon7.js          … Wagen 7: der Tunnel (Weiche 7, zwei Schals, das Ende)
     │   ├── common.js          Helfer für alle Wagen: warten, Tipps, Fenster, Wagen-Ende, Stimmenfarben
     │   ├── itemPaint.js       gemalte Inventar-Bilder der neuen Gegenstände
     │   ├── tutorial.js        Die Tutorial-Schritte (Hinweisschild oben)
@@ -131,6 +138,9 @@ detective-joseph/
     │   ├── crt.js             der Bildschirm in groß: aus, Rauschen oder Kamerabild
     │   ├── sentence.js        Satz-Puzzle: Kärtchen in die richtige Reihenfolge bringen (Schlafwagen)
     │   ├── mirror.js          der Spiegel im Schlafwagen – im Mondlicht erscheint ein Wort
+    │   ├── pigeonholes.js     die Fächerwand im Postwagen (Fach anklicken)
+    │   ├── stamp.js           die Stempelmaschine: Runde einstellen, Fahrkarte stempeln
+    │   ├── switchboard.js     das Stellpult im Schaffnerabteil: Weichen stellen bis zur Ausfahrt
     │   └── cameraFeed.js      das Bild der Tunnelkamera (Tunnel, Ziffer, Zug, Gestalt)
     ├── ui/
     │   ├── cursor.js          Mauszeiger: Zeigefinger, Auge, Hand, Sprechblase, Gegenstand
@@ -140,6 +150,7 @@ detective-joseph/
     │   ├── codeLock.js        Zahlen- und Buchstabenschloss in Nahansicht (Türschloss, Koffer, Gitter)
     │   ├── choice.js          Auswahl im Gespräch (Sätze zum Anklicken)
     │   ├── cards2.js          gezeichnete Blätter der Wagen 2–4: Menütafel, Bon, Frachtliste, Brief, Foto
+    │   ├── cards3.js          … der Wagen 5–7: Briefe aus den Fächern, Fahrkarte, Kreis-Fahrplan, das Schlussbild
     │   ├── cards.js           gezeichnete Blätter: Signaltafel, Rätselheft, Detektivakte
     │   ├── symbols.js         die vier Zeichen vom Türschloss: Tunnel, Laternen, Turm
     │   ├── hints.js           Hinweisschild für das Tutorial
@@ -163,7 +174,11 @@ detective-joseph/
     │   ├── wagonPainter.js    malt Wagen in Zentralperspektive (Raumkoordinaten X/Y/Z → Bildpunkte)
     │   ├── diningCar.js       Speisewagen: Daten + gemalter Hintergrund + bewegliche Teile
     │   ├── sleepingCar.js     Schlafwagen: dito
-    │   └── luggageCar.js      Gepäckwagen: dito
+    │   ├── luggageCar.js      Gepäckwagen: dito
+    │   ├── postCar.js         Postwagen: dito
+    │   ├── conductorCar.js    Schaffnerabteil: dito
+    │   ├── tunnel.js          der Tunnel draußen vor der Lok (Gewölbe, Gleise, Weiche 7)
+    │   └── figures.js         der andere Joseph (Josephs eigene Bilder, dunkler eingefärbt)
     ├── effects/
     │   ├── trainMotion.js     Zug-Gefühl: Rumpeln, Schaukeln, Runde im Kreis, Tunnel, Licht aus, Laternen
     │   ├── morse.js           Blinksignal des Turms (eine Ziffer im Morsecode)
@@ -229,12 +244,12 @@ die alten Dateien ersetzen – oder neuen Ordner anlegen und `path`, `frameCount
   (Gegenstände 128 × 128 mit transparentem Hintergrund). Die Gegenstände sind Platzhalter aus
   `tools/make-items.mjs`; Mauszeiger und Inventarleiste sind deine Bilder.
 - PNG, WebP und JPG funktionieren gleichermaßen – nur den Dateinamen im Code anpassen.
-- **Wagen 2 bis 4 sind (noch) mit Code gemalt** (`src/scene/diningCar.js` usw. mit `wagonPainter.js`). Eigene
+- **Wagen 2 bis 7 sind (noch) mit Code gemalt** (`src/scene/diningCar.js` usw. mit `wagonPainter.js`). Eigene
   Hintergründe: In der Szenen-Datei `background: { paint: … }` durch `background: { src: 'assets/…png', x: 0,
   y: 0, width: 1280, height: 720 }` ersetzen – Fensterscheiben durchsichtig lassen (die Fenster sitzen an
   denselben Stellen wie im ersten Abteil). Bewegliche Teile (Gläser, Rollladen, Frau Adler, Kasimir …) sind
   `props` mit `paint`-Funktion; sie können auch durch Bilder (`image`) ersetzt werden.
-- **Neue Gegenstände** (Kurbel, Vierkant, Hutnadel, Brecheisen …) sind in `src/story/itemPaint.js` gemalt. Eigenes
+- **Neue Gegenstände** (Kurbel, Vierkant, Hutnadel, Brecheisen, Fahrkarte, Füller, Weichenschlüssel, Schals …) sind in `src/story/itemPaint.js` gemalt. Eigenes
   Bild: in `src/story/items.js` beim Gegenstand `image: 'assets/items/….png'` statt `paint` eintragen.
 
 ## Die Geschichte bearbeiten
@@ -333,7 +348,42 @@ Tür zum Postwagen: Vorhängeschloss – der Schlüssel liegt in Koffer Nr. 7 (Z
 2. Brecheisen an Kiste 3 → Vogelfutter.
 3. Käfig: Tuch abnehmen, Vogelfutter geben → Kasimir plappert: „Koffer sieben! Vier – eins – sieben! Psst!“
 4. Koffer Nr. 7 (liegt oben auf den Kisten) mit 417 öffnen → Foto und Schlüssel „Postwagen“.
-5. Schlüssel an die Tür → Finale. (Nebenbei: Brief aus „Runde 43“ in den Postsäcken, Klopfen am Schrankkoffer.)
+5. Schlüssel an die Tür → Ende von Teil 1, weiter im Postwagen. (Nebenbei: Brief aus „Runde 43“ in den Postsäcken,
+   Klopfen am Schrankkoffer.)
+
+### Lösung von Wagen 5 (Postwagen)
+
+Tür zum Schaffnerabteil: Brandt öffnet sie, wenn man am Schalter eine Fahrkarte mit dem Stempel **dieser** Runde abgibt.
+
+1. Am Fahrkartenschalter mit Brandt reden („Fahrkarte, bitte. Gestempelt für diese Runde“).
+2. Rundenzähler über der Tür ablesen (am Anfang 41). In der Fächerwand im Fach mit dieser Nummer: Brief mit Fahrkarte.
+3. Auf den Postsäcken auf den Tunnel warten. Im Dunkeln sitzt der andere Joseph bei Kerzenlicht am Sortiertisch:
+   ansprechen → er gibt Joseph seinen Füller.
+4. Füller auf die Stempelmaschine → Tinte im Stempelkissen.
+5. Stempelmaschine: Rädchen auf die Runde vom Zähler stellen, roten Hebel drücken.
+6. Gestempelte Fahrkarte am Schalter abgeben – noch vor dem nächsten Tunnel. (Im Tunnel zählt der Zähler weiter und
+   das Stempelkissen trocknet aus; neu stempeln geht.) Nebenbei: Fächer 1, 7, 13 und 27 erzählen die Vorgeschichte,
+   Fach 27 ist die **Anleitung**.
+
+### Lösung von Wagen 6 (Schaffnerabteil)
+
+1. Sprechanlage auf dem Pult: Brandt fragen, wie man aus dem Kreis kommt (Weiche 7) und wie der Schlüsselkasten aufgeht.
+2. Schlüsselkasten: „Mein Platz, mein Tisch, und was mir ins Glas gekippt wird“ → Platz 2, Tisch 4, Probe 41 → **2 4 4 1**.
+   Darin: der Weichenschlüssel „W7“.
+3. Weichenschlüssel aufs Stellpult. Weichen stellen: **W3 geradeaus, W5 abbiegen, W9 abbiegen** → Ausfahrt frei,
+   nur Weiche 7 ist eine Handweiche mit Rückfall.
+4. Sprechanlage: Durchsage an den ganzen Zug – der andere Joseph soll zu Weiche 7 kommen.
+5. Notbremse: Joseph wartet auf den Tunnel und zieht → der Zug steht, die Tür „Ende des Zuges“ geht auf.
+
+### Lösung von Wagen 7 (Tunnel)
+
+1. Mit dem anderen Joseph reden.
+2. Weichenschlüssel an den Weichenhebel → Vorhängeschloss ab.
+3. Hebel umlegen: Er springt zurück. Joseph nimmt seinen Schal – zu kurz.
+4. Das Foto aus Koffer Nr. 7 dem anderen Joseph zeigen → er gibt seinen Schal.
+5. Beide Schals im Inventar verknoten, damit den Hebel festbinden → Signal grün.
+6. Brandts Vierkant ans Bremsventil der Lok → Notbremse gelöst.
+7. Auf die Lok klicken: zusammen einsteigen – das Ende.
 
 ## Werkzeuge (`tools/`)
 
@@ -408,6 +458,6 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagen 3:** der Schlafwagen – Frau Adler, Satz-Puzzle über mehrere Runden, Notbremse, Mond und Spiegel
 - [x] **Wagen 4:** der Gepäckwagen – Kasimir der Papagei, Kisten, Koffer Nr. 7, Finale von Teil 1
 - [x] Wagenwechsel, Spielstand (welcher Wagen), Titelbild mit „Weiterspielen“, `?wagen=N`
-- [ ] Gemalte Hintergründe für die Wagen 2–4 (jetzt mit Code gezeichnet)
-- [ ] **Teil 2:** Postwagen, Schaffnerabteil, der Tunnel (siehe `docs/story-ideen.md`)
+- [x] **Teil 2:** Postwagen (Stempel und Rundenzähler), Schaffnerabteil (Stellpult, Notbremse), der Tunnel (Finale an Weiche 7)
+- [ ] Gemalte Hintergründe für die Wagen 2–7 (jetzt mit Code gezeichnet)
 - [ ] Später: echte Sounds, Musik

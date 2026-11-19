@@ -272,6 +272,41 @@ const EFFECTS = {
     fx.tone(t, { frequency: 98, to: 92, type: 'sawtooth', gain: 0.07, attack: 0.3, duration: 1.8 });
     fx.tone(t, { frequency: 147, to: 139, type: 'sine', gain: 0.07, attack: 0.3, duration: 1.8 });
   },
+  // ---------------------------------------------------------------- Wagen 5 bis 7
+  // Stempel: Hebel, dann ein dumpfer Schlag
+  stamp(fx, t) {
+    fx.noise(t, { frequency: 1600, q: 5, gain: 0.15, duration: 0.05 });
+    fx.noise(t + 0.32, { type: 'lowpass', frequency: 300, gain: 0.55, duration: 0.12, brown: true });
+    fx.noise(t + 0.33, { frequency: 2400, q: 6, gain: 0.12, duration: 0.03 });
+  },
+  // Feder kratzt über Papier
+  scribble(fx, t) {
+    for (let i = 0; i < 6; i++) fx.noise(t + i * 0.09 + Math.random() * 0.03, { frequency: 5200 + Math.random() * 1500, q: 3, gain: 0.05, duration: 0.06, pan: -0.4 });
+  },
+  // Druckluft zischt (Bremse lösen)
+  hiss(fx, t) {
+    fx.noise(t, { frequency: 6000, q: 0.7, gain: 0.18, attack: 0.05, duration: 1.4 });
+    fx.noise(t, { frequency: 2500, q: 1, gain: 0.06, attack: 0.05, duration: 1.2 });
+  },
+  // Schwerer Hebel wird umgelegt: Ratschen, dann ein Klonk
+  lever(fx, t) {
+    for (let i = 0; i < 5; i++) fx.noise(t + i * 0.08, { frequency: 1300 - i * 80, q: 6, gain: 0.16, duration: 0.03 });
+    fx.noise(t + 0.45, { type: 'lowpass', frequency: 240, gain: 0.55, duration: 0.15, brown: true });
+    fx.noise(t + 0.46, { frequency: 1800, q: 8, gain: 0.2, duration: 0.05 });
+  },
+  // Die Weiche springt zurück: harter Metallschlag
+  springBack(fx, t) {
+    fx.noise(t, { frequency: 2600, q: 10, gain: 0.3, duration: 0.05 });
+    fx.tone(t, { frequency: 880, to: 840, type: 'triangle', gain: 0.08, duration: 0.9 });
+    fx.tone(t, { frequency: 1320, to: 1270, type: 'sine', gain: 0.04, duration: 0.7 });
+    fx.noise(t + 0.02, { type: 'lowpass', frequency: 200, gain: 0.5, duration: 0.18, brown: true });
+  },
+  // Der Zug fährt an: tiefes Anschwellen, ein paar Schienenstöße
+  trainStart(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 180, gain: 0.4, attack: 1.5, duration: 4, brown: true });
+    fx.tone(t, { frequency: 45, to: 70, type: 'sawtooth', gain: 0.04, attack: 1.5, duration: 4 });
+    for (const delay of [1.6, 2.6, 3.3, 3.8, 4.2]) fx.noise(t + delay, { type: 'lowpass', frequency: 260, gain: 0.35, duration: 0.08, brown: true });
+  },
 };
 
 // Lautstärke-Hüllkurve: schnell lauter, dann ausklingen

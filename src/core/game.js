@@ -19,6 +19,9 @@ import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
 import { Sentence } from '../puzzles/sentence.js';
 import { Mirror } from '../puzzles/mirror.js';
+import { Stamp } from '../puzzles/stamp.js';
+import { Pigeonholes } from '../puzzles/pigeonholes.js';
+import { Switchboard } from '../puzzles/switchboard.js';
 import { Choice } from '../ui/choice.js';
 import { Story } from '../story/story.js';
 import { WAGONS, loadProgress, saveProgress } from '../story/wagons.js';
@@ -62,6 +65,9 @@ export class Game {
       crt: new Crt(),
       sentence: new Sentence(),
       mirror: new Mirror(),
+      stamp: new Stamp(),
+      pigeonholes: new Pigeonholes(),
+      switchboard: new Switchboard(),
       choice: new Choice(),
     };
     for (const view of Object.values(this.views)) {
@@ -109,7 +115,7 @@ export class Game {
     this.player.enterScene(scene);
   }
 
-  // Lädt einen Wagen (1 bis 4, siehe src/story/wagons.js)
+  // Lädt einen Wagen (1 bis 7, siehe src/story/wagons.js)
   async loadWagon(number) {
     const wagon = WAGONS[number];
     this.wagon = number;
@@ -168,6 +174,8 @@ export class Game {
   update(dt) {
     this.scene.update(dt);
     this.camera.shakeY = this.scene.motion?.shakeY ?? 0; // der Zug rumpelt
+    const rolling = this.scene.motion ? Math.min(1, this.scene.motion.cruiseSpeed) : 0;
+    if (rolling !== this.sound.rolling) this.sound.setRolling(rolling); // steht der Zug, wird es still
     this.player.update(dt, this.scene);
     this.story.update(dt);
 

@@ -1,6 +1,6 @@
 import {
   paintBon, paintCrank, paintCrowbar, paintGlass, paintHatpin, paintManifest, paintPadlockKey, paintPhoto, paintRecord,
-  paintNoteSheet, paintSeeds, paintVierkant,
+  paintNoteSheet, paintPen, paintScarf, paintSeeds, paintSwitchKey, paintTicket, paintVierkant,
 } from './itemPaint.js';
 
 // Katalog aller Gegenstände, die Joseph einstecken kann.
@@ -136,6 +136,47 @@ export const ITEMS = {
     paint: paintPadlockKey,
     look: 'Ein Vorhängeschloss-Schlüssel. Auf dem Anhänger: „Postwagen“.',
   },
+
+  // ---------------------------------------------------------------- Wagen 5: Postwagen
+  ticket: {
+    name: 'Fahrkarte',
+    paint: (ctx) => paintTicket(ctx),
+    look: 'Eine Fahrkarte der Ringbahn: „Ringbahnhof → Ringbahnhof, gültig für 1 Runde“. Noch ohne Stempel.',
+  },
+  ticketStamped: {
+    name: 'Fahrkarte (gestempelt)',
+    paint: (ctx) => paintTicket(ctx, { stamped: true }),
+    look: 'Meine Fahrkarte – mit blauem Stempel.',
+  },
+  pen: {
+    name: 'Füller',
+    paint: paintPen,
+    look: 'Ein Füllfederhalter mit blauer Tinte. Dieselbe Tinte wie auf all den Briefen.',
+  },
+
+  // ---------------------------------------------------------------- Wagen 6: Schaffnerabteil
+  switchKey: {
+    name: 'Weichenschlüssel „W7“',
+    paint: paintSwitchKey,
+    look: 'Ein schwerer Bartschlüssel mit rotem Anhänger: „W7 – Handweiche im Tunnel“.',
+  },
+
+  // ---------------------------------------------------------------- Wagen 7: der Tunnel
+  scarf: {
+    name: 'Mein Schal',
+    paint: (ctx) => paintScarf(ctx),
+    look: 'Mein Schal. Lang genug für einen Hals – aber nicht für einen Weichenhebel.',
+  },
+  scarfOther: {
+    name: 'Sein Schal',
+    paint: (ctx) => paintScarf(ctx, { color: '#d9cfb0', stripe: '#27408f' }),
+    look: 'Der Schal des anderen Joseph. Genau wie meiner – nur älter und ein bisschen ausgefranst.',
+  },
+  scarfRope: {
+    name: 'Zwei Schals, verknotet',
+    paint: (ctx) => paintScarf(ctx, { double: true }),
+    look: 'Zwei Schals, fest verknotet. Einer allein reißt. Zwei halten.',
+  },
 };
 
 // Welche Gegenstände sich zu einem neuen verbinden lassen (Reihenfolge egal).
@@ -150,6 +191,11 @@ export const COMBINATIONS = [
     items: ['flashlightHalf', 'battery'],
     result: 'flashlight',
     say: ['Zweite Batterie rein, Deckel zu …', 'Licht! Die Taschenlampe geht.'],
+  },
+  {
+    items: ['scarf', 'scarfOther'],
+    result: 'scarfRope',
+    say: ['Ein doppelter Knoten … und noch einer.', 'Zwei Schals. Jetzt reicht es bis zum Pfosten.'],
   },
 ];
 
