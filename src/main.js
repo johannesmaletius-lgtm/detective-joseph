@@ -1,14 +1,12 @@
-// Einstiegspunkt: Spiel erzeugen, erste Szene mit ihrer Geschichte laden, loslegen.
+// Einstiegspunkt: Spiel erzeugen, Adventskalender zeigen, loslegen.
 
 import { Game } from './core/game.js';
-import { trainCompartment } from './scene/trainCompartment.js';
-import { wagon1 } from './story/wagon1.js';
 
 const status = document.getElementById('status');
 
 try {
   const game = new Game(document.getElementById('game-canvas'));
-  await game.loadScene(trainCompartment, wagon1);
+  await game.prepare();
   status.hidden = true;
   game.start();
 

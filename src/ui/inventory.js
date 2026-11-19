@@ -54,6 +54,16 @@ export class Inventory {
     return hidden + (shown - hidden) * easeOut(this.slide);
   }
 
+  // Neuer Wagen: leere Leiste – nur mit dem, was Joseph aus früheren Wagen mitbringt
+  clear(items = []) {
+    this.items = [...items];
+    this.selected = null;
+    this.offset = 0;
+    this.flash = null;
+    this.slide = 0;
+    this.revealTime = 0;
+  }
+
   has(id) {
     return this.items.includes(id);
   }

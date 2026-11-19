@@ -86,9 +86,15 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 
 - **Block 4 (Türen 19–24): komplett.** 11 Bilder (+ anderer Joseph zusätzlich ohne Mütze): Hintergründe Fotolabor (19), Packwagen (20), Kesselwagen (21), Führerstand der Lok (22), Wartungsgang im Tunnel (23); Tunnelfoto vor Weiche 7 (19), Heizer (21), Spind-Foto Heizer + junger Schaffner (21), der andere Joseph / älterer Schaffner (22), Tunnelausgang im Schnee (23), Schlussbild Wohnstube (24). Tür 24 nutzt sonst den Hintergrund des Schaffnerabteils (18). Claude zeichnet selbst: Belichtungstabelle, Flaschen/Schalen, Kontaktbogen, Pakete, Schablone, Kisten, Bänder, Kelle, Manometer, Wasserstand, Fahrtenschreiber, Kreidezeichen, Lautsprecherschalter, Entgleisen-Effekt, Kilometerstein-Zahlen. Hinweise: Seitenansichten von Heizer und anderem Joseph schauen beide nach rechts (eine spiegeln); im Wartungsgang einige Lampen abdunkeln und die Zahnradlücke einzeichnen; Wanduhr im Schlussbild mit Zifferblatt und 23:47 füllen.
 
-## Noch zu bauen (Code)
+## Code-Stand
 
-Wagenwechsel, Türchen-Sperre nach Datum (mit Test-Schalter), Spielstand speichern, Inventar über Wagen hinweg (Münze, Zahnrad, Kopfhörer, Kelle, Fotos, Miras Karte …), Wagen 2–24 umsetzen, Gesprächssystem, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
+**Gebaut:** Adventskalender als Startbild (Ringbahn von oben, 24 Wagen, `src/advent/`), Türchen-Sperre nach Datum, Spielstand im Browser (geschaffte Türen, Notizen, mitgenommene Gegenstände), Wagenwechsel (Kalender → Wagen → zurück zum Kalender), Inventar über Wagen hinweg (Gegenstände mit `keep: true` in `src/story/items.js`, zusätzlich `startItems` im Drehbuch), Notizen früherer Wagen bleiben im Notizbuch (Überschrift „Wagen N“).
+
+- Neuen Wagen eintragen: in `src/advent/doors.js` bei der Tür `load` ergänzen (Szene + Drehbuch). Am Ende des Wagens `story.finish()` aufrufen.
+- Testen: `?test` (alle Türen offen + Knopf „Spielstand löschen“), `?datum=2026-12-05` (anderes Datum), `?tuer=2&skipintro` (direkt in eine Tür).
+- Ein Wagen, den man mittendrin verlässt, beginnt beim nächsten Mal von vorn.
+
+**Noch zu bauen:** Wagen 2–24 umsetzen, Gesprächssystem, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
 

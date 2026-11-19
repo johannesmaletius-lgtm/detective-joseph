@@ -43,6 +43,17 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 > Browser laden Module nicht direkt von der Festplatte – ein Doppelklick auf `index.html` reicht deshalb nicht.
 > Der Server (`server.js`) braucht nur Node.js, keine weiteren Pakete.
 
+## Adventskalender
+
+Das Spiel beginnt mit dem Adventskalender „Die Ringbahn“: 24 Wagen, jeden Tag vom 1. bis 24. Dezember 2026
+öffnet sich einer. Geschaffte Wagen bekommen einen Stern, der Spielstand bleibt im Browser gespeichert.
+
+| Adresse | Wirkung |
+| --- | --- |
+| `?test` | alle Türen offen, dazu ein Knopf „Spielstand löschen“ |
+| `?datum=2026-12-05` | so tun, als wäre heute der 5. Dezember |
+| `?tuer=1&skipintro` | direkt in Tür 1, ohne Kalender und Anfangsszene |
+
 ## Steuerung
 
 | Eingabe | Wirkung |

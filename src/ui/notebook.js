@@ -33,8 +33,17 @@ export class Notebook {
     this.icon = await loadImage('assets/ui/notebook.png');
   }
 
+  // Neuer Wagen: Die Notizen aus früheren Wagen bleiben stehen (Überschrift „Wagen 1“, „Wagen 2“ …),
+  // die Runden zählen von vorn. notes = [{ door, text }]
+  clear(notes = []) {
+    this.entries = notes.map(({ door, text }) => ({ text, section: `Wagen ${door}`, carried: true }));
+    this.unread = 0;
+    this.isOpen = false;
+    this.pulse = 0;
+  }
+
   add(text, lap) {
-    if (this.entries.some((entry) => entry.text === text)) return;
+    if (this.entries.some((entry) => !entry.carried && entry.text === text)) return;
     this.entries.push({ lap, text });
     this.unread += 1;
     this.pulse = 1;
@@ -124,11 +133,12 @@ export class Notebook {
     // Zeilen zusammenstellen: Überschrift je Runde, darunter die Einträge
     ctx.font = FONTS.handSmall;
     const rows = [];
-    let lap = null;
+    let heading = null;
     for (const entry of this.entries) {
-      if (entry.lap !== lap) {
-        lap = entry.lap;
-        rows.push({ text: `Runde ${lap}`, heading: true });
+      const title = entry.section ?? `Runde ${entry.lap}`;
+      if (title !== heading) {
+        heading = title;
+        rows.push({ text: title, heading: true });
       }
       wrapText(ctx, entry.text, width / 2 - 90).forEach((line, i) => rows.push({ text: line, bullet: i === 0 }));
     }
