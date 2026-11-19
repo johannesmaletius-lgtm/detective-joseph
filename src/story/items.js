@@ -1,6 +1,6 @@
 import {
   paintBon, paintCrank, paintCrowbar, paintGlass, paintHatpin, paintManifest, paintPadlockKey, paintPhoto, paintRecord,
-  paintSeeds, paintVierkant,
+  paintNoteSheet, paintSeeds, paintVierkant,
 } from './itemPaint.js';
 
 // Katalog aller Gegenstände, die Joseph einstecken kann.
@@ -99,6 +99,11 @@ export const ITEMS = {
   },
 
   // ---------------------------------------------------------------- Wagen 3: Schlafwagen
+  sleepNotes: {
+    name: 'Zettel: Frau Adlers Worte',
+    paint: paintNoteSheet,
+    look: 'Was Frau Adler im Schlaf murmelt.',
+  },
   hatpin: {
     name: 'Hutnadel',
     paint: paintHatpin,
