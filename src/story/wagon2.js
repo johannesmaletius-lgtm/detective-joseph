@@ -63,6 +63,9 @@ export const wagon2 = {
     const f = story.flags;
     f.shutter += Math.sign(f.shutterTarget - f.shutter) * Math.min(Math.abs(f.shutterTarget - f.shutter), dt * 2.5);
     f.poisonVisible = story.isDark && f.takenSeat !== POISON_SEAT && !f.tipped;
+    // Die Gäste erscheinen als Schemen, solange im Tunnel angestoßen wird
+    const ghostTarget = f.toasting && story.isDark ? 1 : 0;
+    f.ghosts = (f.ghosts ?? 0) + (ghostTarget - (f.ghosts ?? 0)) * Math.min(1, dt * 2);
   },
 
   // ---------------------------------------------------------------- Anklickbare Stellen
@@ -502,11 +505,21 @@ async function toast(story) {
   const f = story.flags;
   const saving = f.takenSeat === POISON_SEAT && !f.saved;
   const ghost = (seat, text) => story.speak(text, { at: seatVoice(seat), color: VOICES.ghost });
+  f.brandtGone = Boolean(f.saved); // nach seiner Rettung sitzt Herr Brandt nicht mehr am Tisch
   await story.cutscene(async () => {
+    try {
+      await toastScene();
+    } finally {
+      f.toasting = false;
+    }
+  });
+
+  async function toastScene() {
     await story.wait(0.4);
+    f.toasting = true;
     if (!f.firstDark) {
       f.firstDark = true;
-      await story.say(saving ? 'Licht aus. Jetzt kommt es drauf an …' : 'Licht aus … und auf dem Tisch leuchtet ein Glas. Grün!');
+      await story.say(saving ? 'Licht aus. Jetzt kommt es drauf an …' : 'Licht aus … an Tisch 4 sitzen Schatten! Und ein Glas leuchtet grün.');
     }
     if (saving) {
       await ghost(1, 'Auf die Ringbahn!');
@@ -517,6 +530,7 @@ async function toast(story) {
       story.sound('key');
       f.saved = true;
       f.keyOnPlate = true;
+      f.brandtGone = true;
       return;
     }
     if (f.saved) {
@@ -534,9 +548,10 @@ async function toast(story) {
     await ghost(2, 'Was … ist … das …');
     await story.wait(0.6);
     f.tipped = POISON_SEAT;
+    f.brandtGone = true;
     f.sawPoisoning = true;
     await story.say('Herr Brandt?!');
-  });
+  }
 }
 
 async function afterTunnel(story) {

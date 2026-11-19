@@ -456,19 +456,27 @@ export function paintHatchShutter(ctx, closed, time, { cookVisible = true, danci
     circle(ctx, cx + 2, cy - 48, 11, '#f4f1e8', { width: 2.5 });
     circle(ctx, cx + 16, cy - 42, 9, '#f4f1e8', { width: 2.5 });
     poly(ctx, [[cx - 18, cy - 24], [cx + 18, cy - 24], [cx + 18, cy - 32], [cx - 18, cy - 32]], '#f4f1e8', { width: 2 });
-    ellipse(ctx, cx, cy, 26, 24, '#3a2418', { width: 0 });
+    // Gesicht: rund, rote Backen, Knollennase, dicker Schnurrbart
+    ellipse(ctx, cx, cy, 25, 24, '#e2a47a', { width: 2.5 });
+    ellipse(ctx, cx - 14, cy + 6, 6, 4, 'rgba(220, 90, 80, 0.45)', { width: 0 });
+    ellipse(ctx, cx + 14, cy + 6, 6, 4, 'rgba(220, 90, 80, 0.45)', { width: 0 });
     const blink = (time % 4.2) < 0.12 ? 0.15 : 1;
     for (const dx of [-9, 9]) {
-      ellipse(ctx, cx + dx, cy - 4, 5, 4 * blink, '#fff7d8', { width: 0 });
-      circle(ctx, cx + dx + 1, cy - 4, 1.8 * blink, '#1a0f08', { width: 0 });
+      ellipse(ctx, cx + dx, cy - 6, 4.5, 4 * blink, '#fff7d8', { width: 1.5 });
+      circle(ctx, cx + dx + 1, cy - 6, 2 * blink, '#1a0f08', { width: 0 });
     }
-    // Schnurrbart
+    line(ctx, [[cx - 14, cy - 13], [cx - 4, cy - 12]], '#3a2010', 2.5);
+    line(ctx, [[cx + 4, cy - 12], [cx + 14, cy - 13]], '#3a2010', 2.5);
+    ellipse(ctx, cx, cy + 1, 5, 5, '#d48a62', { width: 2 });
     ctx.beginPath();
-    ctx.moveTo(cx - 14, cy + 9);
-    ctx.quadraticCurveTo(cx, cy + 2, cx + 14, cy + 9);
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#140904';
-    ctx.stroke();
+    ctx.moveTo(cx - 17, cy + 12);
+    ctx.quadraticCurveTo(cx - 8, cy + 3, cx, cy + 8);
+    ctx.quadraticCurveTo(cx + 8, cy + 3, cx + 17, cy + 12);
+    ctx.quadraticCurveTo(cx + 8, cy + 9, cx, cy + 12);
+    ctx.quadraticCurveTo(cx - 8, cy + 9, cx - 17, cy + 12);
+    ctx.fillStyle = '#3a2010';
+    ctx.fill();
+    if (dancing) ellipse(ctx, cx, cy + 17, 5, 3, '#8a3a3a', { width: 1.5 });
     ctx.restore();
   }
   if (closed <= 0) return;
@@ -516,6 +524,33 @@ export function paintGramophone(ctx, { hasCrank, record, playing, time }) {
   }
 }
 
+// Im Dunkeln sitzen die Gäste an Tisch 4 – nur als schwache, bläuliche Schemen zu sehen
+export function paintGhosts(ctx, scene) {
+  const level = scene.darkLevel * (scene.flags.ghosts ?? 0);
+  if (level <= 0.05) return;
+  const seats = [1, 3];
+  if (!scene.flags.brandtGone) seats.push(2);
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const seat of seats) {
+    const { X, Z } = SEATS[seat];
+    const far = Z > 0.6;
+    const [x, y] = P(X - 4, far ? 74 : 50, far ? Z + 0.07 : Z - 0.07);
+    const s = 1 / Z;
+    const flicker = 0.75 + 0.25 * Math.sin(scene.time * 7 + seat * 2);
+    const alpha = 0.32 * level * flicker;
+    ctx.fillStyle = `rgba(150, 175, 255, ${alpha})`;
+    ctx.beginPath();
+    ctx.ellipse(x, y - 30 * s, 13 * s, 22 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y - 62 * s, 8 * s, 0, Math.PI * 2);
+    ctx.fill();
+    glow(ctx, x, y - 40 * s, 40 * s, '150, 175, 255', alpha * 0.6, 'screen');
+  }
+  ctx.restore();
+}
+
 // Der Vierkantschlüssel auf Herrn Brandts Teller
 export function paintKeyOnPlate(ctx, time) {
   const [x, y] = P(SEATS[2].X - 14, 74, 0.645);
@@ -553,6 +588,16 @@ export const diningCar = {
       }),
     },
     { id: 'keyOnPlate', when: 'keyOnPlate', paint: (ctx, scene) => paintKeyOnPlate(ctx, scene.time) },
+    {
+      id: 'ghosts',
+      paint: (ctx, scene) => paintGhosts(ctx, scene),
+      light: (scene) => ((scene.flags.ghosts ?? 0) > 0.3 && scene.isDark ? [1, 2, 3].map((seat) => {
+        const { X, Z } = SEATS[seat];
+        const far = Z > 0.6;
+        const [x, y] = P(X - 4, far ? 74 : 50, far ? Z + 0.07 : Z - 0.07);
+        return { x, y: y - 40 / Z, radius: 34 / Z };
+      }) : null),
+    },
     ...[1, 2, 3, 4].map((seat) => ({
       id: `glass${seat}`,
       paint: (ctx, scene) => {
