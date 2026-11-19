@@ -60,6 +60,29 @@ export class Story {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : this.headOf(this.player)) });
   }
 
+  // Eine Figur im Wagen spricht (siehe src/scene/character.js) – solange zeigt sie ihre Sprech-Pose
+  async speakAs(id, text) {
+    const character = this.scene.character(id);
+    character.talking = true;
+    try {
+      await this.game.speech.show(text, {
+        anchor: () => (this.game.view ? SUBTITLE : character.head(this.scene)),
+        color: character.data.color ?? COLORS.speaker,
+      });
+    } finally {
+      character.talking = false;
+    }
+  }
+
+  character(id) {
+    return this.scene.character(id);
+  }
+
+  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
+  choose(options) {
+    return this.game.views.dialogue.open({ options });
+  }
+
   // Jemand anderes spricht, z. B. die Lautsprecherstimme
   speak(text, { at = SPEAKER, color = COLORS.speaker } = {}) {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : at), color });
@@ -174,6 +197,10 @@ export class Story {
 
   // ---------------------------------------------------------------- Ablauf
   async begin({ skipIntro = false } = {}) {
+    for (const id of this.script.startItems ?? []) this.game.inventory.add(id);
+    this.game.inventory.revealTime = 0;
+    for (const text of this.script.recap ?? []) this.game.notebook.add(text, 0);
+    this.game.notebook.unread = 0;
     await this.script.setup?.(this);
     if (skipIntro) await this.script.skipIntro?.(this);
     else await this.script.intro?.(this);
@@ -253,9 +280,19 @@ export class Story {
     this.event('openedNotebook');
   }
 
-  // Ereignisse vom Zug (Tunnel, Licht)
+  // Ereignisse vom Zug (Tunnel, Licht, quietschende Räder)
   onTunnel(inside) {
     this.script.onTunnel?.(this, inside);
+  }
+
+  onSqueal(duration) {
+    this.squealUntil = this.motion.time + duration;
+    this.script.onSqueal?.(this, duration);
+  }
+
+  // Quietschen die Räder gerade? (Dann hört und sieht niemand genau hin.)
+  get squealing() {
+    return (this.squealUntil ?? 0) > (this.motion?.time ?? 0);
   }
 
   // ---------------------------------------------------------------- Hilfen

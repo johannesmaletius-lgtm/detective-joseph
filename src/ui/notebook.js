@@ -40,6 +40,13 @@ export class Notebook {
     this.pulse = 1;
   }
 
+  // Leeren (beim Wechsel in einen anderen Wagen)
+  clear() {
+    this.entries = [];
+    this.unread = 0;
+    this.spread = 0;
+  }
+
   open() {
     this.isOpen = true;
     this.unread = 0;
@@ -128,7 +135,7 @@ export class Notebook {
     for (const entry of this.entries) {
       if (entry.lap !== lap) {
         lap = entry.lap;
-        rows.push({ text: `Runde ${lap}`, heading: true });
+        rows.push({ text: lap === 0 ? 'Was bisher geschah' : `Runde ${lap}`, heading: true });
       }
       wrapText(ctx, entry.text, width / 2 - 90).forEach((line, i) => rows.push({ text: line, bullet: i === 0 }));
     }

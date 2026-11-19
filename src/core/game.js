@@ -17,6 +17,10 @@ import { Jigsaw } from '../puzzles/jigsaw.js';
 import { Wires } from '../puzzles/wires.js';
 import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
+import { PictureView } from '../puzzles/picture.js';
+import { ArrangeView } from '../puzzles/arrange.js';
+import { DialogueView } from '../ui/dialogue.js';
+import { WAGONS } from '../wagons.js';
 import { Story } from '../story/story.js';
 import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED } from '../config.js';
 
@@ -56,7 +60,11 @@ export class Game {
       wires: new Wires(),
       binoculars: new Binoculars(),
       crt: new Crt(),
+      picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
+      arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
+      dialogue: new DialogueView(), // Gesprächsauswahl
     };
+    this.wagon = 1; // Nummer des aktuellen Wagens (siehe src/wagons.js)
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
       view.onSkip = () => this.speech.skip();
@@ -81,7 +89,10 @@ export class Game {
     scene.flags = this.story.flags;
     if (scene.motion) {
       scene.motion.onBump = (strength) => this.sound.clack(strength);
-      scene.motion.onSqueal = (duration) => this.sound.squeal(duration);
+      scene.motion.onSqueal = (duration) => {
+        this.sound.squeal(duration);
+        this.story.onSqueal(duration);
+      };
       scene.motion.onTunnel = (inside) => {
         this.sound.tunnel(inside);
         this.story.onTunnel(inside);
@@ -91,6 +102,28 @@ export class Game {
     }
     this.camera.reset();
     this.player.enterScene(scene);
+  }
+
+  // Wechselt in einen anderen Wagen: Was Joseph bei sich trägt, legt das Drehbuch des neuen Wagens
+  // fest (startItems); das Notizbuch beginnt mit dem, was bisher geschah (recap).
+  async goToWagon(number) {
+    const wagon = WAGONS[number];
+    if (!wagon) {
+      location.href = location.pathname;
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    params.set('wagen', number);
+    params.delete('skipintro');
+    history.replaceState(null, '', `?${params}`.replace(/=(&|$)/g, '$1'));
+    this.overlay.fade = 1;
+    this.closeViews();
+    this.speech.finish();
+    this.inventory.clear();
+    this.notebook.clear();
+    await this.loadScene(wagon.scene, wagon.script);
+    this.wagon = number;
+    await this.story.begin();
   }
 
   start() {
@@ -161,7 +194,8 @@ export class Game {
     const item = selected ? this.inventory.images[selected] : null;
     const itemName = selected ? this.story.itemName(selected) : '';
 
-    if (this.overlay.blocksInput || this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
+    if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
+    if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });
     if (this.inventory.contains(mouse)) {

@@ -1,14 +1,17 @@
-// Einstiegspunkt: Spiel erzeugen, erste Szene mit ihrer Geschichte laden, loslegen.
+// Einstiegspunkt: Spiel erzeugen, den Wagen mit seiner Geschichte laden, loslegen.
 
 import { Game } from './core/game.js';
-import { trainCompartment } from './scene/trainCompartment.js';
-import { wagon1 } from './story/wagon1.js';
+import { WAGONS } from './wagons.js';
+import { START_WAGON } from './config.js';
 
 const status = document.getElementById('status');
 
 try {
   const game = new Game(document.getElementById('game-canvas'));
-  await game.loadScene(trainCompartment, wagon1);
+  const number = WAGONS[START_WAGON] ? START_WAGON : 1;
+  const wagon = WAGONS[number];
+  await game.loadScene(wagon.scene, wagon.script);
+  game.wagon = number;
   status.hidden = true;
   game.start();
 

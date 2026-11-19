@@ -26,3 +26,4 @@ const params = new URLSearchParams(location.search);
 export const DEBUG_AT_START = params.has('debug'); // Debug-Ansicht sofort an
 export const START_MUTED = params.has('mute');     // ohne Ton starten
 export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
+export const START_WAGON = Number(params.get('wagen') ?? 1); // mit welchem Wagen das Spiel beginnt (?wagen=4)
