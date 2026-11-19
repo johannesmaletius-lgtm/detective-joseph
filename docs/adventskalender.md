@@ -2,6 +2,7 @@
 
 Detective Joseph als Adventskalender für Johannes' Freundin: 24 Waggons, jeden Tag (1.–24. Dezember 2026) ein neuer Wagen.
 Planungsseite (Artifact, mit Grafik-Befehlen und Haken pro Bild): https://claude.ai/artifact/PJZU72QAUCiWMff7BHSQmT
+Die ganze Geschichte als Erzählung (mit Hintergrund und Korrekturliste): `docs/geschichte.md` und Reiter „Geschichte“ auf der Planungsseite.
 
 ## Arbeitsweise
 
