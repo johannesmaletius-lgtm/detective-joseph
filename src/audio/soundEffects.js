@@ -17,6 +17,16 @@ export class SoundEffects {
     EFFECTS[name]?.(this, context.currentTime);
   }
 
+  // Ein einzelner Ton, z. B. eine Klaviertaste oder ein Morsepiepen (ab Wagen 9)
+  //   effects.note(440, { duration: 0.6, type: 'triangle', gain: 0.12, delay: 0 })
+  note(frequency, { duration = 0.6, type = 'triangle', gain = 0.12, delay = 0 } = {}) {
+    const context = this.sound.context;
+    if (!context || context.state !== 'running') return;
+    const t = context.currentTime + delay;
+    this.tone(t, { frequency, type, gain, duration });
+    if (type === 'triangle') this.tone(t, { frequency: frequency * 2, type: 'sine', gain: gain * 0.25, duration: duration * 0.6 });
+  }
+
   // Gefiltertes Rauschen: Rascheln, Klicken, Zischen, Poltern
   noise(time, { duration = 0.1, type = 'bandpass', frequency = 1000, q = 1, gain = 0.3, attack = 0.004, pan = 0, brown = false }) {
     const context = this.sound.context;
@@ -223,6 +233,65 @@ const EFFECTS = {
   // Ein Schrei (Oma Ilse wacht auf) – ein hoher, kurzer Ton
   shriek(fx, t) {
     fx.tone(t, { frequency: 880, to: 1320, type: 'sawtooth', gain: 0.05, attack: 0.05, duration: 0.5 });
+  },
+  // Spiegel/Glas klirrt leise
+  mirror(fx, t) {
+    fx.tone(t, { frequency: 2637, type: 'sine', gain: 0.06, duration: 0.9 });
+    fx.tone(t + 0.05, { frequency: 3520, type: 'sine', gain: 0.04, duration: 0.7 });
+  },
+  // Schwerer Hebel rastet ein
+  lever(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 500, gain: 0.35, duration: 0.18, brown: true });
+    fx.noise(t + 0.16, { frequency: 2400, q: 4, gain: 0.2, duration: 0.04 });
+  },
+  // Rauschen aus dem Lautsprecher oder Funkgerät
+  static(fx, t) {
+    fx.noise(t, { frequency: 3000, q: 0.4, gain: 0.08, duration: 1.2, attack: 0.1 });
+  },
+  // Tonband spult
+  tape(fx, t) {
+    fx.tone(t, { frequency: 300, to: 1400, type: 'sawtooth', gain: 0.025, duration: 0.8, attack: 0.05 });
+    fx.noise(t, { frequency: 1800, q: 1, gain: 0.05, duration: 0.8 });
+  },
+  // Uhr schlägt: tiefer Gong
+  chime(fx, t) {
+    fx.tone(t, { frequency: 196, type: 'sine', gain: 0.2, duration: 2.2 });
+    fx.tone(t, { frequency: 392, type: 'sine', gain: 0.08, duration: 1.6 });
+    fx.tone(t, { frequency: 587, type: 'sine', gain: 0.04, duration: 1.0 });
+  },
+  // Kuckuck!
+  cuckoo(fx, t) {
+    fx.tone(t, { frequency: 784, type: 'sine', gain: 0.14, duration: 0.25 });
+    fx.tone(t + 0.3, { frequency: 622, type: 'sine', gain: 0.14, duration: 0.35 });
+  },
+  // Ticken
+  tick(fx, t) {
+    fx.noise(t, { frequency: 4200, q: 8, gain: 0.12, duration: 0.02 });
+  },
+  // Streichholz
+  match(fx, t) {
+    fx.noise(t, { frequency: 3500, q: 0.8, gain: 0.16, duration: 0.25, attack: 0.01 });
+    fx.noise(t + 0.1, { type: 'lowpass', frequency: 900, gain: 0.1, duration: 0.5, brown: true });
+  },
+  // Kirchenglocke
+  churchBell(fx, t) {
+    fx.tone(t, { frequency: 330, type: 'sine', gain: 0.18, duration: 2.6 });
+    fx.tone(t, { frequency: 660, type: 'sine', gain: 0.07, duration: 2 });
+    fx.tone(t, { frequency: 830, type: 'sine', gain: 0.04, duration: 1.2 });
+  },
+  // Bleistift reibt über Papier
+  rub(fx, t) {
+    fx.noise(t, { frequency: 2600, q: 0.6, gain: 0.07, duration: 0.3, attack: 0.04 });
+  },
+  // Schere
+  scissors(fx, t) {
+    fx.noise(t, { frequency: 5200, q: 3, gain: 0.12, duration: 0.05 });
+    fx.noise(t + 0.12, { frequency: 4800, q: 3, gain: 0.12, duration: 0.05 });
+  },
+  // Spielzeugzug
+  toyTrain(fx, t) {
+    for (let i = 0; i < 10; i++) fx.noise(t + i * 0.12, { frequency: 1600, q: 4, gain: 0.07, duration: 0.03 });
+    fx.tone(t + 1.2, { frequency: 1046, type: 'square', gain: 0.03, duration: 0.3 });
   },
   // Notbremse: Rucken und Zischen
   brake(fx, t) {

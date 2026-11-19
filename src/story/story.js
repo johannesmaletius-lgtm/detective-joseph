@@ -111,6 +111,11 @@ export class Story {
     return this.game.inventory.has(id);
   }
 
+  // Ein Ton (Klavier, Glocke, Morsepiepen …): story.tone(440, { duration: 0.5 })
+  tone(frequency, options) {
+    this.game.effects.note(frequency, options);
+  }
+
   sound(name) {
     this.game.effects.play(name);
   }

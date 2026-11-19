@@ -10,6 +10,7 @@
 // Anschauen passiert (z. B. öffnet sich bei den Papierfetzen das Puzzle).
 
 import { WAGON_COMBINATIONS, WAGON_ITEMS } from './wagonItems.js';
+import { WAGON_COMBINATIONS_2, WAGON_ITEMS_2 } from './wagonItems2.js';
 
 export const ITEMS = {
   letter: {
@@ -81,8 +82,8 @@ export const COMBINATIONS = [
 ];
 
 // Gegenstände und Kombinationen ab Wagen 4 (Bilder im Code gezeichnet)
-Object.assign(ITEMS, WAGON_ITEMS);
-COMBINATIONS.push(...WAGON_COMBINATIONS);
+Object.assign(ITEMS, WAGON_ITEMS, WAGON_ITEMS_2);
+COMBINATIONS.push(...WAGON_COMBINATIONS, ...WAGON_COMBINATIONS_2);
 
 export function findCombination(a, b) {
   return COMBINATIONS.find(({ items }) => (items[0] === a && items[1] === b) || (items[0] === b && items[1] === a));
