@@ -36,7 +36,7 @@ export const DOORS = [
   { door: 8, wagon: 'Bordkino', load: wagon('cinemaCar', 'cinemaCar', 'wagon8', 'wagon8') },
   { door: 9, wagon: 'Spiegelwagen', load: wagon('mirrorCar', 'mirrorCar', 'wagon9', 'wagon9') },
   { door: 10, wagon: 'Lautsprecherwagen', load: wagon('speakerCar', 'speakerCar', 'wagon10', 'wagon10') },
-  { door: 11, wagon: 'Uhrenwagen' },
+  { door: 11, wagon: 'Uhrenwagen', load: wagon('clockCar', 'clockCar', 'wagon11', 'wagon11') },
   { door: 12, wagon: 'Musiksalon' },
   { door: 13, wagon: 'Kapelle' },
   { door: 14, wagon: 'Zeitungswagen' },
