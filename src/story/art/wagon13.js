@@ -131,8 +131,8 @@ export function drawWreathCard(ctx, litOrder, time) {
   text(ctx, '„Zünde sie an in der Reihenfolge deines Weges.“', 640, 660, { font: `italic 20px ${SERIF}`, color: '#f3e2b4', align: 'center' });
 }
 
-// kleine Zeichen auf den Kerzen (24 × 24 um die Mitte)
-function drawSymbol(ctx, symbol, x, y) {
+// kleine Zeichen auf den Kerzen (24 × 24 um die Mitte) – auch auf den Modellbahn-Wagen in Wagen 15
+export function drawSymbol(ctx, symbol, x, y) {
   ctx.save();
   ctx.translate(x, y);
   ctx.strokeStyle = '#6b3a1a';
@@ -198,6 +198,18 @@ function drawSymbol(ctx, symbol, x, y) {
       ctx.fill();
       line(ctx, 2, 6, 2, -11);
       s(() => { ctx.moveTo(2, -11); ctx.quadraticCurveTo(10, -7, 8, 0); });
+      break;
+    case 'chapel': // Kreuz und Kerze
+      line(ctx, -4, -12, -4, 12); line(ctx, -11, -5, 3, -5);
+      ctx.fillRect(6, -2, 6, 13);
+      ctx.beginPath();
+      ctx.ellipse(9, -6, 2, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    case 'newspaper':
+      ctx.strokeRect(-12, -10, 24, 20);
+      ctx.fillRect(-9, -7, 18, 4);
+      line(ctx, -9, 1, 9, 1); line(ctx, -9, 6, 4, 6);
       break;
     default:
   }
