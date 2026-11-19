@@ -91,15 +91,22 @@ export class Character {
     const width = image.width * scale;
     const drawHeight = image.height * scale;
     const top = this.y - drawHeight - (this.bounce ?? 0);
+    // clipBottom: die Figur steht hinter etwas (z. B. hinter dem Tresen) – unterhalb dieser Linie unsichtbar
+    const bottom = Math.min(this.y, this.data.clipBottom ?? this.y);
     this.box = [
       { x: this.x - width * 0.38, y: top },
       { x: this.x + width * 0.38, y: top },
-      { x: this.x + width * 0.38, y: this.y },
-      { x: this.x - width * 0.38, y: this.y },
+      { x: this.x + width * 0.38, y: bottom },
+      { x: this.x - width * 0.38, y: bottom },
     ];
     ctx.save();
+    if (this.data.clipBottom) {
+      ctx.beginPath();
+      ctx.rect(0, 0, 1280, this.data.clipBottom);
+      ctx.clip();
+    }
     ctx.globalAlpha = this.alpha;
-    drawShadow(ctx, this.x, this.y, height);
+    if (!this.data.clipBottom) drawShadow(ctx, this.x, this.y, height);
     ctx.drawImage(image, this.x - width / 2, top, width, drawHeight);
     ctx.restore();
   }
