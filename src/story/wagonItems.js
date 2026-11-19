@@ -101,7 +101,7 @@ export const WAGON_ITEMS = {
       }
       ctx.restore();
     },
-    look: 'Ein altes Foto: Herr K. und der Schaffner, Arm in Arm.',
+    look: 'Ein altes Foto: Herr K. und der Schaffner, Seite an Seite.',
   },
 
   // ---------------------------------------------------------------- Wagen 6: Fundbüro
