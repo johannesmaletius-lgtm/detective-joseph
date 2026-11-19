@@ -83,4 +83,8 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 
 ## Noch zu bauen (Code)
 
-Wagenwechsel, Türchen-Sperre nach Datum (mit Test-Schalter), Spielstand speichern, Wagen 2–13 umsetzen, Gesprächssystem, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik), Online stellen (GitHub Pages).
+**Gebaut:** Wagenwechsel (`?wagen=N`, am Ende weiter in den nächsten Wagen), Gesprächssystem, Figuren (auch hinter dem Tresen), allgemeine Nahansichten für Suchbilder/Uhren/Flaschen (`picture`) und zum Ordnen (`arrange`), **Wagen 4–8** (Lösungen im README). Der Fortschritt wird im Browser gemerkt (`localStorage`, noch ohne Anzeige).
+
+Kleine Abweichungen vom Plan in Wagen 4–8: Speisewagen-Gäste sind Herr Tick, Frau Ilse, Herr K., Herr Moll, J. und „Dame mit Tochter“ (Andeutung auf Frau und Tochter des Schaffners); J. ist laut Bruno siebzehn. Wagen 6: Herrn K.s Sachen werden „in Runde 109“ gefunden – die nächste Runde (Fahrschein in Wagen 5: „Runde 108“). Wagen 8: Türcode ist „Runde 0108“ vom Filmrand.
+
+**Noch offen:** Türchen-Sperre nach Datum (mit Test-Schalter), Spielstand-Anzeige, Wagen 2–3 und 9–24, neue Rätselarten (Waage, Regler, Töne, Licht/Spiegel, Takt), Online stellen (GitHub Pages).
