@@ -57,6 +57,7 @@ export async function waitForTunnel(story, line = 'Ich warte kurz auf den Tunnel
     return;
   }
   await story.cutscene(async () => {
+    story.game.voices.react('tired');
     await story.say(line);
     await story.fadeOut(1.1);
     story.motion.skipToTunnel(6);

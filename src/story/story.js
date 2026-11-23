@@ -206,6 +206,7 @@ export class Story {
   async hint() {
     if (this.isBusy) return;
     this.event('askedHint');
+    this.game.voices.react('think');
     const steps = SOLUTIONS[this.door];
     if (!steps) {
       await this.respond(this.script.hint?.(this) ?? 'Ich sehe mich am besten noch einmal gründlich um.');

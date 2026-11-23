@@ -4,6 +4,7 @@
 // dann steht im Manifest { file, start, end } (Sekunden) statt nur der Datei.
 
 const VOLUME = 1;
+const REACT_PAUSE = 3000; // ms zwischen zwei Lauten
 
 export class Voices {
   constructor(trainSound) {
@@ -20,6 +21,29 @@ export class Voices {
         for (const entry of new Set(Object.values(files).map((e) => e.file).filter(Boolean))) this.sprite(entry);
       })
       .catch(() => {});
+  }
+
+  // Läuft gerade ein Satz?
+  get playing() {
+    const audio = this.audio;
+    if (!audio) return false;
+    if (audio.paused === undefined) return true; // Web-Fassung: Datei lädt noch
+    return !audio.paused && !audio.ended;
+  }
+
+  // Ein kurzer Laut von Joseph (tools/joseph-reactions.mjs): solved, think, mistake, wow, scared, tired.
+  // chance = Wahrscheinlichkeit; nie über einen laufenden Satz und höchstens alle paar Sekunden.
+  react(kind, chance = 1) {
+    if (this.trainSound.muted || this.playing || Math.random() > chance) return;
+    const now = performance.now();
+    if (now - (this.reactedAt ?? -1e9) < REACT_PAUSE) return;
+    const keys = Object.keys(this.files).filter((key) => key.startsWith(`~${kind}~`));
+    const fresh = keys.filter((key) => key !== this.lastReaction);
+    const key = (fresh.length ? fresh : keys)[Math.floor(Math.random() * (fresh.length || keys.length))];
+    if (!key) return;
+    this.reactedAt = now;
+    this.lastReaction = key;
+    this.play(key);
   }
 
   has(text) {

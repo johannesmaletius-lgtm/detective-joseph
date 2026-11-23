@@ -14,6 +14,7 @@ export class SoundEffects {
   play(name, ...args) {
     const context = this.sound.context;
     if (!context || context.state !== 'running') return;
+    this.onPlay?.(name);
     EFFECTS[name]?.(this, context.currentTime, ...args);
   }
 

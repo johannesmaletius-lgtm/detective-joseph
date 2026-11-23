@@ -28,6 +28,20 @@ import { SaveGame } from '../advent/save.js';
 import { doorInfo, today } from '../advent/doors.js';
 import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, TEST_MODE } from '../config.js';
 
+// Geräusch → Laut von Joseph [Art, Wahrscheinlichkeit] (siehe Voices.react)
+const REACTIONS = {
+  success: ['solved', 1],
+  unlock: ['solved', 1],
+  wrong: ['mistake', 0.7],
+  locked: ['mistake', 0.7],
+  dread: ['scared', 1],
+  shriek: ['scared', 1],
+  crash: ['scared', 1],
+  lightsOff: ['scared', 0.2],
+  pickup: ['wow', 0.5],
+};
+const YAWN_AFTER = 75; // Sekunden ohne Eingabe
+
 // Das Herz des Spiels.
 //
 // Verwaltet Bildschirm, Eingaben, Kamera, Ton, Joseph, die aktuelle Szene, die Benutzeroberfläche
@@ -48,6 +62,12 @@ export class Game {
     this.sound = new TrainSound({ muted: START_MUTED });
     this.effects = new SoundEffects(this.sound);
     this.voices = new Voices(this.sound);
+    // Joseph reagiert mit kurzen Lauten auf Geräusche (Rätsel gelöst, Fehler, Schreck …)
+    this.effects.onPlay = (name) => {
+      const [kind, chance] = REACTIONS[name] ?? [];
+      if (kind) this.voices.react(kind, chance);
+    };
+    this.idleTime = 0; // Sekunden ohne Eingabe → Joseph gähnt
     this.debug = new DebugOverlay(DEBUG_AT_START);
     this.scene = null;
     this.story = null;
@@ -219,6 +239,13 @@ export class Game {
     this.player.update(dt, this.scene);
     this.story.update(dt);
 
+    // Lange nichts getan: Joseph gähnt
+    this.idleTime = this.story.isBusy || this.view || this.overlay.blocksInput ? 0 : this.idleTime + dt;
+    if (this.idleTime > YAWN_AFTER) {
+      this.idleTime = 0;
+      this.voices.react('tired');
+    }
+
     // Taschenlampe: leuchtet im Dunkeln dorthin, wo die Maus ist
     const mouse = this.camera.screenToWorld(this.input.mouse);
     const flashlight = this.scene.darkLevel > 0 && this.inventory.has('flashlight') && this.input.mouse.inside;
@@ -295,6 +322,7 @@ export class Game {
   }
 
   handleClick(click) {
+    this.idleTime = 0;
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
@@ -353,6 +381,7 @@ export class Game {
   }
 
   handleKey(key) {
+    this.idleTime = 0;
     this.sound.start();
     if (this.inCalendar) {
       if (key === KEYS.toggleSound) this.sound.toggleMute();
