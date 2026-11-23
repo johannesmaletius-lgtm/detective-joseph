@@ -200,7 +200,7 @@ export function drawPage1(ctx) {
     lines: [
       'Wenn du das liest, bist du wieder eingeschlafen. Ich bin du – nur ein paar Runden früher.',
       'Seite 2 und 3 habe ich im untersten Koffer des Stapels versteckt. Da sucht keiner.',
-      'Vorsicht: Die kleinen Koffer sind zerbrechlich (Glas!). NIE einen größeren auf einen kleineren stellen. Platz ist nur auf den zwei Kreidefeldern.',
+      'Vorsicht: Die kleinen Koffer sind zerbrechlich (Glas!). NIE einen größeren auf einen kleineren stellen. Platz ist nur auf den zwei Kreidefeldern. Und lass die vier anderen ordentlich auf EINEM Feld stehen – der Schaffner zählt jede Runde nach.',
       'Die Tür nach vorne will Zahlen: Wieg den untersten Koffer. Sein Gewicht ist der Code – ohne Komma.',
     ],
   });

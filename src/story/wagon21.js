@@ -6,8 +6,9 @@ import { finishWagon, hintFor, inTunnel, roundProgress, skipIntro, tryCode, tunn
 // ============================================================================================
 //
 // DIE RÄTSEL
-//   1. Kesseldruck: Das Manometer steht bei 41 bar (rot). Drei Ventile: rot −7, gelb −3, blau +2.
-//      Genau 25 bar (grün) einstellen, z. B. rot 1×, gelb 3× (41 − 7 − 9 = 25). Erst dann redet der Heizer.
+//   1. Kesseldruck: Das Manometer steht bei 42 bar (rot). Drei Ventile: rot −8, gelb −5, blau +3.
+//      Genau 25 bar (grün) einstellen. Nur mit Rot und Gelb geht es nicht (17 lässt sich aus 8 und 5 nicht
+//      zusammensetzen) – man braucht Blau: z. B. gelb 4×, blau 1× (42 − 20 + 3 = 25). Erst dann redet der Heizer.
 //   2. Wasserstand: Die Speisepumpe zieht nur, wenn der Zug bergab fährt. Das merkt man daran, dass
 //      die Kohlen im Bunker nach vorne rutschen (in der zweiten Hälfte der Runde, kurz). Dann pumpen.
 //   3. Spind des Heizers: altes Foto – der Heizer mit einem jungen Schaffner, der aussieht wie Joseph.
@@ -110,8 +111,8 @@ async function talkToHeizer(story) {
     if (!f.metHeizer) {
       f.metHeizer = true;
       await story.speakAs('heizer', 'Nicht jetzt! Der Kessel fliegt uns gleich um die Ohren!');
-      await story.speakAs('heizer', 'Der Druck muss runter auf fünfundzwanzig. Genau fünfundzwanzig! Rot nimmt sieben weg, Gelb drei, Blau gibt zwei dazu.');
-      story.note('Heizer: Der Kesseldruck muss auf GENAU 25 bar. Rotes Ventil −7, gelbes −3, blaues +2 je Drehung. Vorher redet er nicht.');
+      await story.speakAs('heizer', 'Der Druck muss runter auf fünfundzwanzig. Genau fünfundzwanzig! Rot nimmt acht weg, Gelb fünf, Blau gibt drei dazu.');
+      story.note('Heizer: Der Kesseldruck muss auf GENAU 25 bar. Rotes Ventil −8, gelbes −5, blaues +3 je Drehung. Vorher redet er nicht.');
       return;
     }
     return story.speakAs('heizer', 'Erst der Druck! Genau fünfundzwanzig!');
@@ -259,9 +260,9 @@ function currentGoal(story) {
   const f = story.flags;
   if (!f.pressureOk) {
     return { id: 'pressure', lines: [
-      'Der Heizer redet erst, wenn der Druck genau bei 25 bar steht. Von 41 runter auf 25 – also 16 weniger.',
-      'Rot nimmt 7, Gelb 3, Blau gibt 2 dazu. 7 + 3 + 3 + 3 = 16.',
-      'Rot einmal, Gelb dreimal.',
+      'Der Heizer redet erst, wenn der Druck genau bei 25 bar steht. Von 42 runter auf 25 – also 17 weniger.',
+      'Mit 8ern und 5ern allein kommt man nie auf genau 17. Blau gibt 3 dazu – dann sind es 20 weniger.',
+      'Gelb viermal (−20), Blau einmal (+3).',
     ] };
   }
   if (!f.waterAsked) return { id: 'talk', lines: ['Jetzt mit dem Heizer reden.'] };

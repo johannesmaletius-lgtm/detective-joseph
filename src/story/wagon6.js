@@ -264,7 +264,8 @@ async function openShelf(story) {
   f.shelfFound ??= [];
   await story.view('picture', {
     draw: (ctx) => drawShelf(ctx, f.shelfFound),
-    spots: SHELF_SPOTS,
+    // Ohne Rahmen und ohne Namen am Mauszeiger – sonst verrät das Suchbild sich selbst
+    spots: SHELF_SPOTS.map((spot) => ({ ...spot, name: spot.label, label: '', quiet: true })),
     backdrop: 1,
     help: 'Herrn K.s Sachen suchen (Beschreibungen: Rechtsklick auf den Fundschein im Inventar)  ·  Rechtsklick: zurück',
     onClick: (spot, view) => pickShelf(story, spot, view),
@@ -276,12 +277,12 @@ async function pickShelf(story, spot, view) {
   if (f.shelfFound.includes(spot.id)) return story.say('Das habe ich schon angekreuzt.');
   if (!spot.mine) {
     story.sound('wrong');
-    return story.say(pick([`${spot.label}? Das steht nicht auf dem Fundschein.`, 'Das gehört bestimmt nicht Herrn K.', `Nein, ${spot.label} passt zu keiner Beschreibung.`]));
+    return story.say(pick([`${spot.name}? Das steht nicht auf dem Fundschein.`, 'Das gehört bestimmt nicht Herrn K.', `Nein, ${spot.name} passt zu keiner Beschreibung.`]));
   }
   f.shelfFound.push(spot.id);
   story.sound('click');
   const description = FOUND_SLIP.find(([id]) => id === spot.id)[1];
-  await story.say(`„${description}“ – ${spot.label}. Angekreuzt.`);
+  await story.say(`„${description}“ – ${spot.name}. Angekreuzt.`);
   const count = f.shelfFound.length;
   if (count === 8) {
     f.slipDone = true;

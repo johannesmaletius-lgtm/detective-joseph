@@ -141,7 +141,7 @@ async function fuseBox(story) {
     if (!f.fusesSeen && !inTunnel(story)) {
       f.fusesSeen = true;
       await story.say('Fünf Kabel, alle verschieden dick. Und fünf Sicherungen von 6 bis 25 Ampere.');
-      story.note('Sicherungskasten: Fünf Kabel verschiedener Dicke, fünf lose Sicherungen. Zettel: „Dünner Draht – kleine Sicherung. Sonst brennt’s!“');
+      story.note('Sicherungskasten: Fünf Kabel verschiedener Dicke, fünf lose Sicherungen. Zettel (halb abgerissen): „1 mm² → 6 A, 1,5 mm² → 10 A …“ Zwei Kabelschilder sind abgegriffen.');
     }
     return;
   }

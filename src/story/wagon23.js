@@ -1,4 +1,5 @@
 import { drawPicture } from './art/common.js';
+import { DARK_JUNCTION } from '../scene/serviceTunnel.js';
 import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
@@ -17,7 +18,8 @@ import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCom
 // ERGEBNIS: Draußen Schnee und Bahnhofslichter. Herr Tick geht hinaus, wird mit jedem Schritt älter
 // und lächelt: „Danke, Junge.“ Joseph versteht: Der Tunnel ist wirklich der Ausgang.
 
-const PATH = ['archLeft', 'ahead', 'archRight']; // die drei Abzweigungen vor dem Tor
+const PATH = ['archLeft', 'ahead', 'archRight', 'ahead', 'archLeft', 'archRight']; // die sechs Abzweigungen vor dem Tor
+const GATE = PATH.length; // nach der letzten Abzweigung steht man vor dem Tor
 const VOICE = '#a6f0b6';
 
 export const wagon23 = {
@@ -55,14 +57,15 @@ export const wagon23 = {
     chalk: {
       look: (story) => story.say(signLine(story)),
       use: (story) => story.say(signLine(story)),
+      items: { flashlight: (story) => lightChalk(story) },
     },
     archLeft: { look: 'Ein dunkler Seitengang nach links.', use: (story) => go(story, 'archLeft') },
     archRight: { look: 'Ein dunkler Seitengang nach rechts.', use: (story) => go(story, 'archRight') },
     ahead: { look: 'Der Hauptgang führt weiter geradeaus.', use: (story) => go(story, 'ahead') },
     lamps: { look: 'Tunnellampen, in festen Abständen. Wie auf den Filmbildern im Kino.' },
     gate: {
-      look: (story) => story.say(story.flags.junction >= 3 ? 'Ein Gittertor. Dahinter – Schnee? Im Mechanismus fehlt ein Zahnrad.' : 'Ganz hinten ein Gittertor. Aber dazwischen liegen noch Abzweigungen.'),
-      use: (story) => (story.flags.junction >= 3 ? story.say('Es klemmt. Im Mechanismus fehlt ein Zahnrad.') : go(story, 'ahead')),
+      look: (story) => story.say(story.flags.junction >= GATE ? 'Ein Gittertor. Dahinter – Schnee? Im Mechanismus fehlt ein Zahnrad.' : 'Ganz hinten ein Gittertor. Aber dazwischen liegen noch Abzweigungen.'),
+      use: (story) => (story.flags.junction >= GATE ? story.say('Es klemmt. Im Mechanismus fehlt ein Zahnrad.') : go(story, 'ahead')),
       items: { gear: (story) => insertGear(story) },
     },
     gearGap: {
@@ -116,15 +119,28 @@ async function putOnHeadphones(story) {
 //  Die Abzweigungen
 // ============================================================================================
 
+const SIGN_WORDS = {
+  archLeft: 'eine Laterne mit Pfeil nach links',
+  ahead: 'ein Tunnel',
+  archRight: 'eine Laterne mit Pfeil nach rechts',
+};
+
 function signLine(story) {
   const n = story.flags.junction;
-  const lines = [
-    'Ein Kreidezeichen: eine Laterne mit Pfeil nach links. Das Zeichen vom Türschloss in Wagen 1.',
-    'Ein Kreidezeichen: ein Tunnel.',
-    'Ein Kreidezeichen: eine Laterne mit Pfeil nach rechts.',
-    'Ein Kreidezeichen: der Turm. Das Ziel?',
-  ];
-  return lines[n] ?? 'Kreide.';
+  if (n >= GATE) return 'Ein Kreidezeichen: der Turm. Das Ziel?';
+  if (n === DARK_JUNCTION && story.flags.chalkLit !== n) return 'Hier ist die Lampe kaputt. Die Wand ist stockdunkel – ich sehe kein Zeichen.';
+  const first = n === 0 ? ' Das Zeichen vom Türschloss in Wagen 1.' : '';
+  return `Ein Kreidezeichen: ${SIGN_WORDS[PATH[n]]}.${first}`;
+}
+
+async function lightChalk(story) {
+  const f = story.flags;
+  if (f.junction === DARK_JUNCTION) {
+    f.chalkLit = f.junction;
+    story.sound('click');
+    await story.say('Taschenlampe an … da ist es!');
+  }
+  await story.say(signLine(story));
 }
 
 async function go(story, way) {
@@ -146,7 +162,7 @@ async function go(story, way) {
     }
     return;
   }
-  if (f.junction >= 3) {
+  if (f.junction >= GATE) {
     if (way === 'ahead') return story.say('Hier ist das Tor. Weiter geht es nur hindurch.');
     return story.say('Nein. Das Turmzeichen – hier ist das Ziel. Das Tor.');
   }
@@ -158,6 +174,7 @@ async function go(story, way) {
       story.player.x = 640;
       story.player.y = 680;
       f.junction = 0;
+      f.chalkLit = null;
       story.fadeIn(0.8);
       await story.say('Sackgasse. Und die Lampen hingen ganz unregelmäßig. Ich habe Herrn Tick verloren – zurück zum Anfang.');
     });
@@ -176,12 +193,10 @@ async function go(story, way) {
     story.player.facing = 'back';
     await story.wait(0.5);
     story.fadeIn(0.7);
-    await story.say(f.junction >= 3 ? 'Da vorne ist Herr Tick – am Gittertor! Und an der Wand: wieder ein Zeichen.' : 'Herr Tick ist noch vor mir. Die nächste Abzweigung. Wieder ein Zeichen an der Wand.');
+    await story.say(f.junction >= GATE ? 'Da vorne ist Herr Tick – am Gittertor! Und an der Wand: wieder ein Zeichen.'
+      : f.junction === DARK_JUNCTION ? 'Herr Tick ist noch vor mir. Hier ist es dunkel – die Lampe an dieser Abzweigung ist kaputt.'
+        : 'Herr Tick ist noch vor mir. Die nächste Abzweigung. Wieder ein Zeichen an der Wand.');
   });
-  if (f.junction === 1 && !f.signNoted) {
-    f.signNoted = true;
-    story.note('Die Kreidezeichen weisen den Weg: Laterne links → links abbiegen. Tunnel → geradeaus. Laterne rechts → rechts.');
-  }
 }
 
 // ============================================================================================
@@ -190,7 +205,7 @@ async function go(story, way) {
 
 async function insertGear(story) {
   const f = story.flags;
-  if (f.junction < 3) return story.say('So weit bin ich noch nicht.');
+  if (f.junction < GATE) return story.say('So weit bin ich noch nicht.');
   f.gearIn = true;
   story.remove('gear');
   story.sound('click');
@@ -233,10 +248,11 @@ function drawExit(ctx) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.headphonesOn) return { id: 'phones', lines: ['Die Stimme zieht auch an mir. Etwas, das die Ohren zuhält … die Kopfhörer aus dem Funkraum (Rechtsklick im Inventar).'] };
-  if (f.junction < 3) {
+  if (f.junction < GATE) {
     return { id: 'maze', lines: [
       'An jeder Abzweigung ist ein Kreidezeichen an der linken Wand – die Zeichen vom Türschloss aus Wagen 1.',
-      'Laterne links: links abbiegen. Tunnel: geradeaus. Laterne rechts: rechts abbiegen.',
+      'Laterne links: links abbiegen. Tunnel: geradeaus. Laterne rechts: rechts abbiegen. Wo die Lampe kaputt ist: Taschenlampe auf die Wand.',
+      'Der ganze Weg: links, geradeaus, rechts, geradeaus, links, rechts.',
     ] };
   }
   return { id: 'gear', lines: ['Im Tor fehlt ein Zahnrad. Herrn Ticks Zahnrad im Inventar anklicken, dann die leere Achse.'] };

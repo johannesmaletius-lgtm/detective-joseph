@@ -43,15 +43,17 @@ export function drawFuseBox(ctx) {
     ctx.fillStyle = '#9a927c';
     ctx.fillRect(s.x - 8, s.y + 6, 10, s.h - 12);
     ctx.fillRect(s.x + s.w - 2, s.y + 6, 10, s.h - 12);
-    text(ctx, `${String(size).replace('.', ',')} mm²`, 300, cy - 14 - size * 1.6, { font: `15px ${TYPEWRITER}`, color: '#e9e1c8' });
+    // Zwei Schildchen sind abgegriffen – dort hilft nur der Blick auf die Kabeldicke
+    const worn = size === 2.5 || size === 4;
+    text(ctx, worn ? '?? mm²' : `${String(size).replace('.', ',')} mm²`, 300, cy - 14 - size * 1.6, { font: `15px ${TYPEWRITER}`, color: worn ? 'rgba(233, 225, 200, 0.45)' : '#e9e1c8' });
   });
   // Zettel am Deckel
   sheet(ctx, 950, 566, 150, 104, {
     angle: 0.05,
     inner: (c) => {
-      text(c, 'Dünner Draht –', 75, 30, { font: `16px ${HAND}`, align: 'center' });
-      text(c, 'kleine Sicherung.', 75, 54, { font: `16px ${HAND}`, align: 'center' });
-      text(c, 'Sonst brennt’s!', 75, 86, { font: `bold 16px ${HAND}`, color: '#a12218', align: 'center' });
+      text(c, '1 mm² → 6 A', 75, 30, { font: `16px ${HAND}`, align: 'center' });
+      text(c, '1,5 mm² → 10 A', 75, 54, { font: `16px ${HAND}`, align: 'center' });
+      text(c, '(Rest abgerissen)', 75, 86, { font: `italic 14px ${HAND}`, color: '#7a5a3a', align: 'center' });
     },
   });
   text(ctx, 'Lose Sicherungen', 1005, 140, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });

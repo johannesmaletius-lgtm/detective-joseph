@@ -5,7 +5,9 @@ import { drawSymbol } from '../ui/symbols.js';
 // Links und rechts zweigen Gänge ab, hinten das Gittertor mit dem Zahnradmechanismus.
 // Kreidezeichen an der Wand (wechseln an jeder Abzweigung) und die leere Achse im Tor sind gemalt (props).
 
-const SIGNS = ['lanternLeft', 'tunnel', 'lanternRight', 'tower'];
+// Ein Zeichen pro Abzweigung (muss zu PATH in src/story/wagon23.js passen), am Ende der Turm = das Tor.
+const SIGNS = ['lanternLeft', 'tunnel', 'lanternRight', 'tunnel', 'lanternLeft', 'lanternRight', 'tower'];
+export const DARK_JUNCTION = 3; // hier ist die Lampe kaputt: das Zeichen sieht man nur mit der Taschenlampe
 
 export const serviceTunnel = {
   id: 'serviceTunnel',
@@ -24,11 +26,37 @@ export const serviceTunnel = {
     {
       // Kreidezeichen auf dem hellen Putz links
       paint: (ctx, scene) => {
-        const sign = SIGNS[scene.flags.junction ?? 0];
+        const junction = scene.flags.junction ?? 0;
+        const sign = SIGNS[junction];
         if (!sign) return;
+        const dark = junction === DARK_JUNCTION;
         ctx.save();
-        ctx.globalAlpha = 0.85;
-        drawSymbol(ctx, sign, 300, 320, 90, '#f4f1e8');
+        if (dark) {
+          // kaputte Lampe: die linke Wand liegt im Dunkeln
+          const shadow = ctx.createRadialGradient(280, 300, 60, 280, 300, 460);
+          shadow.addColorStop(0, 'rgba(4, 3, 2, 0.94)');
+          shadow.addColorStop(0.6, 'rgba(4, 3, 2, 0.7)');
+          shadow.addColorStop(1, 'rgba(4, 3, 2, 0)');
+          ctx.fillStyle = shadow;
+          ctx.fillRect(0, 0, 760, 720);
+          // die kaputte Wandlampe: Glas schwarz
+          ctx.fillStyle = 'rgba(20, 18, 16, 0.95)';
+          ctx.beginPath();
+          ctx.ellipse(236, 140, 26, 34, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (!dark || scene.flags.chalkLit === junction) {
+          ctx.globalAlpha = 0.85;
+          drawSymbol(ctx, sign, 300, 320, 90, '#f4f1e8');
+          if (dark) {
+            ctx.globalCompositeOperation = 'screen';
+            const beam = ctx.createRadialGradient(300, 320, 10, 300, 320, 130);
+            beam.addColorStop(0, 'rgba(255, 240, 200, 0.35)');
+            beam.addColorStop(1, 'rgba(255, 240, 200, 0)');
+            ctx.fillStyle = beam;
+            ctx.fillRect(170, 190, 260, 260);
+          }
+        }
         ctx.restore();
       },
     },
