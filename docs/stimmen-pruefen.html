@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Josephs Stimme prüfen</title>
+<!-- Alle Sätze von Joseph zum Durchhören. Öffnen über das laufende Spiel (start.command):
+     http://localhost:8150/docs/stimmen-pruefen.html  – die Liste als Tabelle: docs/joseph-stimmen.csv -->
+<style>
+  body { font: 15px/1.4 system-ui, sans-serif; margin: 16px; background: #f6f3ee; color: #222; }
+  h1 { font-size: 20px; }
+  .bar { position: sticky; top: 0; background: #f6f3ee; padding: 8px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  select, input, button { font: inherit; padding: 4px 8px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { border-bottom: 1px solid #ddd; padding: 6px 4px; vertical-align: top; }
+  td.file { font-family: ui-monospace, monospace; font-size: 12px; color: #666; white-space: nowrap; }
+  tr.playing { background: #fff2c6; }
+  button.play { min-width: 36px; }
+</style>
+</head>
+<body>
+<h1>Josephs Stimme prüfen</h1>
+<div class="bar">
+  <select id="art"><option value="">Alle Arten</option></select>
+  <select id="wagon"><option value="">Alle Wagen</option></select>
+  <input id="suche" placeholder="Text suchen …">
+  <button id="alle">▶ Alle nacheinander</button>
+  <span id="anzahl"></span>
+</div>
+<table><tbody id="liste"></tbody></table>
+<script type="module">
+import { reactionLines } from '../tools/joseph-reactions.mjs';
+const KINDS = { choice: 'Gesprächsfrage', say: 'Gespräch', intro: 'Intro', moment: 'Wichtiger Moment', door: 'Tür/Schloss', rest: 'Kommentar' };
+const manifest = await (await fetch('../assets/voices/manifest.json')).json();
+const lines = await (await fetch('../tools/joseph-dialogue-lines.json')).json();
+const rows = [
+  ...reactionLines().map((r) => ({ art: `Laut (${r.key.split('~')[1]})`, wagon: 'alle', text: r.text, file: manifest[r.key] })),
+  ...lines.map((l) => ({ art: KINDS[l.kind], wagon: l.file.match(/\d+/)?.[0] ?? 'alle', text: l.text, file: manifest[l.text] })),
+].filter((r) => r.file);
+const $ = (id) => document.getElementById(id);
+for (const a of new Set(rows.map((r) => r.art))) $('art').add(new Option(a, a));
+for (const w of [...new Set(rows.map((r) => r.wagon))].sort((a, b) => (+a || 99) - (+b || 99))) $('wagon').add(new Option(w === 'alle' ? 'ohne Wagen' : `Wagen ${w}`, w));
+const audio = new Audio();
+let queue = [];
+function play(row, tr) {
+  document.querySelector('tr.playing')?.classList.remove('playing');
+  tr.classList.add('playing');
+  tr.scrollIntoView({ block: 'nearest' });
+  audio.src = '../' + row.file;
+  audio.play();
+}
+audio.onended = () => { const next = queue.shift(); if (next) play(...next); };
+function show() {
+  const art = $('art').value, wagon = $('wagon').value, q = $('suche').value.toLowerCase();
+  const shown = rows.filter((r) => (!art || r.art === art) && (!wagon || r.wagon === wagon) && (!q || r.text.toLowerCase().includes(q)));
+  $('liste').replaceChildren(...shown.map((r) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><button class="play">▶</button></td><td>${r.text}</td><td>${r.art}<br>${r.wagon === 'alle' ? '' : 'Wagen ' + r.wagon}</td><td class="file">${r.file.split('/').pop()}</td>`;
+    tr.querySelector('button').onclick = () => { queue = []; play(r, tr); };
+    r.tr = tr;
+    return tr;
+  }));
+  $('anzahl').textContent = `${shown.length} Sätze`;
+  $('alle').onclick = () => { queue = shown.map((s) => [s, s.tr]); const first = queue.shift(); if (first) play(...first); };
+}
+for (const id of ['art', 'wagon', 'suche']) $(id).oninput = show;
+show();
+</script>
+</body>
+</html>
