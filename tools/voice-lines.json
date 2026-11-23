@@ -1,0 +1,1212 @@
+[
+ {
+  "speaker": "conductor",
+  "text": "… nächster Halt: Ringbahnhof …",
+  "file": "wagon1.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "… Joseph? … Bist du noch wach? …",
+  "file": "wagon1.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Nächster Halt: der Tunnel. Bitte bleiben Sie ruhig sitzen.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Krrrz … Halt … Tunnel … krrz …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… uuuhhh … wwwoooo …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… uh … wo … ni …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… nerednA eid eiw …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… wie die anderen.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Elf ist der Nächste.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Fffffaaaaaaahhhhrrrr … gggaaaaaasssst …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Faaahrgaaast Kaaa … biiitte …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Fahrgast K., bitte zum Tunnel. Fahrgast K., bitte zum Tunnel.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Haben Sie keine Angst. Sie kommen nach Hause …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… nerednA eid eiw … etshcäN red tsi flE …“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Hallo? … Ist da jemand?“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Psst! Hörst du sie? Alle ticken. Aber nur eine geht richtig.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Wer nicht weiß, welche meiner Uhren mit dem Mond geht, mit dem rede ich nicht. Keine Zeit, keine Zeit.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Welche Uhr geht mit dem Mond, hm? Keine Zeit!",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Die Rundenuhr! Du hast sie gefunden. Dann bist du einer, der zählt.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ich zähle auch. Hundertacht Runden. Hundertacht Mal derselbe Abend.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Immer kurz vor dem Tunnel. Wenn meine Rundenuhr auf dem roten Strich steht – bei fünfzig.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Dann sagt er einen Namen. Und wer seinen Namen hört, der steht auf und geht. Wie im Schlaf.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Angst? … Mein Wagen ist der elfte. Ich habe die Wagen gezählt, und die Runden, und die Leute, die fehlen.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ich bin der Nächste. Das weiß ich seit hundertacht Runden.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Nicht hören … Laut müsste es sein. Genau in dem Augenblick!",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Meine Standuhr! Und die Kuckucksuhr! Die sind laut. Aber sie gehen falsch, alle beide. Auf meinem Zettel an der Werkbank steht, wie.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Rechne du, Junge. Meine Hände zittern zu sehr.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Die Standuhr ist anderthalbmal so schnell, die Kuckucksuhr nur halb so schnell. Beide schlagen zur vollen Stunde.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Und sie laufen erst, wenn wir aus dem Tunnel kommen. Im Tunnel bleibt alles stehen.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ich bin noch da. Hundertneun Runden. Danke, Junge.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Komisch nur … manchmal denke ich, draußen wartet jemand auf mich.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Fahrg– DONG! – KUCKUCK! – DONG! – … Tunnel.“",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Fahrgast DONG …, bitte zum Tunnel.“",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Fahrgast Tick, bitte zum Tunnel. Fahrgast Tick …“",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "… Tick … das bin ich …",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ja … ich komme …",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Was … Wo war ich? … Schon wieder eine Runde. Beinahe, Junge. Beinahe.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Was … hat er gerufen? Ich habe nichts verstanden!",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ich habe nichts verstanden – und ich bin noch hier!",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Hundertneun Runden. Die erste, in der niemand gegangen ist.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Hier, Junge. Das ist für dich. Ein Zahnrad aus meiner besten Uhr.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Das wirst du vorne brauchen.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Und die Tür – warte. Das Uhrwerk dort kenne ich.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Offen. Geh nur.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Mein Klavier … offen? Nach so vielen Runden!",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Seitdem fährt der Zug im Kreis. Und ich spiele, damit ich nicht vergesse, für wen.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Hm-hm-hmm … hm-hm … und dann … und dann …",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Verzeihung. Ich weiß nicht mehr, wie es weitergeht. Seit Ewigkeiten nicht.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Ein Weihnachtslied. Ich habe es geschrieben, für einen ganz besonderen Abend.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Das Notenblatt ist zerrissen, irgendwo hier im Salon. Mein Kopf ist ein Sieb.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Das Ende … es endet, wie es anfängt. Nur rückwärts. Wie ein Zug, der zurückfährt.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Spiel du es, Junge. Meine Finger finden es nicht.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Ich habe es dir vorgespielt – bis auf das Ende.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Mein Klavier ist abgeschlossen. Der Schlüssel liegt in der Spieldose.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Und das Wort für die Spieldose … es war etwas, das die Kleine im Arm hielt. Ich weiß es nicht mehr.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Ohne Noten? Mein Kopf ist ein Sieb, Junge.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Ich spiele. Aber ich verliere immer den Takt. Klopf ihn mir – so wie die Räder. Ta … dam.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Nein, nein – im Takt der Räder! Ta … dam … ta … dam.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Ja … ja, so!",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Und dann … und dann …",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Es ist weg. Der Schluss ist weg. Wie verwischt.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "D … H … A … G. Ja! So endet es!",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Jetzt weiß ich es wieder. Ich habe es an einem Weihnachtsabend gespielt. Hier im Zug. Auf einer Feier.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Für eine junge Frau und ihre kleine Tochter. Die Familie des Schaffners.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Er selbst hatte frei. Er wollte sie am Bahnhof erwarten … mit dem Weihnachtsbaum.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Die Kleine hat mitgesungen. Mit ihrem Stoffhasen im Arm.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Und dann kam der Tunnel. Und der Bahnhof kam nie.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "moll",
+  "text": "Seitdem fährt der Zug im Kreis.",
+  "file": "wagon12.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Ja … das Fenster. Da draußen ist der Tunnel. Da fahren wir jede Runde hinein.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Mama ist schon hindurchgegangen. Ganz am Anfang. Ich warte auf Papa.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Du kannst gut sehen. Dann kannst du mir helfen. Meine Bahn fährt nicht mehr – die Wagen sind ganz durcheinander.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Papa hat sie immer richtig hingestellt. So, wie der echte Zug fährt.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Richtig! Noch mal!",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Richtig! Noch einmal. Das letzte.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Ich sehe was, was du nicht siehst …",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "… und das ist rot und rund und macht BUMM.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "… und das reitet und reitet und kommt nie an.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "… und das ist ganz dunkel. Da gehen alle hinein, und keiner kommt wieder heraus.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Nein, nicht der kleine! Der große. Der echte.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Nein! Rot und rund und BUMM!",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Nein! Es reitet und reitet und kommt nie an. Wie wir.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Nein. Dunkel. Alle gehen hinein. Keiner kommt heraus.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Falsch. Heiligabend … welcher Tag ist das?",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Falsch. Vier Ziffern …",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Du musst raten! Zeig drauf!",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Hallo. Ich bin Mira. Ich bin sieben.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Schon ganz lange.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Ja! Ich sehe was, was du nicht siehst …",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Papa ist immer unterwegs. Er bringt alle nach Hause, einen nach dem anderen.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Und wenn alle zu Hause sind, holt er mich.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Du hast die gleiche Mütze wie Papa. Und den gleichen Schal.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Das sind wir! Mama, Papa und ich. Und Hoppel.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Das war an Weihnachten. Bevor wir mit dem Zug gefahren sind.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Das ist meine Bahn! Erst spielen wir was.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Sie fährt! Sie fährt!",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Sie bleibt immer im Tunnel stehen. Wie der echte Zug.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Der ist für den Bahnhof!",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Stell sie so hin, wie es war. In der Nacht.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Die habe ich gemalt. Für dich.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Das ist Papa. Er bringt alle nach Hause.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Tschüss! Kommst du wieder?",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„… hier Bahnhof … bitte … meine Familie ist in diesem Zug … bitte antworten …“",
+  "file": "wagon16.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Wer ist da in meinem Abteil? …",
+  "file": "wagon18.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Ach. Du bist es. Du bist früh dran, Junge. Sieh dich ruhig um.",
+  "file": "wagon18.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Näher, als du denkst, Junge.",
+  "file": "wagon18.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Weiche sieben stellt man nicht allein, Junge. Und nicht ohne Schlüssel.",
+  "file": "wagon18.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Da, wo er immer ist.",
+  "file": "wagon18.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Frohe Weihnachten, Papa.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Da bist du ja endlich!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Alle haben ihre Anhänger verloren. Jetzt weiß keiner mehr, welches Geschenk wem gehört.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Wenn alle wieder ihr Geschenk haben, zeig ich dir meins. Versprochen.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Erst die Anhänger! Du hast es versprochen.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Jetzt hat jeder wieder seins. Danke!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Meins ist nicht da oben. Ich hab es versteckt, damit es keiner aufmacht. Es ist für Papa.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Wo, steht auf der Frachtliste. Aber nur, wenn man mit Sternen guckt.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Mach es auf! Aber vorsichtig – die Bänder!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Mit Sternen gucken!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Richtig! Alle!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Das ist meins! Mach es auf!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Behalt sie. Du brauchst sie noch.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Bis bald, Papa!",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Nicht jetzt! Der Kessel fliegt uns gleich um die Ohren!",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Der Druck muss runter auf fünfundzwanzig. Genau fünfundzwanzig! Rot nimmt acht weg, Gelb fünf, Blau gibt drei dazu.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Erst der Druck! Genau fünfundzwanzig!",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Gut gemacht, Junge – äh. Jetzt das Wasser. Der Kessel säuft wie ein Loch.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Die Pumpe zieht aber nur, wenn wir bergab fahren. Wenn die Kohlen im Bunker nach vorne rutschen, dann – zack – pumpen!",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Ah, das läuft wieder. Danke, Herr Schaffner.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Na, jetzt machen Sie Witze. Sie kommen doch jede Runde um halb zwölf hier vorbei.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Mit dem Lok-Schlüssel um den Hals. Und gehen nach vorne in die Lok.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Hahaha! Siebzehn! Und ich bin der Weihnachtsmann. Warten Sie, ich zeig Ihnen was.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Aus meinem Spind. Sie und ich, damals, vor der alten Lok. Sie waren jung, ja – aber nicht siebzehn.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Halb zwölf, Herr Schaffner. Wie jede Runde.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Bist du wahnsinnig? Alles zurück!",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Na also! Jetzt können wir reden.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "heizer",
+  "text": "Bravo! Bergab, genau so.",
+  "file": "wagon21.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Ich bin du, Junge.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Der Tunnel ist kein Ende. Er ist der Ausgang.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Wer durchgeht, kommt nach Hause. Wird wieder älter. Lebt weiter.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Und du holst sie mir jede Runde zurück.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Halb zwölf. Wie jede Runde.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "… nach Hause … ich komme …",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "… Fahrgast Tick … bitte zum Tunnel …",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "… ich komme …",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Ach … wie die Luft riecht. Nach Schnee.",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Danke, Junge.",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Bist du so weit, Junge? Ich stehe in der Lok. Der Schlüssel steckt.",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Kommst du nach, Papa?",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Liebe Fahrgäste. Hier spricht der Schaffner.“",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Bruno. Ilse. Herr Moll. Mira. Und alle anderen. Bitte zum Tunnel.“",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Es ist Zeit, nach Hause zu gehen.“",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Papa?",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Dann geh ich schon mal vor. Mama wartet.",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Ich bin bereit. Wenn du die Kelle hebst, ziehe ich. Bei 24,7 – nicht früher, nicht später.",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Ruhig, Junge. Der Zug fährt im Kreis – wir haben noch eine Runde. Bei 24,7.",
+  "file": "wagon24.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Aaah, dieses Quietschen! Meine armen Ohren!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "He! Wer ist da an meinem Tablett?!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Licht! Na also. Wo war ich … ach ja, der Wein.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Ah! Ein Gast! Endlich! Bruno, Koch des Speisewagens. Setzen Sie sich, setzen Sie sich!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Ach nein, warten Sie – die Kärtchen! Jemand hat alle Namenskärtchen vertauscht.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Und ich weiß nicht mehr, wer wo sitzt. Jede Runde decke ich neu, und jede Runde vergesse ich es wieder.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Mehr weiß ich nicht. Steht doch alles in Ihrem Büchlein, oder?",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Wer wo sitzt … Lassen Sie mich nachdenken …",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Herr Tick sitzt hinten – so nah an der Tür wie möglich. Er will immer als Erster raus.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Und auf der Küchenseite, damit er sein Essen als Erster bekommt.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Herr Moll sitzt Herrn Tick genau gegenüber, über den Gang. Die beiden streiten jede Runde über den Takt der Räder.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Frau Ilse strickt. Immer. Sogar zwischen Suppe und Braten. Immer grüne Wolle.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Die Dame mit ihrer Kleinen sitzt auf der rechten Seite, weit weg vom Küchendunst.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Aber nicht neben Herrn Moll! Der summt beim Essen, das kann die Kleine nicht leiden.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Der junge Herr J. trägt eine Fliegerbrille. So wie Sie, ha!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Er bekommt Kakao. Für Wein ist er zu jung – siebzehn, glaube ich.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Und Herr K.? Der sagt jede Runde: „Mir egal, wo ich sitze.“ Er nimmt den Platz, der übrig bleibt.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Da war noch mehr … fragen Sie mich gleich noch mal.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Das ist alles. Ordnen Sie die Kärtchen? Meine Hände sind voller Bratensoße.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Immer gleich: Die Gläser stehen auf dem Tablett in der Reihenfolge, in der ich sie bringe.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Von hinten nach vorne, erst die linke Seite, dann die rechte. Wer zu jung für Wein ist, kriegt Kakao – der kommt zuletzt.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Die Tür? Die geht erst auf, wenn die Kasse stimmt. Vorschrift vom Schaffner!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Das ganze Weihnachtsmenü, für alle Gäste, auf Heller und Pfennig. Die Rechnung schreibe ich, sobald ich weiß, wer wo sitzt.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Die kommen gleich! … Glaube ich.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Wissen Sie, manchmal kommt es mir vor, als hätte ich dieses Essen schon hundertmal gekocht. Für niemanden.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Nehmen Sie das weg! Ich will es nicht sehen!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Bittermandel?! In MEINEM Wein?",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Der Wein … den hat mir ein junger Mann gebracht. Mit Schal und Fliegerbrille. „Ein Geschenk vom Schaffner, für Tisch drei“, hat er gesagt.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Ja! JA! Genau so! Herr Tick hinten links, Frau Ilse, dann Herr K. vorne links …",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Herr Moll, der junge J., und vorne rechts die Dame mit der Kleinen. Jetzt weiß ich es wieder!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Dann schreibe ich schnell die Rechnung … so … und unter das Tablett damit, wie immer.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Finger weg von meinem Tablett! Das geht gleich raus!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Hundertzweiundzwanzig Mark! Die Kasse stimmt! Hören Sie? Die Tür ist auf.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Falsch! Rechnen Sie noch mal nach – für jeden Gast!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Was tippen Sie da? Erst die Rechnung, dann die Kasse!",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Sie gehen? Aber das Essen …",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "bruno",
+  "text": "Herr K.? Der schläft doch im Schlafwagen, Abteil vier. Er kommt jede Runde zu spät.",
+  "file": "wagon4.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… mmh … Koffer …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… chrrr … pfffff …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… er hat den Koffer …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… unter Bett vier … versteckt …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… und der Schlüssel liegt … wo der Mond nicht hinkommt …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… chrrr …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "AAAH! Ein Einbrecher! Hilfe!",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "Die Notbremse! Ich ziehe die Notbremse!",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… sie geht nicht … sie ging noch nie … chrrr …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "… bitte klingeln …",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Fundschein angenommen. Herr K., Abteil vier. Acht Gegenstände.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Moment … diese Sachen werden erst in Runde hundertneun gefunden. Sie sind zu früh, junger Mann.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Für Herrn K. liegt nur eines bereit: Schließfach zwölf.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Schließfach zwölf. Schönen Abend noch.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Ihr Fundschein ist nicht vollständig. Alle Gegenstände ankreuzen, bitte.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Fundbüro der Ringbahn. Fundsachen werden nur gegen ausgefüllten Fundschein herausgegeben.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Fundscheine liegen hinter der Klappe. Der Schlüssel zur Klappe … steht in der Kartei.",
+  "file": "wagon6.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Meine Uhr! Die hab ich … nein. Die bekomme ich erst noch. Behalt sie, Junge.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Noch nicht. Noch hat er mich nicht gerufen.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Hm. Und wenn?",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Ich weiß, Junge. Ich weiß.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Lass mich in Ruhe. Ich warte.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Danke für den Whisky, Junge. Mehr kann ich dir nicht geben als den Deckel.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Du hast gelauscht. Hm. Bring mir mein Übliches, dann reden wir.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Ich sagte: Lass mich in Ruhe.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Hm.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Geh spielen, Junge.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Steck es weg.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "… Woher hast du das?",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Das war eine schöne Feier. Damals. Leg es weg, Junge. Bitte.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Whisky. Rauchig. Wie jede Runde.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Du bist hartnäckig, Junge. Das mag ich.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Hier – mein Deckel. Hundertacht Runden hab ich darauf gezählt. Mit den Zeichen von der Tür im ersten Wagen.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Die Tür da vorne kennt dieselben Zeichen. Du wirst sie brauchen.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Herr K.? Kommt jede Runde. Steht da, wartet, trinkt sein Übliches.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Reden tut er nur, wenn Musik läuft. Und nur mit mir. Wenn ihm einer zuguckt, macht er den Mund nicht auf.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Sein Übliches … ach du liebe Zeit. Ich weiß es nicht mehr. Jede Runde vergesse ich es.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Da stehen noch seine drei Gläser von den letzten drei Runden. Und hinten die Flaschen. Bedienen Sie sich – ich hab die Hände voll.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Die Musikbox? Die spielt nur gegen Münze. Und ich hab keine – im Tresen ist nur Kreide.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Die Gäste lassen manchmal Kleingeld liegen. Überall, nur nicht bei mir.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Das Übliche, Herr K.?",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Wie jede Runde. Und schreib’s auf meinen Deckel.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Der Junge mit der Fliegerbrille fragt nach Ihnen.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Ich weiß. Er will mich retten. Er versteht es noch nicht.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Heute ruft er mich. Ich spür’s. Und wenn der Schaffner ruft, dann gehe ich.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Freiwillig?",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Er war mein Freund. Er bringt uns nach Hause.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "barkeeper",
+  "text": "Finger weg, das ist der Deckel von Herrn K.! Den gibt nur er selbst her.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "… Fahrgast K. … bitte zum Tunnel … Fahrgast K. …",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Da ist er. Er ruft mich.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Wenn der Schaffner ruft, gehe ich, Junge. Das habe ich ihm versprochen.",
+  "file": "wagon7.js"
+ }
+]
