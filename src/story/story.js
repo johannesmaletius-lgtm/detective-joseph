@@ -186,8 +186,13 @@ export class Story {
   }
 
   // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
-  choose(options) {
-    return this.game.views.dialogue.open({ options });
+  // Gibt es die gewählte Frage gesprochen (assets/voices/), stellt Joseph sie laut.
+  async choose(options) {
+    const choice = await this.game.views.dialogue.open({ options });
+    const option = options[choice];
+    const text = typeof option === 'string' ? option : option?.text;
+    if (text && this.game.voices.has(text)) await this.say(text);
+    return choice;
   }
 
   // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)

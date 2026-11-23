@@ -1,5 +1,5 @@
 // Erzeugt die Tondateien für die Sprechtexte der Figuren mit ElevenLabs.
-//   node tools/voice-lines.mjs              (erst die Sätze sammeln)
+//   node tools/voice-lines.mjs              (erst die Sätze sammeln; für Joseph: tools/joseph-dialogue-lines.mjs)
 //   node tools/voice-generate.mjs bruno     (dann eine oder mehrere Figuren vertonen)
 // Bereits vorhandene Dateien werden übersprungen. Ergebnis: assets/voices/<figur>/<nr>.mp3
 // und assets/voices/manifest.json (Satz → Datei), das das Spiel beim Start lädt.
@@ -19,11 +19,15 @@ const VOICES = {
   barkeeper: '8WgkgItVYGBs7XNW7D6w', // Maik – berlinerisch
   ilse: 'nztoarMvjgs3c0c5DINJ', // Oma Elisabeth – Warm & Cozy
   conductor: 'b0JqlN5qkeuPi5BoQiHn', // Hermann – Sympathetic and Trustworthy
+  joseph: 'aTTiK3YzK3dXETpuDE2h', // Ben – Effortless and Casual (nur Sätze im Gespräch, siehe joseph-dialogue-lines.mjs)
 };
 const MODEL = 'eleven_multilingual_v2';
 
 const root = new URL('../', import.meta.url);
-const lines = JSON.parse(readFileSync(new URL('tools/voice-lines.json', root), 'utf8'));
+const lines = [
+  ...JSON.parse(readFileSync(new URL('tools/voice-lines.json', root), 'utf8')),
+  ...JSON.parse(readFileSync(new URL('tools/joseph-dialogue-lines.json', root), 'utf8')).map((l) => ({ ...l, speaker: 'joseph' })),
+];
 const manifestUrl = new URL('assets/voices/manifest.json', root);
 const manifest = existsSync(manifestUrl) ? JSON.parse(readFileSync(manifestUrl, 'utf8')) : {};
 const key = process.env.ELEVENLABS_API_KEY ?? 'proxy-injected';
