@@ -17,6 +17,9 @@ import { Jigsaw } from '../puzzles/jigsaw.js';
 import { Wires } from '../puzzles/wires.js';
 import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
+import { PictureView } from '../puzzles/picture.js';
+import { ArrangeView } from '../puzzles/arrange.js';
+import { DialogueView } from '../ui/dialogue.js';
 import { Story } from '../story/story.js';
 import { ITEMS } from '../story/items.js';
 import { Calendar } from '../advent/calendar.js';
@@ -69,6 +72,9 @@ export class Game {
       wires: new Wires(),
       binoculars: new Binoculars(),
       crt: new Crt(),
+      picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
+      arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
+      dialogue: new DialogueView(), // Gesprächsauswahl
     };
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
@@ -148,7 +154,10 @@ export class Game {
     scene.flags = this.story.flags;
     if (scene.motion) {
       scene.motion.onBump = (strength) => this.sound.clack(strength);
-      scene.motion.onSqueal = (duration) => this.sound.squeal(duration);
+      scene.motion.onSqueal = (duration) => {
+        this.sound.squeal(duration);
+        this.story.onSqueal(duration);
+      };
       scene.motion.onTunnel = (inside) => {
         this.sound.tunnel(inside);
         this.story.onTunnel(inside);
@@ -250,7 +259,8 @@ export class Game {
     const item = selected ? this.inventory.images[selected] : null;
     const itemName = selected ? this.story.itemName(selected) : '';
 
-    if (this.overlay.blocksInput || this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
+    if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
+    if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });
     if (this.inventory.contains(mouse)) {

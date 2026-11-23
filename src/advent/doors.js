@@ -21,11 +21,46 @@ export const DOORS = [
   },
   { door: 2, wagon: 'Gepäckwagen' },
   { door: 3, wagon: 'Postwagen' },
-  { door: 4, wagon: 'Speisewagen' },
-  { door: 5, wagon: 'Schlafwagen' },
-  { door: 6, wagon: 'Fundbüro' },
-  { door: 7, wagon: 'Barwagen' },
-  { door: 8, wagon: 'Bordkino' },
+  {
+    door: 4,
+    wagon: 'Speisewagen',
+    load: async () => ({
+      scene: (await import('../scene/diningCar.js')).diningCar,
+      script: (await import('../story/wagon4.js')).wagon4,
+    }),
+  },
+  {
+    door: 5,
+    wagon: 'Schlafwagen',
+    load: async () => ({
+      scene: (await import('../scene/sleepingCar.js')).sleepingCar,
+      script: (await import('../story/wagon5.js')).wagon5,
+    }),
+  },
+  {
+    door: 6,
+    wagon: 'Fundbüro',
+    load: async () => ({
+      scene: (await import('../scene/lostAndFound.js')).lostAndFound,
+      script: (await import('../story/wagon6.js')).wagon6,
+    }),
+  },
+  {
+    door: 7,
+    wagon: 'Barwagen',
+    load: async () => ({
+      scene: (await import('../scene/barCar.js')).barCar,
+      script: (await import('../story/wagon7.js')).wagon7,
+    }),
+  },
+  {
+    door: 8,
+    wagon: 'Bordkino',
+    load: async () => ({
+      scene: (await import('../scene/cinemaCar.js')).cinemaCar,
+      script: (await import('../story/wagon8.js')).wagon8,
+    }),
+  },
   { door: 9, wagon: 'Spiegelwagen' },
   { door: 10, wagon: 'Lautsprecherwagen' },
   { door: 11, wagon: 'Uhrenwagen' },

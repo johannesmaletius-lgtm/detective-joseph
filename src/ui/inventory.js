@@ -36,7 +36,8 @@ export class Inventory {
 
   async load() {
     this.bar = await loadImage(BAR);
-    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, await loadImage(item.image)]));
+    // Gegenstände ab Wagen 4 sind im Code gezeichnet (icon), die aus Wagen 1 sind Bilder (image)
+    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, item.icon ? drawIcon(item.icon) : await loadImage(item.image)]));
     this.images = Object.fromEntries(entries);
   }
 
@@ -66,6 +67,14 @@ export class Inventory {
 
   has(id) {
     return this.items.includes(id);
+  }
+
+  // Alles weg (beim Wechsel in einen anderen Wagen)
+  clear() {
+    this.items = [];
+    this.selected = null;
+    this.offset = 0;
+    this.flash = null;
   }
 
   add(id) {
@@ -216,4 +225,15 @@ export class Inventory {
 
 function easeOut(t) {
   return 1 - (1 - t) * (1 - t);
+}
+
+// Zeichnet ein Gegenstandsbild (128 × 128) mit einer Zeichenfunktion icon(ctx)
+function drawIcon(icon) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  icon(ctx);
+  return canvas;
 }

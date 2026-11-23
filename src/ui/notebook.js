@@ -40,6 +40,7 @@ export class Notebook {
     this.unread = 0;
     this.isOpen = false;
     this.pulse = 0;
+    this.spread = 0;
   }
 
   add(text, lap) {
@@ -135,7 +136,7 @@ export class Notebook {
     const rows = [];
     let heading = null;
     for (const entry of this.entries) {
-      const title = entry.section ?? `Runde ${entry.lap}`;
+      const title = entry.section ?? (entry.lap === 0 ? 'Was bisher geschah' : `Runde ${entry.lap}`);
       if (title !== heading) {
         heading = title;
         rows.push({ text: title, heading: true });

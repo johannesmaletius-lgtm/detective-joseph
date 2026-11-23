@@ -7,6 +7,7 @@ import { pointInPolygon } from '../navigation/geometry.js';
 import { TrainMotion } from '../effects/trainMotion.js';
 import { Darkness } from '../effects/darkness.js';
 import { OutsideView } from './outsideView.js';
+import { Character } from './character.js';
 
 const CLICK_MARKER_DURATION = 0.45; // Sekunden
 
@@ -33,6 +34,7 @@ export class Scene {
     this.hotspots = (data.hotspots ?? []).map((hotspot) => ({ ...hotspot, area: hotspot.area.map(([x, y]) => ({ x, y })) }));
     this.props = [];      // kleine Bilder im Raum, z. B. der Brief im Schlitz
     this.animations = []; // animierte Stellen im Bild, z. B. der Bildschirm
+    this.characters = (data.characters ?? []).map((character) => new Character(character)); // andere Figuren
     this.background = null;
     this.clickMarker = null;
     this.flags = {};      // Merker aus dem Spielstand (setzt das Spiel, siehe story.js)
@@ -43,9 +45,10 @@ export class Scene {
     const spots = this.data.animations ?? [];
     const [background, players, props] = await Promise.all([
       loadImage(this.data.background.src),
-      Promise.all(spots.map(async (spot) => new AnimationPlayer(await loadAnimation(spot.animation)))),
+      Promise.all(spots.map(async (spot) => (spot.animation ? new AnimationPlayer(await loadAnimation(spot.animation)) : null))),
       Promise.all((this.data.props ?? []).map(async (prop) => ({ ...prop, picture: await loadImage(prop.image) }))),
       this.outside?.load(),
+      ...this.characters.map((character) => character.load()),
     ]);
     this.background = background;
     this.props = props;
@@ -82,7 +85,17 @@ export class Scene {
   hotspotAt(point) {
     const lit = !this.isDark || Darkness.inBeam(point, this.beam);
     const found = (hotspot) => (lit || (hotspot.glows && this.isActive({ when: hotspot.glows })));
-    return this.hotspots.find((hotspot) => this.isActive(hotspot) && found(hotspot) && pointInPolygon(point, hotspot.area)) ?? null;
+    const people = this.visibleCharacters().sort((a, b) => b.y - a.y); // vorne Stehende zuerst
+    return [...people, ...this.hotspots].find((hotspot) => this.isActive(hotspot) && found(hotspot) && pointInPolygon(point, hotspot.area)) ?? null;
+  }
+
+  // Figuren, die gerade da sind (when-Bedingung erfüllt, nicht ausgeblendet)
+  visibleCharacters() {
+    return this.characters.filter((character) => this.isActive(character) && character.alpha > 0.05);
+  }
+
+  character(id) {
+    return this.characters.find((character) => character.id === id);
   }
 
   // Mitte einer anklickbaren Stelle (damit Joseph sich dorthin drehen kann)
@@ -135,7 +148,8 @@ export class Scene {
   update(dt) {
     this.motion?.update(dt);
     this.outside?.update(dt, this.motion);
-    for (const spot of this.animations) spot.player.update(dt);
+    for (const spot of this.animations) spot.player?.update(dt);
+    for (const character of this.characters) character.update(dt);
 
     if (this.clickMarker) {
       this.clickMarker.age += dt;
@@ -158,7 +172,7 @@ export class Scene {
     this.drawAnimations(ctx, 'front');
     this.drawGlows(ctx);
     this.drawClickMarker(ctx);
-    player.draw(ctx, this);
+    this.drawFigures(ctx, player);
 
     // 4) Licht und Flackern liegen über allem – auch über Joseph
     this.outside?.drawLight(ctx);
@@ -178,8 +192,15 @@ export class Scene {
     const { x, y, width, height } = this.data.background;
     ctx.drawImage(this.background, x, y, width, height);
     this.drawProps(ctx);
-    player.draw(ctx, this);
+    this.drawFigures(ctx, player);
     ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Joseph und die anderen Figuren – wer weiter vorne steht (größeres y), wird später gezeichnet
+  drawFigures(ctx, player) {
+    const figures = [player, ...this.characters.filter((character) => this.isActive(character))];
+    figures.sort((a, b) => a.y - b.y);
+    for (const figure of figures) figure.draw(ctx, this);
   }
 
   drawProps(ctx) {
@@ -201,7 +222,7 @@ export class Scene {
       } else if (spot.painter && !spot.playing) {
         spot.painter(ctx, spot.x, spot.y, spot.width, spot.height);
       } else {
-        spot.player.draw(ctx, spot.x, spot.y, spot.width, spot.height);
+        spot.player?.draw(ctx, spot.x, spot.y, spot.width, spot.height);
       }
     }
   }
@@ -213,7 +234,7 @@ export class Scene {
       const { x, y, radius } = spot.glow;
       const color = spot.glowColor ?? (spot.playing ? undefined : spot.painterGlow) ?? spot.glow.color;
       const strength = spot.glowStrength ?? spot.glow.strength;
-      const flicker = 0.6 + 0.4 * Math.abs(Math.sin(spot.player.frameIndex * 12.9898)); // je Frame etwas anders
+      const flicker = 0.6 + 0.4 * Math.abs(Math.sin((spot.player?.frameIndex ?? Math.floor(performance.now() / 70)) * 12.9898)); // je Frame etwas anders
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
       gradient.addColorStop(0, `rgba(${color}, ${strength * flicker})`);
       gradient.addColorStop(1, `rgba(${color}, 0)`);
