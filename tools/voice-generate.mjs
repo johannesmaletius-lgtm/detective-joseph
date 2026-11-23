@@ -39,7 +39,9 @@ const all = process.argv[2] === 'alle';
 const speakers = all ? Object.keys(VOICES) : process.argv.slice(2);
 if (!speakers.length) throw new Error('Welche Figur? z. B. node tools/voice-generate.mjs bruno  (oder: alle)');
 let chars = 0;
+let quotaOut = false;
 for (const speaker of speakers) {
+  if (quotaOut) break;
   const voice = VOICES[speaker];
   if (!voice) throw new Error(`Keine Stimme für „${speaker}“ in VOICES eingetragen`);
   mkdirSync(new URL(`assets/voices/${speaker}/`, root), { recursive: true });
@@ -54,7 +56,12 @@ for (const speaker of speakers) {
         headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: spoken, model_id: model, language_code: 'de' }),
       });
-      if (!res.ok) throw new Error(`${res.status} bei „${text}“: ${await res.text()}`);
+      if (!res.ok) {
+        const error = await res.text();
+        // Zeichen aufgebraucht: sauber aufhören, das Fertige bleibt im Manifest
+        if (/quota/i.test(error)) { console.log('Zeichen aufgebraucht – Schluss bei:', text); quotaOut = true; break; }
+        throw new Error(`${res.status} bei „${text}“: ${error}`);
+      }
       writeFileSync(new URL(file, root), Buffer.from(await res.arrayBuffer()));
       chars += spoken.length;
       console.log('✓', speaker, text);
@@ -63,7 +70,7 @@ for (const speaker of speakers) {
   }
 }
 // Bei „alle“: Sätze, die es im Spiel nicht mehr gibt, samt Datei entfernen
-if (all) {
+if (all && !quotaOut) {
   const current = new Set(lines.map((l) => l.key ?? l.text));
   for (const [text, file] of Object.entries(manifest)) {
     if (current.has(text)) continue;

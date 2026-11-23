@@ -126,9 +126,33 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
   });
 }
 
+// Alles Übrige, was Joseph sagt (Art rest), Wagen für Wagen ab Wagen 1 – damit bei knappem Budget vorne angefangen wird.
+// Erfasst: say(...) überall und Sätze in hotspots/items (look, use, Kombinationen …).
+// Nicht: Sätze der Figuren (speakAs/speak), Notizbuch (note, recap), Karten (card), Tipps (lines in hintFor-Zielen).
+const npcLines = new Set(JSON.parse(readFileSync(new URL('voice-lines.json', import.meta.url), 'utf8')).map((l) => l.text));
+const SKIP_CALLS = new Set(['speakAs', 'speak', 'note', 'card', 'hintFor']);
+const SKIP_KEYS = new Set(['recap', 'lines', 'name', 'label', 'title', 'subtitle', 'id']);
+const sentence = (t) => /\p{L}/u.test(t) && /\s/.test(t) && /[.!?…“”)]$/.test(t.trim());
+const wagonFiles = readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f)).sort((a, b) => parseInt(a.slice(5)) - parseInt(b.slice(5)));
+for (const name of [...wagonFiles, 'wagonCommon.js']) {
+  const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  const consts = new Map();
+  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  const add = (text) => { if (sentence(text) && !out.has(text) && !npcLines.has(text)) out.set(text, { text, file: name, kind: 'rest' }); };
+  const skip = new Set(); // Knoten in Aufrufen/Eigenschaften, die nicht gesprochen werden
+  walk.full(ast, (n) => {
+    if ((n.type === 'CallExpression' && SKIP_CALLS.has(method(n))) || (n.type === 'Property' && SKIP_KEYS.has(n.key?.name))) walk.full(n, (m) => skip.add(m));
+  });
+  walk.full(ast, (c) => { if (c.type === 'CallExpression' && method(c) === 'say' && !skip.has(c)) lits(c.arguments[0], consts).forEach(add); });
+  walk.full(ast, (p) => {
+    if (p.type !== 'Property' || !['hotspots', 'items'].includes(p.key?.name)) return;
+    walk.full(p.value, (n) => { if (!skip.has(n) && ((n.type === 'Literal' && typeof n.value === 'string') || (n.type === 'TemplateLiteral' && !n.expressions.length))) add(n.value ?? n.quasis[0].value.cooked); });
+  });
+}
+
 const list = [...out.values()];
 writeFileSync(new URL('joseph-dialogue-lines.json', import.meta.url), JSON.stringify(list, null, 1));
-for (const kind of ['say', 'choice', 'intro', 'moment', 'door']) {
+for (const kind of ['say', 'choice', 'intro', 'moment', 'door', 'rest']) {
   const l = list.filter((x) => x.kind === kind);
   console.log(kind, l.length, 'Sätze,', l.reduce((s, x) => s + x.text.length, 0), 'Zeichen');
 }
