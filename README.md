@@ -41,6 +41,7 @@ Nahtstelle jeder Runde fährt der Zug durch einen Tunnel, in dem im Abteil das L
 3. Im Browser öffnen: <http://localhost:8150>
 
 Noch einfacher: im Finder `start.command` doppelklicken – das startet den Server und öffnet den Browser.
+Zum Testen mit allen 24 Wagen sofort auswählbar: `start-alle-wagen.command` doppelklicken.
 Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 
 > **Warum ein Server?** Das Spiel ist auf viele kleine JavaScript-Dateien (Module) verteilt.
@@ -69,7 +70,7 @@ Das Spiel beginnt mit der Wagenübersicht „Die Ringbahn“: 24 Wagen, jeden Ta
 | Linksklick auf einen Gegenstand im Inventar | Joseph nimmt ihn in die Hand – dann auf etwas im Abteil klicken (benutzen) oder auf einen anderen Gegenstand (kombinieren) |
 | Rechtsklick auf einen Gegenstand | anschauen / lesen (mit einem Gegenstand in der Hand: loslassen) |
 | Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß (bei vielen Notizen: blättern) |
-| Taste **H** oder „Tipp“ im Notizbuch | Joseph gibt einen Tipp – je öfter man fragt, desto deutlicher |
+| Taste **H** oder „Tipp“ im Notizbuch | der komplette Lösungsweg des Wagens (steht in `src/story/solutions.js`) |
 | **Leertaste** oder Klick | Sprechtext überspringen |
 | In einer Nahansicht (Schloss, Puzzle, Verteilerkasten …) | Linksklick bedient sie, beim Puzzle mit gedrückter Maustaste ziehen |
 | **Esc** oder Rechtsklick | Nahansicht / Notizbuch schließen, Gegenstand loslassen |
@@ -91,6 +92,7 @@ detective-joseph/
 ├── style.css                  Zentriert das Spielbild und hält es im Format 16:9
 ├── server.js                  Mini-Webserver für die Entwicklung (npm start)
 ├── start.command              Doppelklick-Start für macOS
+├── start-alle-wagen.command   dasselbe im Test-Modus: alle 24 Wagen auswählbar
 ├── package.json               Projektname + Startbefehl
 ├── assets/
 │   ├── scenes/train-compartment/
@@ -271,8 +273,8 @@ zu finden (der Bildschirm).
 
 **Tutorial:** Die Hinweise und wann sie kommen stehen in `src/story/tutorial.js`.
 
-**Tipps:** Was Joseph bei Taste **H** sagt, steht ganz unten in `wagon1.js` (`currentGoal`): zu jedem
-Rätsel eine Liste von Sätzen, vom sanften Schubs bis zur Lösung.
+**Lösungsweg:** Taste **H** zeigt den kompletten Lösungsweg des Wagens aus `src/story/solutions.js`. Ändert sich ein
+Rätsel, dort mitändern. (Die alten Tipp-Sätze `hint()` in den Wagen-Dateien werden nur noch benutzt, wenn ein Wagen dort keinen Eintrag hat.)
 
 **Ein neues Rätsel in Nahansicht:** eine Klasse in `src/puzzles/` anlegen, die `View` erweitert (am
 einfachsten `wires.js` kopieren), in `src/core/game.js` unter `views` eintragen und in der Geschichte mit

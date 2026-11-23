@@ -300,7 +300,10 @@ export class Game {
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {
-      if (this.notebook.handleClick(click) === 'hint') this.story.hint();
+      if (this.notebook.handleClick(click) === 'hint') {
+        this.notebook.close();
+        this.story.hint();
+      }
       return;
     }
     if (this.story.isBusy) return this.speech.skip();

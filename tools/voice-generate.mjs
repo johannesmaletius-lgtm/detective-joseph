@@ -1,11 +1,12 @@
 // Erzeugt die Tondateien für die Sprechtexte der Figuren mit ElevenLabs.
 //   node tools/voice-lines.mjs              (erst die Sätze sammeln; für Joseph: tools/joseph-dialogue-lines.mjs)
 //   node tools/voice-generate.mjs bruno     (dann eine oder mehrere Figuren vertonen)
+//   node tools/voice-generate.mjs alle      (alles Fehlende vertonen, veraltete Sätze entfernen)
 // Bereits vorhandene Dateien werden übersprungen. Ergebnis: assets/voices/<figur>/<nr>.mp3
 // und assets/voices/manifest.json (Satz → Datei), das das Spiel beim Start lädt.
 // Der Schlüssel kommt aus ELEVENLABS_API_KEY (in der Cloud setzt ihn der Proxy ein; dort mit
 //   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt starten).
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const VOICES = {
@@ -32,8 +33,9 @@ const manifestUrl = new URL('assets/voices/manifest.json', root);
 const manifest = existsSync(manifestUrl) ? JSON.parse(readFileSync(manifestUrl, 'utf8')) : {};
 const key = process.env.ELEVENLABS_API_KEY ?? 'proxy-injected';
 
-const speakers = process.argv.slice(2);
-if (!speakers.length) throw new Error('Welche Figur? z. B. node tools/voice-generate.mjs bruno');
+const all = process.argv[2] === 'alle';
+const speakers = all ? Object.keys(VOICES) : process.argv.slice(2);
+if (!speakers.length) throw new Error('Welche Figur? z. B. node tools/voice-generate.mjs bruno  (oder: alle)');
 let chars = 0;
 for (const speaker of speakers) {
   const voice = VOICES[speaker];
@@ -56,6 +58,16 @@ for (const speaker of speakers) {
       console.log('✓', speaker, text);
     }
     manifest[text] = file;
+  }
+}
+// Bei „alle“: Sätze, die es im Spiel nicht mehr gibt, samt Datei entfernen
+if (all) {
+  const current = new Set(lines.map((l) => l.text));
+  for (const [text, file] of Object.entries(manifest)) {
+    if (current.has(text)) continue;
+    if (existsSync(new URL(file, root))) unlinkSync(new URL(file, root));
+    delete manifest[text];
+    console.log('– entfernt:', text);
   }
 }
 writeFileSync(manifestUrl, JSON.stringify(manifest, null, 1));

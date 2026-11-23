@@ -2,6 +2,8 @@ import { ITEMS, findCombination } from './items.js';
 import { Tutorial } from './tutorial.js';
 import { Scene } from '../scene/scene.js';
 import { COLORS } from '../ui/text.js';
+import { SOLUTIONS } from './solutions.js';
+import { drawSolutionPage, solutionPages } from '../ui/solutionCard.js';
 
 // Die Geschichte zur Laufzeit.
 //
@@ -200,12 +202,26 @@ export class Story {
     return this.script.itemName?.(this, id) ?? ITEMS[id].name;
   }
 
-  // Tipp von Joseph, wenn der Spieler nicht weiterweiß
+  // Taste H: der komplette Lösungsweg des Wagens (src/story/solutions.js). Ohne Eintrag: Josephs Tipp.
   async hint() {
     if (this.isBusy) return;
     this.event('askedHint');
-    await this.respond(this.script.hint?.(this) ?? 'Ich sehe mich am besten noch einmal gründlich um.');
+    const steps = SOLUTIONS[this.door];
+    if (!steps) {
+      await this.respond(this.script.hint?.(this) ?? 'Ich sehe mich am besten noch einmal gründlich um.');
+      return;
+    }
+    const pages = solutionPages(steps);
+    this.busy++;
+    try {
+      for (const [index, page] of pages.entries()) {
+        await this.card({ draw: (ctx) => drawSolutionPage(ctx, { door: this.door, page, index, count: pages.length }) });
+      }
+    } finally {
+      this.busy--;
+    }
   }
+
 
   // Joseph läuft zu einem Punkt. Ergebnis: true = angekommen, false = unterwegs abgebrochen
   walkTo(x, y, facing) {

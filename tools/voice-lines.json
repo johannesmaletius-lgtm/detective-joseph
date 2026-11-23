@@ -46,6 +46,16 @@
  },
  {
   "speaker": "conductor",
+  "text": "„Lass die Bänder liegen, Junge.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Du verstehst das noch nicht. Geh zurück in dein Abteil und schlaf.“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
   "text": "„Fffffaaaaaaahhhhrrrr … gggaaaaaasssst …“",
   "file": "wagon10.js"
  },
@@ -72,6 +82,11 @@
  {
   "speaker": "conductor",
   "text": "„Hallo? … Ist da jemand?“",
+  "file": "wagon10.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "„Ich bin da, Junge. Ich bin immer da.“",
   "file": "wagon10.js"
  },
  {
@@ -155,6 +170,11 @@
   "file": "wagon11.js"
  },
  {
+  "speaker": "tick",
+  "text": "Und ich weiß nicht mehr, wie alt ich bin. Jede Runde vergesse ich ein Stück. Als würde das Vergessen mir die Jahre wegnehmen.",
+  "file": "wagon11.js"
+ },
+ {
   "speaker": "conductor",
   "text": "„Fahrg– DONG! – KUCKUCK! – DONG! – … Tunnel.“",
   "file": "wagon11.js"
@@ -197,6 +217,26 @@
  {
   "speaker": "tick",
   "text": "Hundertneun Runden. Die erste, in der niemand gegangen ist.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Aber hör zu, Junge. Ich zähle nicht nur die Runden. Ich zähle auch den Tunnel.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Vor hundert Runden war er nach drei Ticks vorbei. Heute dauert er elf. Er wird jede Runde länger.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Irgendwann wird es im Tunnel nicht mehr hell. Dann kommt keiner mehr heraus. Nie mehr.",
+  "file": "wagon11.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Nicht mehr lange. Beeil dich, Junge.",
   "file": "wagon11.js"
  },
  {
@@ -436,6 +476,11 @@
  },
  {
   "speaker": "mira",
+  "text": "Das ist Hoppel. Wir haben dich schon ganz oft gesehen. Du hast uns nur nie bemerkt.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
   "text": "Ja! Ich sehe was, was du nicht siehst …",
   "file": "wagon15.js"
  },
@@ -452,6 +497,11 @@
  {
   "speaker": "mira",
   "text": "Du hast die gleiche Mütze wie Papa. Und den gleichen Schal.",
+  "file": "wagon15.js"
+ },
+ {
+  "speaker": "mira",
+  "text": "Den hat Oma Ilse gestrickt. Oma schläft immer. Sie ist so müde.",
   "file": "wagon15.js"
  },
  {
@@ -591,6 +641,11 @@
  },
  {
   "speaker": "mira",
+  "text": "In Omas weichem Paket sind Handschuhe für mich. Letztes Jahr hat sie Papa einen Schal gestrickt. Einen weißen.",
+  "file": "wagon20.js"
+ },
+ {
+  "speaker": "mira",
   "text": "Das ist meins! Mach es auf!",
   "file": "wagon20.js"
  },
@@ -681,17 +736,42 @@
  },
  {
   "speaker": "conductor",
-  "text": "Der Tunnel ist kein Ende. Er ist der Ausgang.",
+  "text": "Wer in dieser Nacht bleibt, vergisst. Und das Vergessen nimmt einem die Jahre. Frag Herrn Tick.",
   "file": "wagon22.js"
  },
  {
   "speaker": "conductor",
-  "text": "Wer durchgeht, kommt nach Hause. Wird wieder älter. Lebt weiter.",
+  "text": "Ich bin seit der ersten Runde hier. Ein Teil von mir hat alles vergessen – bis zurück zu dem Jungen, der Detektiv werden wollte.",
   "file": "wagon22.js"
  },
  {
   "speaker": "conductor",
-  "text": "Und du holst sie mir jede Runde zurück.",
+  "text": "Der Teil bist du. Der, der alle retten will. Der, der nicht loslassen kann.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Der Tunnel ist kein Ende. Er ist der Ausgang. Wer durchgeht, bekommt seine Jahre zurück und steht um 23:47 am Bahnsteig. So, wie der Zug ankommen sollte.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Martha wartet dort. Seit der ersten Runde. Und K. ist jetzt bei ihr.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Das Glas im Speisewagen war kein Gift. Ein Schlaftrunk. Für die, die Angst haben.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Und du holst sie mir jede Runde zurück. Während der Tunnel wächst.",
+  "file": "wagon22.js"
+ },
+ {
+  "speaker": "conductor",
+  "text": "Hättest du mir geglaubt? Du musstest es selbst herausfinden. Deshalb die Akte. Die Briefe. Die Zeichen.",
   "file": "wagon22.js"
  },
  {
@@ -717,6 +797,11 @@
  {
   "speaker": "tick",
   "text": "Ach … wie die Luft riecht. Nach Schnee.",
+  "file": "wagon23.js"
+ },
+ {
+  "speaker": "tick",
+  "text": "Jetzt weiß ich es wieder. Meine Tochter. Sie wartet am Bahnsteig. Sie hat immer gewartet.",
   "file": "wagon23.js"
  },
  {
@@ -766,7 +851,7 @@
  },
  {
   "speaker": "conductor",
-  "text": "Ruhig, Junge. Der Zug fährt im Kreis – wir haben noch eine Runde. Bei 24,7.",
+  "text": "Ruhig, Junge. Noch wird es hell. Noch eine Runde. Bei 24,7.",
   "file": "wagon24.js"
  },
  {
@@ -961,6 +1046,11 @@
  },
  {
   "speaker": "ilse",
+  "text": "… Mira, Schätzchen … schlaf noch ein bisschen … gleich sind wir bei Papa …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
   "text": "… chrrr … pfffff …",
   "file": "wagon5.js"
  },
@@ -996,7 +1086,12 @@
  },
  {
   "speaker": "ilse",
-  "text": "… sie geht nicht … sie ging noch nie … chrrr …",
+  "text": "… sie geht nicht … sie ging noch nie …",
+  "file": "wagon5.js"
+ },
+ {
+  "speaker": "ilse",
+  "text": "… Joseph? Ach, du bist es, Junge. Du trägst ja meinen Schal … chrrr …",
   "file": "wagon5.js"
  },
  {
@@ -1101,7 +1196,12 @@
  },
  {
   "speaker": "k",
-  "text": "Das war eine schöne Feier. Damals. Leg es weg, Junge. Bitte.",
+  "text": "Das war eine schöne Feier. Damals. Zwanzig Jahre sind wir zusammen gefahren, er und ich.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Ich hab ihm alles beigebracht. Und dann hab ich ihn im Stich gelassen. Leg es weg, Junge. Bitte.",
   "file": "wagon7.js"
  },
  {
@@ -1187,6 +1287,11 @@
  {
   "speaker": "k",
   "text": "Er war mein Freund. Er bringt uns nach Hause.",
+  "file": "wagon7.js"
+ },
+ {
+  "speaker": "k",
+  "text": "Einmal hab ich ihn im Stich gelassen. In jener Nacht. Ein zweites Mal nicht.",
   "file": "wagon7.js"
  },
  {

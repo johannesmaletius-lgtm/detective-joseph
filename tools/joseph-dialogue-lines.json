@@ -15,6 +15,51 @@
   "kind": "say"
  },
  {
+  "text": "Rückwärts – und zu langsam.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Rückwärts ergibt es keinen Sinn … oder doch?",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "„Elf ist der Nächste.“ Wagen elf. Der nächste Fahrgast sitzt im nächsten Wagen!",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Und das ist SEINE Stimme. Die Stimme des Schaffners. Er ruft sie.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Das war kein Band. Das war jetzt. Er sieht mich.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Viel zu langsam. Wie ein Brummbär.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Immer noch zu langsam.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "„Fahrgast K., bitte zum Tunnel.“ Das ist der Ruf, dem Herr K. gefolgt ist.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
+  "text": "Aber das Letzte … das klingt, als liefe es rückwärts.",
+  "file": "wagon10.js",
+  "kind": "say"
+ },
+ {
   "text": "Ohne Strom bleibt es stumm.",
   "file": "wagon10.js",
   "kind": "say"
@@ -51,6 +96,11 @@
  },
  {
   "text": "Die Uhren haben ihn übertönt. Genau beim Ruf.",
+  "file": "wagon11.js",
+  "kind": "say"
+ },
+ {
+  "text": "Wie lange noch?",
   "file": "wagon11.js",
   "kind": "say"
  },
@@ -125,12 +175,22 @@
   "kind": "say"
  },
  {
+  "text": "… Und der Hase hat ein Schlappohr. Der saß im Gepäckwagen. Und das Mädchen im Spiegel …",
+  "file": "wagon15.js",
+  "kind": "say"
+ },
+ {
   "text": "Ich soll darauf zeigen. Also anklicken.",
   "file": "wagon15.js",
   "kind": "say"
  },
  {
-  "text": "… Die gleiche Mütze wie der Täter im Film.",
+  "text": "Oma Ilse … die alte Dame aus dem Schlafwagen? Woher habe ich eigentlich meinen Schal?",
+  "file": "wagon15.js",
+  "kind": "say"
+ },
+ {
+  "text": "… Und die gleiche Mütze wie der Täter im Film.",
   "file": "wagon15.js",
   "kind": "say"
  },
@@ -255,6 +315,11 @@
   "kind": "say"
  },
  {
+  "text": "Auch der Schaffner, der in dieser Nacht Dienst hatte. Er hätte es hören müssen. Wer war das?",
+  "file": "wagon16.js",
+  "kind": "say"
+ },
+ {
   "text": "Er weiß, wer ich bin. Woher?",
   "file": "wagon18.js",
   "kind": "say"
@@ -286,6 +351,11 @@
  },
  {
   "text": "Tick tickt, Brunos Paket klappert, Ilses ist weich, Molls raschelt, K.s ist eine Hutschachtel, und beim Barkeeper gluckert es.",
+  "file": "wagon20.js",
+  "kind": "say"
+ },
+ {
+  "text": "Einen weißen Schal. … So wie meiner.",
   "file": "wagon20.js",
   "kind": "say"
  },
@@ -336,6 +406,11 @@
  },
  {
   "text": "Die Kleine ist verrückt.",
+  "file": "wagon20.js",
+  "kind": "say"
+ },
+ {
+  "text": "… Aber warum tut es dann so weh, wenn sie das sagt?",
   "file": "wagon20.js",
   "kind": "say"
  },
@@ -440,7 +515,17 @@
   "kind": "say"
  },
  {
-  "text": "Du lügst.",
+  "text": "Das ist unmöglich. Ich bin siebzehn!",
+  "file": "wagon22.js",
+  "kind": "say"
+ },
+ {
+  "text": "Warum hast du es mir nicht einfach gesagt?",
+  "file": "wagon22.js",
+  "kind": "say"
+ },
+ {
+  "text": "… Du lügst.",
   "file": "wagon22.js",
   "kind": "say"
  },
@@ -480,7 +565,12 @@
   "kind": "say"
  },
  {
-  "text": "Herr Tick geht hinaus. Mit jedem Schritt wird er ein bisschen älter. Sein Rücken krümmt sich, seine Haare werden weiß.",
+  "text": "Herr Tick geht hinaus. Mit jedem Schritt wird er ein bisschen älter. Sein Rücken krümmt sich, seine Haare werden weiß. Er bekommt seine Jahre zurück.",
+  "file": "wagon23.js",
+  "kind": "say"
+ },
+ {
+  "text": "Weit hinten, über dem Bahnhof, leuchtet eine Uhr. Dreiundzwanzig Uhr siebenundvierzig.",
   "file": "wagon23.js",
   "kind": "say"
  },
@@ -515,7 +605,17 @@
   "kind": "say"
  },
  {
-  "text": "Bruno mit seiner Schürze. Oma Ilse mit ihrem Strickzeug. Der Barkeeper. Herr Moll. Der Heizer, der mir zuzwinkert.",
+  "text": "Bruno mit seiner Schürze. Der Barkeeper. Herr Moll. Der Heizer, der mir zuzwinkert.",
+  "file": "wagon24.js",
+  "kind": "say"
+ },
+ {
+  "text": "Oma Ilse mit ihrem Strickzeug. Im Vorbeigehen zupft sie mir den Schal zurecht: „Steht dir immer noch, Junge.“",
+  "file": "wagon24.js",
+  "kind": "say"
+ },
+ {
+  "text": "Papa. Zum ersten Mal klingt das Wort nicht falsch.",
   "file": "wagon24.js",
   "kind": "say"
  },
@@ -675,6 +775,11 @@
   "kind": "say"
  },
  {
+  "text": "Mira? Wer ist Mira? Und wer ist Papa?",
+  "file": "wagon5.js",
+  "kind": "say"
+ },
+ {
   "text": "Sie hat alles gesagt: Er hat den Koffer unter Bett vier versteckt, und der Schlüssel liegt, wo der Mond nicht hinkommt.",
   "file": "wagon5.js",
   "kind": "say"
@@ -701,6 +806,16 @@
  },
  {
   "text": "Nichts passiert. Der Zug fährt einfach weiter.",
+  "file": "wagon5.js",
+  "kind": "say"
+ },
+ {
+  "text": "Und schon schläft sie wieder. … IHREN Schal?",
+  "file": "wagon5.js",
+  "kind": "say"
+ },
+ {
+  "text": "Den hab ich doch … ich weiß gar nicht, woher ich den habe.",
   "file": "wagon5.js",
   "kind": "say"
  },
