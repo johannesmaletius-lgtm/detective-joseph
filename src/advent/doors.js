@@ -75,7 +75,14 @@ export const DOORS = [
       script: (await import('../story/wagon8.js')).wagon8,
     }),
   },
-  { door: 9, wagon: 'Spiegelwagen' },
+  {
+    door: 9,
+    wagon: 'Spiegelwagen',
+    load: async () => ({
+      scene: (await import('../scene/mirrorCar.js')).mirrorCar,
+      script: (await import('../story/wagon9.js')).wagon9,
+    }),
+  },
   { door: 10, wagon: 'Lautsprecherwagen' },
   { door: 11, wagon: 'Uhrenwagen' },
   { door: 12, wagon: 'Musiksalon' },
