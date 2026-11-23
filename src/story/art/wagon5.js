@@ -1,5 +1,5 @@
 import { loadImage } from '../../core/assets.js';
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, text } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text } from './common.js';
 
 // Gezeichnetes für Wagen 5 (Schlafwagen): Fahrgastbuch, Abteil 4 als Suchbild, das Foto.
 
@@ -128,32 +128,14 @@ export function drawCompartment(ctx, found) {
 
 // ---------------------------------------------------------------- Das Foto (Vorder- und Rückseite)
 export function drawPhoto(ctx) {
-  // Vorderseite
+  // Vorderseite (Foto mit eigenem gezacktem Rand)
   ctx.save();
-  ctx.translate(390, 360);
+  ctx.translate(390, 340);
   ctx.rotate(-0.04);
   ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
   ctx.shadowBlur = 24;
-  ctx.fillStyle = '#f2ead8';
-  ctx.fillRect(-230, -180, 460, 360);
-  ctx.shadowColor = 'transparent';
-  const sepia = ctx.createLinearGradient(0, -160, 0, 140);
-  sepia.addColorStop(0, '#a88e6c');
-  sepia.addColorStop(1, '#5d4a35');
-  ctx.fillStyle = sepia;
-  ctx.fillRect(-210, -160, 420, 290);
-  // Weihnachtsbaum im Hintergrund
-  ctx.fillStyle = 'rgba(40, 32, 22, 0.55)';
-  ctx.beginPath();
-  ctx.moveTo(150, -140);
-  ctx.lineTo(205, 120);
-  ctx.lineTo(95, 120);
-  ctx.closePath();
-  ctx.fill();
-  // Herr K.: Hut, Mantel, Stock, Brille
-  drawFigure(ctx, -70, 120, { hat: 'fedora', coat: '#3b3024' });
-  // Schaffner: Mütze, Uniform mit Knöpfen, Schnurrbart
-  drawFigure(ctx, 40, 120, { hat: 'cap', coat: '#2a2a33', buttons: true });
+  ctx.shadowOffsetY = 8;
+  drawPicture(ctx, 'assets/photos/k-schaffner.webp', -300, -225, 600, 450);
   ctx.restore();
 
   // Rückseite
@@ -171,55 +153,7 @@ export function drawPhoto(ctx) {
       line(c, 20, 200, 380, 200);
     },
   });
-  text(ctx, 'Vorderseite', 390, 586, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  text(ctx, 'Vorderseite', 390, 600, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
   text(ctx, 'Rückseite', 900, 540, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
-}
-
-function drawFigure(ctx, x, foot, { hat, coat, buttons }) {
-  ctx.save();
-  ctx.translate(x, foot);
-  ctx.fillStyle = coat;
-  ctx.beginPath();
-  ctx.moveTo(-34, 0);
-  ctx.lineTo(-28, -150);
-  ctx.quadraticCurveTo(0, -170, 28, -150);
-  ctx.lineTo(34, 0);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#d8c3a0';
-  ctx.beginPath();
-  ctx.arc(0, -180, 22, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#2a2018';
-  if (hat === 'fedora') {
-    ctx.fillRect(-30, -200, 60, 6);
-    ctx.fillRect(-18, -222, 36, 24);
-    ctx.strokeStyle = '#2a2018';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(-8, -180, 6, 0, Math.PI * 2);
-    ctx.arc(8, -180, 6, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.lineWidth = 4;
-    line(ctx, 40, 0, 34, -100);
-  } else {
-    ctx.fillRect(-24, -208, 48, 16);
-    ctx.fillRect(-28, -194, 56, 5);
-    ctx.fillStyle = '#c9a24c';
-    ctx.beginPath();
-    ctx.arc(0, -200, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2a2018';
-    ctx.fillRect(-12, -172, 24, 5);
-  }
-  if (buttons) {
-    ctx.fillStyle = '#c9a24c';
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      ctx.arc(0, -135 + i * 30, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
 }
 
