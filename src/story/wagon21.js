@@ -26,6 +26,7 @@ export const wagon21 = {
   recap: [
     'Der Weihnachtszug ist an Weiche 7 abgebogen. Den Lok-Schlüssel hat der andere Joseph – der mit meiner Mütze.',
     'Mira hat mir eine Kelle geschenkt: „Für Papa. Damit du uns nach Hause bringst.“ Und sie nannte mich Papa. Ich bin siebzehn!',
+    'Der Tunnel: einundzwanzig Ticks. Noch vier.',
   ],
 
   async intro(story) {
@@ -35,6 +36,7 @@ export const wagon21 = {
       lines: [
         'Hitze. Dampf. Ein riesiger Kessel – und ein Mann mit Schaufel.',
         'Der Zeiger am Manometer steht im Roten.',
+        'Der Tunnel eben hat einundzwanzig Ticks gedauert. Ich habe mitgezählt.',
       ],
     });
   },

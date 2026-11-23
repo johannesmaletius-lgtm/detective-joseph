@@ -27,6 +27,7 @@ export const wagon24 = {
     'Ich habe niemanden gerettet. Ich habe sie festgehalten. Die anderen sitzen noch im Zug.',
     'Der andere Joseph ist der Schaffner – ich, nur älter. Weiche 7 lässt sich nur zu zweit stellen: in der Lok und hier am roten Hebel.',
     'Miras Kelle: „Damit du uns nach Hause bringst.“',
+    'Der Tunnel: vierundzwanzig Ticks. Bei fünfundzwanzig wird es nicht mehr hell. Es ist so weit.',
   ],
 
   async intro(story) {
@@ -35,6 +36,7 @@ export const wagon24 = {
       title: 'Heiligabend',
       lines: [
         'Zurück im Schaffnerabteil. Heiligabend.',
+        'Vierundzwanzig Ticks im Tunnel. Viel Zeit bleibt nicht mehr.',
         'Diesmal weiß ich, was zu tun ist.',
       ],
       firstTunnelIn: 140,
@@ -157,12 +159,14 @@ async function theCall(story) {
     story.sound('footsteps');
     await story.wait(0.8);
     await story.say('Schritte im ganzen Zug. Ruhige Schritte. Einer nach dem anderen gehen sie nach hinten, zum Tunnel.');
-    await story.say('Bruno mit seiner Schürze. Oma Ilse mit ihrem Strickzeug. Der Barkeeper. Herr Moll. Der Heizer, der mir zuzwinkert.');
+    await story.say('Bruno mit seiner Schürze. Der Barkeeper. Herr Moll. Der Heizer, der mir zuzwinkert.');
+    await story.say('Oma Ilse mit ihrem Strickzeug. Im Vorbeigehen zupft sie mir den Schal zurecht: „Steht dir immer noch, Junge.“');
     f.miraHere = true;
     story.sound('door');
     await story.wait(0.6);
     await story.speakAs('mira', 'Papa?');
     await story.speakAs('mira', 'Kommst du nach, Papa?');
+    await story.say('Papa. Zum ersten Mal klingt das Wort nicht falsch.');
     await story.say('… Ja, Mira. Ich komme nach. Versprochen.');
     await story.speakAs('mira', 'Dann geh ich schon mal vor. Mama wartet.');
     await story.character('mira').moveTo(640, 400, 1.6);
@@ -239,7 +243,7 @@ async function watchStones(story) {
   story.sound('wrong');
   await story.say(result === 'missed' ? 'Zu spät! Der Stein ist vorbei.' : `Bei ${result.slice(6)}? Falsch! Ich habe die Kelle zu ${Number(result.slice(6).replace(',', '.')) < 24.7 ? 'früh' : 'spät'} gehoben.`);
   story.sound('speaker');
-  await story.speak('Ruhig, Junge. Der Zug fährt im Kreis – wir haben noch eine Runde. Bei 24,7.', { at: SPEAKER, color: VOICE });
+  await story.speak('Ruhig, Junge. Noch wird es hell. Noch eine Runde. Bei 24,7.', { at: SPEAKER, color: VOICE });
 }
 
 // ============================================================================================
@@ -269,7 +273,9 @@ async function finale(story) {
     if (story.game.views.picture.isOpen) await story.say('Stille.');
     await story.wait(0.8);
     if (story.game.views.picture.isOpen) await story.say('Schnee.');
-    await story.wait(2.2);
+    await story.wait(1.2);
+    if (story.game.views.picture.isOpen) await story.say('Irgendwo in der Stille greift eine Hand nach meiner. Eine ältere Hand. Sie fühlt sich an wie meine eigene.');
+    await story.wait(1.0);
   } finally {
     story.scenes -= 1;
   }
@@ -305,7 +311,9 @@ async function finale(story) {
     f.finalSaid = true;
     for (const line of [
       'Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.',
+      'Ich erinnere mich. An alles. An Martha, an Mira, an die Nacht am Bahnsteig. Ich bin nicht mehr zwei.',
       'Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.',
+      'Aus der Küche ruft Oma Ilse, die Plätzchen sind fertig. Am Haken hängt meine Uniform – und darüber ein weißer Schal.',
       'Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.',
       'Oben auf dem Baum brennt eine Kerze noch nicht.',
     ]) {
@@ -315,7 +323,7 @@ async function finale(story) {
   }
   state.ready = true;
   await shown;
-  story.note('Ich bin zu Hause. Mira, Martha, der Weihnachtsbaum. Die Wanduhr zeigt 23:47 – der Zug ist angekommen. Frohe Weihnachten.');
+  story.note('Ich bin zu Hause – und nicht mehr zwei. Mira, Martha, Oma Ilse, der Weihnachtsbaum. Die Wanduhr zeigt 23:47 – der Zug ist angekommen. Frohe Weihnachten.');
   await story.cutscene(async () => {
     await finishWagon(story, {
       number: 24,

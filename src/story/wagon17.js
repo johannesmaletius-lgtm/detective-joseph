@@ -27,6 +27,7 @@ export const wagon17 = {
     'Der Zug ist der Weihnachtszug vom 24. Dezember, der seinen Bahnhof nie erreichte. Auch ich, „J.“, saß darin.',
     'Mira, die Tochter des Schaffners, zeigte mir eine Zeichnung: ein Mann mit meiner Mütze führt Leute in den Tunnel. „Das ist Papa. Er bringt alle nach Hause.“',
     'Im Funkraum: Der Schaffner hatte vom Bahnsteig gewarnt – „Weiche 7 falsch“ –, aber niemand im Zug hat es gehört.',
+    'Der Tunnel: siebzehn Ticks. Wie lange noch, bis es darin dunkel bleibt?',
   ],
 
   async intro(story) {
@@ -239,6 +240,9 @@ async function readList(story) {
     await story.say('„Wer ist schon zu Hause.“ Abgehakt: die Frau des Schaffners, Runde eins. Bis Herr K., Runde 108.');
     await story.say('Offen: Ilse, Tick, Moll, Mira … und J.');
     await story.say('„Der Letzte ist J. Dann sind alle wieder zusammen.“ Das ist seine Liste. Die Liste des anderen.');
+    await story.say('Auf der letzten Seite eine Tabelle: „Tunnel. Runde 1: drei Ticks. Runde 60: sieben. Runde 109: elf. Danach jede Runde einer mehr …“');
+    await story.say('Darunter, dick unterstrichen: „Bei fünfundzwanzig wird es nicht mehr hell. Beeil dich, Junge.“');
+    await story.say('„Beeil dich, Junge.“ Das ist für mich geschrieben.');
     story.sound('dread');
     story.player.facing = 'right';
     for (let x = 1300; x > -120; x -= 22) {
@@ -250,6 +254,7 @@ async function readList(story) {
     await story.say('Weg. Er war die ganze Zeit hier.');
   });
   story.note('Notizbuch des anderen Joseph: „Wer ist schon zu Hause“. Abgehakt bis Herr K. (Runde 108). Offen: Ilse (Wagen 5), Tick (11), Moll (12), Mira (15, „will nicht ohne Papa“), J. (Wagen 1). „Der Letzte ist J. Dann sind alle wieder zusammen.“');
+  story.note('Letzte Seite im Notizbuch: Der Tunnel wird jede Runde länger (Runde 1: drei Ticks, Runde 109: elf, danach jede Runde einer mehr). „Bei fünfundzwanzig wird es nicht mehr hell. Beeil dich, Junge.“ Der Tunnel dauert jetzt siebzehn Ticks.');
 }
 
 // ============================================================================================

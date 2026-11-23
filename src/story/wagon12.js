@@ -32,6 +32,7 @@ export const wagon12 = {
     'Eine Gestalt mit meinen Sachen führt die Fahrgäste in den Tunnel. Es gibt zwei von mir.',
     'Der Schaffner ruft die Fahrgäste über den Lautsprecher, und wer seinen Namen hört, geht wie im Schlaf.',
     'Uhrenwagen: Herr Ticks Uhren haben den Ruf übertönt. Er ist geblieben – die erste Rettung. Er gab mir ein Zahnrad: „Das wirst du vorne brauchen.“',
+    'Herr Tick misst den Tunnel: Vor hundert Runden dauerte er drei Ticks, jetzt zwölf. Er wird jede Runde länger. Wenn es darin nicht mehr hell wird, kommt keiner mehr heraus.',
   ],
 
   setup(story) {

@@ -28,6 +28,7 @@ export const wagon20 = {
     'Der Weihnachtszug ist nicht verunglückt – er ist an Weiche 7 abgebogen. Im Führerstand stand jemand mit meiner Mütze.',
     'Den Lok-Schlüssel hat der andere Joseph.',
     'Mira, die Tochter des Schaffners, ist nicht älter geworden. Sie will nicht ohne ihren Papa nach Hause.',
+    'Der Tunnel: zwanzig Ticks. Noch fünf.',
   ],
 
   async intro(story) {
@@ -149,6 +150,8 @@ async function sortParcels(story) {
   f.parcelsSorted = true;
   await story.say('Tick tickt, Brunos Paket klappert, Ilses ist weich, Molls raschelt, K.s ist eine Hutschachtel, und beim Barkeeper gluckert es.');
   await story.speakAs('mira', 'Richtig! Alle!');
+  await story.speakAs('mira', 'In Omas weichem Paket sind Handschuhe für mich. Letztes Jahr hat sie Papa einen Schal gestrickt. Einen weißen.');
+  await story.say('Einen weißen Schal. … So wie meiner.');
   story.note('Alle Pakete haben wieder ihre Anhänger. Mira will mir jetzt ihr Geschenk zeigen.');
 }
 
@@ -276,6 +279,7 @@ async function untie(story) {
     await story.speakAs('mira', 'Frohe Weihnachten, Papa.');
     await story.say('Papa? Ich bin siebzehn. Ich kann niemandes Vater sein.');
     await story.say('Die Kleine ist verrückt.');
+    await story.say('… Aber warum tut es dann so weh, wenn sie das sagt?');
     await story.speakAs('mira', 'Behalt sie. Du brauchst sie noch.');
   });
   story.note('In Miras Paket: eine selbstgebastelte Schaffnerkelle (darauf „2512“) und eine Karte: „Für Papa. Damit du uns nach Hause bringst. Deine Mira.“ Sie hat „Frohe Weihnachten, Papa“ zu mir gesagt. Ich behalte die Kelle.');

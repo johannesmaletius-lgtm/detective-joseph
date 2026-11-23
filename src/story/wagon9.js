@@ -251,6 +251,13 @@ async function readScratches(story, mirrored) {
 async function lookWallMirror(story, side) {
   const f = story.flags;
   if (inTunnel(story)) return story.say('Im Dunkeln ist der Spiegel schwarz.');
+  if (!f.girlSeen) {
+    f.girlSeen = true;
+    await story.say('Im Spiegel, hinter mir, steht ein kleines Mädchen mit einem Stoffhasen. Sie winkt.');
+    await story.say('Ich drehe mich um – niemand. Nur der rote Teppich.');
+    story.note('Im Spiegelwagen stand im Spiegel kurz ein kleines Mädchen mit einem Stoffhasen hinter mir und winkte. Als ich mich umdrehte, war niemand da. Derselbe Hase wie im Gepäckwagen?');
+    return;
+  }
   if (side === 'left' && f.scratchesSeen) return readScratches(story, false);
   if (side === 'left') return story.say('Ein Spiegel mit Goldrahmen. Gegenüber, an der rechten Wand, spiegeln sich ein paar Kratzer.');
   return story.say(f.ghostSeen ? 'Mein Spiegelbild. Es macht, was ich mache. Jetzt gerade jedenfalls.' : 'Ich im Spiegel. Mütze, Brille, Schal. Wie auf dem Film.');

@@ -28,6 +28,7 @@ export const wagon22 = {
     'Der Weihnachtszug ist an Weiche 7 abgebogen (Kilometer 24,7). Den Lok-Schlüssel hat der andere Joseph.',
     'Der Heizer: „Herr Schaffner, Sie kommen doch jede Runde um halb zwölf hier vorbei, mit dem Lok-Schlüssel um den Hals, und gehen nach vorne in die Lok.“',
     'Beweise: das Familienfoto aus der Kapelle, das Pressefoto vom Bahnsteig, Miras Karte.',
+    'Der Tunnel: zweiundzwanzig Ticks. Noch drei.',
   ],
 
   async intro(story) {
@@ -37,6 +38,7 @@ export const wagon22 = {
       lines: [
         'Der Führerstand. Ganz vorne. Weiter geht es nicht.',
         'Um halb zwölf kommt er hierher. Ich muss mich verstecken.',
+        'Zweiundzwanzig Ticks Dunkelheit. Noch drei, dann wird es nicht mehr hell.',
       ],
     });
   },
@@ -254,10 +256,17 @@ async function reveal(story) {
     await story.say('Graue Schläfen. Ein Schnurrbart. Ein älteres Gesicht. Das Gesicht vom Familienfoto.');
     await story.say('Der Schaffner.');
     await story.speakAs('conductor', 'Ich bin du, Junge.');
-    await story.speakAs('conductor', 'Der Tunnel ist kein Ende. Er ist der Ausgang.');
-    await story.speakAs('conductor', 'Wer durchgeht, kommt nach Hause. Wird wieder älter. Lebt weiter.');
-    await story.speakAs('conductor', 'Und du holst sie mir jede Runde zurück.');
-    await story.say('Du lügst.');
+    await story.say('Das ist unmöglich. Ich bin siebzehn!');
+    await story.speakAs('conductor', 'Wer in dieser Nacht bleibt, vergisst. Und das Vergessen nimmt einem die Jahre. Frag Herrn Tick.');
+    await story.speakAs('conductor', 'Ich bin seit der ersten Runde hier. Ein Teil von mir hat alles vergessen – bis zurück zu dem Jungen, der Detektiv werden wollte.');
+    await story.speakAs('conductor', 'Der Teil bist du. Der, der alle retten will. Der, der nicht loslassen kann.');
+    await story.speakAs('conductor', 'Der Tunnel ist kein Ende. Er ist der Ausgang. Wer durchgeht, bekommt seine Jahre zurück und steht um 23:47 am Bahnsteig. So, wie der Zug ankommen sollte.');
+    await story.speakAs('conductor', 'Martha wartet dort. Seit der ersten Runde. Und K. ist jetzt bei ihr.');
+    await story.speakAs('conductor', 'Das Glas im Speisewagen war kein Gift. Ein Schlaftrunk. Für die, die Angst haben.');
+    await story.speakAs('conductor', 'Und du holst sie mir jede Runde zurück. Während der Tunnel wächst.');
+    await story.say('Warum hast du es mir nicht einfach gesagt?');
+    await story.speakAs('conductor', 'Hättest du mir geglaubt? Du musstest es selbst herausfinden. Deshalb die Akte. Die Briefe. Die Zeichen.');
+    await story.say('… Du lügst.');
     await story.speakAs('conductor', 'Halb zwölf. Wie jede Runde.');
     story.sound('key');
     await story.say('Er zieht den Lok-Schlüssel ab, steckt ihn ein – und geht an mir vorbei. Einfach so.');
@@ -265,7 +274,7 @@ async function reveal(story) {
     await conductor.moveTo(1180, 600, 2.6);
     f.capOff = false;
     story.sound('door');
-    story.note('Er nahm die Mütze ab: der Schaffner, älter, mit Schnurrbart. „Ich bin du. Der Tunnel ist kein Ende, er ist der Ausgang. Und du holst sie mir jede Runde zurück.“ Ich sagte: „Du lügst.“ Er ging mit dem Lok-Schlüssel.');
+    story.note('Er nahm die Mütze ab: der Schaffner, älter, mit Schnurrbart. „Ich bin du. Wer hier bleibt, vergisst – und das Vergessen nimmt einem die Jahre. Ein Teil von mir hat alles vergessen, bis zu dem Jungen, der Detektiv werden wollte. Das bist du.“ Der Tunnel ist der Ausgang: Wer durchgeht, bekommt seine Jahre zurück und steht um 23:47 am Bahnsteig. Martha wartet dort. Das „Gift“ war ein Schlaftrunk. „Und du holst sie mir jede Runde zurück.“ Ich sagte: „Du lügst.“ Er ging mit dem Lok-Schlüssel.');
     await finishWagon(story, {
       number: 22,
       title: 'Ende von Wagen 22',

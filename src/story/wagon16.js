@@ -30,6 +30,7 @@ export const wagon16 = {
     'Jede Runde verschwindet ein Fahrgast. Eine Gestalt mit meiner Mütze und meinem Schal führt sie in den Tunnel. Der Schaffner ruft sie.',
     'Der Weihnachtszug vom 24. Dezember ist im Tunnel verschollen. Frau und Tochter des Schaffners saßen darin, er wartete am Bahnsteig und lief in der Nacht allein in den Tunnel.',
     'Spielzimmer: Mira ist die Tochter des Schaffners. Ihre Zeichnung: Ein Mann mit meiner Mütze führt Leute in den Tunnel. „Das ist Papa. Er bringt alle nach Hause.“',
+    'Der Tunnel: sechzehn Ticks.',
   ],
 
   setup(story) {
@@ -247,10 +248,11 @@ async function playMessage(story) {
     await story.speak('„… hier Bahnhof … bitte … meine Familie ist in diesem Zug … bitte antworten …“', { color: '#f5d7a1' });
     await story.say('Diese Stimme … das ist der Schaffner. Die Stimme aus den Lautsprechern.');
     await story.say('Er hat gewarnt. Vom Bahnsteig aus. Aber hier saß niemand am Funk – alle waren bei der Weihnachtsfeier.');
+    await story.say('Auch der Schaffner, der in dieser Nacht Dienst hatte. Er hätte es hören müssen. Wer war das?');
     story.game.views.picture.close();
   });
   f.messageHeard = true;
-  story.note('Funkspruch auf 345 kHz, in Morsezeichen: „Hier Bahnhof. Zug 24 sofort halten. Weiche 7 falsch. Bitte antworten.“ Danach die Stimme des Schaffners: „Meine Familie ist in diesem Zug.“ Niemand hat geantwortet – alle waren bei der Weihnachtsfeier.');
+  story.note('Funkspruch auf 345 kHz, in Morsezeichen: „Hier Bahnhof. Zug 24 sofort halten. Weiche 7 falsch. Bitte antworten.“ Danach die Stimme des Schaffners: „Meine Familie ist in diesem Zug.“ Niemand hat geantwortet – alle waren bei der Weihnachtsfeier, auch der Schaffner, der in dieser Nacht Dienst hatte. Wer war das?');
   story.note(`Am Ende des Funkspruchs vier Ziffern in Morsezeichen: ${morseText(DOOR_CODE)}`);
 }
 

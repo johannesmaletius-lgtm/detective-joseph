@@ -343,8 +343,18 @@ async function playFilm(story) {
     await story.say('Und neben ihm, Hand in Hand … eine Gestalt mit Mütze, Fliegerbrille und Schal.');
     await story.say('Das … das bin ich.');
     await story.say('Der Täter sieht aus wie ich.');
+    await story.wait(0.8);
+    story.sound('door');
+    await story.say('Hinter mir geht die Tür auf. Schritte. Ich ducke mich zwischen die Sitze.');
+    story.sound('footsteps');
+    await story.wait(1.2);
+    await story.say('Jemand steht im Gang. Ich sehe nur seine Stiefel. Braune Stiefel mit Messingschnallen. Meine Stiefel.');
+    await story.say('Er sieht lange zur Leinwand. Dann sagt er leise: „Noch nicht, Junge. Noch nicht.“');
+    story.sound('door');
+    await story.wait(0.8);
+    await story.say('… Weg. Er wusste, dass ich hier bin. Und er hat mich gehen lassen.');
   });
-  story.note('Der Film aus dem Tunnel: Eine Gestalt mit meiner Mütze, meiner Fliegerbrille und meinem Schal führt Herrn K. an der Hand in den Tunnel. Der Täter sieht aus wie ich.');
+  story.note('Der Film aus dem Tunnel: Eine Gestalt mit meiner Mütze, meiner Fliegerbrille und meinem Schal führt Herrn K. an der Hand in den Tunnel. Der Täter sieht aus wie ich. Danach stand er hinter mir im Kino – „Noch nicht, Junge. Noch nicht.“ Er hat mich gehen lassen.');
 }
 
 async function lookScreen(story) {

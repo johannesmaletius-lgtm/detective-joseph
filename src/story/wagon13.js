@@ -32,6 +32,7 @@ export const wagon13 = {
     'In jedem Tunnel springt alles zurück – nur was ich bei mir trage, bleibt. Jede Runde verschwindet ein Fahrgast.',
     'Eine Gestalt mit meinen Sachen führt die Fahrgäste in den Tunnel. Der Schaffner ruft sie. Herrn Tick habe ich gerettet.',
     'Musiksalon: Herr Moll hat sein Lied (G A H D …) an einem Weihnachtsabend hier im Zug gespielt – für die Frau und die kleine Tochter des Schaffners. „Seitdem fährt der Zug im Kreis.“',
+    'Der Tunnel dauert jetzt dreizehn Ticks. Er wird jede Runde länger.',
   ],
 
   setup(story) {
