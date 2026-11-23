@@ -30,12 +30,13 @@
 <table><tbody id="liste"></tbody></table>
 <script type="module">
 import { reactionLines } from '../tools/joseph-reactions.mjs';
+const wagonOf = (f) => f.match(/^wagon(\d+)/)?.[1] ?? 'alle';
 const KINDS = { choice: 'Gesprächsfrage', say: 'Gespräch', intro: 'Intro', moment: 'Wichtiger Moment', door: 'Tür/Schloss', rest: 'Kommentar' };
 const manifest = await (await fetch('../assets/voices/manifest.json')).json();
 const lines = await (await fetch('../tools/joseph-dialogue-lines.json')).json();
 const rows = [
   ...reactionLines().map((r) => ({ art: `Laut (${r.key.split('~')[1]})`, wagon: 'alle', text: r.text, file: manifest[r.key] })),
-  ...lines.map((l) => ({ art: KINDS[l.kind], wagon: l.file.match(/\d+/)?.[0] ?? 'alle', text: l.text, file: manifest[l.text] })),
+  ...lines.map((l) => ({ art: KINDS[l.kind], wagon: wagonOf(l.file), text: l.text, file: manifest[l.text] })),
 ].filter((r) => r.file);
 const $ = (id) => document.getElementById(id);
 for (const a of new Set(rows.map((r) => r.art))) $('art').add(new Option(a, a));
