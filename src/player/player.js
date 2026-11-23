@@ -12,7 +12,11 @@ const DIRECTIONS = ['front', 'back', 'left', 'right'];
 
 // Zusatzposen von vorn (assets/characters/joseph/pose-….png, gleicher Maßstab wie front.png).
 // Sie machen Joseph beim Herumstehen lebendig: atmen, blinzeln, ab und zu nachdenken.
-const POSES = ['neutral', 'blinzeln', 'sprechen', 'denken', 'zeigen'];
+const POSES = [
+  'neutral', 'blinzeln', 'sprechen', 'denken', 'zeigen',
+  'links-blinzeln', 'links-sprechen', 'rechts-blinzeln', 'rechts-sprechen', // von der Seite (nur Blinzeln und Sprechen)
+];
+const SIDE_NAMES = { left: 'links', right: 'rechts' };
 const BREATH_SECONDS = 3.6;   // ein Atemzug
 const BREATH_AMOUNT = 0.009;  // wie stark sich der Oberkörper hebt (Anteil der Höhe)
 const BLINK_SECONDS = 0.14;
@@ -85,7 +89,7 @@ export class Player {
     this.updateIdle(dt);
   }
 
-  // Kleine Lebenszeichen beim Stehen: Atmen läuft immer, Blinzeln und Nachdenken nur von vorn.
+  // Kleine Lebenszeichen beim Stehen: Atmen läuft immer, Blinzeln und Sprechen von vorn und von der Seite, Nachdenken nur von vorn.
   updateIdle(dt) {
     this.clock += dt;
     if (this.movement.isMoving) {
@@ -115,7 +119,14 @@ export class Player {
 
   // Welches Bild gerade gezeigt wird: beim Stehen von vorn eine der Zusatzposen, sonst die Animation
   currentImage() {
-    if (this.facing !== 'front' || this.movement.isMoving || !this.images.neutral) return this.animator.image;
+    if (this.movement.isMoving || !this.images.neutral) return this.animator.image;
+    const side = SIDE_NAMES[this.facing];
+    if (side) {
+      if (this.talking) return this.images[`${side}-sprechen`];
+      if (this.blinkLeft > 0) return this.images[`${side}-blinzeln`];
+      return this.animator.image;
+    }
+    if (this.facing !== 'front') return this.animator.image; // von hinten: nur atmen
     if (this.talking) return this.images.sprechen;
     if (this.gesture) return this.images[this.gesture.pose] ?? this.images.neutral;
     if (this.blinkLeft > 0) return this.images.blinzeln;
