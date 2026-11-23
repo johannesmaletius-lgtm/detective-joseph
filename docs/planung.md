@@ -119,6 +119,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (23.11.2026, Laufwege und Zeiger):** Alle 24 Laufbereiche überarbeitet: Josephs Füße ragen nicht mehr über Möbel, Kisten, Bänke oder den Bildrand (Ränder um eine halbe Fußbreite nach innen, Mikrofonständer in Wagen 10 und Mira in Wagen 15 ausgespart). Der Mauszeiger ergibt sich jetzt automatisch aus dem Drehbuch (`Scene.fitCursors`): Hand, sobald ein Linksklick etwas tut (`use`) oder ein Gegenstand passt (`items`), sonst Auge; Sprechblase bleibt, wo `cursor: 'talk'` steht (z. B. Lautsprecher in Wagen 18). Fenster zeigen deshalb die Hand (dort wartet Joseph auf den Tunnel).
+
 **Stand (23.11.2026, Türen gesprochen):** Dazu 40 Sätze zu Türen und Schlössern (Art `door`: look an Hotspots mit door/lock im Namen, wrong/dark bei tryCode). ElevenLabs danach: ≈ 4.300 Zeichen frei (Puffer für Textänderungen). Hinweis: Josephs Tipp-Sätze (hintFor) werden nicht mehr angezeigt, weil Taste H für alle 24 Wagen den Lösungsweg zeigt.
 
 **Stand (23.11.2026, wichtige Momente gesprochen):** Zusätzlich 280 Sätze von Joseph vertont (Art `moment` in `tools/joseph-dialogue-lines.mjs`): Zwischensequenzen, Tunnel-/automatische Ereignisse, Sätze bei gelösten Rätseln (success/unlock/dread) und gefundenen Gegenständen (give), Wartesätze aus `wagonCommon.js`. Übrige Kommentare (Anschauen, Ausnahmefälle, Tipps) bleiben Text. ElevenLabs danach: ≈ 6.500 Zeichen frei.

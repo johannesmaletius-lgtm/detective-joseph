@@ -67,8 +67,7 @@ export const wagon17 = {
       use: (story) => openHeating(story),
     },
     glass: {
-      look: (story) => readGlass(story),
-      use: (story) => readGlass(story),
+      look: (story) => readGlass(story), // Linksklick zeigt dasselbe (Auge-Zeiger)
     },
     cans: {
       look: 'Zwei Gießkannen auf dem Brett: eine kleine mit 3 Litern, eine große mit 5 Litern.',
