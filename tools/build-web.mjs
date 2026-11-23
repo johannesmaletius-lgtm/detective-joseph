@@ -6,6 +6,8 @@
 // - alle 24 Wagen sind sofort auswählbar (Test-Modus an)
 import { cpSync, mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { renameSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,7 +36,7 @@ writeFileSync(join(out, 'index.html'), html);
 writeFileSync(join(out, '.nojekyll'), '');
 
 // Sprachdateien je Figur und Wagen hintereinander (mit kurzer Stille), Startzeiten messen.
-// <figur>-w<nr>.mp3 lädt das Spiel erst mit dem Wagen; <figur>.mp3 (Laute, gemeinsame Sätze) gleich beim Start.
+// <figur>-w<nr>.<hash>.mp3 lädt das Spiel erst mit dem Wagen; <figur>.<hash>.mp3 (Laute, gemeinsame Sätze) gleich beim Start.
 const manifest = JSON.parse(readFileSync(join(root, 'assets/voices/manifest.json'), 'utf8'));
 const wagonOf = {};
 for (const list of ['tools/voice-lines.json', 'tools/joseph-dialogue-lines.json']) {
@@ -61,12 +63,16 @@ for (const [speaker, lines] of Object.entries(bySpeaker)) {
     const wav = join(tmp, `${parts.length}.wav`);
     execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', join(root, file), '-af', `apad=pad_dur=${GAP}`, '-ar', '44100', '-ac', '1', wav]);
     const dur = Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', wav]).toString());
-    web[text] = { file: `assets/voices/${speaker}.mp3`, start: +t.toFixed(3), end: +(t + dur - GAP).toFixed(3) };
+    web[text] = { file: speaker, start: +t.toFixed(3), end: +(t + dur - GAP).toFixed(3) };
     parts.push(wav);
     t += dur;
   }
   writeFileSync(join(tmp, 'list.txt'), parts.map((p) => `file '${p}'`).join('\n'));
   execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', join(tmp, 'list.txt'), '-c:a', 'libmp3lame', '-b:a', '64k', '-ac', '1', join(out, `assets/voices/${speaker}.mp3`)]);
+  // Name mit Prüfsumme (<figur>-w<nr>.<hash>.mp3): neue Aufnahmen kommen nie aus dem Browser-Zwischenspeicher
+  const hash = createHash('sha1').update(readFileSync(join(out, `assets/voices/${speaker}.mp3`))).digest('hex').slice(0, 8);
+  renameSync(join(out, `assets/voices/${speaker}.mp3`), join(out, `assets/voices/${speaker}.${hash}.mp3`));
+  for (const { text } of lines) web[text].file = `assets/voices/${speaker}.${hash}.mp3`;
   for (const p of parts) rmSync(p);
   console.log(speaker, lines.length, 'Sätze');
 }
