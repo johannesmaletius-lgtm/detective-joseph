@@ -1,3 +1,4 @@
+import { ENDING } from '../audio/music.js';
 import { CANDLE_SPOT, OCCUPIED, PADDLE_SPOT, drawFinal, drawPanel, drawSnow, drawWindowRun, panelSpots, stoneAt } from './art/wagon24.js';
 import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCommon.js';
 
@@ -216,9 +217,13 @@ async function watchStones(story) {
         // Das Entgleisen: Hebel, Bremsen, Krachen – dann weißer Blitz und Stille
         s.derail += dt;
         once('lever', 0);
-        once('brake', 0.5);
-        once('crash', 1.4);
-        once('crash', 2.3);
+        if (state.derail < 0.1) story.game.music.stop(1.2);
+        if (story.game.effects.hasSample('derail')) once('derail', 0.3); // Bremsen, Kreischen, Krachen (Datei)
+        else {
+          once('brake', 0.5);
+          once('crash', 1.4);
+          once('crash', 2.3);
+        }
         if (s.derail > 3.3) view.close('ok');
         return;
       }
@@ -254,6 +259,7 @@ async function finale(story) {
   const f = story.flags;
   // Stille, Schnee – und langsam die Lichter draußen
   story.game.speech.finish();
+  story.game.music.stop(1.5); // Stille
   const snow = { time: 0 };
   const falling = story.view('picture', {
     state: snow,
@@ -306,6 +312,7 @@ async function finale(story) {
       story.game.speech.skip();
     },
   });
+  story.game.music.play(ENDING, 1.5); // warme Musik, Kaminfeuer
   await story.wait(1.6);
   if (!f.finalSaid) {
     f.finalSaid = true;

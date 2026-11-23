@@ -115,9 +115,11 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
 - Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
 
-**Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds.
+**Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen).
 
 ## Übergabe für die nächste Session
+
+**Stand (23.11.2026, Musik und Geräusche):** Jeder Wagen hat eigene Hintergrundmusik (ElevenLabs Music, 60 s in Schleife, `assets/music/wagen-XX.mp3`, Schluss `ende.mp3`), dazu Hintergrundgeräusche (`assets/sfx/`: Uhren 11, Moll summt 12 bis er gespielt hat, Kapelle 13, Funk 16, Gewächshaus 17, Kessel 21, Lok 22, Wartungsgang 23, Speisewagen 4, Stube im Schlussbild) und das Entgleisen in Wagen 24 als echte Aufnahme. Abspielen: `src/audio/music.js` – ganz leise, startet 2 s nach dem Intro-Text, leiser wenn Joseph spricht, fast stumm, wenn eine Figur spricht, bei Gesprächsauswahl und Zwischensequenzen; im Tunnel dumpf. Lautstärken oben in `music.js` (MUSIC_LEVEL, AMBIENCE_LEVEL, DUCK). Erzeugen/neu machen: `node tools/music-generate.mjs` (Prompts dort; überspringt Vorhandenes). Kosten: Musik ≈ 750 Credits/Minute, Geräusch ≈ 100.
 
 **Stand (23.11.2026, Joseph komplett):** Sammler erweitert (Gegenstände: look/say in den Item-Dateien, allgemeine Antworten in story.js, Schlussbild Wagen 24, Funkspruch Wagen 16, falsche Codes, Listen) – weitere 142 Sätze vertont, jetzt fehlt keiner. Hinterlegt ist der Schlüssel des Freundes (Starter-Tarif, Ben in seinen Voices), danach ≈ 32.500 Zeichen frei. Liste aller Dateien: `docs/joseph-stimmen.csv`, zum Durchhören `docs/stimmen-pruefen.html` (über start.command: http://localhost:8150/docs/stimmen-pruefen.html).
 

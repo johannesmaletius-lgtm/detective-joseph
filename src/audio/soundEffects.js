@@ -4,18 +4,58 @@
 //
 //   effects.play('pickup')
 //
-// Später lassen sich hier echte Sounddateien einbauen.
+// Einige Geräusche kommen aus Dateien (SAMPLES, erzeugt mit tools/music-generate.mjs).
+// Hintergrundgeräusche je Wagen stehen in src/audio/music.js.
+
+// Geräusch → [Datei, Lautstärke]
+const SAMPLES = {
+  derail: ['assets/sfx/entgleisen.mp3', 0.55], // Wagen 24: der Zug kippt
+};
 
 export class SoundEffects {
   constructor(trainSound) {
     this.sound = trainSound;
+    this.samples = {};
+    for (const [name, [file]] of Object.entries(SAMPLES)) {
+      this.samples[name] = { data: fetch(file).then((res) => (res.ok ? res.arrayBuffer() : null)).catch(() => null) };
+    }
+  }
+
+  // Gibt es das Geräusch als Datei?
+  hasSample(name) {
+    return Boolean(this.samples[name]?.ready);
   }
 
   play(name, ...args) {
     const context = this.sound.context;
     if (!context || context.state !== 'running') return;
     this.onPlay?.(name);
+    if (SAMPLES[name]) return this.playSample(name);
     EFFECTS[name]?.(this, context.currentTime, ...args);
+  }
+
+  // Lädt die Dateien (sobald der Ton läuft), damit sie ohne Verzögerung abspielen
+  prepareSamples() {
+    const context = this.sound.context;
+    if (!context) return;
+    for (const sample of Object.values(this.samples)) {
+      sample.buffer ??= sample.data.then((data) => (data ? context.decodeAudioData(data.slice(0)) : null)).catch(() => null);
+      sample.buffer.then((buffer) => { sample.ready = Boolean(buffer); });
+    }
+  }
+
+  playSample(name) {
+    this.prepareSamples();
+    const context = this.sound.context;
+    this.samples[name].buffer.then((buffer) => {
+      if (!buffer) return;
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      const level = context.createGain();
+      level.gain.value = SAMPLES[name][1];
+      source.connect(level).connect(this.sound.output(0));
+      source.start();
+    });
   }
 
   // Ein einzelner Ton, z. B. eine Klaviertaste oder ein Morsepiepen (ab Wagen 9)

@@ -10,6 +10,7 @@ import { Cursor } from '../ui/cursor.js';
 import { Inventory } from '../ui/inventory.js';
 import { Speech } from '../ui/speech.js';
 import { Voices } from '../audio/voices.js';
+import { Music, wagonTrack } from '../audio/music.js';
 import { Hints } from '../ui/hints.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
@@ -37,6 +38,7 @@ const REACTIONS = {
   dread: ['scared', 1],
   shriek: ['scared', 1],
   crash: ['scared', 1],
+  derail: ['scared', 1],
   lightsOff: ['scared', 0.2],
   pickup: ['wow', 0.5],
 };
@@ -62,6 +64,7 @@ export class Game {
     this.sound = new TrainSound({ muted: START_MUTED });
     this.effects = new SoundEffects(this.sound);
     this.voices = new Voices(this.sound);
+    this.music = new Music(this.sound); // Hintergrundmusik je Wagen (src/audio/music.js)
     // Joseph reagiert mit kurzen Lauten auf Geräusche (Rätsel gelöst, Fehler, Schreck …)
     this.effects.onPlay = (name) => {
       const [kind, chance] = REACTIONS[name] ?? [];
@@ -133,6 +136,8 @@ export class Game {
   async playDoor(door, { skipIntro = false } = {}) {
     const entry = doorInfo(door);
     this.voices.preloadWagon(door);
+    this.music.stop();
+    this.music.preload(wagonTrack(door));
     this.overlay.fade = 1;
     this.scene = null;
     const { scene, script } = await entry.load();
@@ -146,8 +151,13 @@ export class Game {
     const done = new Promise((resolve) => {
       this.finished = resolve;
     });
-    this.story.begin({ skipIntro });
+    // Musik erst 2 s nach dem Intro-Text (src/audio/music.js)
+    const story = this.story;
+    story.begin({ skipIntro }).then(() => {
+      if (this.story === story && this.finished) this.music.playWagon(door);
+    });
     await done;
+    this.music.stop(2.5);
     this.finished = null;
     this.save.complete(door, {
       items: this.inventory.items.filter((id) => ITEMS[id]?.keep),
@@ -253,6 +263,7 @@ export class Game {
     const flashlight = this.scene.darkLevel > 0 && this.inventory.has('flashlight') && this.input.mouse.inside;
     this.scene.beam = this.story.beamAt ?? (flashlight ? mouse : null); // in Zwischensequenzen darf die Geschichte selbst leuchten
 
+    this.music.update(dt, this);
     this.speech.update(dt);
     this.hints.update(dt);
     this.notebook.update(dt, this.input.mouse);
@@ -326,6 +337,7 @@ export class Game {
   handleClick(click) {
     this.idleTime = 0;
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
+    this.effects.prepareSamples();
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
@@ -385,6 +397,7 @@ export class Game {
   handleKey(key) {
     this.idleTime = 0;
     this.sound.start();
+    this.effects.prepareSamples();
     if (this.inCalendar) {
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
