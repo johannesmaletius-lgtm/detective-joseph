@@ -228,6 +228,25 @@ export const ADVENT_ITEMS = {
     },
     look: 'Der Heizer und ein junger Schaffner. Der sieht aus wie ich.',
   },
+
+  // ---------------------------------------------------------------- Tür 24: Heiligabend
+  punch: {
+    name: 'Lochzange',
+    icon: (ctx) => {
+      ctx.strokeStyle = '#6a6e76';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(30, 100);
+      ctx.lineTo(70, 40);
+      ctx.moveTo(60, 104);
+      ctx.lineTo(78, 44);
+      ctx.stroke();
+      ctx.fillStyle = '#9aa0a8';
+      ctx.fillRect(66, 22, 30, 26);
+    },
+    look: 'Die Lochzange vom Schreibtisch des Schaffners.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
