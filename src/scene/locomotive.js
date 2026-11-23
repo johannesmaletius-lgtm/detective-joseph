@@ -24,7 +24,7 @@ export const locomotive = {
     },
     {
       id: 'conductor', name: 'Der Schaffner', poses: 'assets/characters/schaffner',
-      x: 820, y: 620, pose: 'front', size: 1.0, when: 'capOff',
+      x: 820, y: 620, pose: 'front', size: 1.0, when: 'capOff', idle: ['blink'],
       walkTo: [640, 640], facing: 'right', color: '#e0c8a0',
     },
   ],
