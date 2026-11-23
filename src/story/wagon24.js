@@ -1,4 +1,4 @@
-import { CANDLE_SPOT, OCCUPIED, PADDLE_SPOT, drawFinal, drawPanel, drawWindowRun, panelSpots, stoneAt } from './art/wagon24.js';
+import { CANDLE_SPOT, OCCUPIED, PADDLE_SPOT, drawFinal, drawPanel, drawSnow, drawWindowRun, panelSpots, stoneAt } from './art/wagon24.js';
 import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
@@ -191,43 +191,55 @@ async function watchStones(story) {
   const f = story.flags;
   if (!f.announced) return story.say('Erst müssen alle Fahrgäste aus dem Zug.');
   if (!f.sealCut) return story.say('Der rote Hebel ist noch verplombt. Erst die Plombe ab.');
-  const state = { t: 0, raised: false };
+  const state = { t: 0, raised: false, derail: null };
+  const sounds = new Set();
+  const once = (name, at) => {
+    if (state.derail >= at && !sounds.has(name + at)) {
+      sounds.add(name + at);
+      story.sound(name);
+    }
+  };
   const result = await story.view('picture', {
     state,
+    backdrop: 1,
     draw: (ctx, view) => drawWindowRun(ctx, view.state),
-    spots: [PADDLE_SPOT],
+    spots: () => (state.raised ? [] : [PADDLE_SPOT]),
     help: 'Kilometersteine zählen – bei 24,7 die Kelle heben  ·  Rechtsklick: zurück',
     update: (dt, view) => {
-      view.state.t += dt;
-      if (view.state.t > 8.4 && !view.state.raised) view.close('missed');
+      const s = view.state;
+      s.t += dt;
+      if (s.derail !== null) {
+        // Das Entgleisen: Hebel, Bremsen, Krachen – dann weißer Blitz und Stille
+        s.derail += dt;
+        once('lever', 0);
+        once('brake', 0.5);
+        once('crash', 1.4);
+        once('crash', 2.3);
+        if (s.derail > 3.3) view.close('ok');
+        return;
+      }
+      if (s.t > 8.4 && !s.raised) view.close('missed');
     },
     onClick: async (spot, view) => {
       const s = view.state;
       s.raised = true;
       const { km, phase } = stoneAt(s.t);
-      view.close(km === '24,7' && phase > 0.15 && phase < 0.85 ? 'ok' : `wrong:${km}`);
+      if (km !== '24,7' || phase <= 0.15 || phase >= 0.85) {
+        view.close(`wrong:${km}`);
+        return;
+      }
+      s.derail = 0;
+      await story.say('Vierundzwanzig Komma sieben. Jetzt!');
+      if (view.isOpen) await story.say('Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.');
     },
   });
+  // Ein Rechtsklick mitten im Entgleisen hält es nicht mehr auf
+  if (state.derail !== null) return finale(story);
   if (result === false) return;
-  if (result !== 'ok') {
-    story.sound('wrong');
-    await story.say(result === 'missed' ? 'Zu spät! Der Stein ist vorbei.' : `Bei ${result.slice(6)}? Falsch! Ich habe die Kelle zu ${Number(result.slice(6).replace(',', '.')) < 24.7 ? 'früh' : 'spät'} gehoben.`);
-    story.sound('speaker');
-    await story.speak('Ruhig, Junge. Der Zug fährt im Kreis – wir haben noch eine Runde. Bei 24,7.', { at: SPEAKER, color: VOICE });
-    return;
-  }
-  await derail(story);
-}
-
-async function derail(story) {
-  await story.cutscene(async () => {
-    await story.say('Vierundzwanzig Komma sieben. Jetzt!');
-    await story.say('Ich hebe Miras Kelle – und ziehe den roten Hebel.');
-    story.sound('lever');
-    await story.wait(0.4);
-    story.sound('crash');
-  });
-  await finale(story);
+  story.sound('wrong');
+  await story.say(result === 'missed' ? 'Zu spät! Der Stein ist vorbei.' : `Bei ${result.slice(6)}? Falsch! Ich habe die Kelle zu ${Number(result.slice(6).replace(',', '.')) < 24.7 ? 'früh' : 'spät'} gehoben.`);
+  story.sound('speaker');
+  await story.speak('Ruhig, Junge. Der Zug fährt im Kreis – wir haben noch eine Runde. Bei 24,7.', { at: SPEAKER, color: VOICE });
 }
 
 // ============================================================================================
@@ -236,20 +248,42 @@ async function derail(story) {
 
 async function finale(story) {
   const f = story.flags;
-  await story.cutscene(async () => {
-    await story.say('Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.');
-    await story.fadeOut(1.5);
-    await story.wait(1.5);
-    await story.say('Stille.');
-    await story.say('Schnee.');
+  // Stille, Schnee – und langsam die Lichter draußen
+  story.game.speech.finish();
+  const snow = { time: 0 };
+  const falling = story.view('picture', {
+    state: snow,
+    backdrop: 1,
+    draw: (ctx, view) => drawSnow(ctx, view.state),
+    spots: [],
+    help: '',
+    update: (dt, view) => {
+      view.state.time += dt;
+    },
+    onMiss: () => story.game.speech.skip(),
   });
+  story.game.views.picture.age = 1; // sofort ganz zeigen – sonst blitzt kurz das Abteil zwischen Weiß und Schnee auf
+  story.scenes += 1; // wie eine Zwischensequenz: Joseph läuft nicht los
+  try {
+    await story.wait(1.8);
+    if (story.game.views.picture.isOpen) await story.say('Stille.');
+    await story.wait(0.8);
+    if (story.game.views.picture.isOpen) await story.say('Schnee.');
+    await story.wait(2.2);
+  } finally {
+    story.scenes -= 1;
+  }
+  story.game.views.picture.close();
+  await falling;
   story.game.overlay.fade = 0;
-  const state = { lit: false, time: 0 };
-  await story.view('picture', {
+  // Erst erzählt Joseph, wo er aufgewacht ist – danach lässt sich die letzte Kerze anzünden.
+  // (Früher kamen diese Sätze nur bei einem Klick neben die Kerze und gingen leicht verloren.)
+  const state = { lit: false, time: 0, ready: false };
+  const shown = story.view('picture', {
     state,
     backdrop: 1,
     draw: (ctx, view) => drawFinal(ctx, view.state),
-    spots: () => (state.lit ? [] : [CANDLE_SPOT]),
+    spots: () => (state.lit || !state.ready ? [] : [CANDLE_SPOT]),
     update: (dt, view) => {
       view.state.time += dt;
     },
@@ -262,16 +296,25 @@ async function finale(story) {
       await story.wait(1.5);
       view.close(true);
     },
-    onMiss: async () => {
-      if (!f.finalSaid) {
-        f.finalSaid = true;
-        await story.say('Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.');
-        await story.say('Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.');
-        await story.say('Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.');
-        await story.say('Oben auf dem Baum brennt eine Kerze noch nicht.');
-      }
+    onMiss: () => {
+      story.game.speech.skip();
     },
   });
+  await story.wait(1.6);
+  if (!f.finalSaid) {
+    f.finalSaid = true;
+    for (const line of [
+      'Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.',
+      'Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.',
+      'Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.',
+      'Oben auf dem Baum brennt eine Kerze noch nicht.',
+    ]) {
+      if (!story.game.views.picture.isOpen) break;
+      await story.say(line);
+    }
+  }
+  state.ready = true;
+  await shown;
   story.note('Ich bin zu Hause. Mira, Martha, der Weihnachtsbaum. Die Wanduhr zeigt 23:47 – der Zug ist angekommen. Frohe Weihnachten.');
   await story.cutscene(async () => {
     await finishWagon(story, {

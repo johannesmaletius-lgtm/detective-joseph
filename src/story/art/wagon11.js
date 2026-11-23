@@ -24,8 +24,20 @@ export function drawClockWall(ctx, { progress, age }) {
   let stoppedIndex = 0;
   for (const spot of clockSpots()) {
     const { cx, cy, r, kind } = spot;
-    if (kind === 'moon') {
-      drawRoundClock(ctx, cx, cy, r, progress);
+    // Von außen sieht die Rundenuhr aus wie die anderen: nur ein einzelner Zeiger, der ganz langsam wandert
+    // (einmal herum pro Runde). Eine stehen gebliebene Uhr hat auch nur noch einen Zeiger – genau hinsehen!
+    if (kind === 'moon' || (kind === 'stopped' && stoppedIndex === 0)) {
+      if (kind === 'stopped') stoppedIndex++;
+      face(ctx, cx, cy, r);
+      const angle = kind === 'moon' ? progress * Math.PI * 2 - Math.PI / 2 : 0.35 * Math.PI * 2 - Math.PI / 2;
+      ctx.strokeStyle = INK;
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 4;
+      line(ctx, cx, cy, cx + Math.cos(angle) * r * 0.8, cy + Math.sin(angle) * r * 0.8);
+      ctx.fillStyle = INK;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      ctx.fill();
       continue;
     }
     face(ctx, cx, cy, r);

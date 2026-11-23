@@ -87,7 +87,7 @@ export const wagon11 = {
     },
     window: {
       look: (story) => story.say(story.isDark ? 'Tunnelwand.' : 'Draußen der Mond. Er wandert langsam von Fenster zu Fenster.'),
-      use: (story) => waitForTunnel(story, 'Ich warte am Fenster auf den Tunnel …'),
+      use: (story) => waitOnSofa(story),
     },
   },
 
@@ -263,9 +263,12 @@ async function waitOnSofa(story) {
   const f = story.flags;
   if (story.motion.tunnelAhead < 12 || inTunnel(story)) return story.say('Gleich kommt der Tunnel. Jetzt setze ich mich nicht.');
   const minute = minuteOfRound(story);
-  if (minute >= CALL_MINUTE - 4 || !f.roundClock) return waitForTunnel(story, 'Ich setze mich kurz aufs Sofa und warte auf den Tunnel …');
+  // Nach dem Ruf: bis zum Tunnel warten. Kurz davor: nicht mehr hinsetzen.
+  // Vorher wird nie über den Ruf hinweggesprungen – sonst kämen Ruf und Warten durcheinander.
+  if (f.saved || f.callLap === story.lap || minute >= CALL_MINUTE) return waitForTunnel(story, 'Ich setze mich kurz und warte auf den Tunnel …');
+  if (minute >= CALL_MINUTE - 4) return story.say('Gleich kommt der Ruf. Jetzt setze ich mich nicht.');
   await story.cutscene(async () => {
-    await story.say('Ich setze mich aufs Sofa und behalte die Rundenuhr im Auge …');
+    await story.say(story.flags.roundClock ? 'Ich setze mich und behalte die Rundenuhr im Auge …' : 'Ich setze mich kurz hin. Herr Tick wird immer unruhiger …');
     await story.fadeOut(1);
     const motion = story.motion;
     const half = motion.settings.tunnel.length / 2;
@@ -273,7 +276,7 @@ async function waitOnSofa(story) {
     motion.distance += target - motion.lapTime;
     await story.wait(0.5);
     story.fadeIn(1);
-    await story.say('Gleich steht der Zeiger auf dem roten Strich.');
+    await story.say(story.flags.roundClock ? 'Gleich steht der Zeiger auf dem roten Strich.' : 'Gleich passiert etwas. Ich spüre es.');
   });
 }
 

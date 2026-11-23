@@ -14,7 +14,7 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 //   2. Dunkelkammer in der richtigen Reihenfolge: Vorhang zu, Licht aus, Rotlicht an. Sonst ist der
 //      Film verdorben – nach dem Tunnel liegt er wieder in der Tasche (Zeitschleife).
 //   3. Drei unbeschriftete Flaschen nach Geruch und halb zerrissener Anleitung in die Schalen:
-//      Entwickler (seifig) – Stoppbad (Essig) – Fixierer (Schwefel). Dann entwickeln.
+//      Entwickler = Lauge (seifig) – Stoppbad = Säure (Essig) – Fixierer (Schwefel). Dann entwickeln.
 //   4. Kontaktbogen: sechs Negative nach den vorbeigezogenen Tunnellampen ordnen → das letzte Bild
 //      kommt in den Vergrößerer: eine Gestalt mit Josephs Mütze allein in der Lok, an Weiche 7,
 //      Kilometerstein 24,7 → Türcode 247.
@@ -249,7 +249,7 @@ async function sortNegatives(story) {
   });
   if (!solved) return;
   f.sorted = true;
-  await story.say('Je tiefer im Tunnel, desto mehr Lampen sind schon vorbei. Das letzte Bild: kurz vor Weiche 7.');
+  await story.say('Je tiefer im Tunnel, desto weniger Lampen liegen noch vor der Kamera. Das letzte Bild: keine Lampe mehr – nur die Weiche.');
   story.note('Negative geordnet. Das letzte Bild zeigt die Stelle kurz vor Weiche 7 – ab in den Vergrößerer.');
 }
 
@@ -315,10 +315,14 @@ function currentGoal(story) {
     }
     return { id: 'chem', lines: [
       'Die Schalen füllen: an den Flaschen riechen und die zerrissene Anleitung lesen.',
+      'Laugen fühlen sich an wie Seife, Essig ist eine Säure. Was übrig bleibt, ist der Fixierer.',
       'Schale 1: seifig (braun) – Schale 2: Essig (gelblich) – Schale 3: Schwefel (klar). Dann „Film entwickeln“.',
     ] };
   }
-  if (!f.sorted) return { id: 'sort', lines: ['Die Negative nach den Tunnellampen ordnen: erst keine Lampe, dann eine, zwei … fünf.'] };
+  if (!f.sorted) return { id: 'sort', lines: [
+    'Im Negativ sind die hellen Lampen dunkle Punkte. Je tiefer der Zug im Tunnel ist, desto weniger Lampen liegen noch vor ihm.',
+    'Erst das Bild mit fünf Lampen vorn, dann vier, drei, zwei, eine – zuletzt keine (dort teilt sich das Gleis).',
+  ] };
   if (!f.enlarged) return { id: 'enlarge', lines: ['Das letzte Negativ in den Vergrößerer: den Vergrößerer links benutzen.'] };
   return { id: 'door', lines: ['Der Kilometerstein auf dem Foto: 24,7 → 247.'] };
 }

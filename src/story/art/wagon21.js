@@ -6,11 +6,11 @@ import { PRINT, RED, SERIF, glow, line, photoCard, text } from './common.js';
 // ---------------------------------------------------------------- Kesseldruck
 // Jede Drehung: rot −7, gelb −3, blau +2 (bar). Ziel: genau 25 (grüner Strich).
 export const VALVES = [
-  { id: 'red', name: 'rotes Ventil', delta: -7, color: '#c0302a', cx: 420, cy: 540 },
-  { id: 'yellow', name: 'gelbes Ventil', delta: -3, color: '#d6a020', cx: 640, cy: 540 },
-  { id: 'blue', name: 'blaues Ventil', delta: 2, color: '#3a6ab0', cx: 860, cy: 540 },
+  { id: 'red', name: 'rotes Ventil', delta: -8, color: '#c0302a', cx: 420, cy: 540 },
+  { id: 'yellow', name: 'gelbes Ventil', delta: -5, color: '#d6a020', cx: 640, cy: 540 },
+  { id: 'blue', name: 'blaues Ventil', delta: 3, color: '#3a6ab0', cx: 860, cy: 540 },
 ];
-export const START_PRESSURE = 41;
+export const START_PRESSURE = 42;
 export const TARGET = 25;
 
 export function valveSpots() {

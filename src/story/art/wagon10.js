@@ -43,15 +43,17 @@ export function drawFuseBox(ctx) {
     ctx.fillStyle = '#9a927c';
     ctx.fillRect(s.x - 8, s.y + 6, 10, s.h - 12);
     ctx.fillRect(s.x + s.w - 2, s.y + 6, 10, s.h - 12);
-    text(ctx, `${String(size).replace('.', ',')} mm²`, 300, cy - 14 - size * 1.6, { font: `15px ${TYPEWRITER}`, color: '#e9e1c8' });
+    // Zwei Schildchen sind abgegriffen – dort hilft nur der Blick auf die Kabeldicke
+    const worn = size === 2.5 || size === 4;
+    text(ctx, worn ? '?? mm²' : `${String(size).replace('.', ',')} mm²`, 300, cy - 14 - size * 1.6, { font: `15px ${TYPEWRITER}`, color: worn ? 'rgba(233, 225, 200, 0.45)' : '#e9e1c8' });
   });
   // Zettel am Deckel
   sheet(ctx, 950, 566, 150, 104, {
     angle: 0.05,
     inner: (c) => {
-      text(c, 'Dünner Draht –', 75, 30, { font: `16px ${HAND}`, align: 'center' });
-      text(c, 'kleine Sicherung.', 75, 54, { font: `16px ${HAND}`, align: 'center' });
-      text(c, 'Sonst brennt’s!', 75, 86, { font: `bold 16px ${HAND}`, color: '#a12218', align: 'center' });
+      text(c, '1 mm² → 6 A', 75, 30, { font: `16px ${HAND}`, align: 'center' });
+      text(c, '1,5 mm² → 10 A', 75, 54, { font: `16px ${HAND}`, align: 'center' });
+      text(c, '(Rest abgerissen)', 75, 86, { font: `italic 14px ${HAND}`, color: '#7a5a3a', align: 'center' });
     },
   });
   text(ctx, 'Lose Sicherungen', 1005, 140, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
@@ -130,42 +132,108 @@ export const RECORDER_SPOTS = [
 
 export function drawRecorder(ctx, state, time) {
   ctx.save();
-  // Gehäuse
-  ctx.fillStyle = '#5b3a20';
-  ctx.fillRect(250, 110, 780, 520);
-  ctx.fillStyle = '#7d5530';
-  ctx.fillRect(266, 126, 748, 488);
-  // Spulen
-  for (const cx of [460, 820]) {
-    ctx.save();
-    ctx.translate(cx, 270);
-    ctx.rotate(state.playing ? time * (state.direction === 'back' ? -4 : 4) * (1 + state.speed) : 0);
-    ctx.fillStyle = '#c8bfa8';
+  // Holzgehäuse mit runden Ecken
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  const wood = ctx.createLinearGradient(0, 110, 0, 630);
+  wood.addColorStop(0, '#7a4a26');
+  wood.addColorStop(1, '#3e2210');
+  ctx.fillStyle = wood;
+  rounded(ctx, 250, 110, 780, 520, 26);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  // gebürstete Metallplatte
+  const plate = ctx.createLinearGradient(0, 130, 0, 610);
+  plate.addColorStop(0, '#c9c4b6');
+  plate.addColorStop(0.5, '#a9a497');
+  plate.addColorStop(1, '#8a8578');
+  ctx.fillStyle = plate;
+  rounded(ctx, 272, 130, 736, 480, 16);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1;
+  for (let y = 134; y < 608; y += 3) line(ctx, 276, y, 1004, y);
+  ctx.strokeStyle = 'rgba(40, 30, 20, 0.5)';
+  ctx.lineWidth = 2;
+  rounded(ctx, 272, 130, 736, 480, 16);
+  ctx.stroke();
+
+  // Spulen: links fast voll, rechts fast leer (das Band läuft von links nach rechts)
+  const spin = state.playing ? time * (state.direction === 'back' ? -4 : 4) * (1 + state.speed) : 0;
+  reel(ctx, 460, 270, spin, state.loaded ? 96 : 0);
+  reel(ctx, 820, 270, spin, state.loaded ? 54 : 0);
+  // Bandweg über Rollen und Tonkopf
+  if (state.loaded) {
+    ctx.strokeStyle = '#4a2a16';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(0, 0, 112, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#3e2c1a';
-    for (let i = 0; i < 3; i++) {
-      ctx.rotate((Math.PI * 2) / 3);
-      ctx.beginPath();
-      ctx.arc(0, -58, 30, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.fillStyle = '#5b5345';
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    ctx.moveTo(460 - 96, 270);
+    ctx.lineTo(420, 400);
+    ctx.lineTo(860, 400);
+    ctx.lineTo(820 + 54, 270);
+    ctx.stroke();
   }
-  ctx.strokeStyle = '#2c1d10';
-  ctx.lineWidth = 3;
-  line(ctx, 460, 382, 820, 382);
-  // Geschwindigkeit
+  for (const rx of [420, 860]) {
+    ctx.fillStyle = '#e8e4d8';
+    ctx.beginPath();
+    ctx.arc(rx, 400, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#5a564c';
+    ctx.stroke();
+  }
+  // Tonkopf mit Abdeckung
+  ctx.fillStyle = '#3a3630';
+  rounded(ctx, 590, 384, 100, 34, 6);
+  ctx.fill();
+  ctx.fillStyle = '#c9a24c';
+  ctx.fillRect(630, 388, 20, 10);
+
+  // Aussteuerungsanzeige (VU-Meter)
+  const vu = { x: 640, y: 262 };
+  ctx.fillStyle = '#1e1a14';
+  rounded(ctx, vu.x - 62, vu.y - 46, 124, 82, 8);
+  ctx.fill();
+  const glowOn = state.power;
+  ctx.fillStyle = glowOn ? '#f4e2a8' : '#8a826a';
+  rounded(ctx, vu.x - 54, vu.y - 38, 108, 66, 6);
+  ctx.fill();
+  ctx.strokeStyle = '#3a2a1a';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(vu.x, vu.y + 26, 46, Math.PI * 1.2, Math.PI * 1.8);
+  ctx.stroke();
+  ctx.strokeStyle = '#b02a20';
+  ctx.beginPath();
+  ctx.arc(vu.x, vu.y + 26, 46, Math.PI * 1.65, Math.PI * 1.8);
+  ctx.stroke();
+  const level = state.playing ? 0.45 + Math.abs(Math.sin(time * 7.3) * Math.sin(time * 3.1)) * 0.5 : 0.02;
+  const a = Math.PI * (1.2 + level * 0.6);
+  ctx.strokeStyle = '#1a1410';
+  ctx.lineWidth = 2;
+  line(ctx, vu.x, vu.y + 26, vu.x + Math.cos(a) * 50, vu.y + 26 + Math.sin(a) * 50);
+  text(ctx, 'VU', vu.x, vu.y + 22, { font: `bold 11px ${PRINT}`, color: '#3a2a1a', align: 'center' });
+  if (glowOn) glow(ctx, vu.x, vu.y, 70, '255, 220, 140', 0.25);
+
+  // Typenschild
+  ctx.fillStyle = '#2a2018';
+  rounded(ctx, 760, 578, 200, 24, 4);
+  ctx.fill();
+  text(ctx, 'RINGBAHN · TONBAND', 860, 595, { font: `bold 13px ${PRINT}`, color: '#d9b25a', align: 'center' });
+
+  // Regler
   dial(ctx, 430, 520, SPEEDS, state.speed, 'cm/s');
   dial(ctx, 640, 520, ['vor', 'zurück'], state.direction === 'back' ? 1 : 0, 'Richtung');
-  // Abspielen
-  ctx.fillStyle = state.playing ? '#3d8f4a' : '#2f3a2c';
-  ctx.fillRect(790, 480, 120, 80);
+  // Abspieltaste
+  const key = ctx.createLinearGradient(0, 480, 0, 560);
+  key.addColorStop(0, state.playing ? '#5fbf6a' : '#4a5a46');
+  key.addColorStop(1, state.playing ? '#2f7a3a' : '#232c22');
+  ctx.fillStyle = key;
+  rounded(ctx, 790, 480, 120, 80, 10);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.fillStyle = '#e8f0d8';
   ctx.beginPath();
   ctx.moveTo(835, 498);
@@ -175,9 +243,75 @@ export function drawRecorder(ctx, state, time) {
   if (state.loaded) {
     ctx.fillStyle = '#f1e5c6';
     ctx.fillRect(590, 150, 100, 40);
+    ctx.strokeStyle = '#8a6a2a';
+    ctx.strokeRect(593, 153, 94, 34);
     text(ctx, 'Band 108', 640, 177, { font: `bold 18px ${TYPEWRITER}`, align: 'center' });
   }
-  if (state.power) glow(ctx, 980, 150, 40, '120, 255, 140', 0.6);
+  // Betriebslampe
+  ctx.fillStyle = state.power ? '#6aff7a' : '#2a3a2a';
+  ctx.beginPath();
+  ctx.arc(960, 520, 9, 0, Math.PI * 2);
+  ctx.fill();
+  if (state.power) glow(ctx, 960, 520, 40, '120, 255, 140', 0.6);
+  ctx.restore();
+}
+
+function rounded(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// Eine Aluminiumspule; tape = Radius des aufgewickelten Bandes
+function reel(ctx, cx, cy, spin, tape) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.arc(5, 7, 114, 0, Math.PI * 2);
+  ctx.fill();
+  if (tape > 0) {
+    const t = ctx.createRadialGradient(0, 0, 20, 0, 0, tape);
+    t.addColorStop(0, '#3a2010');
+    t.addColorStop(1, '#6a3c1c');
+    ctx.fillStyle = t;
+    ctx.beginPath();
+    ctx.arc(0, 0, tape, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.rotate(spin);
+  const metal = ctx.createLinearGradient(-112, -112, 112, 112);
+  metal.addColorStop(0, 'rgba(235, 235, 230, 0.75)');
+  metal.addColorStop(0.5, 'rgba(160, 160, 155, 0.6)');
+  metal.addColorStop(1, 'rgba(230, 230, 225, 0.75)');
+  ctx.fillStyle = metal;
+  ctx.beginPath();
+  ctx.arc(0, 0, 112, 0, Math.PI * 2);
+  // drei Fenster in der Spule
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2;
+    ctx.moveTo(Math.cos(a) * 88 + 0, Math.sin(a) * 88);
+    ctx.arc(Math.cos(a) * 62, Math.sin(a) * 62, 26, 0, Math.PI * 2, true);
+  }
+  ctx.fill('evenodd');
+  ctx.strokeStyle = 'rgba(60, 60, 55, 0.7)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 112, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#5b5345';
+  ctx.beginPath();
+  ctx.arc(0, 0, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#d8d2c0';
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2 + Math.PI / 3;
+    ctx.fillRect(Math.cos(a) * 10 - 3, Math.sin(a) * 10 - 3, 6, 6);
+  }
   ctx.restore();
 }
 
@@ -192,14 +326,14 @@ function dial(ctx, cx, cy, labels, index, title) {
   const n = labels.length;
   labels.forEach((label, i) => {
     const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.9;
-    text(ctx, label, cx + Math.cos(a) * 74, cy + Math.sin(a) * 74 + 6, { font: `bold 17px ${PRINT}`, color: i === index ? '#ffe9a6' : '#cdbb94', align: 'center' });
+    text(ctx, label, cx + Math.cos(a) * 74, cy + Math.sin(a) * 74 + 6, { font: `bold 17px ${PRINT}`, color: i === index ? '#8a1a10' : '#4a3a2a', align: 'center' });
   });
   const a = -Math.PI / 2 + (index - (n - 1) / 2) * 0.9;
   ctx.strokeStyle = '#f4e3b8';
   ctx.lineWidth = 7;
   ctx.lineCap = 'round';
   line(ctx, cx, cy, cx + Math.cos(a) * 36, cy + Math.sin(a) * 36);
-  text(ctx, title, cx, cy + 74, { font: `15px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  text(ctx, title, cx, cy + 74, { font: `15px ${PRINT}`, color: '#3a2a1a', align: 'center' });
 }
 
 // Lämpchen im Wagen, sobald Strom da ist

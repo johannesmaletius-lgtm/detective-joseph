@@ -2,8 +2,8 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Alle 24 Wagen des Adventskalenders „Die Ringbahn“ sind spielbar** (Planung in
-[`docs/adventskalender.md`](docs/adventskalender.md), Erzählung in [`docs/geschichte.md`](docs/geschichte.md)).
+**Stand: Alle 24 Wagen von „Die Ringbahn“ sind spielbar** (Planung in
+[`docs/planung.md`](docs/planung.md), Erzählung in [`docs/geschichte.md`](docs/geschichte.md)).
 Alle Hintergründe, Figuren und Fotos ab Wagen 2 sind die ChatGPT-Bilder aus `assets/reference/`. Zum Ausprobieren
 alle Türen öffnen: <http://localhost:8150/?test> (Lösungen: [Wagen 2, 3 und 17–24](#wagen-2-3-und-1724),
 [Wagen 4–8](#wagen-48), [Wagen 9–16](#wagen-916)). **Wagen 1:** etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps. Joseph wacht
@@ -47,9 +47,9 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 > Browser laden Module nicht direkt von der Festplatte – ein Doppelklick auf `index.html` reicht deshalb nicht.
 > Der Server (`server.js`) braucht nur Node.js, keine weiteren Pakete.
 
-## Adventskalender
+## Die 24 Wagen
 
-Das Spiel beginnt mit dem Adventskalender „Die Ringbahn“: 24 Wagen, jeden Tag vom 1. bis 24. Dezember 2026
+Das Spiel beginnt mit der Wagenübersicht „Die Ringbahn“: 24 Wagen, jeden Tag vom 1. bis 24. Dezember 2026
 öffnet sich einer. Geschaffte Wagen bekommen einen Stern, der Spielstand bleibt im Browser gespeichert.
 
 | Adresse | Wirkung |
@@ -108,7 +108,7 @@ detective-joseph/
 │   ├── ui/                    Mauszeiger (cursors/), Inventarleiste, Notizbuch-Knopf
 │   └── reference/             Originale und Material für spätere Schritte
 ├── docs/story-ideen.md        Vorschläge für die Geschichte (Zug im Kreis, Rätsel pro Abteil)
-├── docs/adventskalender.md    Planung des Adventskalenders: 24 Wagen, Rätsel, roter Faden, Grafiken
+├── docs/planung.md           Planung von Detective Joseph: 24 Wagen, Rätsel, roter Faden, Grafiken
 ├── tools/                     Werkzeuge, die Platzhalter-Grafiken erzeugen (siehe unten)
 └── src/
     ├── main.js                Einstieg: Spiel erzeugen, den Wagen (?wagen=N) mit seiner Geschichte laden, starten
@@ -306,21 +306,21 @@ Nahansichten: `src/story/art/wagonN.js`, Szenen: `baggageCar`, `postCar`, `green
 
 | Wagen | Ort, Figuren | Rätsel (kurz) | Code(s) |
 | --- | --- | --- | --- |
-| 2 | Gepäckwagen | 12 Kofferanhänger nach Abfahrt ordnen → WEICHE SIEBEN; grüner Koffer **WEICHE** → Aktenseite 1; Kofferstapel umschichten (Türme von Hanoi, nie groß auf klein, zwei Kreidefelder); untersten Koffer auf die Gepäckwaage: 17,3 kg; darin Aktenseiten 2 und 3 | Koffer **WEICHE**, Tür **173** |
-| 3 | Postwagen | 8 lose Briefe nach Rundenstempel in die Fächer (römische Zahlen) → leer bleiben I, IV, VI, IX; Schrank **1469** → Dienstanweisung; Rohrpost: Weiche 2 und 3 drehen, Rohrpost anfordern; Brief an J. „Runde 108“: Chiffrierscheibe um 4 drehen → „Morgen verschwindet jemand. Achte auf die Gläser.“ | Schrank **1469**, Tür **STERN** |
+| 2 | Gepäckwagen | 12 Kofferanhänger nach Abfahrt ordnen → WEICHE SIEBEN; grüner Koffer **WEICHE** → Aktenseite 1; Kofferstapel umschichten (Türme von Hanoi, nie groß auf klein, zwei Kreidefelder, die vier kleineren am Ende zusammen auf EINEM Feld – 15 Züge); untersten Koffer auf die Gepäckwaage: 17,3 kg; darin Aktenseiten 2 und 3 | Koffer **WEICHE**, Tür **173** |
+| 3 | Postwagen | 8 lose Briefe nach Rundenstempel in die Fächer (römische Zahlen) → leer bleiben I, IV, VI, IX; Schrank **1469** → Dienstanweisung; Rohrpost: Weiche 1, 3 und 4 drehen (nur 1 allein verbiegt die 2), Rohrpost anfordern; Brief an J. „Runde 108“: Chiffrierscheibe um 4 drehen → „Morgen verschwindet jemand. Achte auf die Gläser.“ Das Türwort WXIVR selbst entziffern (innen suchen, außen ablesen) | Schrank **1469**, Tür **STERN** |
 | 17 | Gewächshaus | Heizung: Ventil 1 und 2 auf, 3 zu → Scheiben beschlagen, Fingerschrift: Rose genau 4 l; Kannen 3 l + 5 l → 4 l, Rose gießen → winziger Schlüssel; Kiste unter dem Tisch → Liste des anderen Joseph: offen Ilse 5, Tick 11, Moll 12, Mira 15, J. 1 | Tür **44** |
 | 18 | Schaffnerabteil, Stimme | Dienstbuch: J. → Moser → Falk tauschen den 24.; Schublade **FALK** → Telegramm + 7 Schlüssel; Schlüssel nach Griffform ans Brett (Haken „Lok“ bleibt leer); Stellwerk: Weiche 1 oben, 2/4/6 rechts → Fahrstraße bis Weiche 7; roter Hebel verplombt | Schublade **FALK** |
-| 19 | Fotolabor | Kameratasche: fast kein Licht = Blende 2, 1/15 → **215**; Vorhang zu, Licht aus, Rotlicht an; Schalen: seifig – Essig – Schwefel; 6 Negative nach Tunnellampen 0–5; Vergrößerer: Tunnelfoto, Kilometerstein 24,7 | Tasche **215**, Tür **247** |
-| 20 | Packwagen, Mira | Pakete den Fahrgästen zuordnen (tickt, Löffel, Wolle, Papier, Hutschachtel, gluckert); Sternenpapier auf die Frachtliste, eins nach rechts → „Paket für Papa – unter dem Boden“; Kisten von der Luke schieben; Bänder: rot, gold, blau, weiß, grün → Kelle + Karte | Tür **2512** |
-| 21 | Kesselwagen, Heizer | Druck von 41 auf genau 25: rot 1×, gelb 3×; Pumpe nur bergab (wenn die Kohlen rutschen); Spind-Foto: Dienstnummer am Ärmel | Tür **317** |
+| 19 | Fotolabor | Kameratasche: fast kein Licht = Blende 2, 1/15 → **215**; Vorhang zu, Licht aus, Rotlicht an; Schalen: seifig (Lauge) – Essig (Säure) – Schwefel; 6 Negative nach den Lampen, die noch vor der Kamera liegen (5 … 0, zuletzt die Weiche); Vergrößerer: Tunnelfoto, Kilometerstein 24,7 | Tasche **215**, Tür **247** |
+| 20 | Packwagen, Mira | Pakete nur an der Form den Fahrgästen zuordnen (Aufziehloch, Löffelspitze, Wollfaden, Notenblatt, Hutschachtel, Flaschenhals; der Anhänger „Heizer“ bleibt übrig); Sternenpapier auf die Frachtliste, eins nach rechts → „Paket für Papa – unter dem Boden“; Kisten von der Luke schieben; Bänder: rot, gold, blau, weiß, grün → Kelle + Karte | Tür **2512** |
+| 21 | Kesselwagen, Heizer | Druck von 42 auf genau 25 (rot −8, gelb −5, blau +3): gelb 4×, blau 1×; Pumpe nur bergab (wenn die Kohlen rutschen); Spind-Foto: Dienstnummer am Ärmel | Tür **317** |
 | 22 | Lok, der andere Joseph | Fahrtenschreiber: km 24,7 = 23:43 → Luke **2343**; im Tender warten, um 23:31 herauskommen; Beweise: Familienfoto, Pressefoto, Miras Karte → er nimmt die Mütze ab | Luke **2343** |
-| 23 | Wartungsgang, Herr Tick | Kopfhörer aufsetzen (Rechtsklick im Inventar); Kreidezeichen: Laterne links = links, Tunnel = geradeaus, Laterne rechts = rechts, Turm = Tor; Zahnrad in die leere Achse | – |
+| 23 | Wartungsgang, Herr Tick | Kopfhörer aufsetzen (Rechtsklick im Inventar); Kreidezeichen an sechs Abzweigungen: links, geradeaus, rechts, geradeaus (dunkel – Taschenlampe auf die Wand), links, rechts; Turm = Tor; Zahnrad in die leere Achse | – |
 | 24 | Heiligabend | Mütze aufsetzen; Lautsprecheranlage: Wagen 4, 5, 7, 12, 15, 21 → Durchsage; Lochzange vom Schreibtisch auf die Plombe; am Fenster bei Kilometerstein 24,7 die Kelle heben; im Schlussbild die letzte Kerze anzünden | – |
 
 ## Wagen 4–8
 
 Starten: über den Kalender (<http://localhost:8150/?test>) oder direkt <http://localhost:8150/?test&tuer=4> (oder 5–8).
-Am Ende eines Wagens geht es zurück zum Adventskalender. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
+Am Ende eines Wagens geht es zurück zur Wagenübersicht. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
 später Foto, Taschenuhr, Bierdeckel); das Notizbuch beginnt mit „Was bisher geschah“. Jeder Wagen hat Tipps
 auf Taste **H**. Die ganze Rätselkette steht oben in der jeweiligen Datei `src/story/wagonN.js`.
 
@@ -350,8 +350,8 @@ Starten: <http://localhost:8150/?test&tuer=9> (oder 10–16). Gegenstände ab Wa
 | Wagen | Ort, Figuren | Rätsel (kurz) | Code(s) |
 | --- | --- | --- | --- |
 | 9 | Spiegelwagen | Zwei Hebel, zu weit auseinander. Das Spiegelbild wiederholt die letzte Runde spiegelverkehrt: in einer Runde rechts ziehen, nach dem Tunnel zur selben Zeit wieder rechts ziehen, wenn links das Spiegelbild zieht. Kratzer in Spiegelschrift (im Spiegel gegenüber lesbar): „Er ist eine Runde zu spät“. Lichtstrahl über 4 Standspiegel ins Glasauge: A \, B \, C /, D / | – |
-| 10 | Lautsprecherwagen, Stimme des Schaffners | Sicherungen: dünnes Kabel – kleine Sicherung (4 → 20 A, 1 → 6 A, 6 → 25 A, 1,5 → 10 A, 2,5 → 16 A); Tonband 108; bei 19 cm/s abspielen, dann rückwärts: „… wie die anderen. Elf ist der Nächste.“ | Schrank **11** |
-| 11 | Uhrenwagen, Herr Tick | Die Rundenuhr (oben rechts, Mond am Zeiger, Ruf bei 50); Gespräch; Herrn Ticks Zettel; Standuhr :45, Kuckucksuhr :35 stellen, Tunnel abwarten, auf dem Sofa bis zum Ruf warten → beide schlagen beim Ruf. Herr Tick gibt das Zahnrad | – |
+| 10 | Lautsprecherwagen, Stimme des Schaffners | Sicherungen: dünnes Kabel – kleine Sicherung (4 → 20 A, 1 → 6 A, 6 → 25 A, 1,5 → 10 A, 2,5 → 16 A; zwei Schilder abgegriffen, Zettel nur halb); Tonband 108; bei 19 cm/s abspielen, dann rückwärts: „… wie die anderen. Elf ist der Nächste.“ | Schrank **11** |
+| 11 | Uhrenwagen, Herr Tick | Die Rundenuhr (oben rechts, nur ein Zeiger, der langsam wandert – oben links steht eine kaputte mit einem Zeiger still; Ruf bei 50); Gespräch; Herrn Ticks Zettel; Standuhr :45, Kuckucksuhr :35 stellen, Tunnel abwarten, auf dem Sofa bis zum Ruf warten → beide schlagen beim Ruf. Herr Tick gibt das Zahnrad | – |
 | 12 | Musiksalon, Herr Moll | 3 Notenstücke (Klavierbank, Teppichecke, Hülle „Weihnachtsfeier · Zug 24“); Kreuze über den Noten: H – A – Es – E → Spieldose **HASE** → Klavierschlüssel; viermal im Takt der Schienenstöße klopfen; Schluss = Anfang rückwärts: D – H – A – G | Spieldose **HASE** |
 | 13 | Kapelle (3. Advent) | 12 Kerzen in der Reihenfolge der Wagen 1–12 → Papier und Bleistift; Gedenktafel abreiben (… Mira … und J.); Laterne am Kranz anzünden, über den Abrieb halten → H, E, I, M; Opferstock → Familienfoto; Glocken G – A – H (groß, rechts, links) → Tür | Opferstock **HEIM** |
 | 14 | Zeitungswagen | Kreuzworträtsel (ILSE, KLAVIER eintragen, LOKFÜHRER → SCHAFFNER) → **WEICHE**; Zeitung vom 25.12. + Schnipsel aus dem Papierkorb (BAHNHOF und „gerettet“ passen nicht); Lupe + Pressefoto: 23:47 | Archiv **WEICHE**, Tür **2347** |
@@ -432,9 +432,9 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
 - [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
 - [x] **Wagenwechsel, Figuren, Gespräche:** `?wagen=N`, weiter zum nächsten Wagen, Bruno/Herr K./Barkeeper, Gesprächsauswahl
-- [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/adventskalender.md`)
+- [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/planung.md`)
 - [ ] **Wagen 2 und 3:** Gepäckwagen, Postwagen
-- [x] **Adventskalender:** Kalender als Startbild, Türchen-Sperre nach Datum, Spielstand
+- [x] **Wagenübersicht:** Ringbahn als Startbild, Türchen-Sperre nach Datum, Spielstand
 - [x] **Wagen 9–16:** Spiegelwagen, Lautsprecherwagen, Uhrenwagen, Musiksalon, Kapelle, Zeitungswagen, Spielzimmer, Funkraum
 - [ ] **Wagen 17–24**, Online stellen
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds

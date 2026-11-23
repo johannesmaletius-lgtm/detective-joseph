@@ -1,5 +1,5 @@
 // Gegenstände der Wagen 9–16. Wie in wagonItems.js im Code gezeichnet (icon, 128 × 128).
-// keep: true = Joseph nimmt sie über den Adventskalender in spätere Wagen mit.
+// keep: true = Joseph nimmt sie in spätere Wagen mit.
 
 const INK = '#2b1c10';
 

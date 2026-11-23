@@ -187,7 +187,8 @@ export function drawCipherLetter(ctx, { turn }) {
       const decoded = CIPHER.map((row) => shiftText(row, -turn));
       text(c, 'Mit der Scheibe gelesen:', 40, 348, { font: `16px ${HAND}`, color: BLUE_INK });
       text(c, `${decoded[1]} ${decoded[2]}`, 40, 378, { font: `bold 18px ${TYPEWRITER}`, color: BLUE_INK });
-      text(c, decoded[3], 40, 404, { font: `bold 18px ${TYPEWRITER}`, color: BLUE_INK });
+      // Das Wort für die Tür liest die Scheibe nicht vor – das muss man selbst Buchstabe für Buchstabe entziffern
+      text(c, decoded[3].replace(/:.*$/, ': _ _ _ _ _'), 40, 404, { font: `bold 18px ${TYPEWRITER}`, color: BLUE_INK });
     },
   });
   // Chiffrierscheibe
@@ -207,6 +208,8 @@ export function drawCipherLetter(ctx, { turn }) {
     text(ctx, String.fromCharCode(65 + i), cx + Math.cos(b) * 70, cy + Math.sin(b) * 70 + 5, { font: `bold 13px ${PRINT}`, color: RED, align: 'center' });
   }
   text(ctx, String(turn), cx, cy + 8, { font: `bold 22px ${PRINT}`, align: 'center' });
+  text(ctx, 'innen (rot): Brief', 880, 556, { font: `italic 18px ${HAND}`, color: '#f6b8a8' });
+  text(ctx, 'außen: Klartext', 880, 584, { font: `italic 18px ${HAND}`, color: '#f1e0b8' });
   for (const spot of DISK_SPOTS) {
     ctx.fillStyle = '#4a3a22';
     ctx.beginPath();

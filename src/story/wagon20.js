@@ -314,8 +314,9 @@ function currentGoal(story) {
   if (!f.metMira) return { id: 'mira', lines: ['Mit Mira reden.'] };
   if (!f.parcelsSorted) {
     return { id: 'parcels', lines: [
-      'Die Anhänger unter die passenden Pakete. Was ich über die Pakete weiß, steht darüber.',
-      'Tick tickt. Bruno klappert mit Löffeln. Ilse strickt (Wolle). Moll hat Noten (Papier). K. trug einen Hut. Und beim Barkeeper gluckert es.',
+      'Die Anhänger unter die passenden Pakete. Wer hat mir unterwegs was gezeigt? Uhren, Löffel, Wolle, Noten, ein Hut, Flaschen …',
+      'Genau hinsehen: ein Kästchen mit Aufziehloch, eine Löffelspitze, ein grüner Wollfaden, Notenlinien an der Ecke, eine runde Schachtel, ein Flaschenhals. Ein Anhänger bleibt übrig.',
+      'Aufziehloch = Herr Tick, Löffel = Bruno, Wolle = Ilse, Notenblatt = Moll, Hutschachtel = Herr K., Flasche = Barkeeper. Der Heizer bekommt hier nichts.',
     ] };
   }
   if (!f.miraTold) return { id: 'mira2', lines: ['Mira noch einmal ansprechen.'] };

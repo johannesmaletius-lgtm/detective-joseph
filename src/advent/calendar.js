@@ -1,7 +1,7 @@
 import { DOORS, dateText, daysUntil, isUnlocked } from './doors.js';
 import { COLORS, FONTS, outlinedText, roundedRect } from '../ui/text.js';
 
-// Der Adventskalender: Die Ringbahn von oben – 24 Wagen auf einem Gleiskreis, in der Mitte der Turm.
+// Die Wagenübersicht von Detective Joseph: Die Ringbahn von oben – 24 Wagen auf einem Gleiskreis, in der Mitte der Turm.
 // Jeder Wagen ist eine Tür. Gesperrte Wagen sind dunkel, offene leuchten, geschaffte tragen einen Stern.
 //
 //   const door = await calendar.open({ save, now, test });   // wartet, bis eine Tür gewählt wird

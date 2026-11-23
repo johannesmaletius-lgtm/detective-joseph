@@ -91,7 +91,7 @@ export const wagon17 = {
       look: (story) => story.say(story.flags.heated ? 'Die Beete dampfen. Warm.' : 'Beete mit Kakteen, Tomaten und Farnen. Die Erde ist kalt.'),
     },
     door: {
-      look: 'Die Tür nach vorne. Ein Zahlenschloss mit zwei Rädchen.',
+      look: 'Die Tür nach vorne. Ein Zahlenschloss mit zwei Rädchen. Darüber, mit dem Finger in den Staub geschrieben: „Alle zusammen.“',
       use: (story) => tryDoor(story),
     },
   },

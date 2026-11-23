@@ -13,7 +13,7 @@ export const INDEX_CARDS = [
   { id: 'glasses', thing: 'Brille, rund', owner: 'Herr K.', round: 112, place: 'Schlafwagen', shelf: 4 },
   { id: 'cane', thing: 'Spazierstock', owner: 'Herr K.', round: 115, place: 'Bordkino', shelf: 9 },
   { id: 'needle', thing: 'Stricknadel', owner: 'Frau Ilse', round: 108, place: 'Schlafwagen', shelf: 1 },
-  { id: 'teddy', thing: 'Teddybär', owner: 'unbekannt (ein Kind?)', round: 99, place: 'Spielzimmer', shelf: 6 },
+  { id: 'teddy', thing: 'Teddybär', owner: 'ein Kind?', round: 99, place: 'Spielzimmer', shelf: 6 },
 ];
 export const K_ORDER = ['hat', 'scarf', 'glasses', 'cane'];
 export const CARD_SLOTS = [0, 1, 2, 3].map((i) => ({ x: 160 + i * 250, y: 150, w: 210, h: 130, label: `${i + 1}.` }));
@@ -42,7 +42,7 @@ export function drawIndexCard(ctx, token, x, y) {
   ctx.strokeStyle = 'rgba(60, 90, 160, 0.25)';
   ctx.lineWidth = 1;
   for (let i = 1; i < 5; i++) line(ctx, 0, 26 + i * 22, 200, 26 + i * 22);
-  text(ctx, 'FUNDBÜRO RINGBAHN', 8, 18, { font: `bold 12px ${PRINT}`, color: RED });
+  text(ctx, 'FUNDBÜRO', 8, 18, { font: `bold 12px ${PRINT}`, color: RED });
   text(ctx, `Lager ${card.shelf}`, 192, 18, { font: `bold 15px ${TYPEWRITER}`, color: INK, align: 'right' });
   text(ctx, card.thing, 10, 44, { font: `15px ${TYPEWRITER}` });
   text(ctx, `Besitzer: ${card.owner}`, 10, 66, { font: `13px ${TYPEWRITER}` });

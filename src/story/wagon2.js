@@ -187,7 +187,7 @@ async function readPage1(story) {
   story.flags.pageRead = true;
   await story.say('Meine Schrift. „Ich bin du – nur ein paar Runden früher.“');
   await story.say('Also: den untersten Koffer aus dem Stapel holen, ohne einen großen auf einen kleinen zu stellen. Und ihn wiegen.');
-  story.note('Aktenseite 1: Seiten 2 und 3 liegen im untersten Koffer des Stapels. Nie einen größeren Koffer auf einen kleineren stellen, nur die zwei Kreidefelder sind frei. Türcode = Gewicht des untersten Koffers, ohne Komma.');
+  story.note('Aktenseite 1: Seiten 2 und 3 liegen im untersten Koffer des Stapels. Nie einen größeren Koffer auf einen kleineren stellen, nur die zwei Kreidefelder sind frei – und die vier anderen Koffer müssen am Ende ordentlich auf EINEM Feld stehen. Türcode = Gewicht des untersten Koffers, ohne Komma.');
 }
 
 // ============================================================================================
@@ -196,6 +196,15 @@ async function readPage1(story) {
 
 function freshPiles() {
   return [[5, 4, 3, 2, 1], [], []];
+}
+
+function bottomFree(piles) {
+  return piles[0].length === 1 && piles[0][0] === 5;
+}
+
+// Die vier kleineren Koffer stehen zusammen auf einem Kreidefeld
+function stackedAway(piles) {
+  return piles[1].length === 4 || piles[2].length === 4;
 }
 
 async function restack(story) {
@@ -238,16 +247,21 @@ async function restack(story) {
       s.held = null;
       story.sound('thud');
       f.moves = s.moves;
-      // Liegt auf dem untersten Koffer nichts mehr?
-      if (s.piles[0].length === 1 && s.piles[0][0] === 5) {
-        await story.wait(0.4);
-        view.close(true);
+      // Liegt auf dem untersten Koffer nichts mehr – und stehen die vier anderen ordentlich auf einem Feld?
+      if (bottomFree(s.piles)) {
+        if (stackedAway(s.piles)) {
+          await story.wait(0.4);
+          view.close(true);
+        } else if (!f.messNoted) {
+          f.messNoted = true;
+          await story.say('Der unterste ist frei … aber so ein Durcheinander? Die Akte sagt: die vier anderen ordentlich auf EIN Feld.');
+        }
       }
     },
   });
   // Koffer, der noch in der Hand war, zurücklegen
   if (state.held) state.piles[state.held.from].push(state.held.size);
-  if (state.piles[0].length === 1 && state.piles[0][0] === 5 && !f.caseFree) {
+  if (bottomFree(state.piles) && stackedAway(state.piles) && !f.caseFree) {
     f.caseFree = true;
     story.give('heavyCase');
     await story.say(`Geschafft – in ${state.moves} Zügen! Der unterste Koffer ist frei.`);
@@ -366,8 +380,8 @@ function currentGoal(story) {
     return { id: 'stack', lines: [
       'Seite 1 sagt: Die fehlenden Seiten liegen im untersten Koffer des Stapels.',
       'Immer nur den obersten Koffer bewegen, nie einen größeren auf einen kleineren. Platz: der Stapel und zwei Kreidefelder.',
-      'Erst die drei kleinsten Koffer auf ein Kreidefeld bringen (das braucht sieben Züge), dann den vierten auf das andere Feld.',
-      'Klein auf Feld rechts, mittel auf Feld links, klein auf mittel. Dritter auf Feld rechts. Klein auf den Stapel, mittel auf Feld rechts, klein auf Feld rechts. Dann den vierten auf Feld links.',
+      'Die vier kleineren Koffer müssen zusammen auf ein Kreidefeld. Trick: Erst die drei kleinsten auf das ANDERE Feld (sieben Züge), dann den vierten auf das Zielfeld, dann die drei obendrauf (noch mal sieben).',
+      'Ziel: Feld links. Kleinster nach rechts, zweiter nach links, kleinster nach links, dritter nach rechts, kleinster auf den Stapel, zweiter nach rechts, kleinster nach rechts, vierter nach links – dann kleinster nach links, zweiter auf den Stapel, kleinster auf den Stapel, dritter nach links, kleinster nach rechts, zweiter nach links, kleinster nach links.',
     ] };
   }
   if (!f.weighed) return { id: 'weigh', lines: ['Den Koffer wiegen: Koffer im Inventar anklicken, dann die Gepäckwaage.'] };

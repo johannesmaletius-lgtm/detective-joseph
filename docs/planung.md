@@ -1,6 +1,6 @@
-# Adventskalender „Die Ringbahn“ – Planungsstand
+# Detective Joseph – „Die Ringbahn“ – Planungsstand
 
-Detective Joseph als Adventskalender für Johannes' Freundin: 24 Waggons, jeden Tag (1.–24. Dezember 2026) ein neuer Wagen.
+Detective Joseph für Johannes' Freundin: 24 Waggons, jeden Tag (1.–24. Dezember 2026) ein neuer Wagen.
 Planungsseite (Artifact, mit Grafik-Befehlen und Haken pro Bild): https://claude.ai/artifact/PJZU72QAUCiWMff7BHSQmT
 Die ganze Geschichte als Erzählung (mit Hintergrund und Korrekturliste): `docs/geschichte.md` und Reiter „Geschichte“ auf der Planungsseite.
 
@@ -88,7 +88,7 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 
 ## Code-Stand
 
-**Gebaut:** Adventskalender als Startbild (Ringbahn von oben, 24 Wagen, `src/advent/`), Türchen-Sperre nach Datum, Spielstand im Browser (geschaffte Türen, Notizen, mitgenommene Gegenstände), Wagenwechsel (Kalender → Wagen → zurück zum Kalender), Inventar über Wagen hinweg (Gegenstände mit `keep: true` in `src/story/items.js`, zusätzlich `startItems` im Drehbuch), Notizen früherer Wagen bleiben im Notizbuch (Überschrift „Wagen N“).
+**Gebaut:** Wagenübersicht als Startbild (Ringbahn von oben, 24 Wagen, `src/advent/`), Türchen-Sperre nach Datum, Spielstand im Browser (geschaffte Türen, Notizen, mitgenommene Gegenstände), Wagenwechsel (Kalender → Wagen → zurück zum Kalender), Inventar über Wagen hinweg (Gegenstände mit `keep: true` in `src/story/items.js`, zusätzlich `startItems` im Drehbuch), Notizen früherer Wagen bleiben im Notizbuch (Überschrift „Wagen N“).
 
 - Neuen Wagen eintragen: in `src/advent/doors.js` bei der Tür `load` ergänzen (Szene + Drehbuch). Am Ende des Wagens `story.finish()` aufrufen.
 - Testen: `?test` (alle Türen offen + Knopf „Spielstand löschen“), `?datum=2026-12-05` (anderes Datum), `?tuer=2&skipintro` (direkt in eine Tür).
@@ -110,6 +110,9 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 **Noch zu bauen:** Wagen 2, 3 und 17–24 umsetzen, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
+
+**Stand (23.11.2026, Spieltest):** Alle 24 Wagen automatisch im Browser durchgespielt (einzeln und nacheinander mit Spielstand) – alle lösbar, keine Fehler. Danach geändert: kein Kalender-Begriff mehr im Spiel; Finale (Tür 24) mit neu gezeichnetem Tunnelfenster, Entgleisen als Bild und Schnee-Übergang, Schlussbild erzählt von selbst; leichte Rätsel schwerer (2, 3, 6, 10, 11, 19, 20, 21, 23 – neue Lösungen im README); schönere Nahansichten (Kofferstapel, Flaschen, Tonband, Puppenhaus, Pakete). Geschätzte Spielzeit gesamt ≈ 6–7 Stunden. Offen: In Tür 1 brechen kurze Szenen nach dem Tunnel Klicks ab.
+
 
 **Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Code: Wagen 1 und 4–16 sind gebaut, es fehlen Wagen 2, 3 und 17–24 (Stand 19.11. abends).
 

@@ -83,7 +83,7 @@ export function drawChemistry(ctx, { trays, held, redLight }) {
     angle: 0.04,
     inner: (c) => {
       text(c, 'Anleitung', 110, 32, { font: `bold 18px ${SERIF}`, align: 'center' });
-      ['Schale 1: Entwickler', '(braun, seifig) 3 Min.', '', 'Schale 2: Stoppbad', '(riecht sauer) 1 Min.', '', 'Schale 3: Fixie…'].forEach((value, i) => text(c, value, 14, 66 + i * 26, { font: `15px ${HAND}`, color: INK }));
+      ['Schale 1: Entwickler', '(eine Lauge) 3 Min.', '', 'Schale 2: Stoppbad', '(eine Säure) 1 Min.', '', 'Schale 3: Fixie…'].forEach((value, i) => text(c, value, 14, 66 + i * 26, { font: `15px ${HAND}`, color: INK }));
       c.fillStyle = '#1a1410';
       c.beginPath();
       c.moveTo(0, 250);
@@ -112,27 +112,61 @@ export function drawContactSheet(ctx) {
   text(ctx, 'Kontaktbogen – nach dem Weg durch den Tunnel ordnen', 640, 124, { font: `bold 20px ${PRINT}`, color: '#e0e0e0', align: 'center' });
   text(ctx, 'Die Tunnellampen hängen in festen Abständen – wie auf den Filmbildern im Kino.', 640, 600, { font: `italic 16px ${SERIF}`, color: '#c8c8c8', align: 'center' });
 }
+// Ein Negativ: Blick nach vorn in den Tunnel, hell und dunkel vertauscht. Die Lampen (in Wirklichkeit hell)
+// sind dunkle Punkte. Je tiefer der Zug im Tunnel ist, desto weniger Lampen liegen noch vor ihm.
+// Auf dem letzten Bild (keine Lampe mehr) teilt sich das Gleis: Weiche 7.
 export function drawNegative(ctx, token, x, y) {
   const w = 120, h = 90;
-  ctx.fillStyle = '#d8d8d8'; // Negativ: hell und dunkel vertauscht
-  ctx.fillRect(x - w / 2, y - h / 2, w, h);
-  ctx.fillStyle = '#4a4a4a';
+  const ahead = 5 - token.lamps;
+  ctx.save();
   ctx.beginPath();
-  ctx.ellipse(x, y + 4, 40, 34, 0, 0, Math.PI * 2);
+  ctx.rect(x - w / 2, y - h / 2, w, h);
+  ctx.clip();
+  ctx.fillStyle = '#d6d4cf';
+  ctx.fillRect(x - w / 2, y - h / 2, w, h);
+  // Tunnelröhre in Perspektive (im Negativ: dunkle Wände werden hell, das ferne Loch dunkel-grau)
+  const vx = x + 6, vy = y - 6;
+  ctx.fillStyle = '#9d9b96';
+  ctx.beginPath();
+  ctx.ellipse(vx, vy, 12, 10, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#111';
-  for (let i = 0; i < token.lamps; i++) {
+  ctx.strokeStyle = 'rgba(70, 70, 70, 0.55)';
+  ctx.lineWidth = 1.5;
+  for (const [ex, ey] of [[x - w / 2, y - h / 2], [x + w / 2, y - h / 2], [x - w / 2, y + h / 2], [x + w / 2, y + h / 2]]) line(ctx, ex, ey, vx + (ex - vx) * 0.12, vy + (ey - vy) * 0.12);
+  // Lampen an der linken Wand, immer kleiner zur Tiefe hin
+  for (let k = 0; k < ahead; k++) {
+    const depth = Math.pow(0.62, k);
+    const lx = vx + (x - w / 2 + 10 - vx) * depth;
+    const ly = vy + (y - h / 2 + 14 - vy) * depth;
+    ctx.fillStyle = 'rgba(30, 30, 30, 0.25)';
     ctx.beginPath();
-    ctx.arc(x - 50 + 8 + i * 9, y - 34, 3, 0, Math.PI * 2);
+    ctx.arc(lx, ly, 9 * depth + 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#151515';
+    ctx.beginPath();
+    ctx.arc(lx, ly, 4 * depth + 1, 0, Math.PI * 2);
     ctx.fill();
   }
-  // Gleise
-  ctx.strokeStyle = '#777';
+  // Gleis
+  ctx.strokeStyle = '#555';
   ctx.lineWidth = 2;
-  line(ctx, x - 20, y + h / 2, x - 4, y + 4);
-  line(ctx, x + 20, y + h / 2, x + 4, y + 4);
+  line(ctx, x - 22, y + h / 2, vx - 2, vy + 8);
+  line(ctx, x + 22, y + h / 2, vx + 2, vy + 8);
+  if (ahead === 0) {
+    // die Weiche: ein zweites Gleis biegt nach rechts ab
+    line(ctx, x + 4, y + 26, x + 46, y + 4);
+    line(ctx, x + 18, y + 34, x + 58, y + 12);
+  }
+  ctx.restore();
+  // Filmrand mit Perforation
   ctx.fillStyle = '#222';
-  for (let i = 0; i < 8; i++) ctx.fillRect(x - w / 2 + 4 + i * 15, y - h / 2 - 8, 8, 5);
+  ctx.fillRect(x - w / 2, y - h / 2 - 12, w, 10);
+  ctx.fillRect(x - w / 2, y + h / 2 + 2, w, 10);
+  ctx.fillStyle = '#d6d4cf';
+  for (let i = 0; i < 8; i++) {
+    ctx.fillRect(x - w / 2 + 5 + i * 15, y - h / 2 - 9, 7, 4);
+    ctx.fillRect(x - w / 2 + 5 + i * 15, y + h / 2 + 5, 7, 4);
+  }
 }
 
 // ---------------------------------------------------------------- Vergrößerung

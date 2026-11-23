@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 20 (Packwagen): Pakete und Anhänger, Frachtliste mit Sternen-Schablone,
 // Kisten über der Bodenluke (Schiebepuzzle), Miras Paket mit fünf Bändern, Kelle und Karte.
@@ -15,37 +15,119 @@ export const PARCELS = [
 const ORDER = ['moll', 'k', 'tick', 'barkeeper', 'ilse', 'bruno'];
 export const PARCEL_SLOTS = ORDER.map((id, i) => ({ id, x: 170 + i * 160, y: 360, w: 120, h: 70 }));
 export function nameTokens() {
-  const names = ['ilse', 'tick', 'k', 'bruno', 'barkeeper', 'moll'];
-  return names.map((id, i) => ({ id, w: 130, h: 50, label: PARCELS.find((p) => p.id === id).name, home: { x: 240 + i * 160, y: 590 } }));
+  // Ein Anhänger zu viel: Für den Heizer liegt hier kein Paket
+  const names = ['ilse', 'tick', 'heizer', 'k', 'bruno', 'barkeeper', 'moll'];
+  const label = (id) => PARCELS.find((p) => p.id === id)?.name ?? 'Der Heizer';
+  return names.map((id, i) => ({ id, w: 130, h: 50, label: label(id), home: { x: 205 + i * 145, y: 590 } }));
 }
 export function checkNames(placement) {
   return placement.every((id, i) => id === PARCEL_SLOTS[i].id);
 }
 
+// Die Pakete: keine Aufschrift – nur Form und Kleinigkeiten verraten, was drin ist.
 export function drawParcels(ctx) {
   wood(ctx, 120, 70, 1040, 580, [100, 60, 30]);
+  glow(ctx, 640, 160, 560, '255, 210, 140', 0.14);
   PARCEL_SLOTS.forEach((slot) => {
     const p = PARCELS.find((q) => q.id === slot.id);
     const cx = slot.x + slot.w / 2, by = 330;
-    ctx.fillStyle = p.color;
+    // Schatten
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(cx + 6, by - 4, 64, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    const paper = (x, y, w, h) => {
+      const g = ctx.createLinearGradient(x, y, x + w, y + h);
+      g.addColorStop(0, shade(p.color, 30));
+      g.addColorStop(1, shade(p.color, -25));
+      ctx.fillStyle = g;
+    };
     if (p.shape === 'round') {
+      // Hutschachtel: Deckel mit Rand
+      paper(cx - 56, by - 110, 112, 100);
       ctx.beginPath();
-      ctx.ellipse(cx, by - 60, 56, 50, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, by - 30, 56, 18, 0, 0, Math.PI);
+      ctx.lineTo(cx - 56, by - 92);
+      ctx.ellipse(cx, by - 92, 56, 18, 0, Math.PI, 0);
+      ctx.closePath();
       ctx.fill();
-    } else if (p.shape === 'flat') ctx.fillRect(cx - 60, by - 40, 120, 30);
-    else if (p.shape === 'long') ctx.fillRect(cx - 30, by - 150, 60, 140);
-    else if (p.shape === 'soft') {
+      ctx.fillStyle = shade(p.color, 45);
       ctx.beginPath();
-      ctx.ellipse(cx, by - 50, 60, 40, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, by - 94, 60, 20, 0, 0, Math.PI * 2);
       ctx.fill();
-    } else if (p.shape === 'bottle') ctx.fillRect(cx - 26, by - 160, 52, 150);
-    else ctx.fillRect(cx - 50, by - 100, 100, 90);
+    } else if (p.shape === 'flat') {
+      // flach und dünn – ein Notenheft; an der Ecke lugt ein Blatt mit Linien hervor
+      paper(cx - 60, by - 34, 120, 26);
+      ctx.fillRect(cx - 60, by - 34, 120, 26);
+      ctx.fillStyle = '#f2ead6';
+      ctx.fillRect(cx + 34, by - 44, 30, 14);
+      ctx.strokeStyle = 'rgba(40, 30, 20, 0.6)';
+      ctx.lineWidth = 1;
+      for (let k = 0; k < 4; k++) line(ctx, cx + 36, by - 41 + k * 3, cx + 62, by - 41 + k * 3);
+    } else if (p.shape === 'long') {
+      // lang und schmal – ein Besteckkasten; eine Löffelspitze schaut heraus
+      paper(cx - 24, by - 150, 48, 140);
+      ctx.fillRect(cx - 24, by - 150, 48, 140);
+      ctx.fillStyle = '#c9ccd2';
+      ctx.beginPath();
+      ctx.ellipse(cx + 8, by - 158, 7, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.shape === 'soft') {
+      // weich und bauchig – ein grüner Wollfaden hängt heraus
+      paper(cx - 60, by - 90, 120, 80);
+      ctx.beginPath();
+      ctx.ellipse(cx, by - 46, 60, 38, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#3f8a3a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx + 46, by - 30);
+      ctx.bezierCurveTo(cx + 70, by - 10, cx + 50, by + 2, cx + 74, by + 6);
+      ctx.stroke();
+    } else if (p.shape === 'bottle') {
+      // eine Flasche, eingewickelt: unten breit, oben ein Hals
+      paper(cx - 26, by - 170, 52, 160);
+      ctx.beginPath();
+      ctx.moveTo(cx - 26, by - 10);
+      ctx.lineTo(cx - 26, by - 100);
+      ctx.quadraticCurveTo(cx - 26, by - 125, cx - 9, by - 135);
+      ctx.lineTo(cx - 9, by - 172);
+      ctx.lineTo(cx + 9, by - 172);
+      ctx.lineTo(cx + 9, by - 135);
+      ctx.quadraticCurveTo(cx + 26, by - 125, cx + 26, by - 100);
+      ctx.lineTo(cx + 26, by - 10);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      // ein kleiner Kasten – an der Seite ein Schlüsselloch zum Aufziehen
+      paper(cx - 46, by - 96, 92, 86);
+      ctx.fillRect(cx - 46, by - 96, 92, 86);
+      ctx.fillStyle = '#c9a24c';
+      ctx.beginPath();
+      ctx.arc(cx + 34, by - 54, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#2a1a0e';
+      ctx.fillRect(cx + 33, by - 56, 2, 5);
+    }
+    // goldenes Band mit Schleife
     ctx.strokeStyle = '#f2d06b';
     ctx.lineWidth = 5;
-    line(ctx, cx, by - 160, cx, by - 10);
-    p.clue.split(', ').forEach((part, i) => text(ctx, i ? part : `„${part}`, cx, 150 + i * 20, { font: `italic 15px ${SERIF}`, color: '#f1e0b8', align: 'center' }));
+    const top = { round: by - 112, flat: by - 34, long: by - 150, soft: by - 84, bottle: by - 100, box: by - 96 }[p.shape];
+    line(ctx, cx, top, cx, by - 10);
+    ctx.fillStyle = '#f2d06b';
+    ctx.beginPath();
+    ctx.ellipse(cx - 9, top - 4, 9, 5, -0.4, 0, Math.PI * 2);
+    ctx.ellipse(cx + 9, top - 4, 9, 5, 0.4, 0, Math.PI * 2);
+    ctx.fill();
   });
-  text(ctx, 'Geschüttelt und befühlt – wem gehört welches Paket?', 640, 110, { font: `bold 20px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+  text(ctx, 'Schütteln verboten – Mira passt auf. Man muss es an der Form erkennen.', 640, 112, { font: `italic 16px ${SERIF}`, color: '#e9d8b0', align: 'center' });
+}
+
+// Farbe heller (+) oder dunkler (−) machen
+function shade(hex, amount) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = (v) => Math.max(0, Math.min(255, v + amount));
+  return `rgb(${c(n >> 16)}, ${c((n >> 8) & 255)}, ${c(n & 255)})`;
 }
 
 export function drawNameTag(ctx, token, x, y) {

@@ -1,4 +1,4 @@
-// Die 24 Türen des Adventskalenders „Die Ringbahn“ (siehe docs/adventskalender.md).
+// Die 24 Türen (Wagen) von Detective Joseph – „Die Ringbahn“ (siehe docs/planung.md).
 //
 // Jede Tür ist ein Wagen. Ein Wagen besteht aus
 //   - einer Szene (nur Daten: Bild, Laufbereich, anklickbare Stellen …), z. B. src/scene/trainCompartment.js

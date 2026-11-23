@@ -33,7 +33,7 @@ import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, T
 // (Mauszeiger, Inventar, Sprechtexte, Notizbuch …) und die Geschichte. Ruft ca. 60-mal pro Sekunde
 // update() (Spiellogik) und draw() (Zeichnen) auf.
 //
-// Zuerst kommt der Adventskalender (src/advent/calendar.js). Wer eine Tür wählt, steigt in diesen Wagen
+// Zuerst kommt die Wagenübersicht (src/advent/calendar.js). Wer eine Tür wählt, steigt in diesen Wagen
 // (Szene + Drehbuch, siehe src/advent/doors.js). Ist der Wagen geschafft, geht es zurück zum Kalender.
 //
 // Ein Klick geht der Reihe nach an: Karte (Titelbild, Brief …) → Nahansicht (Zahlenschloss, Rätsel) →
@@ -51,7 +51,7 @@ export class Game {
     this.story = null;
     this.lastTime = 0;
 
-    // Adventskalender und Spielstand
+    // Wagenübersicht und Spielstand
     this.calendar = new Calendar();
     this.save = new SaveGame();
     this.door = null;     // Tür, die gerade gespielt wird

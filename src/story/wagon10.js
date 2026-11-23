@@ -141,7 +141,7 @@ async function fuseBox(story) {
     if (!f.fusesSeen && !inTunnel(story)) {
       f.fusesSeen = true;
       await story.say('Fünf Kabel, alle verschieden dick. Und fünf Sicherungen von 6 bis 25 Ampere.');
-      story.note('Sicherungskasten: Fünf Kabel verschiedener Dicke, fünf lose Sicherungen. Zettel: „Dünner Draht – kleine Sicherung. Sonst brennt’s!“');
+      story.note('Sicherungskasten: Fünf Kabel verschiedener Dicke, fünf lose Sicherungen. Zettel (halb abgerissen): „1 mm² → 6 A, 1,5 mm² → 10 A …“ Zwei Kabelschilder sind abgegriffen.');
     }
     return;
   }
@@ -271,7 +271,7 @@ async function playTape(story, view) {
     }
     await voice('„Fahrgast K., bitte zum Tunnel. Fahrgast K., bitte zum Tunnel.“');
     await voice('„Haben Sie keine Angst. Sie kommen nach Hause …“');
-    await voice('„… nerednA eid eiw … tsdhcäN red tsi flE …“');
+    await voice('„… nerednA eid eiw … etshcäN red tsi flE …“');
     if (!f.forwardHeard) {
       f.forwardHeard = true;
       await story.say('„Fahrgast K., bitte zum Tunnel.“ Das ist der Ruf, dem Herr K. gefolgt ist.');

@@ -170,7 +170,7 @@ async function openTubes(story) {
   const f = story.flags;
   if (f.letterArrived) return story.say('Die Leitung ist leer. Den Brief habe ich.');
   if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Weichen nicht.');
-  f.switches ??= [false, true, true, false];
+  f.switches ??= [false, true, true, true]; // eine Lösung: Weiche 1, 3 und 4 je einmal drehen
   const state = { open: f.switches, capsule: null };
   await story.view('picture', {
     state,
@@ -234,8 +234,9 @@ async function readLetter(story) {
         await story.wait(0.3);
         await story.say('Jetzt! Vier Buchstaben zurück – hundertacht Runden sind vier ganze Alphabete und noch vier.');
         await story.say('„Morgen verschwindet jemand. Achte auf die Gläser.“');
-        await story.say('„Das Wort für die Tür: Stern.“ Unterschrieben: „Dein J.“');
-        story.note('Der Brief an J. (Runde 108, um 4 verschoben): „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: STERN. Dein J.“');
+        await story.say('„Das Wort für die Tür: W-X-I-V-R.“ Das letzte Wort muss ich selbst entziffern – Buchstabe für Buchstabe.');
+        await story.say('Den Buchstaben aus dem Brief innen auf der roten Scheibe suchen, außen ablesen.');
+        story.note('Der Brief an J. (Runde 108, Scheibe auf 4): „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: WXIVR.“ Das letzte Wort muss ich selbst mit der Scheibe entziffern (innen suchen, außen ablesen).');
       }
     },
   });
@@ -262,7 +263,7 @@ async function tryDoor(story) {
     },
   });
   if (!opened) {
-    if (tries > 0) await story.say(story.flags.decoded ? 'Falsch. S-T-E-R-N …' : 'Falsch. Fünf Buchstaben.');
+    if (tries > 0) await story.say(story.flags.decoded ? 'Falsch. W-X-I-V-R, mit der Scheibe zurückgedreht …' : 'Falsch. Fünf Buchstaben.');
     return;
   }
   await story.cutscene(async () => {
@@ -299,7 +300,8 @@ function currentGoal(story) {
     return { id: 'tubes', lines: [
       'Der Brief steckt in der Rohrpost – die Station rechts neben der Tür.',
       'Alle vier Weichen müssen gerade stehen. Jede Weiche dreht ihre Nachbarn mit – ausprobieren und mitzählen.',
-      'Von krumm-gerade-gerade-krumm aus: Weiche 2 und Weiche 3 je einmal drehen. Dann rechts die Rohrpost anfordern.',
+      'Weiche 1 dreht 1 und 2, Weiche 2 dreht 1 bis 3, Weiche 3 dreht 2 bis 4, Weiche 4 dreht 3 und 4. Nur Weiche 1 ist krumm – aber sie allein zu drehen verbiegt die 2.',
+      'Weiche 1, Weiche 3 und Weiche 4 je einmal drehen. Dann rechts die Rohrpost anfordern.',
     ] };
   }
   if (!f.decoded) {
@@ -308,5 +310,8 @@ function currentGoal(story) {
       'Das Alphabet hat 26 Buchstaben. 108 geteilt durch 26 … Rest 4. Die Scheibe um 4 drehen.',
     ] };
   }
-  return { id: 'door', lines: ['Das Wort für die Tür steht im Brief: STERN.'] };
+  return { id: 'door', lines: [
+    'Das Wort für die Tür steht verschlüsselt im Brief: W-X-I-V-R. Mit der Scheibe auf 4: den Buchstaben innen (rot) suchen und außen ablesen.',
+    'W wird S, X wird T, I wird E, V wird R, R wird N: STERN.',
+  ] };
 }

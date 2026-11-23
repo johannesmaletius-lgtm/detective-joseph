@@ -508,7 +508,7 @@ async function openDoor(story) {
       kind: 'end',
       title: 'Ende von Wagen 1',
       lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Morgen geht es weiter – im nächsten Wagen.'],
-      continueText: 'Klicken, um zum Adventskalender zurückzukehren',
+      continueText: 'Klicken – zurück zu Detective Joseph',
     });
     story.finish();
   });

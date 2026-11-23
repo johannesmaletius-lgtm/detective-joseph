@@ -27,7 +27,7 @@ export const DEBUG_AT_START = params.has('debug'); // Debug-Ansicht sofort an
 export const START_MUTED = params.has('mute');     // ohne Ton starten
 export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
 
-// Adventskalender (siehe src/advent/):
+// Wagenübersicht mit den 24 Türen (siehe src/advent/):
 //   ?test               alle 24 Türen offen, unabhängig vom Datum (dazu ein Knopf „Spielstand löschen“)
 //   ?datum=2026-12-05   so tun, als wäre heute dieser Tag
 //   ?tuer=2             ohne Kalender direkt in diese Tür (gut mit &skipintro)
