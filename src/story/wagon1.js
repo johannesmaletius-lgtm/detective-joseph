@@ -822,6 +822,17 @@ async function firstTunnel(story) {
   story.note('Im Tunnel ging das Licht aus. Jemand ist im Dunkeln an mir vorbei, Richtung Tür. Und auf dem Bildschirm: ein Totenkopf.');
 }
 
+// Eine kurze Szene nach dem Tunnel: Sie wartet, bis Joseph wirklich nichts mehr tut (nicht läuft,
+// nichts sagt, keine Nahansicht offen hat) – sonst würde sie den Klick des Spielers abbrechen.
+async function quietCutscene(story, play) {
+  const quiet = () => !story.isBusy && !story.arrival && !story.player.movement.isMoving && !story.game.view;
+  do {
+    while (!quiet()) await story.wait(0.1);
+    await story.wait(0.6);
+  } while (!quiet());
+  await story.cutscene(play);
+}
+
 // Nach dem Tunnel: Licht wieder an – und im Abteil ist alles wieder an seinem Platz.
 async function afterTunnel(story) {
   // Was Joseph weggenommen hat, ist wieder da
@@ -832,26 +843,22 @@ async function afterTunnel(story) {
   story.flags.screenOff = false;
   refreshScreen(story);
 
-  await story.idle();
   const count = tunnels(story);
   if (count === 1) {
-    await story.wait(0.6);
-    await story.cutscene(async () => {
+    await quietCutscene(story, async () => {
       story.sound('speaker');
       await story.speak('… nächster Halt: Ringbahnhof …');
       await story.say('Ringbahnhof? Nie gehört.');
     });
     story.flags.heardAnnouncement = true;
   } else if (count === 3) {
-    await story.wait(0.6);
-    await story.cutscene(async () => {
+    await quietCutscene(story, async () => {
       story.sound('speaker');
       await story.speak('… nächster Halt: Ringbahnhof …');
       await story.say('Schon wieder. Wir halten nie.');
     });
   } else if (count === 5) {
-    await story.wait(0.6);
-    await story.cutscene(async () => {
+    await quietCutscene(story, async () => {
       story.sound('speaker');
       await story.speak('… Joseph? … Bist du noch wach? …');
       await story.say('Das war … meine Stimme.');
@@ -861,8 +868,7 @@ async function afterTunnel(story) {
 
   if (letterBack && !story.flags.letterReturned) {
     story.flags.letterReturned = true;
-    await story.wait(0.6);
-    await story.cutscene(async () => {
+    await quietCutscene(story, async () => {
       story.faceToward({ x: 765, y: 205 });
       await story.say('Moment. Da steckt wieder ein Brief im Schlitz.');
       await story.say('Aber den hab ich doch in der Tasche …');
@@ -871,8 +877,7 @@ async function afterTunnel(story) {
   }
   if (batteryBack && !story.flags.batteryReturned) {
     story.flags.batteryReturned = true;
-    await story.wait(0.6);
-    await story.cutscene(async () => {
+    await quietCutscene(story, async () => {
       story.faceToward({ x: 820, y: 280 });
       await story.say('Der Bildschirm läuft wieder?!');
       await story.say('Und die Klappe am Schaltpult ist wieder zugeschraubt. Als hätte ich sie nie geöffnet.');

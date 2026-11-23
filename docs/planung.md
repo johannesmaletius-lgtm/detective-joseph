@@ -107,24 +107,23 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
 - Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
 
-**Noch zu bauen:** Wagen 2, 3 und 17–24 umsetzen, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
+**Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds.
 
 ## Übergabe für die nächste Session
 
 **Stand (23.11.2026, Stimmen):** Die Figuren bekommen echte Stimmen von ElevenLabs, Josephs Sätze bleiben vorerst Text. Ablauf: `node tools/voice-lines.mjs` sammelt alle Sätze der Figuren (≈ 13.000 Zeichen), `node tools/voice-generate.mjs <figur>` vertont sie nach `assets/voices/` + `manifest.json`; das Spiel spielt sie in `src/audio/voices.js` ab (Text bleibt stehen, bis die Stimme fertig ist). Fertig: alle 9 Figuren mit deutschen Bibliotheksstimmen (Starter-Tarif, Liste in `tools/voice-generate.mjs`), 242 Sätze. Nicht vertont: der Barkeeper-Satz mit Flaschennamen (Template). Joseph (Ben) spricht nur im Gespräch (`tools/joseph-dialogue-lines.mjs`, 178 Sätze); gewählte Gesprächsfragen sagt er laut (`story.choose`). Seine übrigen Kommentare bleiben Text. Wird ein Satz geändert, `voice-lines.mjs` + `voice-generate.mjs` erneut laufen lassen. Der ElevenLabs-Schlüssel liegt als Network secret in der Umgebung „detective-joseph“.
 
+**Stand (23.11.2026, Spieltest):** Alle 24 Wagen automatisch im Browser durchgespielt (einzeln und nacheinander mit Spielstand) – alle lösbar, keine Fehler. Danach geändert: kein Kalender-Begriff mehr im Spiel; Finale (Tür 24) mit neu gezeichnetem Tunnelfenster, Entgleisen als Bild und Schnee-Übergang, Schlussbild erzählt von selbst; leichte Rätsel schwerer (2, 3, 6, 10, 11, 19, 20, 21, 23 – neue Lösungen im README); schönere Nahansichten (Kofferstapel, Flaschen, Tonband, Puppenhaus, Pakete). Geschätzte Spielzeit gesamt ≈ 6–7 Stunden. Behoben: In Tür 1 warten die kurzen Szenen nach dem Tunnel jetzt, bis Joseph nichts mehr tut, statt Klicks abzubrechen. Figuren atmen, blinzeln und haben Beschäftigt-Posen. Offen: nur noch Online stellen.
 
-**Stand (23.11.2026, Spieltest):** Alle 24 Wagen automatisch im Browser durchgespielt (einzeln und nacheinander mit Spielstand) – alle lösbar, keine Fehler. Danach geändert: kein Kalender-Begriff mehr im Spiel; Finale (Tür 24) mit neu gezeichnetem Tunnelfenster, Entgleisen als Bild und Schnee-Übergang, Schlussbild erzählt von selbst; leichte Rätsel schwerer (2, 3, 6, 10, 11, 19, 20, 21, 23 – neue Lösungen im README); schönere Nahansichten (Kofferstapel, Flaschen, Tonband, Puppenhaus, Pakete). Geschätzte Spielzeit gesamt ≈ 6–7 Stunden. Offen: In Tür 1 brechen kurze Szenen nach dem Tunnel Klicks ab.
 
-
-**Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Code: Wagen 1 und 4–16 sind gebaut, es fehlen Wagen 2, 3 und 17–24 (Stand 19.11. abends).
+**Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Code: damals Wagen 1 und 4–16 gebaut (inzwischen alle 24).
 
 **Wo was liegt**
 - Planung und Entscheidungen: dieses Dokument
 - Erzählung, Hintergrund, Korrekturen: `docs/geschichte.md`
 - Grafiken: `assets/reference/tuer-XX/tuer-XX-<name>.webp` (Joseph: `assets/reference/joseph/joseph-sheet.webp`, Stil-Referenz: `assets/reference/train-compartment-original.png`)
 - Planungsseite: https://claude.ai/artifact/PJZU72QAUCiWMff7BHSQmT. Vor dem Ändern mit dem Artifact-Tool lesen (`action: read`, dann `path: index.html` für die Datei) und unter derselben Adresse neu veröffentlichen. Reiter: Grafik-Blöcke 1–4 mit allen ChatGPT-Befehlen, Geschichte, Türen 1–24, Entscheidungen. Haken pro Bild in der Datenbank der Seite (Sammlung `bilder`, Dokument = Bild-ID wie `t17-hintergrund`, Feld `erledigt: true`).
-- Code von Wagen 1: `src/` (Szenen, Rätsel, Story), Start mit `start.command` bzw. `server.js`
+- Code: `src/` (Szenen `src/scene/`, Drehbücher `src/story/wagonN.js`, Rätsel `src/puzzles/`), Start mit `start.command` bzw. `server.js`
 
 **Arbeitsweise mit Johannes**
 - Immer nur eine Frage, Antworten A/B/C, kurz.
@@ -140,4 +139,4 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Heizer (21) und anderer Joseph (22): beide Seitenansichten schauen nach rechts → eine spiegeln. Für die Enthüllung gibt es den anderen Joseph auch ohne Mütze.
 - Schaffnerabteil (18): Schlüsselbrett hat 8 Umrisse → Rätsel mit 8 Schlüsseln.
 
-**Vorgeschlagene Reihenfolge für den Code:** 1. Wagenwechsel + Türchen-Sperre nach Datum (mit Test-Schalter) + Spielstand speichern, 2. Wagen 2 (Gepäckwagen) als Vorlage für alle weiteren, 3. Wagen für Wagen bis 24, 4. Online stellen.
+**Nächster Schritt:** Online stellen (GitHub Pages).

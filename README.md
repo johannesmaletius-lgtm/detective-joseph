@@ -433,9 +433,10 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
 - [x] **Wagenwechsel, Figuren, Gespräche:** `?wagen=N`, weiter zum nächsten Wagen, Bruno/Herr K./Barkeeper, Gesprächsauswahl
 - [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/planung.md`)
-- [ ] **Wagen 2 und 3:** Gepäckwagen, Postwagen
+- [x] **Wagen 2 und 3:** Gepäckwagen, Postwagen
 - [x] **Wagenübersicht:** Ringbahn als Startbild, Türchen-Sperre nach Datum, Spielstand
 - [x] **Wagen 9–16:** Spiegelwagen, Lautsprecherwagen, Uhrenwagen, Musiksalon, Kapelle, Zeitungswagen, Spielzimmer, Funkraum
-- [ ] **Wagen 17–24**, Online stellen
+- [x] **Wagen 17–24:** Fotolabor bis Finale
+- [ ] Online stellen (GitHub Pages)
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds
 - [x] Wagenwechsel, Spielstand (welcher Wagen), Titelbild mit „Weiterspielen“, `?wagen=N`
