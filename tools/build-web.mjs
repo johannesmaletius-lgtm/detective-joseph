@@ -33,10 +33,22 @@ const html = readFileSync(join(root, 'index.html'), 'utf8').replace(/\s*<script>
 writeFileSync(join(out, 'index.html'), html);
 writeFileSync(join(out, '.nojekyll'), '');
 
-// Sprachdateien je Figur hintereinander (mit kurzer Stille), Startzeiten messen
+// Sprachdateien je Figur und Wagen hintereinander (mit kurzer Stille), Startzeiten messen.
+// <figur>-w<nr>.mp3 lädt das Spiel erst mit dem Wagen; <figur>.mp3 (Laute, gemeinsame Sätze) gleich beim Start.
 const manifest = JSON.parse(readFileSync(join(root, 'assets/voices/manifest.json'), 'utf8'));
+const wagonOf = {};
+for (const list of ['tools/voice-lines.json', 'tools/joseph-dialogue-lines.json']) {
+  for (const { text, file } of JSON.parse(readFileSync(join(root, list), 'utf8'))) {
+    const n = /^wagon(\d+)\.js$/.exec(file)?.[1];
+    if (n) wagonOf[text] ??= n;
+  }
+}
 const bySpeaker = {};
-for (const [text, file] of Object.entries(manifest)) (bySpeaker[file.split('/')[2]] ??= []).push({ text, file });
+for (const [text, file] of Object.entries(manifest)) {
+  const speaker = file.split('/')[2];
+  const group = wagonOf[text] ? `${speaker}-w${wagonOf[text]}` : speaker;
+  (bySpeaker[group] ??= []).push({ text, file });
+}
 mkdirSync(join(out, 'assets/voices'), { recursive: true });
 const tmp = join(out, '.tmp');
 mkdirSync(tmp);
@@ -54,7 +66,7 @@ for (const [speaker, lines] of Object.entries(bySpeaker)) {
     t += dur;
   }
   writeFileSync(join(tmp, 'list.txt'), parts.map((p) => `file '${p}'`).join('\n'));
-  execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', join(tmp, 'list.txt'), '-c:a', 'libmp3lame', '-b:a', '96k', '-ac', '1', join(out, `assets/voices/${speaker}.mp3`)]);
+  execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', join(tmp, 'list.txt'), '-c:a', 'libmp3lame', '-b:a', '64k', '-ac', '1', join(out, `assets/voices/${speaker}.mp3`)]);
   for (const p of parts) rmSync(p);
   console.log(speaker, lines.length, 'Sätze');
 }

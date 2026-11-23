@@ -1,6 +1,6 @@
 // Gesprochene Sätze der Figuren (Tondateien unter assets/voices/, erzeugt mit tools/voice-generate.mjs).
 // assets/voices/manifest.json ordnet jedem Satz seine Datei zu. Sätze ohne Datei bleiben stumm.
-// In der Web-Fassung (tools/build-web.mjs) liegen alle Sätze einer Figur in einer Datei hintereinander;
+// In der Web-Fassung (tools/build-web.mjs) liegen die Sätze einer Figur je Wagen in einer Datei hintereinander;
 // dann steht im Manifest { file, start, end } (Sekunden) statt nur der Datei.
 
 const VOLUME = 1;
@@ -17,8 +17,9 @@ export class Voices {
       .then((res) => (res.ok ? res.json() : {}))
       .then((files) => {
         this.files = files;
-        // Web-Fassung: die Dateien der Figuren schon im Hintergrund laden
-        for (const entry of new Set(Object.values(files).map((e) => e.file).filter(Boolean))) this.sprite(entry);
+        // Web-Fassung: gemeinsame Dateien (Laute …) gleich laden, die eines Wagens erst mit dem Wagen (preloadWagon)
+        for (const file of this.spriteFiles()) if (!/-w\d+\.mp3$/.test(file)) this.sprite(file);
+        if (this.wagon) this.preloadWagon(this.wagon);
       })
       .catch(() => {});
   }
@@ -44,6 +45,16 @@ export class Voices {
     this.reactedAt = now;
     this.lastReaction = key;
     this.play(key);
+  }
+
+  spriteFiles() {
+    return new Set(Object.values(this.files).map((e) => e.file).filter(Boolean));
+  }
+
+  // Web-Fassung: die Sätze eines Wagens im Hintergrund laden (assets/voices/<figur>-w<nr>.mp3)
+  preloadWagon(number) {
+    this.wagon = number;
+    for (const file of this.spriteFiles()) if (file.endsWith(`-w${number}.mp3`)) this.sprite(file);
   }
 
   has(text) {

@@ -132,6 +132,7 @@ export class Game {
   // Eine Tür spielen: Wagen laden, Mitgebrachtes übergeben, warten bis er geschafft ist, Spielstand speichern
   async playDoor(door, { skipIntro = false } = {}) {
     const entry = doorInfo(door);
+    this.voices.preloadWagon(door);
     this.overlay.fade = 1;
     this.scene = null;
     const { scene, script } = await entry.load();
