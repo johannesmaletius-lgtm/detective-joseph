@@ -221,6 +221,60 @@ export const ADVENT_ITEMS = {
     },
     look: 'Sechs Negative aus dem Tunnel.',
   },
+
+  // ---------------------------------------------------------------- Tür 20: Packwagen
+  starPaper: {
+    name: 'Sternenpapier',
+    icon: (ctx) => {
+      ctx.fillStyle = '#c0302a';
+      ctx.fillRect(18, 24, 92, 80);
+      ctx.fillStyle = '#1a120c';
+      for (const [x, y] of [[40, 46], [80, 50], [56, 82], [92, 88]]) {
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 4 : 10;
+          ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        }
+        ctx.fill();
+      }
+    },
+    look: 'Geschenkpapier mit ausgestanzten Sternen. Die Sterne sind Löcher.',
+  },
+  giftBox: {
+    name: 'Miras Paket',
+    icon: (ctx) => {
+      ctx.fillStyle = '#7a2a3a';
+      ctx.fillRect(22, 36, 84, 70);
+      for (const [c, x] of [['#c0302a', 60], ['#e0b030', 44], ['#3a5ab0', 76]]) {
+        ctx.fillStyle = c;
+        ctx.fillRect(x, 36, 8, 70);
+      }
+      ctx.fillStyle = '#2f8a4a';
+      ctx.fillRect(22, 66, 84, 8);
+    },
+    look: 'Miras Paket. „Für Papa“.',
+  },
+  paddle: {
+    name: 'Miras Kelle',
+    keep: true,
+    icon: (ctx) => {
+      ctx.fillStyle = '#8a5a2a';
+      ctx.fillRect(58, 70, 12, 50);
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(64, 46, 36, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c0302a';
+      ctx.beginPath();
+      ctx.arc(64, 46, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(64, 46, 18, 0, Math.PI * 2);
+      ctx.fill();
+    },
+    look: 'Miras selbstgebastelte Schaffnerkelle. „Damit du uns nach Hause bringst.“',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
