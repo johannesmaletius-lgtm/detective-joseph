@@ -138,7 +138,9 @@ export class TrainSound {
     filter.frequency.linearRampToValueAtTime(320, now + duration);
     filter.Q.value = 2.5;
     grind.connect(filter).connect(lowpass(context, 700)).connect(level);
-    grind.start(now, Math.random() * 0.5, duration);
+    grind.loop = true; // das Rauschen ist kürzer als manche Kurve
+    grind.start(now, Math.random() * 0.5);
+    grind.stop(now + duration);
   }
 
   // Ausgang für ein einzelnes Geräusch: etwas links (−1) bis rechts (1), im Tunnel mit Hall
