@@ -119,6 +119,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (23.11.2026, fast alles gesprochen):** Alle übrigen Joseph-Sätze gesammelt (Art `rest` in `tools/joseph-dialogue-lines.mjs`, Wagen 1 → 24) und vertont, bis das ElevenLabs-Konto leer war: 766 von 769 fertig. Offen: 3 Sätze in Wagen 24 (ab „Die Lochzange vom Schreibtisch.“). Weitermachen: `node tools/voice-generate.mjs joseph` (überspringt Fertiges, hört bei leerem Konto sauber auf). Mit einem anderen Konto: Stimme Ben (`aTTiK3YzK3dXETpuDE2h`) muss dort in „My Voices“ sein, sonst klingt Joseph anders. Nicht vertont: Tipp-Sätze (werden nicht angezeigt), Notizbuch, Sätze mit Platzhaltern.
+
 **Stand (23.11.2026, Türen gesprochen):** Dazu 40 Sätze zu Türen und Schlössern (Art `door`: look an Hotspots mit door/lock im Namen, wrong/dark bei tryCode). ElevenLabs danach: ≈ 4.300 Zeichen frei (Puffer für Textänderungen). Hinweis: Josephs Tipp-Sätze (hintFor) werden nicht mehr angezeigt, weil Taste H für alle 24 Wagen den Lösungsweg zeigt.
 
 **Stand (23.11.2026, wichtige Momente gesprochen):** Zusätzlich 280 Sätze von Joseph vertont (Art `moment` in `tools/joseph-dialogue-lines.mjs`): Zwischensequenzen, Tunnel-/automatische Ereignisse, Sätze bei gelösten Rätseln (success/unlock/dread) und gefundenen Gegenständen (give), Wartesätze aus `wagonCommon.js`. Übrige Kommentare (Anschauen, Ausnahmefälle, Tipps) bleiben Text. ElevenLabs danach: ≈ 6.500 Zeichen frei.
