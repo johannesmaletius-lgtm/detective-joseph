@@ -1,5 +1,5 @@
 import { drawSymbol } from '../../ui/symbols.js';
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 7 (Barwagen): Flaschenregal mit Gläsern, Bierdeckel, Zeitung.
 
@@ -20,72 +20,183 @@ export const BOTTLE_SPOTS = [
 ];
 
 export function drawBottles(ctx) {
-  wood(ctx, 110, 90, 1060, 580, [70, 40, 22]);
-  // Regalbrett
-  ctx.fillStyle = '#4a2a14';
-  ctx.fillRect(110, 480, 1060, 24);
-  ctx.fillStyle = '#5c3820';
-  ctx.fillRect(110, 640, 1060, 30);
-  glow(ctx, 640, 120, 500, '255, 210, 140', 0.18);
+  // Rückwand der Bar: der Barwagen unscharf dahinter, darüber warmes Licht
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(110, 90, 1060, 580);
+  ctx.clip();
+  ctx.filter = 'blur(4px) brightness(0.4)';
+  drawPicture(ctx, 'assets/scenes/wagon-07/background.webp', -120, -80, 1520, 860);
+  ctx.filter = 'none';
+  // Spiegel hinter den Flaschen
+  const mirror = ctx.createLinearGradient(0, 120, 0, 480);
+  mirror.addColorStop(0, 'rgba(120, 140, 150, 0.22)');
+  mirror.addColorStop(1, 'rgba(40, 50, 55, 0.35)');
+  ctx.fillStyle = mirror;
+  ctx.fillRect(150, 120, 980, 360);
+  ctx.strokeStyle = '#8a6a2a';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(150, 120, 980, 360);
+  glow(ctx, 640, 100, 560, '255, 200, 120', 0.25);
+  ctx.restore();
+  // Regalbretter
+  shelf(ctx, 480);
+  shelf(ctx, 640);
   BOTTLES.forEach((bottle, i) => drawBottle(ctx, BOTTLE_X(i), 480, bottle));
   // drei leere Gläser (Tumbler) mit bernsteinfarbenem Rest
-  for (let i = 0; i < 3; i++) {
-    const x = 480 + i * 160, y = 640;
-    ctx.fillStyle = 'rgba(196, 118, 32, 0.6)';
-    ctx.fillRect(x - 38, y - 18, 76, 12);
-    ctx.strokeStyle = 'rgba(230, 240, 245, 0.85)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x - 44, y - 100);
-    ctx.lineTo(x - 40, y - 4);
-    ctx.lineTo(x + 40, y - 4);
-    ctx.lineTo(x + 44, y - 100);
-    ctx.stroke();
-    ctx.lineWidth = 6;
-    line(ctx, x - 40, y - 4, x + 40, y - 4);
-  }
+  for (let i = 0; i < 3; i++) tumbler(ctx, 480 + i * 160, 640);
+  ctx.strokeStyle = '#2a160a';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(110, 90, 1060, 580);
+}
+
+function shelf(ctx, y) {
+  const g = ctx.createLinearGradient(0, y, 0, y + 26);
+  g.addColorStop(0, '#7a4a24');
+  g.addColorStop(1, '#3a1e0c');
+  ctx.fillStyle = g;
+  ctx.fillRect(110, y, 1060, 26);
+  ctx.fillStyle = 'rgba(255, 220, 160, 0.35)';
+  ctx.fillRect(110, y, 1060, 2);
+  ctx.fillStyle = '#c9a24c';
+  ctx.fillRect(110, y + 22, 1060, 3);
+}
+
+function tumbler(ctx, x, y) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(x + 4, y + 2, 46, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Glas
+  const glass = ctx.createLinearGradient(x - 44, 0, x + 44, 0);
+  glass.addColorStop(0, 'rgba(220, 235, 240, 0.35)');
+  glass.addColorStop(0.3, 'rgba(220, 235, 240, 0.08)');
+  glass.addColorStop(0.7, 'rgba(220, 235, 240, 0.06)');
+  glass.addColorStop(1, 'rgba(220, 235, 240, 0.3)');
+  ctx.fillStyle = glass;
+  ctx.beginPath();
+  ctx.moveTo(x - 44, y - 100);
+  ctx.lineTo(x - 40, y - 2);
+  ctx.lineTo(x + 40, y - 2);
+  ctx.lineTo(x + 44, y - 100);
+  ctx.closePath();
+  ctx.fill();
+  // bernsteinfarbener Rest
+  const rest = ctx.createLinearGradient(0, y - 24, 0, y - 8);
+  rest.addColorStop(0, 'rgba(230, 150, 50, 0.8)');
+  rest.addColorStop(1, 'rgba(150, 80, 20, 0.85)');
+  ctx.fillStyle = rest;
+  ctx.beginPath();
+  ctx.ellipse(x, y - 22, 39, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(x - 39, y - 22, 78, 12);
+  // dicker Glasboden
+  ctx.fillStyle = 'rgba(210, 225, 230, 0.45)';
+  ctx.fillRect(x - 40, y - 10, 80, 8);
+  ctx.strokeStyle = 'rgba(235, 245, 250, 0.8)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(x, y - 100, 44, 6, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  line(ctx, x - 44, y - 100, x - 40, y - 2);
+  line(ctx, x + 44, y - 100, x + 40, y - 2);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.lineWidth = 3;
+  line(ctx, x - 32, y - 90, x - 30, y - 30);
+  ctx.restore();
+}
+
+function bottlePath(ctx, x, top, base, width) {
+  ctx.beginPath();
+  ctx.moveTo(x - 13, top);
+  ctx.lineTo(x + 13, top);
+  ctx.lineTo(x + 13, top + 70);
+  ctx.quadraticCurveTo(x + width / 2, top + 88, x + width / 2, top + 122);
+  ctx.lineTo(x + width / 2, base - 10);
+  ctx.quadraticCurveTo(x + width / 2, base - 2, x + width / 2 - 8, base - 2);
+  ctx.lineTo(x - width / 2 + 8, base - 2);
+  ctx.quadraticCurveTo(x - width / 2, base - 2, x - width / 2, base - 10);
+  ctx.lineTo(x - width / 2, top + 122);
+  ctx.quadraticCurveTo(x - width / 2, top + 88, x - 13, top + 70);
+  ctx.closePath();
 }
 
 function drawBottle(ctx, x, base, bottle) {
   const height = 300, width = 84;
   const top = base - height;
   ctx.save();
-  // Flaschenkörper
-  ctx.fillStyle = bottle.glass;
-  ctx.globalAlpha = 0.55;
+  // Schatten auf dem Brett
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
   ctx.beginPath();
-  ctx.moveTo(x - 14, top);
-  ctx.lineTo(x + 14, top);
-  ctx.lineTo(x + 14, top + 70);
-  ctx.quadraticCurveTo(x + width / 2, top + 90, x + width / 2, top + 120);
-  ctx.lineTo(x + width / 2, base - 6);
-  ctx.lineTo(x - width / 2, base - 6);
-  ctx.lineTo(x - width / 2, top + 120);
-  ctx.quadraticCurveTo(x - width / 2, top + 90, x - 14, top + 70);
-  ctx.closePath();
+  ctx.ellipse(x + 6, base + 2, 46, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Glas (dunkel am Rand, heller in der Mitte)
+  bottlePath(ctx, x, top, base, width);
+  const glass = ctx.createLinearGradient(x - width / 2, 0, x + width / 2, 0);
+  glass.addColorStop(0, bottle.glass);
+  glass.addColorStop(0.45, 'rgba(255, 255, 255, 0.12)');
+  glass.addColorStop(1, bottle.glass);
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = bottle.glass;
+  ctx.fill();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = glass;
   ctx.fill();
   ctx.globalAlpha = 1;
   // Inhalt: Füllstand in Strichen (10 = bis zur Schulter)
   const bodyTop = top + 124, bodyBottom = base - 8;
   const step = (bodyBottom - bodyTop) / 10;
   const liquidTop = bodyBottom - bottle.level * step;
+  ctx.save();
+  bottlePath(ctx, x, top, base, width - 6);
+  ctx.clip();
   ctx.fillStyle = bottle.color;
-  ctx.fillRect(x - width / 2 + 3, liquidTop, width - 6, bodyBottom - liquidTop);
+  ctx.fillRect(x - width / 2, liquidTop, width, bodyBottom - liquidTop + 6);
+  const depth = ctx.createLinearGradient(x - width / 2, 0, x + width / 2, 0);
+  depth.addColorStop(0, 'rgba(0, 0, 0, 0.35)');
+  depth.addColorStop(0.5, 'rgba(255, 230, 180, 0.12)');
+  depth.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
+  ctx.fillStyle = depth;
+  ctx.fillRect(x - width / 2, liquidTop, width, bodyBottom - liquidTop + 6);
+  // Oberfläche
+  ctx.fillStyle = 'rgba(255, 240, 210, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(x, liquidTop, width / 2 - 4, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
   // Messstriche am Glas
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
   ctx.lineWidth = 1.5;
   for (let i = 1; i < 10; i++) line(ctx, x + width / 2 - 12, bodyBottom - i * step, x + width / 2 - 2, bodyBottom - i * step);
-  // Etikett
-  ctx.fillStyle = '#efe3c0';
-  ctx.fillRect(x - 36, top + 170, 72, bottle.sub ? 56 : 40);
-  text(ctx, bottle.label, x, top + 194, { font: `bold ${bottle.label.length > 7 ? 11 : 14}px ${PRINT}`, align: 'center' });
-  if (bottle.sub) text(ctx, bottle.sub, x, top + 214, { font: `9px ${PRINT}`, align: 'center' });
-  // Glanz und Korken
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-  ctx.lineWidth = 4;
-  line(ctx, x - width / 2 + 10, top + 130, x - width / 2 + 10, base - 30);
+  // Etikett mit Rahmen
+  const lh = bottle.sub ? 58 : 42;
+  const label = ctx.createLinearGradient(0, top + 168, 0, top + 168 + lh);
+  label.addColorStop(0, '#f6ecd0');
+  label.addColorStop(1, '#dccb9e');
+  ctx.fillStyle = label;
+  ctx.fillRect(x - 37, top + 168, 74, lh);
+  ctx.strokeStyle = '#8a6a2a';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - 34, top + 171, 68, lh - 6);
+  text(ctx, bottle.label, x, top + 194, { font: `bold ${bottle.label.length > 7 ? 10 : bottle.label.length > 5 ? 12 : 14}px ${SERIF}`, align: 'center' });
+  if (bottle.sub) text(ctx, bottle.sub, x, top + 214, { font: `italic 9px ${SERIF}`, align: 'center' });
+  // Glanzlichter
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  line(ctx, x - width / 2 + 11, top + 132, x - width / 2 + 11, base - 34);
+  ctx.lineWidth = 2;
+  line(ctx, x - 7, top + 8, x - 7, top + 62);
+  // Kapsel und Korken
   ctx.fillStyle = '#9a6b3c';
-  ctx.fillRect(x - 12, top - 22, 24, 26);
+  ctx.fillRect(x - 11, top - 20, 22, 24);
+  const foil = ctx.createLinearGradient(x - 14, 0, x + 14, 0);
+  foil.addColorStop(0, '#6a1a14');
+  foil.addColorStop(0.5, '#c9443a');
+  foil.addColorStop(1, '#6a1a14');
+  ctx.fillStyle = bottle.id === 'whisky' || bottle.id === 'rum' ? '#c9a24c' : foil;
+  ctx.fillRect(x - 14, top - 4, 28, 26);
   ctx.restore();
 }
 

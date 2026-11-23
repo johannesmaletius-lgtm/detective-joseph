@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, RED, TYPEWRITER, drawFilePage, glow, line, text, wood } from './common.js';
+import { HAND, INK, PRINT, RED, TYPEWRITER, drawFilePage, drawPicture, glow, line, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 2 (Gepäckwagen): Kofferanhänger, Kofferstapel mit Kreidefeldern, Gepäckwaage, Aktenseiten.
 
@@ -82,57 +82,172 @@ export function pileSpots() {
 }
 
 export function drawStack(ctx, { piles, held, moves }) {
-  wood(ctx, 80, 80, 1120, 580, [92, 52, 24]);
-  glow(ctx, 640, 120, 600, '255, 210, 140', 0.12);
+  // Hintergrund: der Gepäckwagen selbst, abgedunkelt – davor die Dielen mit den Kreidefeldern
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(80, 80, 1120, 580);
+  ctx.clip();
+  ctx.filter = 'blur(3px) brightness(0.45)';
+  drawPicture(ctx, 'assets/scenes/wagon-02/background.webp', 0, -60, 1280, 720);
+  ctx.filter = 'none';
+  // Dielenboden in Perspektive
+  const floorTop = 470;
+  const floor = ctx.createLinearGradient(0, floorTop, 0, 660);
+  floor.addColorStop(0, '#5a3418');
+  floor.addColorStop(1, '#2a160a');
+  ctx.fillStyle = floor;
+  ctx.fillRect(80, floorTop, 1120, 190);
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.lineWidth = 2;
+  for (let k = -8; k <= 8; k++) line(ctx, 640 + k * 60, floorTop, 640 + k * 150, 660);
+  for (const y of [500, 540, 590, 650]) line(ctx, 80, y, 1200, y);
+  glow(ctx, 640, 140, 620, '255, 200, 120', 0.18);
+  ctx.restore();
+  ctx.strokeStyle = '#2a160a';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(80, 80, 1120, 580);
+
   PILE_X.forEach((x, i) => {
-    if (i > 0) {
-      ctx.strokeStyle = 'rgba(245, 240, 230, 0.75)';
-      ctx.lineWidth = 4;
-      ctx.setLineDash([16, 8]);
-      ctx.strokeRect(x - 140, PILE_Y - 6, 280, 34);
-      ctx.setLineDash([]);
-    } else {
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
-      ctx.fillRect(x - 140, PILE_Y - 6, 280, 34);
+    if (i > 0) chalkRect(ctx, x - 140, PILE_Y - 8, 280, 38, i);
+    else {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(x, PILE_Y + 10, 150, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
-    text(ctx, ['Stapel', 'Kreidefeld', 'Kreidefeld'][i], x, PILE_Y + 58, { font: `bold 20px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+    text(ctx, ['Stapel', 'Kreidefeld', 'Kreidefeld'][i], x, PILE_Y + 64, { font: `bold 20px ${HAND}`, color: '#f1e8d0', align: 'center' });
     let y = PILE_Y;
-    for (const size of piles[i]) {
-      y -= drawCase(ctx, x, y, size);
-    }
+    for (const size of piles[i]) y -= drawCase(ctx, x, y, size);
   });
   if (held) drawCase(ctx, PILE_X[held.from], 230, held.size, true);
-  text(ctx, `Züge: ${moves}`, 1170, 120, { font: `18px ${PRINT}`, color: '#f1e0b8', align: 'right' });
+  text(ctx, `Züge: ${moves}`, 1170, 120, { font: `bold 20px ${HAND}`, color: '#f1e0b8', align: 'right' });
 }
 
-// Zeichnet einen Koffer, Unterkante bei y. Ergebnis: Höhe
+// Ein Rechteck aus Kreide: leicht schief, mit rauer Linie
+function chalkRect(ctx, x, y, w, h, seed) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(240, 236, 225, 0.8)';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  const jitter = (k) => Math.sin(seed * 12.9 + k * 7.3) * 3;
+  for (let pass = 0; pass < 2; pass++) {
+    ctx.beginPath();
+    ctx.moveTo(x + jitter(1 + pass), y + jitter(2));
+    ctx.lineTo(x + w + jitter(3), y + jitter(4 + pass));
+    ctx.lineTo(x + w + jitter(5 + pass), y + h + jitter(6));
+    ctx.lineTo(x + jitter(7), y + h + jitter(8 + pass));
+    ctx.closePath();
+    ctx.stroke();
+    ctx.globalAlpha = 0.45;
+  }
+  ctx.restore();
+}
+
+function roundedBox(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// Zeichnet einen Lederkoffer, Unterkante bei y. Ergebnis: Höhe (inklusive Griff)
 function drawCase(ctx, x, y, size, lifted = false) {
   const w = 80 + size * 36, h = 40 + size * 6;
+  const left = x - w / 2, top = y - h;
+  const color = CASE_COLORS[size - 1];
   ctx.save();
   if (lifted) {
     ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 14;
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 16;
   }
-  ctx.fillStyle = CASE_COLORS[size - 1];
-  ctx.fillRect(x - w / 2, y - h, w, h);
+  // Griff oben
+  ctx.strokeStyle = '#2a170b';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(x - 16, top + 2);
+  ctx.quadraticCurveTo(x, top - 16, x + 16, top + 2);
+  ctx.stroke();
+  // Korpus mit Ledergradient
+  const leather = ctx.createLinearGradient(0, top, 0, y);
+  leather.addColorStop(0, lighten(color, 40));
+  leather.addColorStop(0.45, color);
+  leather.addColorStop(1, lighten(color, -45));
+  ctx.fillStyle = leather;
+  roundedBox(ctx, left, top, w, h, 8);
+  ctx.fill();
   ctx.shadowColor = 'transparent';
-  ctx.strokeStyle = 'rgba(30, 16, 8, 0.9)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x - w / 2, y - h, w, h);
-  ctx.fillStyle = 'rgba(30, 16, 8, 0.55)';
-  ctx.fillRect(x - w / 2 + 18, y - h, 8, h);
-  ctx.fillRect(x + w / 2 - 26, y - h, 8, h);
-  ctx.fillStyle = '#d6a645';
-  ctx.fillRect(x - 8, y - h + 8, 16, 10);
+  ctx.strokeStyle = 'rgba(25, 12, 5, 0.9)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  // Naht und Deckelkante
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(255, 230, 190, 0.35)';
+  ctx.lineWidth = 1.2;
+  roundedBox(ctx, left + 5, top + 5, w - 10, h - 10, 5);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(20, 10, 4, 0.55)';
+  ctx.lineWidth = 2;
+  line(ctx, left + 4, top + h * 0.32, left + w - 4, top + h * 0.32);
+  // Lederriemen
+  for (const sx of [left + w * 0.22, left + w * 0.78]) {
+    ctx.fillStyle = lighten(color, -60);
+    ctx.fillRect(sx - 6, top, 12, h);
+    ctx.fillStyle = '#d9b25a';
+    ctx.fillRect(sx - 8, top + h * 0.32 - 5, 16, 10);
+    ctx.fillStyle = 'rgba(40, 25, 5, 0.7)';
+    ctx.fillRect(sx - 4, top + h * 0.32 - 2, 8, 4);
+  }
+  // Messingecken
+  ctx.fillStyle = '#c9a24c';
+  for (const [cx, cy, sx, sy] of [[left, top, 1, 1], [left + w, top, -1, 1], [left, y, 1, -1], [left + w, y, -1, -1]]) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + sx * 12, cy);
+    ctx.lineTo(cx, cy + sy * 12);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Schloss
+  ctx.fillStyle = '#e0bc62';
+  ctx.fillRect(x - 9, top + h * 0.32 - 6, 18, 12);
+  // Aufkleber: kleine Koffer „GLAS!“, große alte Reiseetiketten
   if (size <= 2) {
-    // „Vorsicht Glas“-Aufkleber
+    ctx.save();
+    ctx.translate(x + w * 0.05, top + h * 0.62);
+    ctx.rotate(-0.08);
     ctx.fillStyle = '#f2e6c8';
-    ctx.fillRect(x + 6, y - h + 10, 44, 18);
-    text(ctx, 'GLAS!', x + 28, y - h + 24, { font: `bold 11px ${PRINT}`, color: RED, align: 'center' });
+    ctx.fillRect(-4, -9, 44, 18);
+    ctx.strokeStyle = RED;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-4, -9, 44, 18);
+    text(ctx, 'GLAS!', 18, 5, { font: `bold 11px ${PRINT}`, color: RED, align: 'center' });
+    ctx.restore();
+  } else {
+    const labels = [['#e6c76a', 'WIEN'], ['#9fc0d8', 'CHUR'], ['#e09a7a', 'ESSEN']];
+    const [bg, city] = labels[size - 3];
+    ctx.save();
+    ctx.translate(left + w * 0.5, top + h * 0.66);
+    ctx.rotate(0.06 * (size % 2 ? 1 : -1));
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 26, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    text(ctx, city, 0, 4, { font: `bold 10px ${PRINT}`, color: '#3a2412', align: 'center' });
+    ctx.restore();
   }
   ctx.restore();
   return h + 2;
+}
+
+function lighten(hex, amount) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  const c = (v) => Math.max(0, Math.min(255, v + amount));
+  return `rgb(${c(n >> 16)}, ${c((n >> 8) & 255)}, ${c(n & 255)})`;
 }
 
 // ---------------------------------------------------------------- Gepäckwaage
