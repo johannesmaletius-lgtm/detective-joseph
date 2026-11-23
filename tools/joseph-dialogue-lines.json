@@ -15,6 +15,31 @@
   "kind": "say"
  },
  {
+  "text": "… Hm?",
+  "file": "wagon1.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Ein Zug. Mitten in der Nacht.",
+  "file": "wagon1.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Wie bin ich hier reingekommen?",
+  "file": "wagon1.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Auf meinem Unterarm steht etwas. In meiner Schrift …",
+  "file": "wagon1.js",
+  "kind": "intro"
+ },
+ {
+  "text": "„Nicht einschlafen.“ Na gut. Ich bin wach. Hellwach.",
+  "file": "wagon1.js",
+  "kind": "intro"
+ },
+ {
   "text": "Rückwärts – und zu langsam.",
   "file": "wagon10.js",
   "kind": "say"
@@ -73,6 +98,21 @@
   "text": "Meine eigene Stimme aus allen Trichtern. Gruselig.",
   "file": "wagon10.js",
   "kind": "say"
+ },
+ {
+  "text": "Lautsprecher. Mikrofon. Tonbänder.",
+  "file": "wagon10.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Von hier aus spricht er also – der Schaffner.",
+  "file": "wagon10.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Wenn er Herrn K. gerufen hat, dann gibt es davon vielleicht eine Aufnahme.",
+  "file": "wagon10.js",
+  "kind": "intro"
  },
  {
   "text": "Er hört mich nicht. Er geht einfach.",
@@ -135,6 +175,21 @@
   "kind": "choice"
  },
  {
+  "text": "Uhren. Hunderte. Und alle ticken anders.",
+  "file": "wagon11.js",
+  "kind": "intro"
+ },
+ {
+  "text": "„Elf ist der Nächste.“ Das hier ist Wagen elf.",
+  "file": "wagon11.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der alte Mann dort … der ist der Nächste.",
+  "file": "wagon11.js",
+  "kind": "intro"
+ },
+ {
   "text": "Der Schlüssel passt. Der Tastendeckel ist offen.",
   "file": "wagon12.js",
   "kind": "say"
@@ -168,6 +223,36 @@
   "text": "Ich sehe mich um.",
   "file": "wagon12.js",
   "kind": "choice"
+ },
+ {
+  "text": "Ein Salon mit Klavier und Grammophon.",
+  "file": "wagon12.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Und jemand summt. Immer dieselben paar Töne.",
+  "file": "wagon12.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Eine Kapelle. Mitten im Zug.",
+  "file": "wagon13.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Ein Adventskranz, drei Glocken … und eine Tafel voller Ruß.",
+  "file": "wagon13.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Zeitungen. Stapelweise.",
+  "file": "wagon14.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Wenn dieser Zug an Weihnachten verschwunden ist, dann stand das in der Zeitung.",
+  "file": "wagon14.js",
+  "kind": "intro"
  },
  {
   "text": "Sie hat den Stoffhasen vom Familienfoto im Arm. Das ist die Tochter des Schaffners!",
@@ -295,6 +380,16 @@
   "kind": "choice"
  },
  {
+  "text": "Ein Spielzimmer. Puppen, eine Modellbahn, ein Schaukelpferd …",
+  "file": "wagon15.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Und ein kleines Mädchen mit einem Stoffhasen.",
+  "file": "wagon15.js",
+  "kind": "intro"
+ },
+ {
   "text": "Ich setze die Kopfhörer auf …",
   "file": "wagon16.js",
   "kind": "say"
@@ -320,6 +415,26 @@
   "kind": "say"
  },
  {
+  "text": "Ein Funkraum. Ein Funkgerät mit Röhren, eine Morsetaste, ein Logbuch.",
+  "file": "wagon16.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Wenn in jener Nacht jemand gefunkt hat, dann hier.",
+  "file": "wagon16.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Ein Gewächshaus – mitten im Zug. Warm, feucht, und es riecht nach Erde.",
+  "file": "wagon17.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Da unten liegt ein Schlafsack. Hier wohnt jemand.",
+  "file": "wagon17.js",
+  "kind": "intro"
+ },
+ {
   "text": "Er weiß, wer ich bin. Woher?",
   "file": "wagon18.js",
   "kind": "say"
@@ -333,6 +448,26 @@
   "text": "Wo ist der Lok-Schlüssel?",
   "file": "wagon18.js",
   "kind": "say"
+ },
+ {
+  "text": "Das Abteil des Schaffners. Sein Mantel hängt hier. Seine Mütze.",
+  "file": "wagon18.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Ein Fotolabor. Schalen, Flaschen, ein Vergrößerer. Und eine Kameratasche an der Wand.",
+  "file": "wagon19.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der Gepäckwagen. Koffer, Kisten, Anhänger … und niemand da.",
+  "file": "wagon2.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Meine Akte ist halb leer. Vielleicht finde ich hier, was fehlt.",
+  "file": "wagon2.js",
+  "kind": "intro"
  },
  {
   "text": "Ich? Kennen wir uns?",
@@ -420,6 +555,16 @@
   "kind": "say"
  },
  {
+  "text": "Geschenke! Ein ganzer Berg. Keins davon ausgepackt.",
+  "file": "wagon20.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Und da steht Mira.",
+  "file": "wagon20.js",
+  "kind": "intro"
+ },
+ {
   "text": "Herr … Schaffner? Ich bin nicht der Schaffner.",
   "file": "wagon21.js",
   "kind": "say"
@@ -473,6 +618,21 @@
   "text": "Jetzt zieht sie! Wasser gluckert in den Kessel. Das Glas füllt sich.",
   "file": "wagon21.js",
   "kind": "say"
+ },
+ {
+  "text": "Hitze. Dampf. Ein riesiger Kessel – und ein Mann mit Schaufel.",
+  "file": "wagon21.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der Zeiger am Manometer steht im Roten.",
+  "file": "wagon21.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der Tunnel eben hat einundzwanzig Ticks gedauert. Ich habe mitgezählt.",
+  "file": "wagon21.js",
+  "kind": "intro"
  },
  {
   "text": "Halb zwölf. Er steckt den Schlüssel ins Schloss – jetzt!",
@@ -535,6 +695,21 @@
   "kind": "say"
  },
  {
+  "text": "Der Führerstand. Ganz vorne. Weiter geht es nicht.",
+  "file": "wagon22.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Um halb zwölf kommt er hierher. Ich muss mich verstecken.",
+  "file": "wagon22.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Zweiundzwanzig Ticks Dunkelheit. Noch drei, dann wird es nicht mehr hell.",
+  "file": "wagon22.js",
+  "kind": "intro"
+ },
+ {
   "text": "Herr Tick! Hören Sie mich?",
   "file": "wagon23.js",
   "kind": "say"
@@ -588,6 +763,11 @@
   "text": "Und die anderen sitzen noch im Zug.",
   "file": "wagon23.js",
   "kind": "say"
+ },
+ {
+  "text": "Dreiundzwanzig Ticks Dunkelheit. Noch zwei.",
+  "file": "wagon23.js",
+  "kind": "intro"
  },
  {
   "text": "Ja. Ich bin so weit.",
@@ -648,6 +828,31 @@
   "text": "Zu spät! Der Stein ist vorbei.",
   "file": "wagon24.js",
   "kind": "say"
+ },
+ {
+  "text": "Zurück im Schaffnerabteil. Heiligabend.",
+  "file": "wagon24.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Vierundzwanzig Ticks im Tunnel. Viel Zeit bleibt nicht mehr.",
+  "file": "wagon24.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Diesmal weiß ich, was zu tun ist.",
+  "file": "wagon24.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der Postwagen. Säcke voller Briefe, und Fächer bis unter die Decke.",
+  "file": "wagon3.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Irgendwo hier liegt ein Brief für mich.",
+  "file": "wagon3.js",
+  "kind": "intro"
  },
  {
   "text": "Er dreht sich zum Herd und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …",
@@ -760,6 +965,16 @@
   "kind": "choice"
  },
  {
+  "text": "Der Speisewagen. Es riecht nach Braten und Kerzenwachs.",
+  "file": "wagon4.js",
+  "kind": "intro"
+ },
+ {
+  "text": "„Achte auf die Gläser“, stand in dem Brief. Hier stehen jede Menge Gläser.",
+  "file": "wagon4.js",
+  "kind": "intro"
+ },
+ {
   "text": "Mein Blatt unter der Tür von Abteil 4 ist weg. Der Tunnel hat es geschluckt.",
   "file": "wagon5.js",
   "kind": "say"
@@ -840,6 +1055,16 @@
   "kind": "choice"
  },
  {
+  "text": "Der Schlafwagen. Leise schnarcht jemand.",
+  "file": "wagon5.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Abteil 4 – da soll Herr K. schlafen.",
+  "file": "wagon5.js",
+  "kind": "intro"
+ },
+ {
   "text": "Hallo? Wer spricht da?",
   "file": "wagon6.js",
   "kind": "say"
@@ -858,6 +1083,16 @@
   "text": "Diese Stimme … Das ist die Stimme aus den Lautsprechern. Der Schaffner?",
   "file": "wagon6.js",
   "kind": "say"
+ },
+ {
+  "text": "Ein Fundbüro. Mitten im Zug.",
+  "file": "wagon6.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Hüte, Schirme, Koffer … Was hier wohl alle verloren haben?",
+  "file": "wagon6.js",
+  "kind": "intro"
  },
  {
   "text": "Herr K.? Sie sind Herr K., oder?",
@@ -1003,5 +1238,45 @@
   "text": "Lieber nicht.",
   "file": "wagon7.js",
   "kind": "choice"
+ },
+ {
+  "text": "Der Barwagen. Und da hinten, am Tisch – ein alter Herr mit Hut und rotem Schal.",
+  "file": "wagon7.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Das ist er. Herr K.",
+  "file": "wagon7.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Ein Kino. Im Zug.",
+  "file": "wagon8.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Herr K. … Ich stand direkt neben ihm. Und dann war er weg.",
+  "file": "wagon8.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Wenn es hier eine Kamera im Tunnel gibt, dann vielleicht auch einen Film davon.",
+  "file": "wagon8.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Spiegel. Überall Spiegel.",
+  "file": "wagon9.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Der Täter trägt meine Mütze, meine Brille, meinen Schal …",
+  "file": "wagon9.js",
+  "kind": "intro"
+ },
+ {
+  "text": "Und hier sehe ich mich gleich zehnmal.",
+  "file": "wagon9.js",
+  "kind": "intro"
  }
 ]

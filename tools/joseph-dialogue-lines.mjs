@@ -1,5 +1,6 @@
 // Sammelt Josephs Sätze, die er im Gespräch mit anderen Figuren sagt: alle story.say(...) in Funktionen,
-// in denen auch eine Figur spricht (speakAs/speak), dazu die Fragen aus den Gesprächsauswahlen (choose).
+// in denen auch eine Figur spricht (speakAs/speak), dazu die Fragen aus den Gesprächsauswahlen (choose)
+// und die Sätze am Anfang jedes Wagens (intro).
 // Ausgabe: tools/joseph-dialogue-lines.json  [{ text, file, kind }]
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -67,10 +68,22 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
     });
     if (list?.type === 'ArrayExpression') list.elements.forEach((e) => e?.type === 'Literal' && add(e.value, 'choice'));
   });
+  // Der Anfang jedes Wagens (intro): alles, was Joseph dort sagt, und die lines von wagonIntro(...)
+  walk.full(ast, (p) => {
+    if (p.type !== 'Property' || p.key.name !== 'intro' || !FN.has(p.value.type)) return;
+    walk.full(p.value, (c) => {
+      if (c.type !== 'CallExpression') return;
+      if (method(c) === 'say') lits(c.arguments[0], consts).forEach((t) => add(t, 'intro'));
+      if (method(c) === 'wagonIntro') {
+        const lines = c.arguments[1]?.properties?.find((q) => q.key.name === 'lines');
+        if (lines) lits(lines.value, consts).forEach((t) => add(t, 'intro'));
+      }
+    });
+  });
 }
 const list = [...out.values()];
 writeFileSync(new URL('joseph-dialogue-lines.json', import.meta.url), JSON.stringify(list, null, 1));
-for (const kind of ['say', 'choice']) {
+for (const kind of ['say', 'choice', 'intro']) {
   const l = list.filter((x) => x.kind === kind);
   console.log(kind, l.length, 'Sätze,', l.reduce((s, x) => s + x.text.length, 0), 'Zeichen');
 }

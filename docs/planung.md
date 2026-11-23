@@ -119,6 +119,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (23.11.2026, Intros gesprochen):** Josephs Sätze am Anfang jedes Wagens (intro, 55 Sätze) sind vertont – `tools/joseph-dialogue-lines.mjs` sammelt sie mit (Art `intro`). Seine übrigen Kommentare bleiben Text. ElevenLabs danach: ≈ 21.900 Zeichen frei.
+
 **Stand (23.11.2026, Josephs Laute):** Joseph hat 28 kurze Laute (Ben, `eleven_v3` mit Tags wie [yawns]), Liste in `tools/joseph-reactions.mjs`, im Manifest unter `~art~nr`. Arten: geschafft, überlegen, Fehler, Staunen, Schreck, müde. Das Spiel spielt sie über `voices.react()` ab, ausgelöst von Geräuschen (`REACTIONS` in `src/core/game.js`: success/unlock, wrong/locked, dread/shriek/crash, manchmal lightsOff und pickup), beim Tipp (überlegen), beim Warten auf den Tunnel und nach 75 s ohne Eingabe (gähnen). Nie über einen laufenden Satz, höchstens alle 3 s. ElevenLabs danach: ≈ 24.600 Zeichen frei (Reset ≈ 23.12.).
 
 **Stand (23.11.2026, online):** Das Spiel geht bei jedem Push auf `main` automatisch auf GitHub Pages (`.github/workflows/pages.yml` → `tools/build-web.mjs`: alle 24 Wagen offen, Stimmen je Figur in einer Datei). Adresse: https://johannesmaletius-lgtm.github.io/detective-joseph/

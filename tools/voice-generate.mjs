@@ -43,8 +43,8 @@ for (const speaker of speakers) {
   const voice = VOICES[speaker];
   if (!voice) throw new Error(`Keine Stimme für „${speaker}“ in VOICES eingetragen`);
   mkdirSync(new URL(`assets/voices/${speaker}/`, root), { recursive: true });
-  for (const { text, key = text, model = MODEL } of lines.filter((l) => l.speaker === speaker)) {
-    const id = createHash('sha1').update(speaker + '|' + (key === text ? text : key + '|' + text)).digest('hex').slice(0, 10);
+  for (const { text, key: entry = text, model = MODEL } of lines.filter((l) => l.speaker === speaker)) {
+    const id = createHash('sha1').update(speaker + '|' + (entry === text ? text : entry + '|' + text)).digest('hex').slice(0, 10);
     const file = `assets/voices/${speaker}/${id}.mp3`;
     if (!existsSync(new URL(file, root))) {
       // Anführungszeichen gehören nicht zur Aussprache
@@ -59,7 +59,7 @@ for (const speaker of speakers) {
       chars += spoken.length;
       console.log('✓', speaker, text);
     }
-    manifest[key] = file;
+    manifest[entry] = file;
   }
 }
 // Bei „alle“: Sätze, die es im Spiel nicht mehr gibt, samt Datei entfernen
