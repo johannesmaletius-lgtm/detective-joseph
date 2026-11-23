@@ -24,7 +24,9 @@ cpSync(join(root, 'assets'), join(out, 'assets'), {
 
 // Test-Modus: alle Wagen offen
 const config = join(out, 'src', 'config.js');
-writeFileSync(config, readFileSync(config, 'utf8').replace("export const TEST_MODE = params.has('test');", 'export const TEST_MODE = true; // Web-Fassung: alle 24 Wagen auswählbar'));
+const configText = readFileSync(config, 'utf8').replace(/export const TEST_MODE = .*;/, 'export const TEST_MODE = true; // Web-Fassung: alle 24 Wagen auswählbar');
+if (!configText.includes('TEST_MODE = true')) throw new Error('TEST_MODE in src/config.js nicht gefunden');
+writeFileSync(config, configText);
 
 // Seite: index.html wie im Projekt, nur ohne den Hinweis für lokal geöffnete Dateien
 const html = readFileSync(join(root, 'index.html'), 'utf8').replace(/\s*<script>[\s\S]*?<\/script>/, '');
