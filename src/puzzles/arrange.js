@@ -13,6 +13,7 @@ import { COLORS, FONTS, outlinedText } from '../ui/text.js';
 //     drawBackground: (ctx, view) => { … },
 //     drawToken: (ctx, token, x, y, view) => { … },    // x, y = Mitte des Kärtchens
 //     check: (placement) => true,                      // placement[slot] = id des Kärtchens oder null
+//     partial: false,                                  // true: Plätze dürfen am Ende frei bleiben
 //     help: '…',
 //   });
 //
@@ -113,7 +114,8 @@ export class ArrangeView extends View {
     Object.assign(token.place, { x: slot.x + slot.w / 2, y: slot.y + slot.h / 2, slot: best });
     this.sound('click');
     const placement = this.placement();
-    if (placement.every(Boolean) && this.options.check(placement)) {
+    // partial: true – geprüft wird nach jedem Ablegen, auch wenn noch Plätze frei sind
+    if ((this.options.partial || placement.every(Boolean)) && this.options.check(placement)) {
       this.solved = 0.001;
       this.sound('success');
     }

@@ -27,7 +27,14 @@ export const DOORS = [
       script: (await import('../story/wagon2.js')).wagon2,
     }),
   },
-  { door: 3, wagon: 'Postwagen' },
+  {
+    door: 3,
+    wagon: 'Postwagen',
+    load: async () => ({
+      scene: (await import('../scene/postCar.js')).postCar,
+      script: (await import('../story/wagon3.js')).wagon3,
+    }),
+  },
   {
     door: 4,
     wagon: 'Speisewagen',

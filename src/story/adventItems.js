@@ -51,6 +51,34 @@ export const ADVENT_ITEMS = {
     },
     look: 'Die fehlenden Seiten meiner Akte. Jetzt ist sie vollständig.',
   },
+
+  // ---------------------------------------------------------------- Tür 3: Postwagen
+  postNote: {
+    name: 'Dienstanweisung',
+    icon: (ctx) => paper(ctx, 24, 18, 80, 92, 0.06, (c) => {
+      c.fillStyle = INK;
+      c.font = 'bold 11px serif';
+      c.fillText('Dienst-', 8, 16);
+      lines(c, 8, 28, 62, 6, 10);
+    }),
+    look: 'Die Dienstanweisung des Postmeisters.',
+  },
+  cipherLetter: {
+    name: 'Brief an J.',
+    icon: (ctx) => {
+      ctx.fillStyle = '#efe3c2';
+      ctx.fillRect(14, 30, 100, 68);
+      ctx.strokeStyle = 'rgba(80,60,30,0.7)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(14, 30, 100, 68);
+      line(ctx, 14, 30, 64, 70);
+      line(ctx, 114, 30, 64, 70);
+      ctx.fillStyle = '#27408f';
+      ctx.font = 'bold 18px serif';
+      ctx.fillText('J.', 24, 90);
+    },
+    look: 'Ein Brief an J. Verschlüsselt.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
