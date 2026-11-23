@@ -194,6 +194,33 @@ export const ADVENT_ITEMS = {
     },
     look: 'Sieben Schlüssel an einem Ring. Jeder Griff hat eine andere Form.',
   },
+
+  // ---------------------------------------------------------------- Tür 19: Fotolabor
+  film: {
+    name: 'Film',
+    icon: (ctx) => {
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(34, 30, 60, 70);
+      ctx.fillStyle = '#c9a24a';
+      ctx.fillRect(34, 30, 60, 14);
+      ctx.fillRect(34, 86, 60, 14);
+      ctx.fillStyle = '#5a3a1a';
+      ctx.fillRect(90, 50, 22, 26);
+    },
+    look: 'Ein unentwickelter Film.',
+  },
+  negatives: {
+    name: 'Negative',
+    icon: (ctx) => {
+      ctx.fillStyle = '#3a3a3a';
+      ctx.fillRect(10, 44, 108, 40);
+      for (let i = 0; i < 4; i++) {
+        ctx.fillStyle = '#d0d0d0';
+        ctx.fillRect(16 + i * 26, 52, 20, 24);
+      }
+    },
+    look: 'Sechs Negative aus dem Tunnel.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
