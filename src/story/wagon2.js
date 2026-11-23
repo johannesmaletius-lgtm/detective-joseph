@@ -11,12 +11,12 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wago
 //      Seiten 2 und 3 liegen im untersten Koffer des Stapels; Code der Tür = sein Gewicht.
 //   3. Kofferstapel umschichten (Türme von Hanoi, 5 Koffer, zwei Kreidefelder, nie groß auf klein).
 //      Nach jedem Tunnel steht der Stapel wieder wie vorher.
-//   4. Den untersten Koffer auf die Gepäckwaage: 24,7 kg → Türcode 247. Im Koffer: Seiten 2 und 3.
+//   4. Den untersten Koffer auf die Gepäckwaage: 17,3 kg → Türcode 173. Im Koffer: Seiten 2 und 3.
 //
 // ERGEBNIS: Die Akte ist komplett – „In jeder Runde verschwindet im Tunnel ein Fahrgast.“
 
-const DOOR_CODE = '247';
-const CASE_WEIGHT = 24.7;
+const DOOR_CODE = '173';
+const CASE_WEIGHT = 17.3;
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export const wagon2 = {
@@ -276,11 +276,11 @@ async function openScale(story, withCase) {
     help: 'Rechtsklick: zurück',
   });
   if (!withCase) return story.say(story.has('heavyCase') ? 'Leer zeigt sie null. Ich muss den Koffer drauflegen.' : 'Null Kilo. Ich müsste etwas drauflegen.');
-  await story.say('Vierundzwanzig Komma sieben Kilo.');
+  await story.say('Siebzehn Komma drei Kilo.');
   if (!story.flags.weighed) {
     story.flags.weighed = true;
-    await story.say('„Sein Gewicht ist der Code – ohne Komma.“ Also zwei, vier, sieben.');
-    story.note('Der unterste Koffer wiegt 24,7 kg → Türcode 247.');
+    await story.say('„Sein Gewicht ist der Code – ohne Komma.“ Also eins, sieben, drei.');
+    story.note('Der unterste Koffer wiegt 17,3 kg → Türcode 173.');
   }
 }
 
@@ -320,7 +320,7 @@ async function tryDoor(story) {
     },
   });
   if (!opened) {
-    if (tries > 0) await story.say(story.flags.weighed ? 'Falsch. Zwei, vier, sieben …' : 'Falsch. Drei Ziffern – ich habe noch keine Ahnung, welche.');
+    if (tries > 0) await story.say(story.flags.weighed ? 'Falsch. Eins, sieben, drei …' : 'Falsch. Drei Ziffern – ich habe noch keine Ahnung, welche.');
     return;
   }
   await ending(story);
@@ -329,7 +329,7 @@ async function tryDoor(story) {
 async function ending(story) {
   await story.cutscene(async () => {
     story.sound('unlock');
-    await story.say('Zwei, vier, sieben. Offen!');
+    await story.say('Eins, sieben, drei. Offen!');
     if (!story.flags.pagesRead) {
       await story.say('Halt – erst sehe ich nach, was im Koffer ist.');
       if (story.has('heavyCase')) await openHeavyCase(story);
@@ -372,5 +372,5 @@ function currentGoal(story) {
   }
   if (!f.weighed) return { id: 'weigh', lines: ['Den Koffer wiegen: Koffer im Inventar anklicken, dann die Gepäckwaage.'] };
   if (!f.pagesRead) return { id: 'pages', lines: ['Was ist im Koffer? Rechtsklick auf den Koffer im Inventar.'] };
-  return { id: 'door', lines: ['24,7 kg, ohne Komma: 247 – das ist der Code für die Tür.'] };
+  return { id: 'door', lines: ['17,3 kg, ohne Komma: 173 – das ist der Code für die Tür.'] };
 }

@@ -94,7 +94,7 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 - Testen: `?test` (alle Türen offen + Knopf „Spielstand löschen“), `?datum=2026-12-05` (anderes Datum), `?tuer=2&skipintro` (direkt in eine Tür).
 - Ein Wagen, den man mittendrin verlässt, beginnt beim nächsten Mal von vorn.
 
-**Wagen 1 und 4–16 sind gebaut** (Lösungen im README). Wagen 4–8 aus der parallelen Session sind mit dem Kalender zusammengeführt (sie enden jetzt mit `story.finish()`).
+**Alle 24 Wagen sind gebaut** (Lösungen im README). Wagen 4–8 und 9–16 stammen aus parallelen Sessions und sind mit dem Kalender zusammengeführt; Wagen 2, 3 und 17–24 sind danach entstanden. Die ältere, selbst gemalte Fassung „Teil 1“ ist entfernt – es gibt nur noch die Wagen mit den ChatGPT-Bildern.
 
 Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 9: Die Kratzer sind ein Hinweis („Er ist eine Runde zu spät“), kein Code. Die Tür öffnet das Glasauge (Lichtstrahl).

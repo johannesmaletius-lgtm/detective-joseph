@@ -259,7 +259,7 @@ export function drawPaddleAndCard(ctx) {
   ctx.beginPath();
   ctx.arc(0, -40, 60, 0, Math.PI * 2);
   ctx.fill();
-  text(ctx, '2412', 0, -28, { font: `bold 34px ${HAND}`, color: '#c0302a', align: 'center' });
+  text(ctx, '2512', 0, -28, { font: `bold 34px ${HAND}`, color: '#c0302a', align: 'center' });
   ctx.restore();
   // Karte
   sheet(ctx, 640, 170, 460, 330, {

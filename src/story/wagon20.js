@@ -16,7 +16,7 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 //      „Paket für Papa – unter dem Boden“.
 //   3. Kisten von der Bodenluke schieben (Schiebepuzzle). Darunter: Miras Paket.
 //   4. Fünf Bänder übereinander – nur das oberste lässt sich lösen (rot, gold, blau, weiß, grün).
-//      Darin: eine selbstgebastelte Schaffnerkelle (Türcode 2412 in Kinderschrift) und eine Karte.
+//      Darin: eine selbstgebastelte Schaffnerkelle (Türcode 2512 in Kinderschrift) und eine Karte.
 //
 // ERGEBNIS: „Frohe Weihnachten, Papa.“ – „Ich bin siebzehn. Die Kleine ist verrückt.“
 // Joseph behält die Kelle (für den 24.).
@@ -272,13 +272,13 @@ async function untie(story) {
   await story.card({ draw: drawPaddleAndCard });
   await story.cutscene(async () => {
     await story.say('„Für Papa. Damit du uns nach Hause bringst. Deine Mira.“');
-    await story.say('Auf der Kelle steht in Kinderschrift: zwei, vier, eins, zwei.');
+    await story.say('Auf der Kelle steht in Kinderschrift: zwei, fünf, eins, zwei.');
     await story.speakAs('mira', 'Frohe Weihnachten, Papa.');
     await story.say('Papa? Ich bin siebzehn. Ich kann niemandes Vater sein.');
     await story.say('Die Kleine ist verrückt.');
     await story.speakAs('mira', 'Behalt sie. Du brauchst sie noch.');
   });
-  story.note('In Miras Paket: eine selbstgebastelte Schaffnerkelle (darauf „2412“) und eine Karte: „Für Papa. Damit du uns nach Hause bringst. Deine Mira.“ Sie hat „Frohe Weihnachten, Papa“ zu mir gesagt. Ich behalte die Kelle.');
+  story.note('In Miras Paket: eine selbstgebastelte Schaffnerkelle (darauf „2512“) und eine Karte: „Für Papa. Damit du uns nach Hause bringst. Deine Mira.“ Sie hat „Frohe Weihnachten, Papa“ zu mir gesagt. Ich behalte die Kelle.');
 }
 
 // ============================================================================================
@@ -287,13 +287,13 @@ async function untie(story) {
 
 async function tryDoor(story) {
   const opened = await tryCode(story, {
-    id: 'door20', code: '2412',
+    id: 'door20', code: '2512',
     wrong: (s) => (s.flags.opened ? 'Falsch. Was steht auf der Kelle?' : 'Falsch. Vier Ziffern.'),
   });
   if (!opened) return;
   await story.cutscene(async () => {
     story.sound('unlock');
-    await story.say('Zwei, vier, eins, zwei. Der vierundzwanzigste Zwölfte. Heiligabend.');
+    await story.say('Zwei, fünf, eins, zwei. Der fünfundzwanzigste Zwölfte. Der erste Weihnachtstag – da wollten sie zusammen zu Hause sein.');
     await story.speakAs('mira', 'Bis bald, Papa!');
     story.sound('door');
     await finishWagon(story, {
@@ -334,5 +334,5 @@ function currentGoal(story) {
     ] };
   }
   if (!f.opened) return { id: 'ribbons', lines: ['Miras Paket ansehen (Rechtsklick im Inventar). Nur das oberste Band geht ab: rot, dann gold, blau, weiß, grün.'] };
-  return { id: 'door', lines: ['Auf der Kelle steht der Code: 2412.'] };
+  return { id: 'door', lines: ['Auf der Kelle steht der Code: 2512.'] };
 }
