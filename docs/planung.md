@@ -111,6 +111,9 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (23.11.2026, Spieltest):** Alle 24 Wagen automatisch im Browser durchgespielt (einzeln und nacheinander mit Spielstand) – alle lösbar, keine Fehler. Danach geändert: kein Kalender-Begriff mehr im Spiel; Finale (Tür 24) mit neu gezeichnetem Tunnelfenster, Entgleisen als Bild und Schnee-Übergang, Schlussbild erzählt von selbst; leichte Rätsel schwerer (2, 3, 6, 10, 11, 19, 20, 21, 23 – neue Lösungen im README); schönere Nahansichten (Kofferstapel, Flaschen, Tonband, Puppenhaus, Pakete). Geschätzte Spielzeit gesamt ≈ 6–7 Stunden. Offen: In Tür 1 brechen kurze Szenen nach dem Tunnel Klicks ab.
+
+
 **Stand (19.11.2026):** Planung komplett. Alle 24 Türen haben Wagen, Rätsel und Ergebnis, die Geschichte ist durchgehend und auf Widersprüche geprüft (`docs/geschichte.md`). Alle ChatGPT-Grafiken der Blöcke 1–4 liegen unter `assets/reference/tuer-02/` bis `tuer-24/`. Code: Wagen 1 und 4–16 sind gebaut, es fehlen Wagen 2, 3 und 17–24 (Stand 19.11. abends).
 
 **Wo was liegt**
