@@ -46,7 +46,7 @@ export const DOORS = [
   { door: 18, wagon: 'Schaffnerabteil', load: wagon('conductorCar', 'conductorCar', 'wagon18', 'wagon18') },
   { door: 19, wagon: 'Fotolabor', load: wagon('photoLab', 'photoLab', 'wagon19', 'wagon19') },
   { door: 20, wagon: 'Packwagen', load: wagon('parcelCar', 'parcelCar', 'wagon20', 'wagon20') },
-  { door: 21, wagon: 'Kesselwagen' },
+  { door: 21, wagon: 'Kesselwagen', load: wagon('boilerCar', 'boilerCar', 'wagon21', 'wagon21') },
   { door: 22, wagon: 'Die Lok' },
   { door: 23, wagon: 'Wartungsgang' },
   { door: 24, wagon: 'Heiligabend' },

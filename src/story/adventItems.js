@@ -275,6 +275,21 @@ export const ADVENT_ITEMS = {
     },
     look: 'Miras selbstgebastelte Schaffnerkelle. „Damit du uns nach Hause bringst.“',
   },
+
+  // ---------------------------------------------------------------- Tür 21: Kesselwagen
+  lockerPhoto: {
+    name: 'Foto aus dem Spind',
+    icon: (ctx) => {
+      ctx.fillStyle = '#efe6d2';
+      ctx.fillRect(16, 26, 96, 76);
+      ctx.fillStyle = '#8a6a44';
+      ctx.fillRect(22, 32, 84, 64);
+      ctx.fillStyle = '#4a3220';
+      ctx.fillRect(40, 52, 16, 40);
+      ctx.fillRect(70, 48, 16, 44);
+    },
+    look: 'Der Heizer und ein junger Schaffner. Der sieht aus wie ich.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
