@@ -13,12 +13,12 @@ export class Voices {
     this.audio = null;
     this.timer = null;
     this.sprites = {}; // Datei → Audio (Web-Fassung: eine Datei pro Figur)
-    fetch('assets/voices/manifest.json')
+    fetch('assets/voices/manifest.json', { cache: 'no-cache' }) // immer die neueste Liste
       .then((res) => (res.ok ? res.json() : {}))
       .then((files) => {
         this.files = files;
         // Web-Fassung: gemeinsame Dateien (Laute …) gleich laden, die eines Wagens erst mit dem Wagen (preloadWagon)
-        for (const file of this.spriteFiles()) if (!/-w\d+\.mp3$/.test(file)) this.sprite(file);
+        for (const file of this.spriteFiles()) if (!/-w\d+\./.test(file)) this.sprite(file);
         if (this.wagon) this.preloadWagon(this.wagon);
       })
       .catch(() => {});
@@ -51,10 +51,10 @@ export class Voices {
     return new Set(Object.values(this.files).map((e) => e.file).filter(Boolean));
   }
 
-  // Web-Fassung: die Sätze eines Wagens im Hintergrund laden (assets/voices/<figur>-w<nr>.mp3)
+  // Web-Fassung: die Sätze eines Wagens im Hintergrund laden (assets/voices/<figur>-w<nr>.<hash>.mp3)
   preloadWagon(number) {
     this.wagon = number;
-    for (const file of this.spriteFiles()) if (file.endsWith(`-w${number}.mp3`)) this.sprite(file);
+    for (const file of this.spriteFiles()) if (file.includes(`-w${number}.`)) this.sprite(file);
   }
 
   has(text) {
