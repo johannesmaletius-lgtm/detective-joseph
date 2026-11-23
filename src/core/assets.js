@@ -8,11 +8,16 @@ const cache = new Map();
 
 export function loadImage(src) {
   if (!cache.has(src)) {
-    // Bewusst mit dem "load"-Ereignis statt image.decode(): decode() wartet in einem
+    // Bewusst mit dem "load"-Ereignis statt nur image.decode(): decode() wartet in einem
     // Hintergrund-Tab so lange, bis der Tab sichtbar wird – das Spiel würde dort hängen.
     const loading = new Promise((resolve, reject) => {
       const image = new Image();
-      image.onload = () => resolve(image);
+      // Gleich nach dem Laden entpacken – sonst passiert das erst beim ersten Zeichnen und das Spiel ruckelt.
+      // (Höchstens kurz warten: in einem Hintergrund-Tab würde decode() sonst hängen, siehe oben.)
+      image.onload = () => {
+        const decoded = image.decode ? image.decode().catch(() => {}) : Promise.resolve();
+        Promise.race([decoded, new Promise((done) => setTimeout(done, 500))]).then(() => resolve(image));
+      };
       image.onerror = () => {
         cache.delete(src); // beim nächsten Versuch neu laden
         reject(new Error(`Bild nicht gefunden oder defekt: ${src}`));

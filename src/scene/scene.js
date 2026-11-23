@@ -186,8 +186,7 @@ export class Scene {
     this.drawAnimations(ctx, 'behind');
 
     // 2) das Hintergrundbild
-    const { x, y, width, height } = this.data.background;
-    ctx.drawImage(this.background, x, y, width, height);
+    this.drawBackground(ctx);
 
     // 3) Dinge davor: kleine Bilder, Animationen, Lichtschein, Klick-Markierung, Joseph –
     //    und was vorne auf dem Boden steht, vor Joseph
@@ -211,13 +210,38 @@ export class Scene {
   // Nur die Fensterscheiben: die Außenwelt, aus der alles weggenommen wird, was im Abteil davor liegt
   // (Wände und Rahmen des Hintergrundbilds, kleine Bilder, Joseph). Für die Dunkelheit im Tunnel.
   drawGlass(ctx, player) {
-    this.outside.draw(ctx);
+    this.outside.draw(ctx, { reuse: true }); // die Außenwelt ist in diesem Bild schon gemalt
     ctx.globalCompositeOperation = 'destination-out';
-    const { x, y, width, height } = this.data.background;
-    ctx.drawImage(this.background, x, y, width, height);
+    this.drawBackground(ctx);
     this.drawProps(ctx);
     this.drawFigures(ctx, player);
     ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Das Hintergrundbild wird einmal in genau der Bildschirmgröße vorbereitet. Sonst müsste der Browser
+  // das große Bild in jedem einzelnen Bild neu umrechnen – das kostet viel Zeit und lässt das Spiel ruckeln.
+  drawBackground(ctx) {
+    const { x, y, width, height } = this.data.background;
+    const { a: zoomX, d: zoomY } = ctx.getTransform();
+    const w = Math.round(width * zoomX), h = Math.round(height * zoomY);
+    const source = this.background;
+    if (w <= 0 || h <= 0 || (source.width === w && source.height === h)) {
+      ctx.drawImage(source, x, y, width, height);
+      return;
+    }
+    if (this.scaledBackground?.source !== source || this.scaledBackground.width !== w || this.scaledBackground.height !== h) {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const scaled = canvas.getContext('2d');
+      scaled.imageSmoothingQuality = 'high';
+      scaled.drawImage(source, 0, 0, w, h);
+      this.scaledBackground = { source, width: w, height: h, canvas };
+    }
+    ctx.save();
+    ctx.imageSmoothingQuality = 'low'; // hat schon die richtige Größe
+    ctx.drawImage(this.scaledBackground.canvas, x, y, width, height);
+    ctx.restore();
   }
 
   // Joseph und die anderen Figuren – wer weiter vorne steht (größeres y), wird später gezeichnet

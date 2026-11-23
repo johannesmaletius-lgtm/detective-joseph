@@ -12,6 +12,7 @@
 const DARK = 'rgba(3, 2, 8, 0.95)';
 const BEAM_RADIUS = 125;
 const MARGIN = 20; // etwas größer als das Bild, damit beim Rumpeln kein heller Rand entsteht
+const GLASS_BAND = { top: 50, height: 300 }; // hier liegen alle Fenster (mit Rand fürs Schaukeln)
 
 export class Darkness {
   constructor() {
@@ -24,7 +25,8 @@ export class Darkness {
   // glass:  (optional) Funktion (ctx) => { … }, die nur die Fensterscheiben zeichnet (siehe scene.js)
   draw(ctx, level, { glass = null, lights = [], beam = null }) {
     if (level <= 0) return;
-    const buffer = this.buffer = this.prepare(ctx, this.buffer);
+    // Die Dunkelheit besteht nur aus weichen Verläufen – dafür reicht einfache Auflösung (spart viel Rechenzeit).
+    const buffer = this.buffer = this.prepare(ctx, this.buffer, 1);
     const dark = buffer.getContext('2d');
     const zoom = buffer.width / (1280 + 2 * MARGIN);
     dark.setTransform(zoom, 0, 0, zoom, MARGIN * zoom, MARGIN * zoom);
@@ -41,20 +43,32 @@ export class Darkness {
     dark.globalAlpha = 1;
     dark.globalCompositeOperation = 'source-over';
 
+    ctx.save();
+    ctx.imageSmoothingQuality = 'low'; // weiche Verläufe: einfaches Hochrechnen genügt und ist viel schneller
     ctx.drawImage(buffer, -MARGIN, -MARGIN, 1280 + 2 * MARGIN, 720 + 2 * MARGIN);
+    ctx.restore();
 
     // Fensterscheiben: Blick nach draußen über die Dunkelheit legen
     if (glass) {
+      // Fenster gibt es nur im oberen Band des Bildes – nur dort wird gezeichnet.
       const glassBuffer = this.glassBuffer = this.prepare(ctx, this.glassBuffer);
       const pane = glassBuffer.getContext('2d');
-      pane.setTransform(zoom, 0, 0, zoom, MARGIN * zoom, MARGIN * zoom);
+      const paneZoom = glassBuffer.width / (1280 + 2 * MARGIN);
+      const { top, height } = GLASS_BAND;
+      pane.setTransform(paneZoom, 0, 0, paneZoom, MARGIN * paneZoom, MARGIN * paneZoom);
       pane.globalCompositeOperation = 'source-over';
-      pane.clearRect(-MARGIN, -MARGIN, 1280 + 2 * MARGIN, 720 + 2 * MARGIN);
+      pane.clearRect(-MARGIN, top, 1280 + 2 * MARGIN, height);
+      pane.save();
+      pane.beginPath();
+      pane.rect(-MARGIN, top, 1280 + 2 * MARGIN, height);
+      pane.clip();
       glass(pane);
+      pane.restore();
       pane.globalCompositeOperation = 'source-over';
       ctx.save();
       ctx.globalAlpha = 0.85 * level;
-      ctx.drawImage(glassBuffer, -MARGIN, -MARGIN, 1280 + 2 * MARGIN, 720 + 2 * MARGIN);
+      ctx.imageSmoothingQuality = 'low';
+      ctx.drawImage(glassBuffer, 0, (top + MARGIN) * paneZoom, glassBuffer.width, height * paneZoom, -MARGIN, top, 1280 + 2 * MARGIN, height);
       ctx.restore();
     }
 
@@ -77,8 +91,8 @@ export class Darkness {
   }
 
   // Zwischenbild in ganzzahliger Vergrößerung (1× oder 2×, je nach Bildschirm) – wird wiederverwendet
-  prepare(ctx, buffer) {
-    const zoom = Math.min(2, Math.max(1, Math.round(ctx.getTransform().a)));
+  prepare(ctx, buffer, maxZoom = 2) {
+    const zoom = Math.min(maxZoom, Math.max(1, Math.round(ctx.getTransform().a)));
     const width = (1280 + 2 * MARGIN) * zoom;
     if (buffer?.width === width) return buffer;
     const canvas = document.createElement('canvas');
