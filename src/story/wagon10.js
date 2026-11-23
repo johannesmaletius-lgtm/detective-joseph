@@ -1,42 +1,51 @@
 import {
-  FUSE_SLOTS, SPEEDS, TAPE_SPOTS, checkFuses, drawFuse, drawFuseBox, drawReelShelf, drawTapeDeck, fuseTokens, reelSpots, tapeCaption,
+  FUSES, FUSE_HOMES, FUSE_ORDER, FUSE_SLOTS, RECORDER_SPOTS, SPEEDS, drawFuse, drawFuseBox, drawPower,
+  drawRecorder, drawTapeShelf, tapeSpots,
 } from './art/wagon10.js';
-import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
+import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
-//  TÜR 10 – Der Lautsprecherwagen (der Schaffner nur als Stimme)
+//  WAGEN 10 – Der Lautsprecherwagen (der Schaffner nur als Stimme)
 // ============================================================================================
+//
+// Von hier aus spricht der Schaffner. Hier liegen die Tonbänder aller Runden.
 //
 // DIE RÄTSEL
-//   1. Kein Strom: Im Sicherungskasten fehlen fünf Sicherungen (in der Werkzeugkiste).
-//      Dünner Draht – schwache Sicherung, dicker Draht – starke. Nach Kabeldicke einsetzen.
-//   2. Das Band der Runde, in der Herr K. verschwand (Runde 108), aus dem Regal holen.
-//   3. Im Tonbandgerät: Geschwindigkeit richtig einstellen (9,5 cm/s, steht am Regal) →
-//      „Fahrgast K., bitte zum Tunnel …“ – und danach etwas, das rückwärts klingt.
-//   4. Rückwärts abspielen → „… wie die anderen. Elf ist der Nächste.“ → 11 öffnet das Mischpult,
-//      darin der Schalter für die Tür.
-//
-// ERGEBNIS: Der Schaffner ruft die Fahrgäste. Als Nächstes: Wagen 11.
+//   1. Kein Strom: Die fünf Sicherungen liegen lose daneben. Dickes Kabel = große Sicherung
+//      (1 → 6 A, 1,5 → 10 A, 2,5 → 16 A, 4 → 20 A, 6 → 25 A).
+//   2. Das Tonband der Runde, in der Herr K. verschwand: 108 (Filmrand im Bordkino).
+//   3. Tonbandgerät: Auf der Hülle steht „aufgenommen bei 19“. Bei 19 cm/s: „Fahrgast K., bitte zum
+//      Tunnel …“ – und ein Stück, das rückwärts klingt. Richtung „zurück“: „… wie die anderen.
+//      Elf ist der Nächste.“
+//   4. Schrank unter dem Mischpult: Vorhängeschloss mit zwei Ziffern → 11. Darin der Schalter „Tür“.
 
-const MIXER_CODE = '11';
-const VOICE = '#a6f0b6';
+const CABINET_CODE = '11';
+const RIGHT_SPEED = 2; // 19 cm/s
 
 export const wagon10 = {
   flags: {},
   startItems: ['flashlight'],
   recap: [
-    'In jeder Runde verschwindet im Tunnel ein Fahrgast. Herr K. verschwand in Runde 108 – er ging freiwillig, als der Schaffner ihn rief.',
-    'Auf dem Filmbild im Kino führt jemand mit meiner Mütze Herrn K. in den Tunnel.',
-    'Im Spiegelwagen stand jemand hinter mir, der aussah wie ich. Es gibt zwei von mir.',
+    'In jedem Tunnel springt alles zurück – nur was ich bei mir trage, bleibt. Jede Runde verschwindet ein Fahrgast.',
+    'Herr K. ist in Runde 108 im Tunnel verschwunden. Er ging freiwillig, als der Schaffner ihn über den Lautsprecher rief.',
+    'Der Film im Bordkino zeigt eine Gestalt mit meiner Mütze, die Herrn K. in den Tunnel führt.',
+    'Spiegelwagen: Im Spiegel stand für einen Augenblick jemand hinter mir. Es gibt zwei von mir.',
   ],
+
+  setup(story) {
+    const f = story.flags;
+    f.recorder ??= { speed: 0, direction: 'forward', playing: false, loaded: false, power: false };
+    story.scene.paintSpot('lights', (ctx) => drawPower(ctx, f.power, story.motion.time));
+  },
 
   async intro(story) {
     await wagonIntro(story, {
       number: 10,
       title: 'Der Lautsprecherwagen',
       lines: [
-        'Trichter, Kabel, Tonbänder. Von hier kommen die Durchsagen.',
-        'Von hier hat der Schaffner Herrn K. gerufen.',
+        'Lautsprecher. Mikrofon. Tonbänder.',
+        'Von hier aus spricht er also – der Schaffner.',
+        'Wenn er Herrn K. gerufen hat, dann gibt es davon vielleicht eine Aufnahme.',
       ],
     });
   },
@@ -45,247 +54,286 @@ export const wagon10 = {
 
   hotspots: {
     fuses: {
-      look: (story) => story.say(story.flags.power ? 'Alle fünf Sicherungen sitzen.' : 'Ein Sicherungskasten. Fünf Fassungen – alle leer. Deshalb ist hier alles tot.'),
-      use: (story) => insertFuses(story),
-      items: { fuseBox: (story) => insertFuses(story) },
+      look: (story) => story.say(story.flags.power ? 'Alle fünf Sicherungen sitzen. Strom ist da.' : 'Der Sicherungskasten ist offen. Fünf leere Fassungen, die Sicherungen liegen lose daneben.'),
+      use: (story) => fuseBox(story),
     },
-    toolbox: {
-      look: 'Eine grüne Werkzeugkiste.',
-      use: async (story) => {
-        if (story.flags.fusesTaken) return story.say('Nur noch Schrauben und Isolierband.');
-        story.flags.fusesTaken = true;
-        story.sound('drawer');
-        story.give('fuseBox');
-        await story.say('Ein Kästchen mit Ersatzsicherungen: zwei, sechs, zehn, sechzehn und fünfundzwanzig Ampere.');
-      },
+    tapes: {
+      look: 'Ein Regal voller Tonbänder. Auf jeder Hülle steht eine Rundennummer.',
+      use: (story) => tapeShelf(story),
     },
-    reels: {
-      look: 'Ein Regal voller Tonbänder. Auf jedem steht eine Runde.',
-      use: (story) => pickReel(story),
+    boxes: { look: 'Kisten mit Ersatzröhren und Kabeln.' },
+    recorder: {
+      look: (story) => story.say(story.flags.power ? 'Ein großes Tonbandgerät. Die Lämpchen leuchten.' : 'Ein großes Tonbandgerät. Ohne Strom tut es nichts.'),
+      use: (story) => recorder(story),
+      items: { tape108: (story) => loadTape(story) },
     },
-    tape: {
-      look: (story) => story.say(story.flags.power ? 'Ein Tonbandgerät. Geschwindigkeit, Laufrichtung, Abspielen.' : 'Ein Tonbandgerät. Ohne Strom.'),
-      use: (story) => useTape(story),
-      items: { reel108: (story) => useTape(story, true), reelWrong: (story) => useTape(story, true) },
+    mic: {
+      look: 'Das Mikrofon für die Durchsagen.',
+      use: (story) => speakIntoMic(story),
     },
     mixer: {
-      look: 'Ein Mischpult mit vielen Schiebereglern. Die Klappe darunter ist mit einem Vorhängeschloss gesichert.',
-      use: (story) => openMixer(story),
+      look: 'Ein Mischpult mit Reglern für jeden Wagen. Wagen 1, 2, 3 … bis 24. Die Regler sind alle unten.',
+      use: 'Die Regler bewegen sich nicht. Gesperrt – unten am Schrank hängt ein Vorhängeschloss.',
     },
-    mixerLock: { look: 'Ein Vorhängeschloss mit zwei Rädchen.', use: (story) => openMixer(story) },
-    microphone: {
-      look: 'Ein Mikrofon. Hier spricht der Schaffner.',
-      use: (story) => story.say(story.flags.power ? 'Ich räuspere mich ins Mikrofon. Aus allen Trichtern: „Hm-hm.“ Lieber nicht.' : 'Kein Strom.'),
+    cabinet: {
+      look: (story) => story.say(story.flags.cabinetOpen ? 'Der Schrank ist offen. Drin: ein einzelner großer Schalter mit der Aufschrift „Tür“.' : 'Ein Schrank unter dem Mischpult. Ein Vorhängeschloss mit zwei Rädchen.'),
+      use: (story) => openCabinet(story),
     },
     monitor: {
-      look: (story) => story.say(story.flags.power ? 'Der Bildschirm mit dem Totenkopf. Derselbe wie im ersten Abteil.' : 'Ein Bildschirm, dunkel. Darauf ein Totenkopf – wie im ersten Abteil.'),
+      look: (story) => story.say(story.flags.power ? 'Der Totenkopf auf dem Bildschirm leuchtet grün. Wie in meinem Abteil. Er hört überall mit.' : 'Ein Bildschirm mit einem Totenkopf. Wie in meinem Abteil.'),
     },
-    horn: { look: 'Ein Lautsprecher-Trichter. Von hier hört man die Durchsage in jedem Wagen.' },
     door: {
-      look: (story) => story.say(story.flags.doorOpen ? 'Die Tür ist entriegelt.' : 'Die Tür nach vorne. Kein Griff, kein Schloss – sie wird von irgendwo hier aus geöffnet.'),
-      use: (story) => (story.flags.doorOpen ? ending(story) : story.say('Zu. Elektrisch verriegelt.')),
+      look: 'Die Tür nach vorne. Kein Schloss, kein Griff – nur ein Schild: „Öffnung über Mischpult“.',
+      use: (story) => (story.flags.doorOpen ? leaveWagon(story) : story.say('Sie geht nicht auf. „Öffnung über Mischpult“.')),
     },
+    horn: { look: 'Ein Lautsprechertrichter. Davon gibt es in jedem Wagen einen.' },
+    panel: { look: 'Schalter: „Durchsage“, „Alle Wagen“, „Ruf“. Der Ruf-Schalter ist verplombt.' },
     window: {
-      look: (story) => story.say(story.isDark ? 'Tunnel.' : 'Schnee, Wald, der Turm.'),
+      look: (story) => story.say(story.isDark ? 'Tunnelwand.' : 'Draußen Schnee und der Turm.'),
       use: (story) => waitForTunnel(story, 'Ich warte am Fenster auf den Tunnel …'),
     },
   },
 
-  items: {
-    reel108: { look: 'Das Tonband aus Runde 108. Die Runde, in der Herr K. verschwand.' },
-  },
-
   hint: (story) => hintFor(story, currentGoal(story)),
 
-  onTunnel(story, inside) {
+  async onTunnel(story, inside) {
     if (inside) {
       story.flags.tunnels = tunnels(story) + 1;
       story.game.closeViewsInDark();
     }
   },
+
+  update(story) {
+    announce(story);
+  },
 };
 
+// Kurz vor jedem Tunnel spricht der Schaffner – aus allen Trichtern
+async function announce(story) {
+  const f = story.flags;
+  const lap = story.lap;
+  if (story.motion.tunnelAhead > 16 || story.motion.tunnelAhead < 14 || f.announced === lap) return;
+  f.announced = lap;
+  if (story.inCutscene || story.game.view) return;
+  story.sound('speaker');
+  await story.speak(f.power ? '„Nächster Halt: der Tunnel. Bitte bleiben Sie ruhig sitzen.“' : '„Krrrz … Halt … Tunnel … krrz …“', { at: { x: 640, y: 150 } });
+}
+
 // ============================================================================================
-//  1. Sicherungen
+//  Sicherungen
 // ============================================================================================
 
-async function insertFuses(story) {
+async function fuseBox(story) {
   const f = story.flags;
-  if (f.power) return story.say('Die Sicherungen sitzen.');
-  if (inTunnel(story)) return story.say('Im Dunkeln stecke ich die womöglich falsch rein.');
-  if (!story.has('fuseBox')) return story.say('Die Fassungen sind leer. Ich brauche Sicherungen.');
+  if (f.power) return story.say('Strom ist da. Lieber nichts mehr anfassen.');
+  if (inTunnel(story)) return story.say('Im Dunkeln fasse ich da nicht hinein.');
   const solved = await story.view('arrange', {
     id: 'fuses',
     title: 'Sicherungskasten',
     slots: FUSE_SLOTS,
-    tokens: fuseTokens(),
+    tokens: FUSES.map((fuse, i) => ({ id: fuse.id, label: `Sicherung ${fuse.amp} A`, w: 168, h: 52, home: FUSE_HOMES[i] })),
     drawBackground: drawFuseBox,
     drawToken: drawFuse,
-    check: checkFuses,
+    check: (placement) => placement.every((id, i) => id === FUSE_ORDER[i]),
     help: 'Sicherungen mit gedrückter Maustaste in die Fassungen ziehen  ·  Rechtsklick: zurück',
   });
   if (!solved) {
-    if (!f.fuseTip) {
-      f.fuseTip = true;
-      await story.say('Im Deckel steht, welche wohin gehört: dünner Draht, schwache Sicherung.');
+    if (!f.fusesSeen && !inTunnel(story)) {
+      f.fusesSeen = true;
+      await story.say('Fünf Kabel, alle verschieden dick. Und fünf Sicherungen von 6 bis 25 Ampere.');
+      story.note('Sicherungskasten: Fünf Kabel verschiedener Dicke, fünf lose Sicherungen. Zettel: „Dünner Draht – kleine Sicherung. Sonst brennt’s!“');
     }
     return;
   }
   f.power = true;
-  story.remove('fuseBox');
+  f.recorder.power = true;
   story.sound('power');
-  await story.wait(0.5);
-  await story.say('Summen. Lämpchen gehen an. Der Bildschirm flackert – Strom!');
-  story.note('Strom im Lautsprecherwagen: die fünf Sicherungen nach Drahtdicke eingesetzt.');
+  await story.say('Klack – Strom! Überall gehen kleine Lämpchen an.');
+  await story.say('Und der Totenkopf auf dem Bildschirm leuchtet grün. Er hört mit.');
+  story.note('Die Sicherungen sitzen (dünnes Kabel, kleine Sicherung). Im Lautsprecherwagen ist Strom.');
 }
 
 // ============================================================================================
-//  2. Das richtige Band
+//  Tonbänder
 // ============================================================================================
 
-async function pickReel(story) {
-  if (inTunnel(story)) return story.say('Im Dunkeln kann ich die Etiketten nicht lesen.');
-  if (story.has('reel108')) return story.say('Das Band aus Runde 108 habe ich.');
+async function tapeShelf(story) {
+  const f = story.flags;
+  if (inTunnel(story)) return story.say('Im Dunkeln kann ich die Nummern nicht lesen.');
   await story.view('picture', {
-    draw: drawReelShelf,
-    spots: reelSpots(),
-    area: { x: 170, y: 110, w: 940, h: 500 },
-    help: 'Klicken: Band nehmen  ·  Rechtsklick: zurück',
+    draw: (ctx) => drawTapeShelf(ctx, f.tapeTaken),
+    spots: () => tapeSpots().filter((spot) => !(f.tapeTaken && spot.round === 108)),
+    area: { x: 170, y: 110, w: 940, h: 560 },
+    help: 'Band anklicken: nehmen  ·  Rechtsklick: zurück',
     onClick: async (spot, view) => {
-      if (spot.round !== 108) {
-        await story.say(`Runde ${spot.round}? Was ist in dieser Runde passiert …? Ich nehme lieber das Band, auf das es ankommt.`);
+      if (spot.round === 108) {
+        f.tapeTaken = true;
+        story.give('tape108');
+        story.sound('pickup');
+        view.close(true);
+        await story.say('Runde 108. Die Runde, in der Herr K. verschwand.');
+        story.note('Im Regal: das Tonband aus Runde 108.');
         return;
       }
-      story.sound('pickup');
-      story.give('reel108');
-      view.close(true);
-      await story.say('Runde 108. Die Runde, in der Herr K. verschwand.');
+      if (spot.round === 110) return story.say('„Runde 110“ – eine leere Spule. Noch nicht aufgenommen.');
+      if (spot.round < 100) return story.say(`Runde ${spot.round}. So lange fährt dieser Zug schon im Kreis …`);
+      return story.say(`Runde ${spot.round}. Nicht die, die ich suche.`);
     },
   });
-  if (!story.flags.speedNoted) {
-    story.flags.speedNoted = true;
-    story.note('Am Tonband-Regal steht: Bandgeschwindigkeit 9,5 cm/s.');
+  if (!f.shelfSeen && !f.tapeTaken && !inTunnel(story)) {
+    f.shelfSeen = true;
+    story.note('Tonbandregal: ein Band für jede Runde. Welche Runde suche ich?');
   }
 }
 
 // ============================================================================================
-//  3. + 4. Tonbandgerät
+//  Tonbandgerät
 // ============================================================================================
 
-async function useTape(story, inserting = false) {
+async function loadTape(story) {
   const f = story.flags;
-  if (!f.power) return story.say('Ohne Strom dreht sich da gar nichts.');
+  story.remove('tape108');
+  f.recorder.loaded = true;
+  story.sound('snap');
+  await story.say('Band 108 eingelegt. Auf der Hülle stand: „aufgenommen bei 19“.');
+  story.note('Tonband 108 liegt im Gerät. Auf der Hülle: „aufgenommen bei 19“.');
+  await recorder(story);
+}
+
+async function recorder(story) {
+  const f = story.flags;
+  const r = f.recorder;
   if (inTunnel(story)) return story.say('Im Dunkeln finde ich die Knöpfe nicht.');
-  if (inserting && !f.reelIn) {
-    f.reelIn = true;
-    story.remove('reel108');
-    story.sound('click');
-    await story.say('Band eingelegt.');
-  }
-  const state = { speed: f.speed ?? 3, reverse: f.reverse ?? false, loaded: Boolean(f.reelIn), playing: false, time: 0, caption: '' };
+  if (f.reversedHeard) return story.say('Ich habe es gehört. „Elf ist der Nächste.“');
   await story.view('picture', {
-    state,
-    draw: (ctx, view) => drawTapeDeck(ctx, view.state),
-    spots: TAPE_SPOTS,
-    area: { x: 300, y: 120, w: 680, h: 500 },
-    update: (dt, view) => {
-      view.state.time += dt;
-    },
-    help: 'Klicken: Knopf drehen, Richtung umschalten, abspielen  ·  Rechtsklick: zurück',
+    draw: (ctx, view) => drawRecorder(ctx, r, view.age),
+    spots: RECORDER_SPOTS,
+    area: { x: 250, y: 110, w: 780, h: 600 },
+    help: 'Regler anklicken: umstellen  ·  Rechtsklick: zurück',
     onClick: async (spot, view) => {
-      const s = view.state;
       if (spot.id === 'speed') {
-        s.speed = (s.speed + 1) % SPEEDS.length;
-        f.speed = s.speed;
-        story.sound('rotate');
-        return;
-      }
-      if (spot.id === 'direction') {
-        s.reverse = !s.reverse;
-        f.reverse = s.reverse;
+        r.speed = (r.speed + 1) % SPEEDS.length;
         story.sound('click');
         return;
       }
-      if (!s.loaded) return story.say('Erst ein Band einlegen.');
-      s.playing = true;
-      s.caption = tapeCaption(s.speed, s.reverse);
-      story.sound('speaker');
-      await story.wait(3.2);
-      s.playing = false;
-      await react(story, s);
-      s.caption = '';
+      if (spot.id === 'direction') {
+        r.direction = r.direction === 'back' ? 'forward' : 'back';
+        story.sound('click');
+        return;
+      }
+      if (!f.power) return story.say('Nichts. Kein Strom.');
+      if (!r.loaded) return story.say('Es ist kein Band eingelegt.');
+      await playTape(story, view);
     },
   });
 }
 
-async function react(story, s) {
+async function playTape(story, view) {
   const f = story.flags;
-  if (s.speed !== 1) {
-    await story.say(s.speed === 0 ? 'Viel zu langsam. Wie ein Bär im Winterschlaf.' : 'Viel zu schnell! Wie ein Eichhörnchen.');
-    return;
-  }
-  if (!s.reverse) {
-    await story.speak('Fahrgast K., bitte zum Tunnel …', { color: VOICE });
-    if (!f.heardCall) {
-      f.heardCall = true;
-      await story.say('Die Stimme des Schaffners. Und danach … dieses Gemurmel. Das klingt, als liefe es rückwärts.');
-      story.note('Band Runde 108 bei 9,5 cm/s: „Fahrgast K., bitte zum Tunnel …“ – danach Gemurmel, das rückwärts klingt.');
+  const r = f.recorder;
+  const voice = (text) => story.speak(text, { color: '#f5d7a1' });
+  r.playing = true;
+  story.sound('tape');
+  try {
+    if (r.direction === 'back') {
+      await story.wait(0.6);
+      if (r.speed !== RIGHT_SPEED) {
+        await voice(r.speed === 0 ? '„… uuuhhh … wwwoooo …“' : '„… uh … wo … ni …“');
+        await story.say('Rückwärts – und zu langsam.');
+        return;
+      }
+      if (!f.forwardHeard) {
+        await voice('„… nerednA eid eiw …“');
+        await story.say('Rückwärts ergibt es keinen Sinn … oder doch?');
+        return;
+      }
+      await voice('„… wie die anderen.“');
+      story.sound('dread');
+      await voice('„Elf ist der Nächste.“');
+      r.playing = false;
+      f.reversedHeard = true;
+      view.close(true);
+      await story.say('„Elf ist der Nächste.“ Wagen elf. Der nächste Fahrgast sitzt im nächsten Wagen!');
+      await story.say('Und das ist SEINE Stimme. Die Stimme des Schaffners. Er ruft sie.');
+      story.note('Tonband 108 rückwärts: „… wie die anderen. Elf ist der Nächste.“ Der Schaffner ruft die Fahrgäste. Als Nächstes ist jemand in Wagen 11 dran.');
+      return;
     }
-    return;
-  }
-  await story.speak('… wie die anderen. Elf ist der Nächste.', { color: VOICE });
-  if (!f.heardSecret) {
-    f.heardSecret = true;
-    await story.say('„Elf ist der Nächste.“ Das hat er nicht laut gesagt. Er hat es rückwärts aufs Band gesprochen.');
-    await story.say('Der Schaffner ruft die Fahrgäste. Und als Nächstes Wagen elf?');
-    story.note('Rückwärts: „… wie die anderen. Elf ist der Nächste.“ Der Schaffner ruft die Fahrgäste – als Nächstes Wagen 11.');
+    await story.wait(0.6);
+    if (r.speed === 0) {
+      await voice('„Fffffaaaaaaahhhhrrrr … gggaaaaaasssst …“');
+      await story.say('Viel zu langsam. Wie ein Brummbär.');
+      return;
+    }
+    if (r.speed === 1) {
+      await voice('„Faaahrgaaast Kaaa … biiitte …“');
+      await story.say('Immer noch zu langsam.');
+      return;
+    }
+    await voice('„Fahrgast K., bitte zum Tunnel. Fahrgast K., bitte zum Tunnel.“');
+    await voice('„Haben Sie keine Angst. Sie kommen nach Hause …“');
+    await voice('„… nerednA eid eiw … tsdhcäN red tsi flE …“');
+    if (!f.forwardHeard) {
+      f.forwardHeard = true;
+      await story.say('„Fahrgast K., bitte zum Tunnel.“ Das ist der Ruf, dem Herr K. gefolgt ist.');
+      await story.say('Aber das Letzte … das klingt, als liefe es rückwärts.');
+      story.note('Tonband 108 bei 19 cm/s: „Fahrgast K., bitte zum Tunnel … Haben Sie keine Angst. Sie kommen nach Hause.“ Am Ende ein Stück, das rückwärts klingt.');
+    }
+  } finally {
+    r.playing = false;
   }
 }
 
 // ============================================================================================
-//  Mischpult, Tür und Ende
+//  Mikrofon, Schrank, Tür
 // ============================================================================================
 
-async function openMixer(story) {
+async function speakIntoMic(story) {
+  if (!story.flags.power) return story.say('Ohne Strom bleibt es stumm.');
+  await story.say('Hallo? … Ist da jemand?');
+  story.sound('speaker');
+  await story.speak('„Hallo? … Ist da jemand?“', { at: { x: 640, y: 150 }, color: '#f2e6c4' });
+  await story.say('Meine eigene Stimme aus allen Trichtern. Gruselig.');
+}
+
+async function openCabinet(story) {
   const f = story.flags;
-  if (f.doorOpen) return story.say('Der Türschalter steht auf „Auf“.');
-  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Zahlen nicht.');
-  if (f.mixerOpen) return flipDoor(story);
-  let tries = 0;
-  const opened = await story.codeLock({
-    id: 'mixer10',
-    digits: 2,
+  if (f.cabinetOpen) return flipDoorSwitch(story);
+  const opened = await tryCode(story, {
+    id: 'cabinet10',
+    code: CABINET_CODE,
     style: 'steel',
-    check: (code) => {
-      tries += 1;
-      return code === MIXER_CODE;
-    },
+    dark: 'Im Dunkeln sehe ich die Rädchen nicht.',
+    wrong: (s) => (s.flags.reversedHeard ? 'Falsch. Wer ist der Nächste?' : 'Falsch. Zwei Ziffern …'),
   });
-  if (!opened) {
-    if (tries > 0) await story.say(f.heardSecret ? 'Falsch. „Elf ist der Nächste“ …' : 'Falsch. Zwei Ziffern.');
-    return;
-  }
-  f.mixerOpen = true;
+  if (!opened) return;
+  f.cabinetOpen = true;
+  await story.say('Elf! Das Schloss ist auf.');
+  await story.say('Im Schrank: ein großer Schalter. Darauf steht „Tür“.');
+  await flipDoorSwitch(story);
+}
+
+async function flipDoorSwitch(story) {
+  const f = story.flags;
+  if (f.doorOpen) return story.say('Der Schalter steht auf „offen“.');
+  if (!f.power) return story.say('Ich lege den Schalter um … nichts. Kein Strom.');
+  f.doorOpen = true;
+  story.sound('lever');
+  await story.wait(0.4);
   story.sound('unlock');
-  await story.say('Elf. Die Klappe ist auf.');
-  await flipDoor(story);
+  await story.say('Klack. Vorne an der Tür klickt es.');
+  story.note('Im Schrank unter dem Mischpult (Code 11): der Schalter „Tür“. Die Tür ist offen.');
 }
 
-async function flipDoor(story) {
-  if (!story.flags.power) return story.say('Ein Schalter: „Tür“. Aber ohne Strom tut er nichts.');
-  story.flags.doorOpen = true;
-  story.sound('latch');
-  await story.say('Ein Kippschalter: „Tür“. Klack – die Tür ist entriegelt.');
-}
-
-async function ending(story) {
+async function leaveWagon(story) {
+  if (!story.flags.reversedHeard) return story.say('Erst will ich wissen, was auf dem Band ist.');
   await story.cutscene(async () => {
     story.sound('door');
-    await story.say('Wer den Ruf hört, geht. Wie im Schlaf. So war es bei Herrn K.');
-    await story.say('Und als Nächstes ist Wagen elf dran. Diesmal komme ich nicht zu spät.');
+    await story.say('Der Schaffner ruft die Fahrgäste. Und wer den Ruf hört, geht.');
+    await story.say('Elf ist der Nächste. Diesmal bin ich vorher da.');
     await finishWagon(story, {
+      number: 10,
       title: 'Ende von Wagen 10',
-      lines: ['Der Schaffner ruft die Fahrgäste. Rückwärts auf dem Band: „Elf ist der Nächste.“'],
+      lines: ['„… wie die anderen. Elf ist der Nächste.“'],
       nextTitle: 'im Uhrenwagen',
     });
   });
@@ -298,16 +346,31 @@ async function ending(story) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.power) {
-    if (!story.has('fuseBox')) return { id: 'fusesFind', lines: ['Hier ist alles ohne Strom. Im Sicherungskasten fehlen die Sicherungen – vielleicht in der Werkzeugkiste?'] };
     return { id: 'fuses', lines: [
-      'Die Sicherungen nach der Dicke der Kabel einsetzen: dünner Draht, schwache Sicherung.',
-      'Von oben nach unten: 16 A, 6 A, 25 A, 2 A, 10 A.',
+      'Hier ist nirgends Strom. Der Sicherungskasten links ist offen.',
+      'Dünnes Kabel – kleine Sicherung, dickes Kabel – große Sicherung.',
+      'Von oben nach unten: 4 mm² → 20 A, 1 → 6 A, 6 → 25 A, 1,5 → 10 A, 2,5 → 16 A.',
     ] };
   }
-  if (!f.reelIn && !story.has('reel108')) return { id: 'reel', lines: ['Im Regal liegt für jede Runde ein Band. Herr K. verschwand in Runde 108.'] };
-  if (!f.reelIn) return { id: 'insert', lines: ['Das Band ins Tonbandgerät: Band im Inventar anklicken, dann das Tonbandgerät.'] };
-  if (!f.heardCall) return { id: 'speed', lines: ['Die Geschwindigkeit muss stimmen. Am Regal steht sie: 9,5 cm/s.'] };
-  if (!f.heardSecret) return { id: 'reverse', lines: ['Das Gemurmel am Ende klingt rückwärts. Den Schalter auf „RÜCK“ stellen und noch einmal abspielen.'] };
-  if (!f.doorOpen) return { id: 'mixer', lines: ['„Elf ist der Nächste.“ Das Mischpult hat ein Schloss mit zwei Rädchen: 1 und 1.'] };
-  return { id: 'door', lines: ['Die Tür ist entriegelt.'] };
+  if (!f.tapeTaken) {
+    return { id: 'tape', lines: [
+      'Im Regal liegt für jede Runde ein Tonband. Welche Runde ist wichtig?',
+      'Herr K. verschwand in Runde 108 – das stand am Filmrand im Bordkino.',
+    ] };
+  }
+  if (!f.recorder.loaded) return { id: 'load', lines: ['Das Tonband ins Tonbandgerät rechts einlegen: Band im Inventar anklicken, dann das Gerät.'] };
+  if (!f.forwardHeard) {
+    return { id: 'speed', lines: [
+      'Das Band läuft zu langsam. Auf der Hülle stand, mit welcher Geschwindigkeit es aufgenommen wurde.',
+      '„Aufgenommen bei 19“ – den linken Regler auf 19 stellen, Richtung „vor“, dann abspielen.',
+    ] };
+  }
+  if (!f.reversedHeard) {
+    return { id: 'reverse', lines: [
+      'Das Ende klang rückwärts. Das Gerät kann auch rückwärts abspielen.',
+      'Mittlerer Regler auf „zurück“, Geschwindigkeit 19 lassen, abspielen.',
+    ] };
+  }
+  if (!f.cabinetOpen) return { id: 'cabinet', lines: ['„Elf ist der Nächste.“ Das Schloss am Schrank unter dem Mischpult hat zwei Rädchen: 1 – 1.'] };
+  return { id: 'door', lines: ['Der Schalter im Schrank öffnet die Tür. Dann hindurch.'] };
 }

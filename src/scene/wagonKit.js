@@ -36,10 +36,12 @@ export function perspective(overrides = {}) {
   return { ...trainCompartment.perspective, ...overrides };
 }
 
-// Anklickbare Fenster aus den Fensterrechtecken (zum Anschauen und um auf den Tunnel zu warten)
-export function windowSpots(windows) {
-  return windows.map((w) => ({
-    id: 'window', name: 'Fenster', cursor: 'look',
-    area: [[w.from, Math.max(0, w.top)], [w.to, Math.max(0, w.top)], [w.to, w.bottom], [w.from, w.bottom]],
-  }));
+// Rechteck als anklickbare Fläche: box(x0, y0, x1, y1) → [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]
+export function box(x0, y0, x1, y1) {
+  return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+}
+
+// Fenster als anklickbare Stellen (aus denselben Rechtecken wie outside.windows)
+export function windowSpots(windows, name = 'Fenster') {
+  return windows.map((w) => ({ id: 'window', name, cursor: 'look', area: box(w.from, w.top, w.to, w.bottom) }));
 }

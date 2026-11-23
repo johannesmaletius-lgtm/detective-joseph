@@ -10,6 +10,14 @@
 export const YEAR = 2026;
 export const MONTH = 11; // Dezember (JavaScript zählt die Monate ab 0)
 
+// Lädt Szene und Drehbuch eines Wagens erst, wenn die Tür geöffnet wird
+function wagon(sceneFile, sceneName, storyFile, storyName) {
+  return async () => ({
+    scene: (await import(`../scene/${sceneFile}.js`))[sceneName],
+    script: (await import(`../story/${storyFile}.js`))[storyName],
+  });
+}
+
 export const DOORS = [
   {
     door: 1,
@@ -19,99 +27,22 @@ export const DOORS = [
       script: (await import('../story/wagon1.js')).wagon1,
     }),
   },
-  {
-    door: 2,
-    wagon: 'Gepäckwagen',
-    load: async () => ({
-      scene: (await import('../scene/baggageCar.js')).baggageCar,
-      script: (await import('../story/wagon2.js')).wagon2,
-    }),
-  },
-  {
-    door: 3,
-    wagon: 'Postwagen',
-    load: async () => ({
-      scene: (await import('../scene/postCar.js')).postCar,
-      script: (await import('../story/wagon3.js')).wagon3,
-    }),
-  },
-  {
-    door: 4,
-    wagon: 'Speisewagen',
-    load: async () => ({
-      scene: (await import('../scene/diningCar.js')).diningCar,
-      script: (await import('../story/wagon4.js')).wagon4,
-    }),
-  },
-  {
-    door: 5,
-    wagon: 'Schlafwagen',
-    load: async () => ({
-      scene: (await import('../scene/sleepingCar.js')).sleepingCar,
-      script: (await import('../story/wagon5.js')).wagon5,
-    }),
-  },
-  {
-    door: 6,
-    wagon: 'Fundbüro',
-    load: async () => ({
-      scene: (await import('../scene/lostAndFound.js')).lostAndFound,
-      script: (await import('../story/wagon6.js')).wagon6,
-    }),
-  },
-  {
-    door: 7,
-    wagon: 'Barwagen',
-    load: async () => ({
-      scene: (await import('../scene/barCar.js')).barCar,
-      script: (await import('../story/wagon7.js')).wagon7,
-    }),
-  },
-  {
-    door: 8,
-    wagon: 'Bordkino',
-    load: async () => ({
-      scene: (await import('../scene/cinemaCar.js')).cinemaCar,
-      script: (await import('../story/wagon8.js')).wagon8,
-    }),
-  },
-  {
-    door: 9,
-    wagon: 'Spiegelwagen',
-    load: async () => ({
-      scene: (await import('../scene/mirrorCar.js')).mirrorCar,
-      script: (await import('../story/wagon9.js')).wagon9,
-    }),
-  },
-  {
-    door: 10,
-    wagon: 'Lautsprecherwagen',
-    load: async () => ({
-      scene: (await import('../scene/speakerCar.js')).speakerCar,
-      script: (await import('../story/wagon10.js')).wagon10,
-    }),
-  },
-  {
-    door: 11,
-    wagon: 'Uhrenwagen',
-    load: async () => ({
-      scene: (await import('../scene/clockCar.js')).clockCar,
-      script: (await import('../story/wagon11.js')).wagon11,
-    }),
-  },
-  { door: 12, wagon: 'Musiksalon' },
-  { door: 13, wagon: 'Kapelle' },
-  { door: 14, wagon: 'Zeitungswagen' },
-  { door: 15, wagon: 'Spielzimmer' },
-  { door: 16, wagon: 'Funkraum' },
-  {
-    door: 17,
-    wagon: 'Gewächshaus',
-    load: async () => ({
-      scene: (await import('../scene/greenhouse.js')).greenhouse,
-      script: (await import('../story/wagon17.js')).wagon17,
-    }),
-  },
+  { door: 2, wagon: 'Gepäckwagen', load: wagon('baggageCar', 'baggageCar', 'wagon2', 'wagon2') },
+  { door: 3, wagon: 'Postwagen', load: wagon('postCar', 'postCar', 'wagon3', 'wagon3') },
+  { door: 4, wagon: 'Speisewagen', load: wagon('diningCar', 'diningCar', 'wagon4', 'wagon4') },
+  { door: 5, wagon: 'Schlafwagen', load: wagon('sleepingCar', 'sleepingCar', 'wagon5', 'wagon5') },
+  { door: 6, wagon: 'Fundbüro', load: wagon('lostAndFound', 'lostAndFound', 'wagon6', 'wagon6') },
+  { door: 7, wagon: 'Barwagen', load: wagon('barCar', 'barCar', 'wagon7', 'wagon7') },
+  { door: 8, wagon: 'Bordkino', load: wagon('cinemaCar', 'cinemaCar', 'wagon8', 'wagon8') },
+  { door: 9, wagon: 'Spiegelwagen', load: wagon('mirrorCar', 'mirrorCar', 'wagon9', 'wagon9') },
+  { door: 10, wagon: 'Lautsprecherwagen', load: wagon('speakerCar', 'speakerCar', 'wagon10', 'wagon10') },
+  { door: 11, wagon: 'Uhrenwagen', load: wagon('clockCar', 'clockCar', 'wagon11', 'wagon11') },
+  { door: 12, wagon: 'Musiksalon', load: wagon('musicSalon', 'musicSalon', 'wagon12', 'wagon12') },
+  { door: 13, wagon: 'Kapelle', load: wagon('chapelCar', 'chapelCar', 'wagon13', 'wagon13') },
+  { door: 14, wagon: 'Zeitungswagen', load: wagon('newspaperCar', 'newspaperCar', 'wagon14', 'wagon14') },
+  { door: 15, wagon: 'Spielzimmer', load: wagon('playroom', 'playroom', 'wagon15', 'wagon15') },
+  { door: 16, wagon: 'Funkraum', load: wagon('radioRoom', 'radioRoom', 'wagon16', 'wagon16') },
+  { door: 17, wagon: 'Gewächshaus', load: wagon('greenhouse', 'greenhouse', 'wagon17', 'wagon17') },
   { door: 18, wagon: 'Schaffnerabteil' },
   { door: 19, wagon: 'Fotolabor' },
   { door: 20, wagon: 'Packwagen' },

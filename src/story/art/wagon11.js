@@ -1,133 +1,200 @@
-import { HAND, INK, PRINT, RED, SERIF, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, glow, line, sheet, text, wood } from './common.js';
 
-// Gezeichnetes für Wagen 11 (Uhrenwagen): die Wand voller Uhren, Standuhr und Kuckucksuhr zum Stellen.
+// Gezeichnetes für Wagen 11 (Uhrenwagen): die Wand voller Uhren (eine geht mit dem Mond),
+// die Rundenuhr, Standuhr und Kuckucksuhr zum Stellen.
 
-// ---------------------------------------------------------------- Uhrenwand
-// Acht Uhren. Eine davon geht „mit dem Mond“: Ihr Zeiger dreht sich einmal pro Runde.
-// kind: 'moon' = einmal pro Runde, 'run' = normaler Sekundenzeiger, 'stop' = steht
-export const WALL = [
-  { id: 'c1', kind: 'stop', h: 3, m: 40 },
-  { id: 'c2', kind: 'run', h: 10, m: 10 },
-  { id: 'c3', kind: 'stop', h: 7, m: 25 },
-  { id: 'c4', kind: 'stop', h: 12, m: 0 },
-  { id: 'c5', kind: 'run', h: 1, m: 55 },
-  { id: 'c6', kind: 'moon' },
-  { id: 'c7', kind: 'stop', h: 5, m: 5 },
-  { id: 'c8', kind: 'stop', h: 9, m: 45 },
-];
-function wallPos(i) {
-  return { x: 260 + (i % 4) * 250, y: 200 + Math.floor(i / 4) * 250 };
-}
-export function wallSpots() {
-  return WALL.map((clock, i) => ({ id: clock.id, cx: wallPos(i).x, cy: wallPos(i).y, r: 92, label: 'Uhr' }));
+export const CALL_MINUTE = 50;  // so weit ist die Rundenuhr, wenn der Ruf kommt (von 60)
+export const RATES = { grandfather: 1.5, cuckoo: 0.5 }; // Minuten je Rundenminute
+export const TARGET = { grandfather: 45, cuckoo: 35 };  // so müssen sie beim Verlassen des Tunnels stehen
+
+// ---------------------------------------------------------------- Wand voller Uhren
+const KINDS = ['stopped', 'ticking', 'moon', 'backward', 'stopped', 'fast', 'ticking', 'stopped', 'backward'];
+const STOPPED = [[10, 10], [3, 40], [7, 25]];
+
+export function clockSpots() {
+  return KINDS.map((kind, i) => ({
+    id: `c${i}`, kind,
+    cx: 380 + (i % 3) * 260, cy: 160 + Math.floor(i / 3) * 200, r: 82,
+    label: 'Uhr',
+  }));
 }
 
-// lapShare = 0 … 1 (wie weit die Runde ist), time = Sekunden
-export function drawClockWall(ctx, { lapShare, time }) {
-  wood(ctx, 120, 70, 1040, 560, [86, 50, 26]);
-  WALL.forEach((clock, i) => {
-    const { x, y } = wallPos(i);
-    let hour, minute, second = null;
-    if (clock.kind === 'moon') {
-      // ein Umlauf pro Runde – nur ein Zeiger, mit einem kleinen Mond an der Spitze
-      dial(ctx, x, y, 86, '#e8e0f0');
-      const a = -Math.PI / 2 + lapShare * Math.PI * 2;
-      ctx.strokeStyle = '#2a2a4a';
-      ctx.lineWidth = 5;
-      line(ctx, x, y, x + Math.cos(a) * 64, y + Math.sin(a) * 64);
-      ctx.fillStyle = '#f4ecc0';
-      ctx.beginPath();
-      ctx.arc(x + Math.cos(a) * 64, y + Math.sin(a) * 64, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#e8e0f0';
-      ctx.beginPath();
-      ctx.arc(x + Math.cos(a) * 64 + 5, y + Math.sin(a) * 64 - 3, 8, 0, Math.PI * 2);
-      ctx.fill();
-      return;
+export function drawClockWall(ctx, { progress, age }) {
+  wood(ctx, 220, 40, 840, 640, [104, 62, 30]);
+  let stoppedIndex = 0;
+  for (const spot of clockSpots()) {
+    const { cx, cy, r, kind } = spot;
+    if (kind === 'moon') {
+      drawRoundClock(ctx, cx, cy, r, progress);
+      continue;
     }
-    hour = clock.h;
-    minute = clock.m;
-    if (clock.kind === 'run') second = time % 60;
-    dial(ctx, x, y, 86, '#f1e6c8');
-    hands(ctx, x, y, 86, hour, minute, second);
-  });
+    face(ctx, cx, cy, r);
+    let hour, minute, second = null;
+    if (kind === 'stopped') {
+      [hour, minute] = STOPPED[stoppedIndex++ % STOPPED.length];
+    } else if (kind === 'ticking') {
+      hour = 11; minute = 40 + age / 60; second = Math.floor(age) % 60;
+    } else if (kind === 'backward') {
+      hour = 4; minute = 30 - age * 2; second = (60 - (Math.floor(age * 2) % 60)) % 60;
+    } else {
+      hour = (age * 0.5) % 12; minute = (age * 6) % 60;
+    }
+    hands(ctx, cx, cy, r, hour, minute, second);
+  }
+  text(ctx, 'Herrn Ticks Uhren. Welche geht mit dem Mond?', 640, 668, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
-function dial(ctx, x, y, r, face) {
-  ctx.fillStyle = '#8a6a2a';
+function face(ctx, cx, cy, r, color = '#efe3c2') {
+  ctx.fillStyle = '#5a3416';
   ctx.beginPath();
-  ctx.arc(x, y, r + 8, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r + 8, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = face;
+  ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = INK;
+  ctx.lineWidth = 2;
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2;
-    ctx.lineWidth = i % 3 === 0 ? 4 : 2;
-    line(ctx, x + Math.cos(a) * (r - 14), y + Math.sin(a) * (r - 14), x + Math.cos(a) * (r - 4), y + Math.sin(a) * (r - 4));
+    line(ctx, cx + Math.cos(a) * r * 0.82, cy + Math.sin(a) * r * 0.82, cx + Math.cos(a) * r * 0.94, cy + Math.sin(a) * r * 0.94);
   }
 }
 
-function hands(ctx, x, y, r, hour, minute, second = null) {
-  const ha = -Math.PI / 2 + ((hour % 12) + minute / 60) / 12 * Math.PI * 2;
-  const ma = -Math.PI / 2 + minute / 60 * Math.PI * 2;
+function hands(ctx, cx, cy, r, hour, minute, second) {
+  const ha = ((hour % 12) + minute / 60) / 12 * Math.PI * 2 - Math.PI / 2;
+  const ma = (minute / 60) * Math.PI * 2 - Math.PI / 2;
   ctx.strokeStyle = INK;
   ctx.lineCap = 'round';
-  ctx.lineWidth = 7;
-  line(ctx, x, y, x + Math.cos(ha) * r * 0.5, y + Math.sin(ha) * r * 0.5);
+  ctx.lineWidth = 6;
+  line(ctx, cx, cy, cx + Math.cos(ha) * r * 0.5, cy + Math.sin(ha) * r * 0.5);
   ctx.lineWidth = 4;
-  line(ctx, x, y, x + Math.cos(ma) * r * 0.78, y + Math.sin(ma) * r * 0.78);
+  line(ctx, cx, cy, cx + Math.cos(ma) * r * 0.78, cy + Math.sin(ma) * r * 0.78);
   if (second !== null) {
-    const sa = -Math.PI / 2 + second / 60 * Math.PI * 2;
-    ctx.strokeStyle = RED;
+    const sa = (second / 60) * Math.PI * 2 - Math.PI / 2;
+    ctx.strokeStyle = '#a12218';
     ctx.lineWidth = 2;
-    line(ctx, x, y, x + Math.cos(sa) * r * 0.85, y + Math.sin(sa) * r * 0.85);
+    line(ctx, cx, cy, cx + Math.cos(sa) * r * 0.86, cy + Math.sin(sa) * r * 0.86);
   }
-  ctx.lineCap = 'butt';
+  ctx.fillStyle = INK;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+  ctx.fill();
 }
 
-// ---------------------------------------------------------------- Standuhr und Kuckucksuhr stellen
+// Die Rundenuhr: ein Zeiger, einmal herum pro Runde. Oben „Tunnel“, roter Strich beim Ruf.
+export function drawRoundClock(ctx, cx, cy, r, progress, { big = false } = {}) {
+  face(ctx, cx, cy, r, '#d9d2c0');
+  ctx.save();
+  // Nachthimmel im Zifferblatt
+  ctx.fillStyle = '#1c2340';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#f4ecc8';
+  for (let i = 0; i < 14; i++) ctx.fillRect(cx + Math.cos(i * 2.3) * r * 0.55, cy + Math.sin(i * 1.7) * r * 0.5, 2, 2);
+  ctx.restore();
+  // Tunnel oben
+  ctx.fillStyle = '#20160e';
+  ctx.beginPath();
+  ctx.arc(cx, cy - r * 0.84, r * 0.13, Math.PI, 0);
+  ctx.fill();
+  // Ruf-Strich
+  const ca = (CALL_MINUTE / 60) * Math.PI * 2 - Math.PI / 2;
+  ctx.strokeStyle = '#c0281e';
+  ctx.lineWidth = big ? 8 : 5;
+  line(ctx, cx + Math.cos(ca) * r * 0.74, cy + Math.sin(ca) * r * 0.74, cx + Math.cos(ca) * r * 0.98, cy + Math.sin(ca) * r * 0.98);
+  if (big) {
+    text(ctx, 'Tunnel', cx, cy - r - 18, { font: `bold 20px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+    text(ctx, 'Ruf', cx + Math.cos(ca) * (r + 34), cy + Math.sin(ca) * (r + 34) + 6, { font: `bold 20px ${HAND}`, color: '#ff8a70', align: 'center' });
+    for (let m = 10; m < 60; m += 10) {
+      const a = (m / 60) * Math.PI * 2 - Math.PI / 2;
+      text(ctx, String(m), cx + Math.cos(a) * r * 0.62, cy + Math.sin(a) * r * 0.62 + 6, { font: `16px ${SERIF}`, color: '#e9dfc0', align: 'center' });
+    }
+  }
+  // der Zeiger mit dem Mond
+  const a = progress * Math.PI * 2 - Math.PI / 2;
+  ctx.strokeStyle = '#e8d9a8';
+  ctx.lineWidth = 4;
+  line(ctx, cx, cy, cx + Math.cos(a) * r * 0.7, cy + Math.sin(a) * r * 0.7);
+  ctx.fillStyle = '#f7f0cf';
+  ctx.beginPath();
+  ctx.arc(cx + Math.cos(a) * r * 0.7, cy + Math.sin(a) * r * 0.7, r * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#1c2340';
+  ctx.beginPath();
+  ctx.arc(cx + Math.cos(a) * r * 0.7 + r * 0.04, cy + Math.sin(a) * r * 0.7 - r * 0.02, r * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+export function drawRoundClockCard(ctx, progress) {
+  wood(ctx, 340, 70, 600, 580, [104, 62, 30]);
+  drawRoundClock(ctx, 640, 350, 210, progress, { big: true });
+  text(ctx, 'Ein Zeiger, einmal herum pro Runde. Oben der Tunnel.', 640, 630, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+}
+
+// ---------------------------------------------------------------- Standuhr / Kuckucksuhr stellen
 export const SET_SPOTS = [
-  { id: 'gMinus', x: 250, y: 520, w: 80, h: 60, label: 'Standuhr: 5 Minuten zurück' },
-  { id: 'gPlus', x: 350, y: 520, w: 80, h: 60, label: 'Standuhr: 5 Minuten vor' },
-  { id: 'cMinus', x: 850, y: 520, w: 80, h: 60, label: 'Kuckucksuhr: 5 Minuten zurück' },
-  { id: 'cPlus', x: 950, y: 520, w: 80, h: 60, label: 'Kuckucksuhr: 5 Minuten vor' },
+  { id: 'plus', x: 760, y: 560, w: 120, h: 70, label: 'Minutenzeiger vor (5 Minuten)' },
+  { id: 'minus', x: 400, y: 560, w: 120, h: 70, label: 'Minutenzeiger zurück (5 Minuten)' },
 ];
 
-// grand, cuckoo = Minuten (0 … 55), auf welche die Uhren gestellt sind (die Stunde ist egal)
-export function drawSetting(ctx, { grand, cuckoo }) {
-  wood(ctx, 120, 60, 1040, 600, [70, 40, 22]);
-  glow(ctx, 640, 120, 500, '255, 210, 140', 0.12);
-  // Standuhr
-  dial(ctx, 340, 300, 150, '#f1e6c8');
-  hands(ctx, 340, 300, 150, 11, grand);
-  text(ctx, 'STANDUHR', 340, 110, { font: `bold 24px ${PRINT}`, color: '#f1e0b8', align: 'center' });
-  text(ctx, 'Gong zur vollen Stunde', 340, 488, { font: `16px ${PRINT}`, color: '#f1e0b8', align: 'center' });
-  // Kuckucksuhr
-  dial(ctx, 940, 300, 150, '#f1e6c8');
-  hands(ctx, 940, 300, 150, 11, cuckoo);
-  text(ctx, 'KUCKUCKSUHR', 940, 110, { font: `bold 24px ${PRINT}`, color: '#f1e0b8', align: 'center' });
-  text(ctx, 'Kuckuck zur vollen Stunde', 940, 488, { font: `16px ${PRINT}`, color: '#f1e0b8', align: 'center' });
-  for (const spot of SET_SPOTS) {
-    ctx.fillStyle = '#3d2a16';
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
-    text(ctx, spot.id.endsWith('Plus') ? '+5' : '−5', spot.x + spot.w / 2, spot.y + 40, { font: `bold 24px ${PRINT}`, color: '#ffe7a0', align: 'center' });
+export function drawSetClock(ctx, which, minute, running) {
+  const cuckoo = which === 'cuckoo';
+  wood(ctx, 320, 40, 640, 620, cuckoo ? [120, 70, 30] : [84, 46, 22]);
+  if (cuckoo) {
+    ctx.fillStyle = '#5c2e12';
+    ctx.beginPath();
+    ctx.moveTo(400, 210);
+    ctx.lineTo(640, 70);
+    ctx.lineTo(880, 210);
+    ctx.fill();
+    ctx.fillStyle = '#e7c23a';
+    ctx.beginPath();
+    ctx.arc(640, 150, 18, 0, Math.PI * 2);
+    ctx.fill();
   }
-  text(ctx, `:${String(grand).padStart(2, '0')}`, 340, 620, { font: `bold 26px ${PRINT}`, color: '#ffe7a0', align: 'center' });
-  text(ctx, `:${String(cuckoo).padStart(2, '0')}`, 940, 620, { font: `bold 26px ${PRINT}`, color: '#ffe7a0', align: 'center' });
-  // Herrn Ticks Zettel
-  sheet(ctx, 520, 170, 240, 300, {
+  face(ctx, 640, 340, 170);
+  hands(ctx, 640, 340, 170, cuckoo ? 11 : 2, minute, null);
+  // Minutenzahlen
+  for (let m = 0; m < 60; m += 15) {
+    const a = (m / 60) * Math.PI * 2 - Math.PI / 2;
+    text(ctx, m === 0 ? '12' : String(m / 5), 640 + Math.cos(a) * 124, 340 + Math.sin(a) * 124 + 10, { font: `bold 28px ${SERIF}`, color: INK, align: 'center' });
+  }
+  for (const spot of SET_SPOTS) {
+    ctx.fillStyle = '#3a2412';
+    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
+    ctx.strokeStyle = '#c9a24c';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(spot.x, spot.y, spot.w, spot.h);
+    text(ctx, spot.id === 'plus' ? '⟳ vor' : '⟲ zurück', spot.x + spot.w / 2, spot.y + 44, { font: `bold 22px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+  }
+  text(ctx, `:${String(minute).padStart(2, '0')}`, 640, 600, { font: `bold 30px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+  text(ctx, cuckoo ? 'Kuckucksuhr – geht nur halb so schnell' : 'Standuhr – geht anderthalbmal so schnell', 640, 650, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  if (running) text(ctx, 'läuft erst nach dem nächsten Tunnel von hier los', 640, 104, { font: `italic 16px ${SERIF}`, color: '#e9d8b0', align: 'center' });
+}
+
+// Herrn Ticks Zettel über seine Uhren
+export function drawTickNote(ctx) {
+  sheet(ctx, 380, 150, 520, 400, {
     angle: 0.02,
     inner: (c) => {
-      text(c, 'Notizen – Tick', 120, 34, { font: `bold 18px ${SERIF}`, align: 'center' });
-      ['Runde = 2 Mondstunden', '(0:00 nach dem Tunnel,', ' 2:00 beim nächsten)', '', 'Ruf: immer 1:50 Mondzeit', '', 'Standuhr: geht doppelt', '  so schnell', 'Kuckucksuhr: geht halb', '  so schnell', '', 'Im Tunnel stehen alle Uhren', 'still. Danach laufen sie los.'].forEach((value, i) => text(c, value, 16, 64 + i * 18, { font: `15px ${HAND}`, color: INK }));
+      text(c, 'Meine Uhren – nicht vergessen!', 260, 54, { font: `bold 24px ${HAND}`, align: 'center' });
+      const rows = [
+        'Standuhr: 1½-mal so schnell.',
+        'Kuckucksuhr: halb so schnell.',
+        'Beide schlagen zur vollen Stunde.',
+        'Sie laufen los, wenn wir aus',
+        'dem Tunnel kommen. Vorher stehen sie.',
+        'Der Ruf: Rundenuhr auf dem roten Strich.',
+      ];
+      rows.forEach((row, i) => text(c, row, 36, 112 + i * 44, { font: `21px ${HAND}` }));
     },
   });
 }
 
-// Schlägt die Uhr genau beim Ruf? Sie läuft nach dem Tunnel 110 Mondminuten lang los.
-export function strikesAtCall(start, speed) {
-  return (start + 110 * speed) % 60 === 0;
+// Pendel der Standuhr – schwingt, wenn sie läuft
+export function drawPendulum(ctx, running, time) {
+  if (!running) return;
+  glow(ctx, 276, 300, 30, '255, 220, 140', 0.25 + 0.15 * Math.abs(Math.sin(time * 3)));
 }

@@ -338,6 +338,7 @@ async function ending(story) {
     await story.say('Wenn das stimmt … dann passiert es heute Nacht wieder.');
     story.sound('door');
     await finishWagon(story, {
+      number: 2,
       title: 'Ende von Wagen 2',
       lines: ['Die Akte ist komplett: In jeder Runde verschwindet im Tunnel ein Fahrgast.'],
       nextTitle: 'im Postwagen',

@@ -1,33 +1,46 @@
-import { drawBeamPlan, drawPlaque, drawScratches, mirrorSpots, paintMirrors, tracePath } from './art/wagon9.js';
+import { SCRATCH_TEXT, drawEyeGlow, drawScratches, drawLevers, drawMirrors, drawPlan, planSpots, traceBeam } from './art/wagon9.js';
 import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
-//  TÜR 9 – Der Spiegelwagen
+//  WAGEN 9 – Der Spiegelwagen (niemand da)
 // ============================================================================================
 //
-// DIE RÄTSEL
-//   1. Kratzer in der Wand: Spiegelschrift. Im Spiegel gelesen: „Was du tust, tut er in der
-//      nächsten Runde – verkehrt herum.“
-//   2. Zwei Hebel, die gleichzeitig unten sein müssen (dann öffnet sich die Blende der Deckenlampe).
-//      Allein schafft Joseph das nicht. Aber sein Spiegelbild wiederholt in der nächsten Runde,
-//      was er getan hat – spiegelverkehrt und zur selben Zeit der Runde: Zieht Joseph rechts,
-//      zieht das Spiegelbild eine Runde später links. Dann muss Joseph rechts bereitstehen.
-//   3. Der Lichtstrahl der Lampe muss über vier Standspiegel ins Glasauge der Tür (Plan von oben).
-//   4. Die Tür geht auf – und im Spiegel steht kurz jemand hinter Joseph.
+// Der Täter trägt Josephs Sachen. Im Spiegelwagen bewegt sich das Spiegelbild eine Runde zu spät.
 //
-// ERGEBNIS: Es gibt zwei von ihm.
+// DIE RÄTSEL
+//   1. Zwei Hebel, links und rechts an der Stirnwand – zu weit auseinander für einen allein.
+//      Zieht Joseph einen, springt er zurück. In der NÄCHSTEN Runde, im selben Augenblick, zieht
+//      sein Spiegelbild den anderen Hebel (spiegelverkehrt). Die Kratzer an der Wand sagen es in
+//      Spiegelschrift: „Er ist eine Runde zu spät.“ (lesbar im Spiegel gegenüber)
+//   2. Also: in einer Runde einen Hebel ziehen, nach dem Tunnel zur selben Zeit wieder dort stehen
+//      und ziehen, wenn das Spiegelbild den anderen zieht → beide unten → die Standspiegel lassen
+//      sich drehen, die Lampe über der Tür klappt auf.
+//   3. Lichtstrahl über die vier Standspiegel ins Glasauge der Tür. Lösung: A \, B \, C /, D /.
+//   4. Die Tür geht auf. Im großen Spiegel steht für einen Augenblick jemand hinter Joseph.
 
-const MIRROR_WINDOW = 6; // Sekunden, die der gespiegelte Hebel unten bleibt
-const SOLUTION_START = ['\\', '\\', '/', '\\'];
+const HOLD = 3.5; // so lange hält Joseph (oder sein Spiegelbild) einen Hebel unten
+const SOLUTION = { A: '\\', B: '\\', C: '/', D: '/' };
 
 export const wagon9 = {
   flags: {},
   startItems: ['flashlight'],
   recap: [
-    'In jeder Runde verschwindet im Tunnel ein Fahrgast. Herr K. ging freiwillig, als der Schaffner ihn rief – ich konnte ihn nicht retten.',
-    'Im Bordkino: Auf dem letzten Filmbild führt eine Gestalt Herrn K. in den Tunnel. Mit meiner Mütze, meiner Brille, meinem Schal.',
-    'Der Täter sieht aus wie ich.',
+    'In jedem Tunnel springt alles zurück – nur was ich bei mir trage, bleibt. Jede Runde verschwindet ein Fahrgast.',
+    'Herr K. ist in Runde 108 im Tunnel verschwunden. Er ging freiwillig, als der Schaffner ihn rief.',
+    'Bordkino: Der Film aus dem Tunnel zeigt eine Gestalt mit meiner Mütze, meiner Brille und meinem Schal, die Herrn K. in den Tunnel führt. Der Täter sieht aus wie ich.',
   ],
+
+  setup(story) {
+    const f = story.flags;
+    f.turns ??= { A: '/', B: '/', C: '\\', D: '\\' };
+    f.pulls ??= {};      // Runde → [{ side, t }]
+    f.levers = { left: 0, right: 0 };
+    story.scene.paintSpot('mirrors', (ctx) => drawMirrors(ctx, { figures: reflections(story), time: story.motion.time }));
+    story.scene.paintSpot('levers', (ctx) => {
+      drawLevers(ctx, f.levers);
+      drawEyeGlow(ctx, f.eyeLit ? 1 : 0, story.motion.time);
+    });
+  },
 
   async intro(story) {
     await wagonIntro(story, {
@@ -35,73 +48,52 @@ export const wagon9 = {
       title: 'Der Spiegelwagen',
       lines: [
         'Spiegel. Überall Spiegel.',
-        'Und überall ich. Nach dem Film im Kino ist das kein schöner Anblick.',
+        'Der Täter trägt meine Mütze, meine Brille, meinen Schal …',
+        'Und hier sehe ich mich gleich zehnmal.',
       ],
     });
   },
 
   skipIntro: (story) => skipIntro(story),
 
-  setup(story) {
-    story.flags.ghost = 0;
-    story.scene.paintSpot('mirror', (ctx) => paintMirrors(ctx, { scene: story.scene, player: story.player, ghost: story.flags.ghost }));
-  },
-
-  update(story) {
-    const f = story.flags;
-    if (!f.pulls?.length || f.shutterOpen) return;
-    // Was Joseph in der letzten Runde gezogen hat, zieht jetzt sein Spiegelbild – verkehrt herum
-    const now = story.motion.lapTime, lap = story.lap;
-    for (const pull of f.pulls) {
-      if (pull.lap !== lap - 1 || pull.replayed) continue;
-      if (now >= pull.at && now < pull.at + 1.5) {
-        pull.replayed = true;
-        f.mirrorLever = pull.lever === 'right' ? 'left' : 'right';
-        f.mirrorUntil = story.motion.time + MIRROR_WINDOW;
-        mirrorPulls(story, f.mirrorLever);
-      }
-    }
-  },
-
   hotspots: {
-    leverLeft: { look: 'Ein Hebel links neben der Tür.', use: (story) => pull(story, 'left') },
-    leverRight: { look: 'Ein Hebel rechts neben der Tür.', use: (story) => pull(story, 'right') },
-    plaque: {
-      look: async (story) => {
-        await story.card({ draw: drawPlaque });
-        if (!story.flags.plaqueRead) {
-          story.flags.plaqueRead = true;
-          story.note('Messingschild: Durchgang nur mit Licht im Auge. Die Blende der Lampe öffnet sich, wenn beide Hebel zugleich unten sind.');
-        }
-      },
-    },
+    leverLeft: { look: (story) => lookLever(story), use: (story) => pullLever(story, 'left') },
+    leverRight: { look: (story) => lookLever(story), use: (story) => pullLever(story, 'right') },
+
     eye: {
-      look: (story) => story.say(story.flags.eyeLit ? 'Das Glasauge leuchtet.' : 'Ein Glasauge in der Tür. Es starrt mich an. Darunter ein kleines Messingschild.'),
-      use: 'Es lässt sich nicht drehen. Es wartet auf etwas.',
-    },
-    lamp: {
-      look: (story) => story.say(story.flags.shutterOpen ? 'Die Blende ist offen. Ein heller Strahl fällt auf den ersten Standspiegel.' : 'Die Deckenlampe hat eine Blende, wie eine Kamera. Sie ist zu.'),
-    },
-    stands: {
-      look: 'Vier runde Standspiegel auf Messingfüßen. Man kann sie drehen.',
-      use: (story) => aimMirrors(story),
-    },
-    scratches: {
-      look: 'Kratzer in der Holzwand. Buchstaben – aber verkehrt herum.',
-      use: (story) => readScratches(story, false),
-    },
-    wallMirror: {
-      look: (story) => story.say(story.flags.ghostSeen ? 'Nur ich. Diesmal.' : 'Mein Spiegelbild. Es sieht müde aus.'),
-      use: (story) => readScratches(story, true),
-    },
-    speaker: { look: 'Ein Lautsprecher. Still.' },
-    carpet: {
-      look: 'Ein roter Teppich, frisch gebürstet.',
-      use: (story) => waitForTunnel(story, 'Ich setze mich auf den Teppich und warte auf den Tunnel …'),
+      look: (story) => story.say(story.flags.eyeLit ? 'Das Glasauge leuchtet.' : 'Ein Glasauge in der Tür. Darunter steht: „Ich öffne mich dem Licht.“'),
+      use: (story) => story.say(story.flags.eyeLit ? 'Es leuchtet. Die Tür ist offen.' : 'Mit der Taschenlampe? … Nichts. Es will anderes Licht. Das von oben vielleicht.'),
+      items: { flashlight: 'Ich leuchte hinein – nichts. Das Auge will ein anderes Licht.' },
     },
     door: {
-      look: 'Die Tür nach vorne. Kein Schloss, kein Griff – nur das Glasauge.',
-      use: (story) => (story.flags.eyeLit ? ending(story) : story.say('Sie rührt sich nicht. Kein Griff, kein Schloss. Nur dieses Auge.')),
+      look: (story) => story.say(story.flags.eyeLit ? 'Die Tür ist offen.' : 'Kein Griff, kein Schloss. Nur ein Glasauge.'),
+      use: (story) => (story.flags.eyeLit ? leaveWagon(story) : story.say('Zu. Kein Griff. Nur dieses Glasauge.')),
+    },
+    lamp: {
+      look: (story) => story.say(story.flags.leversDone ? 'Die Lampe ist aufgeklappt. Ein Lichtstrahl fällt schräg nach unten – auf die Standspiegel.' : 'Eine Lampe über der Tür. Sie hat eine Klappe, die zu ist.'),
+    },
+    speaker: { look: 'Ein Lautsprecher. Stumm.' },
+    panel: { look: 'Ein Kasten mit zwei Lämpchen: „Links“ und „Rechts“. Darunter: „Beide zugleich“.' },
+    scratches: {
+      look: (story) => readScratches(story, true),
+      use: (story) => readScratches(story, true),
+    },
+    standA: standMirror(),
+    standB: standMirror(),
+    standC: standMirror(),
+    standD: standMirror(),
+    mirrorL: {
+      look: (story) => lookWallMirror(story, 'left'),
+      use: (story) => lookWallMirror(story, 'left'),
+    },
+    mirrorR: {
+      look: (story) => lookWallMirror(story, 'right'),
+      use: (story) => lookWallMirror(story, 'right'),
+    },
+    candles: { look: 'Kerzen. Sie flackern nicht, obwohl der Zug rumpelt.' },
+    carpet: {
+      look: 'Ein langer roter Teppich bis zur Tür.',
+      use: (story) => waitForTunnel(story, 'Ich setze mich auf den Teppich und warte auf den Tunnel …'),
     },
   },
 
@@ -113,160 +105,225 @@ export const wagon9 = {
       story.game.closeViewsInDark();
     }
   },
+
+  update(story) {
+    updateLevers(story);
+  },
 };
 
-// ============================================================================================
-//  1. Spiegelschrift
-// ============================================================================================
-
-async function readScratches(story, inMirror) {
-  const f = story.flags;
-  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich nichts.');
-  if (inMirror && !f.scratchesSeen) return story.say('Mein Spiegelbild. Mehr nicht.');
-  story.sound('paper');
-  await story.card({ draw: (ctx) => drawScratches(ctx, inMirror) });
-  if (!inMirror) {
-    f.scratchesSeen = true;
-    if (!f.scratchesRead) await story.say('Spiegelschrift. Die lese ich am besten in einem Spiegel.');
-    return;
-  }
-  if (f.scratchesRead) return;
-  f.scratchesRead = true;
-  await story.say('Im Spiegel: „Was du tust, tut er in der nächsten Runde – verkehrt herum.“');
-  await story.say('Er? Mein Spiegelbild?');
-  story.note('Kratzer in Spiegelschrift: „Was du tust, tut er in der nächsten Runde – verkehrt herum.“');
+function standMirror() {
+  return {
+    look: (story) => story.say(story.flags.leversDone ? 'Ein Standspiegel. Er lässt sich jetzt drehen.' : 'Ein runder Spiegel auf einem Messingständer. Er ist festgestellt – irgendwo muss es eine Sperre geben.'),
+    use: (story) => turnMirrors(story),
+  };
 }
 
 // ============================================================================================
-//  2. Die Hebel
+//  Spiegelbilder
 // ============================================================================================
 
-async function pull(story, lever) {
+function reflections(story) {
   const f = story.flags;
-  if (f.shutterOpen) return story.say('Die Blende ist offen. Die Hebel brauche ich nicht mehr.');
+  const figures = [];
+  if (f.ghost) {
+    // das verspätete Spiegelbild am anderen Hebel
+    const mirror = f.ghost.side === 'left' ? 'standA' : 'standD';
+    figures.push({ mirror, alpha: 0.85, dark: 0.35 });
+    figures.push({ mirror: f.ghost.side === 'left' ? 'wall2' : 'wall3', alpha: 0.7, dark: 0.45 });
+  }
+  if (f.reveal) {
+    figures.push({ mirror: 'wall5', alpha: 0.9, dark: 0.3 });
+    if (f.reveal === 'two') figures.push({ mirror: 'wall5', alpha: 0.85, dark: 0.82, offset: 0.22, scale: 1.06 });
+  }
+  return figures;
+}
+
+// ============================================================================================
+//  Hebel und das verspätete Spiegelbild
+// ============================================================================================
+
+function now(story) {
+  return story.motion.time;
+}
+
+function updateLevers(story) {
+  const f = story.flags;
+  const t = now(story);
+  const lapTime = story.motion.lapTime;
+  // Das Spiegelbild wiederholt, was Joseph in der letzten Runde getan hat – spiegelverkehrt
+  if (!f.leversDone) {
+    for (const pull of f.pulls[story.lap - 1] ?? []) {
+      if (pull.fired || lapTime < pull.t || lapTime > pull.t + 1) continue;
+      pull.fired = true;
+      f.ghost = { side: pull.side === 'left' ? 'right' : 'left', until: t + HOLD };
+      story.sound('lever');
+      if (!f.ghostSeen) noticeGhost(story);
+    }
+  }
+  if (f.ghost && t > f.ghost.until) f.ghost = null;
+  const target = {
+    left: (f.held?.side === 'left' && t < f.held.until) || f.ghost?.side === 'left' || f.leversDone ? 1 : 0,
+    right: (f.held?.side === 'right' && t < f.held.until) || f.ghost?.side === 'right' || f.leversDone ? 1 : 0,
+  };
+  for (const side of ['left', 'right']) f.levers[side] += (target[side] - f.levers[side]) * 0.35;
+  if (!f.leversDone && f.held && t < f.held.until && f.ghost && f.ghost.side !== f.held.side) {
+    f.leversDone = true;
+    bothLevers(story);
+  }
+}
+
+async function noticeGhost(story) {
+  const f = story.flags;
+  f.ghostSeen = true;
+  if (story.inCutscene) return;
+  const side = f.ghost.side === 'left' ? 'linke' : 'rechte';
+  await story.say(`Da! Der ${side} Hebel geht runter – von ganz allein!`);
+  await story.say('Und im Spiegel daneben … stehe ich. Und ziehe. Aber ich stehe doch hier!');
+  story.note(`Runde ${story.lap}: Der ${side} Hebel ging von allein nach unten – im Spiegel daneben stand ich und zog. Genau wie ich es in der Runde davor am anderen Hebel gemacht habe.`);
+}
+
+function lookLever(story) {
+  const f = story.flags;
+  if (f.leversDone) return story.say('Beide Hebel sind unten und eingerastet.');
+  return story.say('Ein schwerer Hebel. Der andere ist auf der anderen Seite der Tür – viel zu weit weg, um beide gleichzeitig zu ziehen.');
+}
+
+async function pullLever(story, side) {
+  const f = story.flags;
+  if (f.leversDone) return story.say('Die Hebel sind unten. Mehr geht nicht.');
   if (inTunnel(story)) return story.say('Im Dunkeln finde ich den Griff nicht.');
-  story.sound('latch');
-  const other = lever === 'right' ? 'left' : 'right';
-  if (f.mirrorLever === other && (f.mirrorUntil ?? 0) > story.motion.time) {
-    f.shutterOpen = true;
-    await story.cutscene(async () => {
-      await story.say(`Ich ziehe ${lever === 'right' ? 'rechts' : 'links'} – und gegenüber hält mein Spiegelbild den anderen Hebel!`);
-      story.sound('unlock');
-      await story.wait(0.6);
-      await story.say('Klack! Oben an der Lampe … die Blende öffnet sich. Ein Lichtstrahl fällt in den Wagen.');
-      await story.say('Ich habe mir selbst geholfen. Über eine Runde hinweg.');
-    });
-    story.note('Beide Hebel waren zugleich unten: ich rechts, mein Spiegelbild links (eine Runde, nachdem ich rechts gezogen hatte). Die Blende der Lampe ist offen.');
-    return;
-  }
-  f.pulls ??= [];
-  f.pulls = f.pulls.filter((p) => p.lap >= story.lap - 1);
-  f.pulls.push({ lever, at: story.motion.lapTime, lap: story.lap });
-  await story.say(pickLine(f));
-  if (!f.leverNoted) {
-    f.leverNoted = true;
-    story.note('Die Hebel neben der Tür federn sofort zurück. Beide gleichzeitig ziehen – allein komme ich nicht an beide.');
+  const t = now(story);
+  if (f.held && t < f.held.until) return;
+  f.held = { side, until: t + HOLD };
+  (f.pulls[story.lap] ??= []).push({ side, t: story.motion.lapTime });
+  story.sound('lever');
+  f.pullCount = (f.pullCount ?? 0) + 1;
+  await story.say(f.pullCount === 1 ? 'Hngh … schwer. Ich halte ihn unten …' : 'Ich ziehe und halte …');
+  await story.wait(Math.max(0, f.held.until - now(story)));
+  if (f.leversDone) return;
+  story.sound('lever');
+  if (f.pullCount === 1) {
+    await story.say('Er springt zurück. Allein schaffe ich das nicht. Auf dem Kasten steht: „Beide zugleich“.');
+    story.note('Spiegelwagen: zwei Hebel, links und rechts der Tür. „Beide zugleich“ – aber sie sind zu weit auseinander für einen allein.');
+  } else if (!f.ghostSeen) {
+    await story.say('Wieder zurückgesprungen.');
+  } else {
+    await story.say('Zurückgesprungen. Ich war nicht im selben Augenblick wie mein Spiegelbild.');
   }
 }
 
-function pickLine(f) {
-  const lines = [
-    'Klack. Der Hebel federt sofort zurück. Allein bewegt er nichts.',
-    'Wieder nichts. Beide gleichzeitig – aber ich habe nur zwei Hände und die Hebel sind drei Meter auseinander.',
-    'Klack. Zurück.',
-  ];
-  f.leverTries = (f.leverTries ?? 0) + 1;
-  return lines[Math.min(f.leverTries - 1, lines.length - 1)];
-}
-
-// Das Spiegelbild zieht den Hebel, den Joseph in der letzten Runde auf der anderen Seite gezogen hat
-async function mirrorPulls(story, lever) {
-  story.sound('latch');
-  if (story.isBusy) return;
-  const side = lever === 'left' ? 'linken' : 'rechten';
-  await story.respond(async () => {
-    await story.say(`Da! Im Spiegel … mein Spiegelbild zieht am ${side} Hebel!`);
-    await story.say(`Und der ${side} Hebel ist wirklich unten! Schnell – den anderen!`);
-  });
-  if (!story.flags.mirrorNoted) {
-    story.flags.mirrorNoted = true;
-    story.note(`Mein Spiegelbild hat den ${side} Hebel gezogen – genau zu der Zeit der Runde, zu der ich in der Runde davor den anderen gezogen habe. Er bleibt ein paar Sekunden unten.`);
-  }
-}
-
-// ============================================================================================
-//  3. Der Lichtstrahl
-// ============================================================================================
-
-async function aimMirrors(story) {
+async function bothLevers(story) {
   const f = story.flags;
-  if (inTunnel(story)) return story.say('Im Dunkeln ist kein Strahl zu sehen.');
+  await story.cutscene(async () => {
+    story.sound('unlock');
+    await story.wait(0.6);
+    await story.say('Beide unten! Mein Spiegelbild links, ich rechts – oder umgekehrt.');
+    story.sound('latch');
+    await story.say('Oben über der Tür klappt die Lampe auf. Ein Lichtstrahl fällt auf die Standspiegel.');
+    await story.say('Und die Ständer sind nicht mehr festgestellt.');
+  });
+  story.note('Mit meinem Spiegelbild zusammen beide Hebel gezogen: Die Lampe über der Tür ist aufgeklappt, die vier Standspiegel lassen sich drehen. Das Glasauge in der Tür „öffnet sich dem Licht“.');
+}
+
+// ============================================================================================
+//  Kratzer und Spiegel an der Wand
+// ============================================================================================
+
+async function readScratches(story, mirrored) {
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich nur Schatten.');
+  story.sound('page');
+  await story.card({ draw: (ctx) => drawScratches(ctx, mirrored) });
+  const f = story.flags;
+  if (mirrored && !f.scratchesSeen) {
+    f.scratchesSeen = true;
+    await story.say('Buchstaben, tief ins Holz geritzt. Alle verkehrt herum – Spiegelschrift.');
+    story.note('An der rechten Wand: Kratzer in Spiegelschrift. Im Spiegel gegenüber könnte ich sie lesen.');
+  }
+  if (!mirrored && !f.scratchesRead) {
+    f.scratchesRead = true;
+    await story.say(`„${SCRATCH_TEXT.join(' ')}“.`);
+    await story.say('Wer ist eine Runde zu spät? … Mein Spiegelbild?');
+    story.note(`Die Kratzer, im Spiegel gelesen: „${SCRATCH_TEXT.join(' ')}.“ Meine Schrift.`);
+  }
+}
+
+
+async function lookWallMirror(story, side) {
+  const f = story.flags;
+  if (inTunnel(story)) return story.say('Im Dunkeln ist der Spiegel schwarz.');
+  if (side === 'left' && f.scratchesSeen) return readScratches(story, false);
+  if (side === 'left') return story.say('Ein Spiegel mit Goldrahmen. Gegenüber, an der rechten Wand, spiegeln sich ein paar Kratzer.');
+  return story.say(f.ghostSeen ? 'Mein Spiegelbild. Es macht, was ich mache. Jetzt gerade jedenfalls.' : 'Ich im Spiegel. Mütze, Brille, Schal. Wie auf dem Film.');
+}
+
+// ============================================================================================
+//  Lichtstrahl über die Standspiegel
+// ============================================================================================
+
+async function turnMirrors(story) {
+  const f = story.flags;
+  if (!f.leversDone) return story.say('Festgestellt. Er lässt sich keinen Millimeter drehen.');
   if (f.eyeLit) return story.say('Der Strahl trifft das Auge. So bleibt es.');
-  f.tilt ??= [...SOLUTION_START];
-  const state = { tilt: f.tilt, time: 0 };
+  if (inTunnel(story)) return story.say('Im Dunkeln ist auch der Lichtstrahl weg.');
   const solved = await story.view('picture', {
-    state,
-    draw: (ctx, view) => {
-      if (f.shutterOpen) drawBeamPlan(ctx, view.state);
-      else drawBeamPlan(ctx, { ...view.state, tilt: view.state.tilt, dark: true });
-    },
-    spots: mirrorSpots(),
-    area: { x: 280, y: 40, w: 720, h: 640 },
-    update: (dt, view) => {
-      view.state.time += dt;
-    },
-    help: 'Klicken: Spiegel drehen  ·  Rechtsklick: zurück',
+    draw: (ctx, view) => drawPlan(ctx, f.turns, { time: view.age ?? 0 }),
+    spots: planSpots(),
+    area: { x: 290, y: 30, w: 700, h: 680 },
+    help: 'Spiegel anklicken: drehen  ·  Rechtsklick: zurück',
     onClick: async (spot, view) => {
-      const i = Number(spot.id.slice(1)) - 1;
-      view.state.tilt[i] = view.state.tilt[i] === '/' ? '\\' : '/';
-      story.sound('rotate');
-      if (f.shutterOpen && tracePath(view.state.tilt).hit) {
-        await story.wait(0.8);
+      f.turns[spot.id] = f.turns[spot.id] === '/' ? '\\' : '/';
+      story.sound('mirror');
+      if (traceBeam(f.turns).hit) {
+        story.sound('success');
+        await story.wait(1.1);
         view.close(true);
       }
     },
   });
-  if (!f.shutterOpen) {
-    await story.say('Ohne Licht bringt das Drehen nichts. Die Blende der Lampe ist zu.');
+  if (!solved) {
+    if (!f.planSeen && !inTunnel(story)) {
+      f.planSeen = true;
+      await story.say('Der Strahl kommt von der Lampe und springt von Spiegel zu Spiegel. Er muss das Glasauge in der Tür treffen.');
+      story.note('Die vier Standspiegel drehen, bis der Lichtstrahl der Lampe ins Glasauge der Tür fällt.');
+    }
     return;
   }
-  if (!solved) return;
   f.eyeLit = true;
-  story.sound('success');
-  await story.say('Der Strahl springt von Spiegel zu Spiegel … und trifft das Glasauge!');
-  await story.say('Klick. Irgendwo in der Tür löst sich ein Riegel.');
-  story.note('Der Lichtstrahl trifft das Glasauge. Die Tür ist entriegelt.');
+  story.sound('unlock');
+  await story.say('Der Strahl trifft das Glasauge! Es leuchtet – und in der Tür klickt es.');
+  story.note('Der Lichtstrahl trifft das Glasauge (A \\, B \\, C /, D /). Die Tür ist offen.');
 }
 
 // ============================================================================================
-//  Ende
+//  Ende: zwei von ihm
 // ============================================================================================
 
-async function ending(story) {
+async function leaveWagon(story) {
   const f = story.flags;
   await story.cutscene(async () => {
-    await story.say('Die Tür ist offen. Endlich raus aus diesem Spiegelkabinett.');
     story.player.facing = 'right';
-    story.sound('dread');
-    for (let t = 0; t <= 1; t += 0.05) {
-      f.ghost = t;
-      await story.wait(0.04);
-    }
-    await story.wait(0.6);
-    await story.say('… Moment.');
-    await story.say('Im großen Spiegel rechts. Hinter mir. Da steht jemand. Mit meiner Mütze.');
-    story.player.facing = 'front';
-    f.ghost = 0;
-    f.ghostSeen = true;
+    f.reveal = 'one';
+    await story.say('Noch ein letzter Blick in den großen Spiegel …');
     await story.wait(0.8);
-    await story.say('Niemand. Hier ist niemand.');
-    await story.say('Aber ich habe ihn gesehen. Er sah aus wie ich – nur älter.');
+    f.reveal = 'two';
+    story.sound('dread');
+    await story.wait(1.4);
+    await story.say('Da! Hinter mir! Jemand mit Mütze …');
+    f.reveal = 'one';
+    story.player.facing = 'front';
+    await story.wait(0.7);
+    await story.say('… niemand. Hier ist niemand.');
+    story.player.facing = 'right';
+    await story.wait(0.5);
+    f.reveal = null;
+    await story.say('Mein Spiegelbild ist eine Runde zu spät. Und das, was hinter mir stand, war gar nicht im Wagen.');
     await story.say('Es gibt zwei von mir.');
-    story.note('Im Spiegel stand kurz jemand hinter mir – mit meiner Mütze. Als ich mich umdrehte, war niemand da. Es gibt zwei von mir.');
+    story.note('Im großen Spiegel stand für einen Augenblick jemand hinter mir – mit meiner Mütze. Als ich mich umdrehte, war niemand da. Es gibt zwei von mir.');
     story.sound('door');
     await finishWagon(story, {
+      number: 9,
       title: 'Ende von Wagen 9',
-      lines: ['Im Spiegel stand jemand hinter Joseph. Es gibt zwei von ihm.'],
+      lines: ['„Es gibt zwei von mir.“'],
       nextTitle: 'im Lautsprecherwagen',
     });
   });
@@ -278,27 +335,31 @@ async function ending(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.shutterOpen) {
-    if (!f.plaqueRead) return { id: 'plaque', lines: ['Unter dem Glasauge an der Tür hängt ein kleines Messingschild. Rechtsklick darauf.'] };
+  if (!f.leversDone) {
+    if (!f.pullCount) return { id: 'pull', lines: ['An der Stirnwand sind zwei Hebel. Was passiert, wenn ich einen ziehe?'] };
     if (!f.scratchesRead) {
-      return { id: 'scratch', lines: [
-        'Beide Hebel gleichzeitig – allein unmöglich. Rechts an der Wand sind Kratzer.',
-        'Die Kratzer sind Spiegelschrift. Erst ansehen, dann einen der Spiegel daneben benutzen.',
+      return { id: 'scratches', lines: [
+        'Rechts an der Wand sind Kratzer. Was steht da?',
+        'Die Kratzer sind in Spiegelschrift. Im Spiegel gegenüber (linke Wand) kann man sie lesen.',
       ] };
     }
-    return { id: 'levers', lines: [
-      'Was ich tue, tut mein Spiegelbild in der nächsten Runde – verkehrt herum. Also zur selben Zeit der Runde, aber am anderen Hebel.',
-      'Den rechten Hebel ziehen. Dann auf den Tunnel warten. In der nächsten Runde zieht mein Spiegelbild zur selben Zeit den linken.',
-      'Rechts ziehen, dann auf dem Teppich auf den Tunnel warten. Danach rechts am Hebel stehen bleiben. Sobald das Spiegelbild links zieht: sofort rechts ziehen!',
+    if (!f.ghostSeen) {
+      return { id: 'ghost', lines: [
+        '„Er ist eine Runde zu spät.“ Was macht mein Spiegelbild in der nächsten Runde?',
+        'Einen Hebel ziehen, dann bis nach dem nächsten Tunnel warten (z. B. auf dem Teppich) und genau zur selben Zeit die Hebel beobachten.',
+      ] };
+    }
+    return { id: 'both', lines: [
+      'Das Spiegelbild zieht in der nächsten Runde den ANDEREN Hebel – genau in dem Augenblick, in dem ich in der Runde davor gezogen habe.',
+      'In einer Runde den rechten Hebel ziehen und merken, wann. Nach dem Tunnel rechtzeitig wieder am rechten Hebel stehen: Wenn der linke von allein runtergeht, sofort rechts ziehen.',
     ] };
   }
   if (!f.eyeLit) {
     return { id: 'beam', lines: [
-      'Der Strahl der Lampe muss über die vier Standspiegel ins Glasauge.',
-      'Vom ersten Spiegel nach links, dann nach unten, dann quer nach rechts, dann hinauf zum Auge.',
-      'Spiegel 1, 2 und 4 so: „/“. Spiegel 3 so: „\\“.',
+      'Die Standspiegel lassen sich jetzt drehen. Der Lichtstrahl soll ins Glasauge der Tür.',
+      'Vom Licht aus: A schickt den Strahl nach links zu B, B nach oben zu C, C nach rechts zu D, D nach oben ins Auge.',
+      'A und B wie „\\“, C und D wie „/“.',
     ] };
   }
-  return { id: 'door', lines: ['Das Auge leuchtet. Die Tür ist offen.'] };
+  return { id: 'door', lines: ['Die Tür ist offen. Hindurchgehen.'] };
 }
-

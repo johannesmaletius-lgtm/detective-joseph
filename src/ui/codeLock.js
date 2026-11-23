@@ -8,8 +8,8 @@ import { drawSymbol } from './symbols.js';
 //     id: 'door',                                   // jedes Schloss merkt sich seine Rädchen
 //     digits: 4,
 //     symbols: ['tunnel', 'lanternLeft', 'lanternRight', 'tower'],  // (optional) Zeichen über den Rädchen
+//     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',           // (optional) Buchstaben statt Ziffern auf den Rädchen
 //     style: 'brass',                               // 'brass' (Messing) oder 'steel' (Stahl, z. B. am Koffer)
-//     alphabet: '0123456789',                       // (optional) was auf den Rädchen steht, z. B. Buchstaben
 //     check: (code) => code === '5783',
 //   });
 //
@@ -50,7 +50,7 @@ export class CodeLock extends View {
   }
 
   get code() {
-    return this.wheels.map((wheel) => this.alphabet[wheel.value % this.alphabet.length]).join('');
+    return this.wheels.map((wheel) => this.alphabet[wheel.value]).join('');
   }
 
   // Maße des Schlosskörpers – breiter bei mehr Rädchen, höher mit Zeichen
@@ -195,11 +195,12 @@ export class CodeLock extends View {
       ctx.font = 'bold 56px "Trebuchet MS", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      const count = this.alphabet.length;
+      if (count > 10) ctx.font = 'bold 48px "Trebuchet MS", sans-serif';
       for (const offset of [-1, 0, 1]) {
-        const count = this.alphabet.length;
-        const digit = this.alphabet[(wheel.value + offset + count) % count]; // oben das vorige, unten das nächste Zeichen
+        const sign = this.alphabet[(wheel.value + offset + count) % count]; // oben das vorige, unten das nächste Zeichen
         ctx.fillStyle = offset === 0 ? '#1d140c' : 'rgba(29, 20, 12, 0.45)';
-        ctx.fillText(String(digit), x, y + (offset + wheel.roll) * 62);
+        ctx.fillText(sign, x, y + (offset + wheel.roll) * 62);
       }
       ctx.restore();
       arrow(ctx, x, y - WHEEL.height / 2 - 30, -1);

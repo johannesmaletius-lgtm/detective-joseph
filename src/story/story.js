@@ -22,6 +22,8 @@ import { COLORS } from '../ui/text.js';
 // Außerdem darf ein Drehbuch festlegen:
 //   startItems: ['flashlight']          Gegenstände, die Joseph zu Beginn sicher dabeihat (zusätzlich zu dem,
 //                                       was er aus dem letzten geschafften Wagen mitbringt, siehe items.js: keep)
+//   await story.choose(['A', 'B'])      Auswahl im Gespräch: Ergebnis 0, 1 … oder -1 (abgebrochen)
+//   await story.speak('…', { at })      jemand anderes spricht (Farbe und Stelle wählbar)
 //
 // Außerdem darf ein Drehbuch enthalten:
 //   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
@@ -83,11 +85,6 @@ export class Story {
     return this.scene.character(id);
   }
 
-  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
-  choose(options) {
-    return this.game.views.dialogue.open({ options });
-  }
-
   // Jemand anderes spricht, z. B. die Lautsprecherstimme
   speak(text, { at = SPEAKER, color = COLORS.speaker } = {}) {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : at), color });
@@ -109,6 +106,11 @@ export class Story {
 
   has(id) {
     return this.game.inventory.has(id);
+  }
+
+  // Ein Ton (Klavier, Glocke, Morsepiepen …): story.tone(440, { duration: 0.5 })
+  tone(frequency, options) {
+    this.game.effects.note(frequency, options);
   }
 
   sound(name, ...args) {
@@ -177,6 +179,11 @@ export class Story {
     return this.game.views[name].open(options);
   }
 
+  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
+  choose(options) {
+    return this.game.views.dialogue.open({ options });
+  }
+
   // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)
   itemName(id) {
     return this.script.itemName?.(this, id) ?? ITEMS[id].name;
@@ -211,7 +218,7 @@ export class Story {
   }
 
   // ---------------------------------------------------------------- Ablauf
-  async begin({ skipIntro = false } = {}) {
+  async begin({ skipIntro = false, fresh = false } = {}) {
     for (const id of this.script.startItems ?? []) this.game.inventory.add(id);
     this.game.inventory.revealTime = 0;
     // Was bisher geschah – nur, wenn keine Notizen aus früheren Wagen mitgekommen sind (z. B. im Test-Modus)
@@ -219,6 +226,7 @@ export class Story {
       for (const text of this.script.recap ?? []) this.game.notebook.add(text, 0);
     }
     this.game.notebook.unread = 0;
+    if (fresh) await this.script.prepare?.(this);
     await this.script.setup?.(this);
     if (skipIntro) await this.script.skipIntro?.(this);
     else await this.script.intro?.(this);

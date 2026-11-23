@@ -1,8 +1,6 @@
-import { background, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
 
-// Wagen 10 (Tür 10): der Lautsprecherwagen. Nur DATEN – was passiert, steht in src/story/wagon10.js.
-// Links der Sicherungskasten und das Regal mit den Tonbändern, rechts das Tonbandgerät,
-// das Mikrofon und das Mischpult (mit Vorhängeschloss). Neben der Tür der Totenkopf-Bildschirm.
+// Wagen 10: der Lautsprecherwagen. Nur DATEN – was passiert, steht in src/story/wagon10.js.
 
 const WINDOWS = [
   { from: 17, to: 114, top: 106, bottom: 255 },
@@ -19,18 +17,25 @@ export const speakerCar = {
   background: background('assets/scenes/wagon-10/background.webp'),
   outside: outside(WINDOWS),
 
+  animations: [
+    { id: 'lights', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
   hotspots: [
-    { id: 'fuses', name: 'Sicherungskasten', area: [[28, 244], [204, 254], [204, 496], [28, 500]], walkTo: [330, 600], facing: 'left' },
-    { id: 'toolbox', name: 'Werkzeugkiste', area: [[292, 512], [392, 512], [392, 620], [292, 620]], walkTo: [420, 640], facing: 'left' },
-    { id: 'reels', name: 'Regal mit Tonbändern', area: [[220, 280], [440, 280], [440, 560], [220, 560]], walkTo: [450, 520], facing: 'left' },
-    { id: 'tape', name: 'Tonbandgerät', area: [[912, 240], [1100, 240], [1100, 430], [912, 430]], walkTo: [820, 520], facing: 'right' },
-    { id: 'mixer', name: 'Mischpult', area: [[1000, 350], [1240, 350], [1280, 520], [1000, 520]], walkTo: [900, 640], facing: 'right' },
-    { id: 'mixerLock', name: 'Vorhängeschloss', area: [[1112, 540], [1170, 540], [1170, 616], [1112, 616]], walkTo: [900, 640], facing: 'right' },
-    { id: 'microphone', name: 'Mikrofon', area: [[852, 314], [904, 314], [904, 610], [852, 610]], walkTo: [800, 560], facing: 'right' },
-    { id: 'monitor', name: 'Bildschirm', area: [[804, 168], [890, 168], [890, 246], [804, 246]], walkTo: [760, 440], facing: 'back' },
-    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: [[110, 0], [250, 0], [250, 110], [110, 110]] },
-    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: [[1046, 0], [1190, 0], [1190, 110], [1046, 110]] },
-    { id: 'door', name: 'Tür zum nächsten Wagen', area: [[558, 118], [722, 118], [722, 396], [558, 396]], walkTo: [640, 420], facing: 'back' },
+    { id: 'fuses', name: 'Sicherungskasten', area: box(28, 240, 205, 500), walkTo: [330, 640], facing: 'left' },
+    { id: 'tapes', name: 'Regal mit Tonbändern', area: box(206, 236, 442, 560), walkTo: [470, 600], facing: 'left' },
+    { id: 'boxes', name: 'Kisten', cursor: 'look', area: box(232, 234, 410, 280) },
+    { id: 'recorder', name: 'Tonbandgerät', area: box(906, 240, 1100, 432), walkTo: [800, 560], facing: 'right' },
+    { id: 'mic', name: 'Mikrofon', area: box(846, 312, 906, 380), walkTo: [790, 600], facing: 'right' },
+    { id: 'mixer', name: 'Mischpult', area: box(1000, 350, 1262, 528), walkTo: [860, 660], facing: 'right' },
+    { id: 'cabinet', name: 'Schrank mit Vorhängeschloss', area: box(1010, 528, 1262, 718), walkTo: [860, 680], facing: 'right' },
+    { id: 'monitor', name: 'Bildschirm', area: box(804, 160, 890, 246), walkTo: [740, 470], facing: 'right' },
+    { id: 'door', name: 'Tür zum nächsten Wagen', area: box(566, 118, 720, 400), walkTo: [640, 440], facing: 'back' },
+    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: box(108, 0, 246, 108) },
+    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: box(346, 64, 432, 142) },
+    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: box(846, 64, 932, 142) },
+    { id: 'horn', name: 'Lautsprecher', cursor: 'look', area: box(1048, 0, 1182, 108) },
+    { id: 'panel', name: 'Schalttafel', cursor: 'look', area: box(736, 222, 792, 304) },
     ...windowSpots(WINDOWS),
   ],
 
@@ -40,17 +45,14 @@ export const speakerCar = {
 
   walkArea: {
     outline: [
-      [470, 400],
-      [800, 400],
-      [840, 450],
-      [830, 560],
-      [820, 640],
-      [940, 640],
-      [990, 712],
-      [300, 712],
-      [400, 640],
-      [440, 560],
-      [450, 470],
+      [452, 412],
+      [830, 412],
+      [840, 470],
+      [960, 600],
+      [990, 700],
+      [300, 700],
+      [300, 640],
+      [440, 520],
     ],
     holes: [],
   },

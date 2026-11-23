@@ -84,6 +84,7 @@ export const wagon1 = {
 
   // Mit ?skipintro in der Adresse: gleich losspielen
   skipIntro(story) {
+    story.game.overlay.fade = 0;
     start(story);
   },
 

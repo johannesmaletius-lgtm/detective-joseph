@@ -142,17 +142,29 @@ export class Game {
   }
 
   // Lädt eine Szene samt Bildern, stellt Joseph an seine Startposition und bereitet die Geschichte vor.
-  // carried = was Joseph aus früheren Wagen mitbringt: { items: ['flashlight'], notes: [{ door, text }] }
-  async loadScene(sceneData, script, carried = { items: [], notes: [] }) {
+  // carried = was Joseph aus früheren Wagen mitbringt: { items: ['flashlight'], notes: [{ door, text }] }.
+  // Ohne carried (Teil 1, durch die Tür in den nächsten Wagen) behält Joseph Inventar und Notizbuch,
+  // und der Zug fährt einfach weiter (gleiche Stelle, gleiche Runde).
+  async loadScene(sceneData, script, carried = null) {
     const scene = new Scene(sceneData);
     await Promise.all([scene.load(), this.prepare()]);
-    this.inventory.clear(carried.items);
-    this.notebook.clear(carried.notes);
+    const previous = this.scene?.motion;
+    this.story?.cancelAction();
+    this.closeViews();
+    this.notebook.close();
+    this.speech.finish();
+    this.hints.hide();
+    this.inventory.selected = null;
+    if (carried) {
+      this.inventory.clear(carried.items);
+      this.notebook.clear(carried.notes);
+    }
     this.overlay.card = null;
     this.scene = scene;
     this.story = new Story(this, script);
     scene.flags = this.story.flags;
     if (scene.motion) {
+      if (previous) scene.motion.continueFrom(previous);
       scene.motion.onBump = (strength) => this.sound.clack(strength);
       scene.motion.onSqueal = (duration) => {
         this.sound.squeal(duration);
@@ -208,7 +220,7 @@ export class Game {
     // Taschenlampe: leuchtet im Dunkeln dorthin, wo die Maus ist
     const mouse = this.camera.screenToWorld(this.input.mouse);
     const flashlight = this.scene.darkLevel > 0 && this.inventory.has('flashlight') && this.input.mouse.inside;
-    this.scene.beam = flashlight ? mouse : null;
+    this.scene.beam = this.story.beamAt ?? (flashlight ? mouse : null); // in Zwischensequenzen darf die Geschichte selbst leuchten
 
     this.speech.update(dt);
     this.hints.update(dt);
@@ -259,6 +271,7 @@ export class Game {
     const item = selected ? this.inventory.images[selected] : null;
     const itemName = selected ? this.story.itemName(selected) : '';
 
+    this.overlay.hover = this.overlay.optionAt(mouse);
     if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
     if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
@@ -281,7 +294,7 @@ export class Game {
 
   handleClick(click) {
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
-    if (this.overlay.blocksInput) return this.overlay.handleClick();
+    if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {

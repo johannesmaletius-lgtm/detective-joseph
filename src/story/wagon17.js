@@ -277,6 +277,7 @@ async function tryDoor(story) {
     await story.say('„Zu Hause“. Er holt sie nach Hause, einen nach dem anderen. Und ich bin der Letzte.');
     story.sound('door');
     await finishWagon(story, {
+      number: 17,
       title: 'Ende von Wagen 17',
       lines: ['Die Liste des anderen Joseph: „Der Letzte ist J. Dann sind alle wieder zusammen.“'],
       nextTitle: 'im Schaffnerabteil',

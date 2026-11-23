@@ -102,6 +102,22 @@ export class TrainMotion {
     this.sweeps = [];
   }
 
+  // Beim Wechsel in den nächsten Wagen: derselbe Zug, dieselbe Stelle der Strecke, dieselbe Runde
+  continueFrom(other) {
+    this.distance = other.distance;
+    this.inTunnel = this.tunnelAt(this.distance);
+    this.tunnel = this.inTunnel ? 1 : 0;
+    this.lightsOn = !(this.settings.lightsOutInTunnel && this.inTunnel);
+    this.lights = this.lightsOn ? 1 : 0;
+    this.sweeps = [];
+  }
+
+  // So viele Fahrsekunden weiterfahren, ohne dass dazwischen etwas passiert (z. B. beim Warten)
+  advance(seconds) {
+    this.distance += seconds;
+    this.sweeps = [];
+  }
+
   update(dt) {
     this.time += dt;
     const t = this.time;

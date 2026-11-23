@@ -33,4 +33,4 @@ export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangs
 //   ?tuer=2             ohne Kalender direkt in diese Tür (gut mit &skipintro)
 export const TEST_MODE = params.has('test');
 export const FAKE_DATE = params.get('datum');
-export const START_DOOR = Number(params.get('tuer')) || null;
+export const START_DOOR = Number(params.get('tuer') ?? params.get('wagen')) || null; // ?wagen=N geht auch

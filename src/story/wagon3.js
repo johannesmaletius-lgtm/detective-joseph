@@ -271,6 +271,7 @@ async function tryDoor(story) {
     await story.say('„Morgen verschwindet jemand. Achte auf die Gläser.“ Wer schreibt mir diese Briefe – in meiner eigenen Schrift?');
     story.sound('door');
     await finishWagon(story, {
+      number: 3,
       title: 'Ende von Wagen 3',
       lines: ['Der Brief an J.: „Morgen verschwindet jemand. Achte auf die Gläser.“'],
       nextTitle: 'im Speisewagen',

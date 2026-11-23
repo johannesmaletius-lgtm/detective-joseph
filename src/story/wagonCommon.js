@@ -74,16 +74,47 @@ export function hintFor(story, goal) {
   return goal.lines[level];
 }
 
-// Das Ende eines Wagens: abblenden, Endkarte, dann zurück zum Adventskalender (Spielstand wird gespeichert)
-export async function finishWagon(story, { title, lines = [], nextTitle }) {
+// Das Ende eines Wagens: abblenden, Endkarte, dann zurück zum Adventskalender (der Spielstand wird gespeichert)
+export async function finishWagon(story, { number, title, lines = [], nextTitle }) {
   await story.fadeOut(1.6);
   const minutes = Math.max(1, Math.round((performance.now() - (story.flags.startedAt ?? performance.now())) / 60000));
   await story.card({
     kind: 'end',
     title,
     lines: [...lines, `Gelöst in Runde ${story.lap} – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`,
-      `Weiter geht es ${nextTitle ?? 'im nächsten Wagen'} – morgen.`],
-    continueText: 'Klicken: zurück zum Adventskalender',
+      number < 24 ? `Morgen geht es weiter – ${nextTitle ?? 'im nächsten Wagen'}.` : ''],
+    continueText: 'Klicken, um zum Adventskalender zurückzukehren',
   });
   story.finish();
 }
+
+// Ein Zahlen- oder Buchstabenschloss öffnen. Ergebnis: true, wenn es aufgeht.
+//   await tryCode(story, { id: 'door9', code: '2341', digits: 4, wrong: 'Falsch.' })
+export async function tryCode(story, { id, code, digits = code.length, style, alphabet, symbols, dark = 'Im Dunkeln sehe ich nichts.', wrong = 'Falsch.' }) {
+  if (inTunnel(story)) {
+    await story.say(dark);
+    return false;
+  }
+  let tries = 0;
+  const opened = await story.codeLock({
+    id, digits, style, alphabet, symbols,
+    check: (value) => {
+      tries += 1;
+      return value === code;
+    },
+  });
+  if (!opened && tries > 0 && !inTunnel(story)) {
+    story.sound('wrong');
+    await story.say(typeof wrong === 'function' ? wrong(story) : wrong);
+  }
+  return opened;
+}
+
+// Wo der Zug in der Runde ist: 0 = gerade aus dem Tunnel heraus, 1 = gleich wieder hinein
+export function roundProgress(story) {
+  const motion = story.motion;
+  const half = motion.settings.tunnel.length / 2;
+  return Math.min(1, Math.max(0, (motion.lapTime - half) / (motion.lapLength - 2 * half)));
+}
+
+export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

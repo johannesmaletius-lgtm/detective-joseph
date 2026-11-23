@@ -1,192 +1,298 @@
-import { HAND, PRINT, SERIF, drawPicture, glow, line, sheet, text } from './common.js';
+import { loadImage } from '../../core/assets.js';
+import { STAND_MIRRORS, WALL_MIRRORS } from '../../scene/mirrorCar.js';
+import { HAND, PRINT, glow, line, text, wood } from './common.js';
 
-// Gezeichnetes für Wagen 9 (Spiegelwagen): die Spiegelbilder, die Spiegelschrift, der Lichtstrahl.
+// Gezeichnetes für Wagen 9 (Spiegelwagen): was in den Spiegeln zu sehen ist, die Hebel,
+// die Kratzer (Spiegelschrift) und der Lichtplan mit den vier Standspiegeln.
+
+let joseph = null;
+loadImage('assets/characters/joseph/front.png').then((image) => { joseph = image; });
+
+export const SCRATCH_TEXT = ['ER IST', 'EINE RUNDE', 'ZU SPÄT'];
 
 // ---------------------------------------------------------------- Spiegel
-// Die Spiegel im Hintergrundbild sind durchsichtig. Dahinter zeichnen wir den Wagen gespiegelt,
-// leicht silbrig – und Joseph als Spiegelbild. ghost = 0 … 1: eine zweite Gestalt hinter ihm.
-export function paintMirrors(ctx, { scene, player, ghost = 0 }) {
-  ctx.save();
-  const base = ctx.createLinearGradient(0, 0, 0, 720);
-  base.addColorStop(0, '#7d8a99');
-  base.addColorStop(1, '#3a424d');
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, 1280, 720);
-  ctx.translate(1280, 0);
-  ctx.scale(-1, 1);
-  const { x, y, width, height } = scene.data.background;
-  if (scene.background) {
-    ctx.globalAlpha = 0.8;
-    ctx.drawImage(scene.background, x, y, width, height);
-    ctx.globalAlpha = 1;
-  }
-  player.draw(ctx, scene);
-  ctx.restore();
-  // Die zweite Gestalt: im großen Spiegel rechts, als stünde sie hinter Joseph
-  if (ghost > 0) {
+// figures: [{ mirror: 'wall0' | 'standA' …, alpha, dark, offset }] – Spiegelbilder von Joseph
+export function drawMirrors(ctx, { figures = [], time = 0 } = {}) {
+  const all = [
+    ...WALL_MIRRORS.map((m, i) => ({ ...m, key: `wall${i}`, oval: true })),
+    ...STAND_MIRRORS.map((m) => ({ ...m, key: `stand${m.id}`, round: true })),
+  ];
+  for (const m of all) {
+    const w = m.to - m.from, h = m.bottom - m.top;
     ctx.save();
-    ctx.globalAlpha = ghost * 0.9;
-    drawPicture(ctx, 'assets/characters/anderer-joseph/front.webp', 1112, 150, 86, 232);
+    ctx.beginPath();
+    ctx.rect(m.from - 2, m.top - 2, w + 4, h + 4);
+    ctx.clip();
+    // dunkles, warmes Glas mit dem Widerschein der Kerzen
+    const glass = ctx.createLinearGradient(m.from, m.top, m.to, m.bottom);
+    glass.addColorStop(0, '#3a2a1e');
+    glass.addColorStop(0.5, '#5b4330');
+    glass.addColorStop(1, '#231811');
+    ctx.fillStyle = glass;
+    ctx.fillRect(m.from - 2, m.top - 2, w + 4, h + 4);
+    // Spiegelung des Gangs: Teppich und Fluchtpunkt
+    ctx.fillStyle = 'rgba(120, 30, 24, 0.45)';
+    ctx.beginPath();
+    ctx.moveTo(m.from + w * 0.42, m.top + h * 0.55);
+    ctx.lineTo(m.from + w * 0.58, m.top + h * 0.55);
+    ctx.lineTo(m.from + w * 0.85, m.bottom + 2);
+    ctx.lineTo(m.from + w * 0.15, m.bottom + 2);
+    ctx.fill();
+    glow(ctx, m.from + w * 0.25, m.top + h * 0.3, Math.max(w, h) * 0.35, '255, 190, 110', 0.22 + 0.04 * Math.sin(time * 3 + m.from));
+    for (const figure of figures.filter((f) => f.mirror === m.key)) drawReflection(ctx, m, figure);
+    // Glanzstreifen
+    ctx.fillStyle = 'rgba(255, 245, 230, 0.10)';
+    ctx.beginPath();
+    ctx.moveTo(m.from + w * 0.15, m.top);
+    ctx.lineTo(m.from + w * 0.35, m.top);
+    ctx.lineTo(m.from + w * 0.05, m.bottom);
+    ctx.lineTo(m.from - w * 0.15, m.bottom);
+    ctx.fill();
     ctx.restore();
   }
-  // silbriger Schimmer
-  const sheen = ctx.createLinearGradient(0, 0, 1280, 720);
-  sheen.addColorStop(0, 'rgba(200, 220, 240, 0.25)');
-  sheen.addColorStop(0.5, 'rgba(120, 140, 170, 0.08)');
-  sheen.addColorStop(1, 'rgba(200, 220, 240, 0.22)');
-  ctx.fillStyle = sheen;
-  ctx.fillRect(0, 0, 1280, 720);
 }
 
-// ---------------------------------------------------------------- Kratzer in Spiegelschrift
-export const SCRATCH_LINES = ['WAS DU TUST,', 'TUT ER IN DER', 'NÄCHSTEN RUNDE –', 'VERKEHRT HERUM.'];
-
-export function drawScratches(ctx, mirrored) {
-  ctx.fillStyle = mirrored ? '#2a3038' : '#5a3418';
-  ctx.fillRect(300, 110, 680, 480);
-  if (mirrored) {
-    const sheen = ctx.createLinearGradient(300, 110, 980, 590);
-    sheen.addColorStop(0, 'rgba(200, 220, 240, 0.25)');
-    sheen.addColorStop(1, 'rgba(120, 140, 170, 0.1)');
-    ctx.fillStyle = sheen;
-    ctx.fillRect(300, 110, 680, 480);
-  } else {
-    ctx.strokeStyle = 'rgba(30, 14, 4, 0.35)';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 480; i += 16) line(ctx, 300, 110 + i, 980, 110 + i + 6);
-  }
+function drawReflection(ctx, m, { alpha = 0.8, dark = 0.45, offset = 0, scale = 1 }) {
+  if (!joseph) return;
+  const w = m.to - m.from, h = m.bottom - m.top;
+  const height = h * 0.78 * scale;
+  const width = (joseph.width / joseph.height) * height;
+  const x = m.from + w / 2 - width / 2 + offset * w;
+  const y = m.bottom - height + h * 0.04;
   ctx.save();
-  if (!mirrored) {
-    ctx.translate(1280, 0);
-    ctx.scale(-1, 1);
-  }
-  SCRATCH_LINES.forEach((value, i) => text(ctx, value, 640, 220 + i * 92, {
-    font: `bold 56px ${HAND}`, color: mirrored ? '#e8dcc0' : '#f0c98a', align: 'center',
-  }));
+  ctx.globalAlpha = alpha;
+  ctx.translate(x + width, y);
+  ctx.scale(-1, 1); // spiegelverkehrt
+  ctx.drawImage(joseph, 0, 0, width, height);
+  ctx.globalCompositeOperation = 'source-atop';
+  ctx.fillStyle = `rgba(10, 6, 4, ${dark})`;
+  ctx.fillRect(0, 0, width, height);
   ctx.restore();
-  ctx.strokeStyle = '#b8924a';
-  ctx.lineWidth = 10;
-  ctx.strokeRect(300, 110, 680, 480);
 }
 
-export function drawPlaque(ctx) {
-  sheet(ctx, 420, 220, 440, 260, {
-    color: '#c9a24a',
-    shade: '#8c6a2a',
-    inner: (c) => {
-      text(c, 'SPIEGELWAGEN', 220, 60, { font: `bold 30px ${SERIF}`, align: 'center' });
-      text(c, 'Durchgang nur mit Licht im Auge.', 220, 120, { font: `20px ${SERIF}`, align: 'center' });
-      text(c, 'Die Blende der Lampe öffnet sich,', 220, 165, { font: `18px ${SERIF}`, align: 'center' });
-      text(c, 'wenn beide Hebel zugleich unten sind.', 220, 192, { font: `18px ${SERIF}`, align: 'center' });
-    },
+// ---------------------------------------------------------------- Hebel
+// Die Hebel sind im Hintergrundbild oben. Ist einer unten, wird der obere Griff übermalt
+// und der Griff nach unten gezeichnet.
+const LEVERS = {
+  left: { pivot: [412, 230], knob: [446, 174], plateTop: 199, wall: '#55503a', plate: '#a8732c' },
+  right: { pivot: [874, 230], knob: [842, 171], plateTop: 199, wall: '#4e4630', plate: '#a8732c' },
+};
+
+export function drawLevers(ctx, { left = 0, right = 0 } = {}) {
+  drawLever(ctx, LEVERS.left, left);
+  drawLever(ctx, LEVERS.right, right);
+}
+
+// down: 0 = oben (nichts zeichnen), 1 = ganz unten
+function drawLever(ctx, lever, down) {
+  if (down <= 0.02) return;
+  const [px, py] = lever.pivot;
+  const [kx, ky] = lever.knob;
+  ctx.save();
+  // alten Griff übermalen: Kugel und Stange über der Platte …
+  ctx.fillStyle = lever.wall;
+  ctx.beginPath();
+  ctx.arc(kx, ky, 15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = lever.wall;
+  ctx.lineWidth = 16;
+  const t = (lever.plateTop + 1 - py) / (ky - py);
+  line(ctx, kx, ky, px + (kx - px) * t, lever.plateTop + 1);
+  // … und auf der Platte
+  ctx.strokeStyle = lever.plate;
+  ctx.lineWidth = 14;
+  line(ctx, px + (kx - px) * t, lever.plateTop + 4, px, py);
+  // neuer Griff: um die Achse nach unten gedreht
+  const angle = Math.atan2(ky - py, kx - px);
+  const target = -angle; // an der Waagrechten gespiegelt
+  const a = angle + (target - angle) * down;
+  const length = Math.hypot(kx - px, ky - py);
+  const nx = px + Math.cos(a) * length, ny = py + Math.sin(a) * length;
+  ctx.strokeStyle = '#4a2c0c';
+  ctx.lineWidth = 12;
+  line(ctx, px, py, nx, ny);
+  ctx.strokeStyle = '#e0a83c';
+  ctx.lineWidth = 8;
+  line(ctx, px, py, nx, ny);
+  const knob = ctx.createRadialGradient(nx - 4, ny - 4, 2, nx, ny, 13);
+  knob.addColorStop(0, '#ffe7a0');
+  knob.addColorStop(1, '#a8701e');
+  ctx.fillStyle = knob;
+  ctx.beginPath();
+  ctx.arc(nx, ny, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#c48a2e';
+  ctx.beginPath();
+  ctx.arc(px, py, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#7a4c14';
+  ctx.beginPath();
+  ctx.arc(px, py, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// Lichtschein am Glasauge der Tür
+export function drawEyeGlow(ctx, strength, time) {
+  if (strength <= 0) return;
+  glow(ctx, 680, 266, 70, '255, 240, 190', strength * (0.6 + 0.1 * Math.sin(time * 8)));
+}
+
+// ---------------------------------------------------------------- Kratzer
+// mirrored = true: so wie sie in der Wand stehen (Spiegelschrift); false: im Spiegel gelesen
+export function drawScratches(ctx, mirrored) {
+  ctx.save();
+  const panel = ctx.createLinearGradient(330, 150, 950, 570);
+  panel.addColorStop(0, '#7a4a22');
+  panel.addColorStop(1, '#4c2c12');
+  ctx.fillStyle = panel;
+  ctx.fillRect(330, 150, 620, 420);
+  wood(ctx, 340, 160, 600, 400, [110, 64, 30]);
+  if (!mirrored) {
+    // Rahmen eines Spiegels
+    ctx.strokeStyle = '#c9a24c';
+    ctx.lineWidth = 16;
+    ctx.strokeRect(338, 158, 604, 404);
+  }
+  ctx.translate(640, 0);
+  if (mirrored) ctx.scale(-1, 1);
+  ctx.strokeStyle = 'rgba(245, 220, 170, 0.85)';
+  ctx.lineWidth = 3;
+  ctx.font = `bold 62px ${HAND}`;
+  ctx.textAlign = 'center';
+  SCRATCH_TEXT.forEach((row, i) => {
+    ctx.save();
+    ctx.translate(0, 270 + i * 92);
+    ctx.rotate(-0.04 + i * 0.03);
+    ctx.strokeText(row, 0, 0);
+    ctx.restore();
   });
+  // ein paar wilde Striche dazwischen
+  ctx.strokeStyle = 'rgba(245, 220, 170, 0.4)';
+  for (let i = 0; i < 9; i++) line(ctx, -260 + i * 60, 190 + (i % 3) * 120, -210 + i * 58, 230 + (i % 3) * 120);
+  ctx.restore();
+  text(ctx, mirrored ? 'Tief in die Holzwand geritzt.' : 'Im Spiegel gegenüber: die Kratzer, richtig herum.', 640, 610, { font: `18px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
-// ---------------------------------------------------------------- Lichtstrahl (Plan von oben)
-// Raster 7 × 5. Die Lampe leuchtet von oben in Spalte 3 hinein. Vier Standspiegel, jeder steht
-// entweder „/“ oder „\“. Das Glasauge sitzt oben in Spalte 6.
-export const GRID = { x: 340, y: 110, cell: 86, cols: 7, rows: 5 };
-export const STAND_MIRRORS = [
-  { id: 'm1', col: 3, row: 1 },
-  { id: 'm2', col: 0, row: 1 },
-  { id: 'm3', col: 0, row: 4 },
-  { id: 'm4', col: 6, row: 4 },
+// ---------------------------------------------------------------- Lichtplan
+// Der Wagen von oben: Lichtstrahl von der Deckenlampe über die vier Standspiegel ins Glasauge.
+// Gitter 5 × 5, Zeile 0 = an der Tür. '/' und '\' = Stellung des Spiegels.
+export const GRID = { x: 390, y: 112, cell: 100, cols: 5, rows: 5 };
+export const PLAN_MIRRORS = [
+  { id: 'A', col: 2, row: 3 },
+  { id: 'B', col: 0, row: 3 },
+  { id: 'C', col: 0, row: 1 },
+  { id: 'D', col: 2, row: 1 },
 ];
-export const EYE = { col: 6, row: 0 };
-const LAMP = { col: 3 };
+export const PLAN_START = { col: 2, row: 4, dx: 0, dy: -1 }; // der Strahl kommt von unten
+export const PLAN_EYE = { col: 2, row: -1 };
 
-export function mirrorSpots() {
-  return STAND_MIRRORS.map((m, i) => ({ id: m.id, cx: GRID.x + (m.col + 0.5) * GRID.cell, cy: GRID.y + (m.row + 0.5) * GRID.cell, r: 40, label: `Standspiegel ${i + 1} drehen` }));
-}
-
-// Weg des Strahls: Liste von Punkten (Zellmitten). hit = true, wenn er das Auge trifft.
-export function tracePath(tilt) {
-  let col = LAMP.col, row = -1, dx = 0, dy = 1;
-  const points = [{ col, row: -0.5 }];
+// Verfolgt den Strahl. Ergebnis: Punkte (Mitten der Zellen) und ob er das Auge trifft.
+export function traceBeam(turns) {
+  const points = [{ col: PLAN_START.col, row: PLAN_START.row + 0.6 }];
+  let { col, row, dx, dy } = PLAN_START;
   for (let steps = 0; steps < 40; steps++) {
+    if (row < 0) {
+      points.push({ col, row: -0.4 });
+      return { points, hit: col === PLAN_EYE.col };
+    }
+    if (col < 0 || col >= GRID.cols || row >= GRID.rows) {
+      points.push({ col: col - dx * 0.4, row: row - dy * 0.4 });
+      return { points, hit: false };
+    }
+    const mirror = PLAN_MIRRORS.find((m) => m.col === col && m.row === row);
+    if (mirror) {
+      points.push({ col, row });
+      const slash = turns[mirror.id] === '/';
+      [dx, dy] = slash ? [-dy, -dx] : [dy, dx];
+    }
     col += dx;
     row += dy;
-    if (col < 0 || col >= GRID.cols || row >= GRID.rows) {
-      points.push({ col: col - dx / 2, row: row - dy / 2 });
-      return { points, hit: false };
-    }
-    if (row < 0) {
-      points.push({ col, row: -0.5 });
-      return { points, hit: false };
-    }
-    if (col === EYE.col && row === EYE.row) {
-      points.push({ col, row });
-      return { points, hit: true };
-    }
-    const mirror = STAND_MIRRORS.findIndex((m) => m.col === col && m.row === row);
-    if (mirror >= 0) {
-      points.push({ col, row });
-      if (tilt[mirror] === '/') [dx, dy] = [-dy, -dx];
-      else [dx, dy] = [dy, dx];
-    }
   }
   return { points, hit: false };
 }
 
-export function drawBeamPlan(ctx, { tilt, time = 0, dark = false }) {
+const cellCenter = (col, row) => ({ x: GRID.x + (col + 0.5) * GRID.cell, y: GRID.y + (row + 0.5) * GRID.cell });
+
+export function planSpots() {
+  return PLAN_MIRRORS.map((m) => {
+    const c = cellCenter(m.col, m.row);
+    return { id: m.id, cx: c.x, cy: c.y, r: 40, label: `Standspiegel ${m.id} drehen` };
+  });
+}
+
+export function drawPlan(ctx, turns, { lit = true, time = 0 } = {}) {
   const { x, y, cell, cols, rows } = GRID;
-  ctx.fillStyle = '#2a1a10';
-  ctx.fillRect(x - 60, y - 70, cols * cell + 120, rows * cell + 140);
-  // Teppich in der Mitte
-  ctx.fillStyle = '#6e1a16';
-  ctx.fillRect(x + 2 * cell + 10, y, 3 * cell - 20, rows * cell);
+  const W = cols * cell, H = rows * cell;
+  wood(ctx, x - 90, y - 110, W + 180, H + 190, [70, 40, 22]);
+  // Boden des Wagens
+  ctx.fillStyle = '#2b1d14';
+  ctx.fillRect(x, y, W, H);
+  ctx.fillStyle = 'rgba(140, 32, 26, 0.55)';
+  ctx.fillRect(x + cell * 1.6, y, cell * 1.8, H);
   ctx.strokeStyle = 'rgba(255, 230, 170, 0.12)';
   ctx.lineWidth = 1;
-  for (let c = 0; c <= cols; c++) line(ctx, x + c * cell, y, x + c * cell, y + rows * cell);
-  for (let r = 0; r <= rows; r++) line(ctx, x, y + r * cell, x + cols * cell, y + r * cell);
-  text(ctx, 'Tür', x + cols * cell / 2, y - 40, { font: `bold 18px ${PRINT}`, color: '#e8d8b0', align: 'center' });
+  for (let i = 1; i < cols; i++) line(ctx, x + i * cell, y, x + i * cell, y + H);
+  for (let i = 1; i < rows; i++) line(ctx, x, y + i * cell, x + W, y + i * cell);
+  ctx.strokeStyle = '#c9a24c';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(x, y, W, H);
+  // Tür mit Glasauge
+  const eye = cellCenter(PLAN_EYE.col, 0);
+  ctx.fillStyle = '#5d5a44';
+  ctx.fillRect(eye.x - 60, y - 40, 120, 36);
+  ctx.fillStyle = '#e9f2f0';
+  ctx.beginPath();
+  ctx.arc(eye.x, y - 22, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#2a7a6a';
+  ctx.beginPath();
+  ctx.arc(eye.x, y - 22, 6, 0, Math.PI * 2);
+  ctx.fill();
+  text(ctx, 'Tür · Glasauge', eye.x, y - 52, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
   // Lampe
-  glow(ctx, x + (LAMP.col + 0.5) * cell, y - 20, 60, '255, 230, 150', 0.6);
-  text(ctx, 'Lampe', x + (LAMP.col + 0.5) * cell - 60, y - 14, { font: `14px ${PRINT}`, color: '#ffe7a0', align: 'right' });
-  // Auge
-  const ex = x + (EYE.col + 0.5) * cell, ey = y + (EYE.row + 0.5) * cell;
-  ctx.fillStyle = '#e9e4d6';
-  ctx.beginPath();
-  ctx.ellipse(ex, ey, 30, 18, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#2f7a6a';
-  ctx.beginPath();
-  ctx.arc(ex, ey, 11, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#111';
-  ctx.beginPath();
-  ctx.arc(ex, ey, 5, 0, Math.PI * 2);
-  ctx.fill();
-  text(ctx, 'Glasauge', ex, ey + 40, { font: `14px ${PRINT}`, color: '#e8d8b0', align: 'center' });
-  // Strahl (nur, wenn die Blende der Lampe offen ist)
-  const { points, hit } = dark ? { points: [], hit: false } : tracePath(tilt);
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255, 236, 160, 0.9)';
-  ctx.shadowColor = 'rgba(255, 220, 120, 0.9)';
-  ctx.shadowBlur = 18;
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  points.forEach((p, i) => {
-    const px = x + (p.col + 0.5) * cell, py = y + (p.row + 0.5) * cell;
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  });
-  ctx.stroke();
-  ctx.restore();
-  if (hit) glow(ctx, ex, ey, 90, '255, 240, 180', 0.6 + 0.2 * Math.sin(time * 6));
-  // Standspiegel
-  STAND_MIRRORS.forEach((m, i) => {
-    const cx = x + (m.col + 0.5) * cell, cy = y + (m.row + 0.5) * cell;
-    ctx.fillStyle = '#7a5a20';
+  const start = cellCenter(PLAN_START.col, PLAN_START.row);
+  text(ctx, 'Lichtstrahl der Deckenlampe', start.x, y + H + 50, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+
+  // Strahl
+  const beam = traceBeam(turns);
+  if (lit) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (const [width, color] of [[16, 'rgba(255, 230, 160, 0.18)'], [6, 'rgba(255, 240, 200, 0.75)'], [2, '#fffbe8']]) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      beam.points.forEach((p, i) => {
+        const c = cellCenter(p.col, p.row);
+        if (i === 0) ctx.moveTo(c.x, y + H + 24);
+        else ctx.lineTo(c.x, c.y);
+      });
+      ctx.stroke();
+    }
+    ctx.restore();
+    if (beam.hit) glow(ctx, eye.x, y - 22, 60, '255, 245, 200', 0.6 + 0.2 * Math.sin(time * 6));
+  }
+
+  // Spiegel
+  for (const m of PLAN_MIRRORS) {
+    const c = cellCenter(m.col, m.row);
+    ctx.fillStyle = '#3c2a18';
     ctx.beginPath();
-    ctx.arc(cx, cy, 34, 0, Math.PI * 2);
+    ctx.arc(c.x, c.y, 34, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#c8dbe8';
-    ctx.lineWidth = 8;
-    const d = 26;
-    if (tilt[i] === '/') line(ctx, cx - d, cy + d, cx + d, cy - d);
-    else line(ctx, cx - d, cy - d, cx + d, cy + d);
-    text(ctx, String(i + 1), cx + 30, cy - 26, { font: `bold 16px ${PRINT}`, color: '#ffe7a0', align: 'center' });
-  });
-  return hit;
+    ctx.strokeStyle = '#c9a24c';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    const slash = turns[m.id] === '/';
+    ctx.strokeStyle = '#dff3f6';
+    ctx.lineWidth = 7;
+    ctx.lineCap = 'round';
+    if (slash) line(ctx, c.x - 24, c.y + 24, c.x + 24, c.y - 24);
+    else line(ctx, c.x - 24, c.y - 24, c.x + 24, c.y + 24);
+    text(ctx, m.id, c.x + 30, c.y - 26, { font: `bold 18px ${PRINT}`, color: '#f3e2b4' });
+  }
+  return beam;
 }

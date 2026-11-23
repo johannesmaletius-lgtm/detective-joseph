@@ -227,6 +227,8 @@ if __name__ == '__main__':
     prepare_picture(REF / 'tuer-05' / 'tuer-05-abteil-k.webp', SCENES / 'wagon-05' / 'abteil-k.webp')
     prepare_picture(REF / 'tuer-06' / 'tuer-06-regal.webp', SCENES / 'wagon-06' / 'regal.webp')
     prepare_picture(REF / 'tuer-08' / 'tuer-08-standbild.webp', SCENES / 'wagon-08' / 'standbild.webp')
+    prepare_picture(REF / 'tuer-13' / 'tuer-13-familienfoto.webp', SCENES / 'wagon-13' / 'familienfoto.webp', width=540)
+    prepare_picture(REF / 'tuer-14' / 'tuer-14-pressefoto.webp', SCENES / 'wagon-14' / 'pressefoto.webp', width=900)
     PHOTOS = ROOT / 'assets' / 'photos'
     prepare_photo(REF / 'tuer-13' / 'tuer-13-familienfoto.webp', PHOTOS / 'familienfoto.webp', 620)
     prepare_photo(REF / 'tuer-14' / 'tuer-14-pressefoto.webp', PHOTOS / 'pressefoto.webp', 900)
