@@ -104,7 +104,14 @@ export const DOORS = [
   { door: 14, wagon: 'Zeitungswagen' },
   { door: 15, wagon: 'Spielzimmer' },
   { door: 16, wagon: 'Funkraum' },
-  { door: 17, wagon: 'Gewächshaus' },
+  {
+    door: 17,
+    wagon: 'Gewächshaus',
+    load: async () => ({
+      scene: (await import('../scene/greenhouse.js')).greenhouse,
+      script: (await import('../story/wagon17.js')).wagon17,
+    }),
+  },
   { door: 18, wagon: 'Schaffnerabteil' },
   { door: 19, wagon: 'Fotolabor' },
   { door: 20, wagon: 'Packwagen' },

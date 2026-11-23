@@ -146,6 +146,24 @@ export const ADVENT_ITEMS = {
     },
     look: 'Das Zahnrad von Herrn Tick. „Das wirst du vorne brauchen.“',
   },
+
+  // ---------------------------------------------------------------- Tür 17: Gewächshaus
+  tinyKey: {
+    name: 'Winziger Schlüssel',
+    icon: (ctx) => key(ctx, '#d6a645', '#7a5418', 0.7),
+    look: 'Ein winziger Schlüssel aus der Rosenblüte.',
+  },
+  guestList: {
+    name: 'Notizbuch des anderen',
+    icon: (ctx) => {
+      ctx.fillStyle = '#3d4a2a';
+      ctx.fillRect(28, 18, 72, 94);
+      ctx.fillStyle = '#e9dfc4';
+      ctx.fillRect(34, 22, 62, 86);
+      lines(ctx, 40, 36, 48, 6, 11);
+    },
+    look: 'Das Notizbuch des anderen Joseph. Eine Liste der Fahrgäste.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];
