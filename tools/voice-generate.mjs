@@ -9,7 +9,16 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const VOICES = {
-  bruno: 'JBFqnCBsd6RMkjVDRZzb', // George
+  // Stimmen aus der ElevenLabs-Bibliothek (deutsche Muttersprachler, ab Starter-Tarif)
+  mira: 'cQIPwmwhLZssddrp5o3h', // Laura – Magical Fairytales
+  bruno: 'U2swAVvmpE98PJAkPUMP', // Willy Lübke – Rough & Bold
+  tick: 'Lbm7qDmJUxIxpWx9qhZO', // Eldric – Verrücktes Genie
+  moll: 'xouqnknI7nCiPaJ9gwt8', // Tom – Gloomy and Disappointed
+  k: 'VjWOqc90NMYAnt5VlDD8', // Kornas – Danisch
+  heizer: 'uYBtrwzOqK8qaectN0V2', // Nikolaus – Rumbling and Reassuring
+  barkeeper: '8WgkgItVYGBs7XNW7D6w', // Maik – berlinerisch
+  ilse: 'nztoarMvjgs3c0c5DINJ', // Oma Elisabeth – Warm & Cozy
+  conductor: 'b0JqlN5qkeuPi5BoQiHn', // Hermann – Sympathetic and Trustworthy
 };
 const MODEL = 'eleven_multilingual_v2';
 
