@@ -1278,5 +1278,1405 @@
   "text": "Und hier sehe ich mich gleich zehnmal.",
   "file": "wagon9.js",
   "kind": "intro"
+ },
+ {
+  "text": "Ich hab mir den Weg selbst hinterlassen. Ich war also wirklich schon einmal hier …",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich setz mich kurz und warte auf den Tunnel. Aber nicht einschlafen …",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Hm?! … Fast eingenickt.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "NICHT einschlafen, Joseph. Da vorne kommt der Tunnel.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Was …?! Das Licht!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das sind wir! Unser Zug fährt gerade an der Kamera vorbei.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wieder dunkel. Ohne Licht finde ich hier gar nichts.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Licht aus – Taschenlampe an. Der Brief sagt: die Tür!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Den hab ich schon. Wort für Wort derselbe Brief.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Brief. Adressiert an „J.“",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Bis auf die Fahrkarte leer.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wieder eine Taschenlampe, wieder ein Schlüssel, wieder die Fahrkarte. Genau dieselben.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die hab ich ja schon. Ich lasse sie drin.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Mal sehen, was drin ist …",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eine Taschenlampe – ohne Batterien. Ein kleiner Schlüssel. Und eine Fahrkarte.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„RINGBAHN – gültig für 1 Runde.“ Kein Abfahrtsort, kein Ziel. Die lasse ich stecken.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die ist schon offen.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Schlüssel passt!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Taschenmesser. Die Spitze ist ganz stumpf.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Sechs Fetzen. Das müssten alle sein – jetzt kann ich sie zusammensetzen.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Stück von einem Fahrplan. Solche Fetzen liegen hier überall – ich sollte sie sammeln.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Koffer ist leer. Fernglas und Akte hab ich.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich steige auf die Bank … so komme ich ran.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. Die Kette hält.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Rätselheft stand „Koffer“ neben drei eingekreisten Feldern. Die muss ich ausrechnen.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Drei Ziffern. Wenn der Koffer mir gehört, habe ich sie mir bestimmt irgendwo aufgeschrieben.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das Schloss springt auf!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Fernglas. Und eine Akte – mit meinem Zeichen drauf.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Meine eigene Akte. Ich ermittle in diesem Zug … und stecke selbst drin fest.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Kabel nicht.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Leitung steht. Lieber nichts mehr anfassen.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wenn ich die Kabelstücke richtig drehe, reicht die Leitung vielleicht von der Kamera bis zum Bildschirm.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Lampe ist grün – das Signal steht. Aber der Bildschirm ist tot.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ohne seine Batterie zeigt er gar nichts.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Lampe ist grün – das Signal steht!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und drüben auf dem Bildschirm … da ist ein Bild.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da … da steht jemand. Mitten im Tunnel!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Er sieht direkt in die Kamera. Und er trägt … meinen Schal?",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Klappe ist schon offen. Das Fach ist leer.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Meine Taschenlampe hat ihre zwei Batterien. Diese hier bleibt drin – sonst geht der Bildschirm aus.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich habe schon eine lose Batterie in der Tasche. Erst einmal die verbauen.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Schrauben sitzen wieder fest. Also noch einmal …",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Messerspitze passt in die Schrauben …",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und wieder liegt eine Batterie im Fach. Dieselbe wie vorhin – und doch eine zweite.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Was ich bei mir trage, bleibt. Was ich hierlasse, kommt wieder.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Klappe auf – und da drin: eine Batterie!",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Oh. Der Bildschirm ist aus.",
+  "file": "wagon1.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Schaffner ruft die Fahrgäste. Und wer den Ruf hört, geht.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Elf ist der Nächste. Diesmal bin ich vorher da.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Runde 108. Die Runde, in der Herr K. verschwand.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Runde 110“ – eine leere Spule. Noch nicht aufgenommen.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Schalter steht auf „offen“.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich lege den Schalter um … nichts. Kein Strom.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Klack. Vorne an der Tür klickt es.",
+  "file": "wagon10.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich setze mich und behalte die Rundenuhr im Auge …",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich setze mich kurz hin. Herr Tick wird immer unruhiger …",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Gleich steht der Zeiger auf dem roten Strich.",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Gleich passiert etwas. Ich spüre es.",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Herr Tick ist noch da. Die erste Runde, in der niemand verschwunden ist.",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Vielleicht kann ich sie alle retten.",
+  "file": "wagon11.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Familie des Schaffners war in diesem Zug. An Weihnachten.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Dem Schaffner ist an einem Weihnachtsabend etwas passiert. Und seitdem fährt der Zug im Kreis.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da ist nichts mehr.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln taste ich lieber nicht herum.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Weihnachtsfeier · Zug 24“ … keine Platte drin. Nur ein Stück Notenpapier.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Den Schlüssel habe ich.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "HASE. Die Spieldose springt auf und spielt drei Töne …",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Darin liegt ein kleiner Schlüssel mit einem Notenschlüssel am Griff.",
+  "file": "wagon12.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Zum Gedenken an den Weihnachtszug vom 24. Dezember, der seinen Bahnhof nie erreichte.“",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Bruno. Ilse. K. Tick. Moll. Der Lokführer, der Funker. Mira …",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "… und J.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "J. Wie in den Briefen an mich. Wie … Joseph?",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Alle, die ich hier getroffen habe, saßen in jener Nacht in diesem Zug. Und ich auch?",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein junger Schaffner. Seine Frau. Eine kleine Tochter mit einem Stoffhasen. Vor einem Weihnachtsbaum.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Hase … wie im Lied von Herrn Moll.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und der Schaffner … er sieht aus wie ich. Nur älter.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Alle Fahrgäste haben in jener Weihnachtsnacht in diesem Zug gesessen.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und auf der Tafel steht auch J.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich nehme die Laterne. Im roten Glas sind winzige Löcher, wie Nadelstiche.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wieder ein Luftzug. Alle aus.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Luftzug – und alle Kerzen sind aus. Die Reihenfolge stimmt nicht.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Schublade hat keinen Griff. Sie geht nicht auf.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Schublade ist leer.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "In der Schublade: dünnes Papier und ein weicher Bleistift. Ein Zettel: „Für die Tafel.“",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln wird das nichts.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Das Foto habe ich.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "HEIM. Der Opferstock ist offen. Darin liegt ein Foto.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Anfang von Herrn Molls Lied! … Und die Tür springt auf.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein tiefer, voller Ton. Jede Glocke klingt anders.",
+  "file": "wagon13.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„WEIHNACHTSZUG IM TUNNEL VERSCHOLLEN.“",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Unter den Fahrgästen: Frau und Tochter des Schaffners. Er selbst wartete am Bahnsteig.“",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Zeugen sahen ihn in der Nacht allein in den Tunnel laufen. Er wird seitdem vermisst.“",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Deshalb steht „J.“ auf der Tafel. Der Schaffner ist hinterher. In den Tunnel.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "23:47. Der Zug ist nie angekommen. Und der Schaffner ist in den Tunnel gelaufen.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die nehme ich mit. Ein Detektiv braucht eine Lupe.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln wühle ich da nicht.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ausgeschnittene Wörter. Jemand hat sie aus einer Zeitung herausgeschnitten.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "WEICHE. Der Archivschrank ist offen.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Archiv sind nur noch Ausgaben vom 24. Dezember. Immer wieder der 24.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ganz unten, in der Schublade „24. – 25. Dez.“: eine einzige Zeitung vom 25. Dezember!",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Aber jemand hat Wörter herausgeschnitten. Die Schlagzeile ist voller Löcher.",
+  "file": "wagon14.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Schlüssel passt. Die Vorderwand des Bahnhofs klappt auf.",
+  "file": "wagon15.js",
+  "kind": "moment"
+ },
+ {
+  "text": "23:41. Sechs Minuten, bevor der Zug ankommen sollte, hat er gewarnt.",
+  "file": "wagon16.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Weiche 7 falsch.“ Niemand hat es gehört.",
+  "file": "wagon16.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Kopfhörer. Das Kabel ist lang genug.",
+  "file": "wagon16.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Wer ist schon zu Hause.“ Abgehakt: die Frau des Schaffners, Runde eins. Bis Herr K., Runde 108.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Offen: Ilse, Tick, Moll, Mira … und J.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Der Letzte ist J. Dann sind alle wieder zusammen.“ Das ist seine Liste. Die Liste des anderen.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Auf der letzten Seite eine Tabelle: „Tunnel. Runde 1: drei Ticks. Runde 60: sieben. Runde 109: elf. Danach jede Runde einer mehr …“",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Darunter, dick unterstrichen: „Bei fünfundzwanzig wird es nicht mehr hell. Beeil dich, Junge.“",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Beeil dich, Junge.“ Das ist für mich geschrieben.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da! Hinter der beschlagenen Scheibe! Jemand rennt weg – mit meiner Mütze!",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Weg. Er war die ganze Zeit hier.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Fünf, elf, zwölf, fünfzehn und eins: vierundvierzig. Offen.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Zu Hause“. Er holt sie nach Hause, einen nach dem anderen. Und ich bin der Letzte.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Genau vier Liter … Die Knospe öffnet sich, Blatt für Blatt.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "In der Blüte liegt ein winziger Schlüssel!",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Kiste ist leer. Das Notizbuch habe ich.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Abgeschlossen. Das Schlüsselloch ist winzig.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der winzige Schlüssel passt.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Notizbuch. Und darin eine Liste – Fahrgäste, mit Haken dahinter.",
+  "file": "wagon17.js",
+  "kind": "moment"
+ },
+ {
+  "text": "K-E-R-N. Auf!",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Kern … K. – Herr K.! ER hatte in jener Nacht Dienst. Er hätte am Funk sitzen müssen.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Einmal hab ich ihn im Stich gelassen“, hat er gesagt. Deshalb ist er freiwillig gegangen.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Telegramm. Und ein Bund mit sieben Schlüsseln.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Fahrstraße bis Weiche 7 steht.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln sehe ich den Plan nicht.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Hebel lassen sich nicht bewegen. Ein Schild: „Gesperrt, solange Schlüssel fehlen.“",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Fahrstraße steht – vom Ring bis an Weiche 7. Die Tür ist entriegelt.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Jetzt fehlt nur noch Weiche 7 selbst. Der rote Hebel.",
+  "file": "wagon18.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Lok im Tunnel. Die Gleise teilen sich – Weiche 7. Der Zug biegt ab.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Er ist nicht verunglückt. Er ist abgebogen!",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und im Führerstand … jemand mit meiner Mütze. Allein am Hebel. Der Lok-Schlüssel steckt.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Am Gleis ein Kilometerstein: 24,7.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Zwei, vier, sieben. Offen.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Lok-Schlüssel ist nicht verloren. Er hat ihn. Der andere Joseph.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Nach dem Tunnel … die Kameratasche ist wieder zu. Und der Film ist sicher wieder drin. Noch ein Versuch.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eine Belichtungstabelle. Und: „Letzte Aufnahme: Tunnel, fast kein Licht.“",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Blende 2, eine Fünfzehntelsekunde. Auf! Darin: ein Film. Nicht entwickelt.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Film ist entwickelt. Die Negative habe ich.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Tunnel warte ich lieber.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich sehe nichts. Ohne Rotlicht geht hier gar nichts.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Streifen Negative. Hell und dunkel vertauscht – ein Tunnel, immer wieder.",
+  "file": "wagon19.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eins, sieben, drei. Offen!",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Halt – erst sehe ich nach, was im Koffer ist.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Meine Akte ist jetzt vollständig. Und sie sagt: Jede Runde verschwindet jemand.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wenn das stimmt … dann passiert es heute Nacht wieder.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Kofferstapel … steht wieder genau wie vorher. Alles zurückgesprungen.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Die Aktenseite habe ich.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Buchstaben nicht.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. Sechs Buchstaben … das erste Wort von den Anhängern?",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. Sechs Buchstaben. Irgendwo hier steht bestimmt ein Wort.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "W-E-I-C-H-E. Klick!",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Blatt Papier. „Akte J. – Seite 1“. Das ist eine Seite aus meiner Akte!",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Den untersten Koffer habe ich schon.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln lasse ich womöglich etwas fallen.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Einfach so in fremdem Gepäck wühlen? Erst will ich wissen, wonach ich suche.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Uff, ist der schwer. Mal sehen, was er wiegt.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Koffer ist leer. Die Seiten habe ich.",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Schnallen gehen auf. Ganz unten, unter alten Decken …",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Zwei Seiten. Seite 2 und Seite 3!",
+  "file": "wagon2.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Stück habe ich schon.",
+  "file": "wagon20.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich reiße ein Stück ab. Die Sterne sind richtige Löcher.",
+  "file": "wagon20.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Die Kelle und die Karte habe ich.",
+  "file": "wagon20.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Alle fünf Bänder ab. Darin: eine Kelle aus Pappe, rot und weiß. Und eine Karte.",
+  "file": "wagon20.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Drei, eins, sieben. Offen. Dahinter: die Lok.",
+  "file": "wagon21.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Halb zwölf. Mit dem Lok-Schlüssel um den Hals. Dann warte ich dort auf ihn.",
+  "file": "wagon21.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich klettere hinaus – zu früh! Die Tür geht auf, er sieht mich …",
+  "file": "wagon22.js",
+  "kind": "moment"
+ },
+ {
+  "text": "… und weg ist er. Zurück in den Zug.",
+  "file": "wagon22.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Er kommt gerade herein – und sieht mich, bevor er am Pult ist. Er dreht sich um und rennt.",
+  "file": "wagon22.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Zu spät! Er hat den Schlüssel schon wieder abgezogen und ist fort.",
+  "file": "wagon22.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Neue Runde. Gleiche Zeit. Noch einmal – genau um halb zwölf, wenn er am Pult steht.",
+  "file": "wagon22.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich gehe ihm nach … die Stimme … so müde …",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wo bin ich? … Ich saß auf dem Boden. Fast wäre ich eingeschlafen. Ich brauche etwas gegen diese Stimme.",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Hier entlang …",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Sackgasse. Und die Lampen hingen ganz unregelmäßig. Ich habe Herrn Tick verloren – zurück zum Anfang.",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da vorne ist Herr Tick – am Gittertor! Und an der Wand: wieder ein Zeichen.",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Herr Tick ist noch vor mir. Hier ist es dunkel – die Lampe an dieser Abzweigung ist kaputt.",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Herr Tick ist noch vor mir. Die nächste Abzweigung. Wieder ein Zeichen an der Wand.",
+  "file": "wagon23.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die habe ich schon benutzt.",
+  "file": "wagon24.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Lochzange. Damit bekomme ich die Plombe auf.",
+  "file": "wagon24.js",
+  "kind": "moment"
+ },
+ {
+  "text": "S-T-E-R-N. Offen.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Morgen verschwindet jemand. Achte auf die Gläser.“ Wer schreibt mir diese Briefe – in meiner eigenen Schrift?",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Die Dienstanweisung habe ich.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Zahlen nicht.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. Die leeren Fächer, der Reihe nach …",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. Der Postmeister hat sich den Code bestimmt irgendwo hier gemerkt.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eins, vier, sechs, neun. Auf!",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eine Dienstanweisung vom Postmeister.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Leitung ist leer. Den Brief habe ich.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Weichen nicht.",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Fump! Die Büchse ist da. Darin: ein Brief. „An J.“",
+  "file": "wagon3.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Glas eins an Tisch eins, Herr Tick. Glas zwei an Frau Ilse. Glas drei an Tisch drei, vorne links …",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Herr K. Das vergiftete Glas ist für Herrn K.!",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das Giftglas habe ich schon.",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Schnell – das Giftglas weg! Bruno merkt nichts.",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und darunter klemmt die Rechnung.",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Rechnung! Bruno hält sich immer noch die Ohren zu.",
+  "file": "wagon4.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Entschuldigung … Frau Ilse?",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Quiiiietsch.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Tür ist offen. Herr K. ist nach vorne gegangen – ich gehe hinterher.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln finde ich die Schublade nicht.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Nur Wolle. Die Stricknadel habe ich.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich ziehe ganz vorsichtig …",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Schublade quietscht wie verrückt. Ich müsste sie aufziehen, wenn etwas anderes noch lauter ist.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Räder kreischen – und die Schublade gleich mit. Ilse schläft weiter.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wolle, Strickzeug – und eine lange Stricknadel. Die leihe ich mir.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das Papier ist ganz dünn. Hinten sind lauter leere Seiten …",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich reiße eine leere Seite heraus. Wer weiß, wofür sie gut ist.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ganz langsam ziehe ich das Blatt zurück … und mit ihm den Schlüssel!",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Abgeschlossen. Der Schlüssel steckt innen.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ohne Brille, ohne Schuhe, ohne Mantel – aber mit Hut. Mitten in der Nacht.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Als wäre er im Schlaf aufgestanden und einfach losgegangen. Nach vorne, zum Tunnel.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und jemand in Schaffneruniform war bei ihm.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Koffer im Bettkasten ist leer. Das Foto habe ich.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Bettkasten unter dem Bett liegt ein kleiner Koffer.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Er hat den Koffer unter Bett vier versteckt.“ Das ist er!",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Abgeschlossen. Ein winziges Schlüsselloch.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der kleine Schlüssel passt! Im Koffer … nur ein Foto.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Unter dem Tischchen ist nichts mehr.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich leuchte unter das Tischchen. Staub. Ein paar Krümel.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Nur Schatten und Staub.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich weiß noch nicht, wonach ich suche.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wo der Mond nicht hinkommt … Unter das Tischchen fällt nie Mondlicht.",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da, ganz hinten an der Wand, mit Klebeband befestigt: ein winziger Schlüssel!",
+  "file": "wagon5.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Klick! Die Taschenuhr – im Dunkeln leuchtet sie. Und der Deckel springt auf!",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Offen! Seine Sachen tauchen erst ab Runde 109 auf. Dann verschwindet er erst im nächsten Tunnel – am Ende von Runde 108.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Dann ist er noch irgendwo im Zug. Und ich kann ihn noch warnen!",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Taschenuhr tickt kurz – und steht wieder. Sie steht wohl auf der falschen Zeit.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Klappe ist offen.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Der Schlüssel zur Klappe steht in der Kartei.“ Ich sollte mir die Karteikarten ansehen.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Zu. Vier Ziffern.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die Klappe ist auf!",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Gleich dahinter liegt ein Block Fundscheine. Einen nehme ich mit.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das habe ich schon angekreuzt.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das gehört bestimmt nicht Herrn K.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Alle acht! Jetzt den Fundschein abgeben – an der Glocke.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Schließfach zwölf. Abgeschlossen.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Die Taschenuhr habe ich.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Schließfach zwölf ist offen! Darin: eine goldene Taschenuhr. Sie steht.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Auf der Rückseite eingraviert: „Stell mich auf die Tunnelzeit.“",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die nehme ich mal mit. Groß genug, um sich dahinter zu verstecken.",
+  "file": "wagon7.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Nur noch Asche.",
+  "file": "wagon7.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eine Münze! Zehn Pfennig.",
+  "file": "wagon7.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Scharf! Der Film läuft …",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das ist im Tunnel. Ein alter Mann mit Hut, Mantel und Stock – Herr K.!",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und neben ihm, Hand in Hand … eine Gestalt mit Mütze, Fliegerbrille und Schal.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das … das bin ich.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Täter sieht aus wie ich.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Hinter mir geht die Tür auf. Schritte. Ich ducke mich zwischen die Sitze.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Jemand steht im Gang. Ich sehe nur seine Stiefel. Braune Stiefel mit Messingschnallen. Meine Stiefel.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Er sieht lange zur Leinwand. Dann sagt er leise: „Noch nicht, Junge. Noch nicht.“",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "… Weg. Er wusste, dass ich hier bin. Und er hat mich gehen lassen.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Wer auch immer das ist – er trägt meine Sachen. Ich finde ihn.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Eine halbe Kinokarte: „Bordkino Ringbahn – Die letzte Runde – Reihe 3 …“ Der Rest fehlt.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Nur noch hartes Popcorn.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich wühle im Popcorn … ganz unten … da ist was!",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Die andere Hälfte einer Kinokarte. „… Platz 12“.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Leer. Die Filmbilder habe ich.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Falsch. „Nur für den Platz des Vorführers“ … Reihe und Platz?",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "„Nur für den Platz des Vorführers.“ Welcher Platz?",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Reihe 3, Platz 12. Die Dose ist auf!",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ein Film – aber zerschnitten. Acht einzelne Bilder, durcheinander.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Das große Rad dreht das kleine mit. Und das kleine springt immer zwei Zähne weiter.",
+  "file": "wagon8.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Beide unten! Mein Spiegelbild links, ich rechts – oder umgekehrt.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Oben über der Tür klappt die Lampe auf. Ein Lichtstrahl fällt auf die Standspiegel.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Und die Ständer sind nicht mehr festgestellt.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Noch ein letzter Blick in den großen Spiegel …",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Da! Hinter mir! Jemand mit Mütze …",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "… niemand. Hier ist niemand.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Mein Spiegelbild ist eine Runde zu spät. Und das, was hinter mir stand, war gar nicht im Wagen.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Es gibt zwei von mir.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Festgestellt. Er lässt sich keinen Millimeter drehen.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Strahl trifft das Auge. So bleibt es.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Im Dunkeln ist auch der Lichtstrahl weg.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Strahl kommt von der Lampe und springt von Spiegel zu Spiegel. Er muss das Glasauge in der Tür treffen.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Der Strahl trifft das Glasauge! Es leuchtet – und in der Tür klickt es.",
+  "file": "wagon9.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Gleich kommt der Tunnel. Jetzt warte ich nicht.",
+  "file": "wagonCommon.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Hm?! … Wach bleiben, Joseph. Da kommt der Tunnel.",
+  "file": "wagonCommon.js",
+  "kind": "moment"
+ },
+ {
+  "text": "Ich warte kurz auf den Tunnel. Aber nicht einschlafen …",
+  "file": "wagonCommon.js",
+  "kind": "moment"
  }
 ]

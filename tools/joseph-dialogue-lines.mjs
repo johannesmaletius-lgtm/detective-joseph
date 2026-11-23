@@ -1,6 +1,6 @@
 // Sammelt Josephs Sätze, die er im Gespräch mit anderen Figuren sagt: alle story.say(...) in Funktionen,
 // in denen auch eine Figur spricht (speakAs/speak), dazu die Fragen aus den Gesprächsauswahlen (choose)
-// und die Sätze am Anfang jedes Wagens (intro).
+// und die Sätze am Anfang jedes Wagens (intro) und wichtige Momente (moment, siehe unten).
 // Ausgabe: tools/joseph-dialogue-lines.json  [{ text, file, kind }]
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -81,9 +81,34 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
     });
   });
 }
+// Wichtige Momente, die (fast) jeder Spieler hört: Zwischensequenzen (cutscene), was im Tunnel oder von selbst
+// passiert (onTunnel, update), gelöste Rätsel (Geräusch success/unlock/dread) und gefundene Gegenstände (give).
+// Dazu die gemeinsamen Sätze aus wagonCommon.js (z. B. Warten auf den Tunnel).
+const KEY_SOUNDS = new Set(['success', 'unlock', 'dread']);
+for (const name of readdirSync(DIR).filter((f) => /^wagon(\d+|Common)\.js$/.test(f))) {
+  const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  const consts = new Map();
+  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  const add = (text) => { if (/\p{L}/u.test(text) && !out.has(text)) out.set(text, { text, file: name, kind: 'moment' }); };
+  const says = (node) => walk.full(node, (c) => { if (c.type === 'CallExpression' && method(c) === 'say') lits(c.arguments[0], consts).forEach(add); });
+  if (name === 'wagonCommon.js') {
+    says(ast);
+    walk.full(ast, (n) => { if (n.type === 'AssignmentPattern' && n.left.name === 'line') lits(n.right, consts).forEach(add); });
+    continue;
+  }
+  walk.full(ast, (c) => { if (c.type === 'CallExpression' && method(c) === 'cutscene' && c.arguments[0]) says(c.arguments[0]); });
+  walk.full(ast, (p) => { if (p.type === 'Property' && ['onTunnel', 'update'].includes(p.key.name) && FN.has(p.value.type)) says(p.value); });
+  walk.full(ast, (fn) => {
+    if (!FN.has(fn.type)) return;
+    const calls = ownCalls(fn);
+    const key = calls.some((c) => method(c) === 'give' || (method(c) === 'sound' && KEY_SOUNDS.has(c.arguments[0]?.value)));
+    if (key) for (const c of calls) if (method(c) === 'say') lits(c.arguments[0], consts).forEach(add);
+  });
+}
+
 const list = [...out.values()];
 writeFileSync(new URL('joseph-dialogue-lines.json', import.meta.url), JSON.stringify(list, null, 1));
-for (const kind of ['say', 'choice', 'intro']) {
+for (const kind of ['say', 'choice', 'intro', 'moment']) {
   const l = list.filter((x) => x.kind === kind);
   console.log(kind, l.length, 'Sätze,', l.reduce((s, x) => s + x.text.length, 0), 'Zeichen');
 }
