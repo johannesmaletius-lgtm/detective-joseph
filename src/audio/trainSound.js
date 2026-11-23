@@ -9,6 +9,8 @@
 // Klick oder Tastendruck. Taste M schaltet ihn stumm. Später lassen sich hier echte
 // Sounddateien (z. B. MP3) einbauen.
 
+import { levels, saveLevels } from './levels.js';
+
 const VOLUME = 0.55;
 
 export class TrainSound {
@@ -33,6 +35,10 @@ export class TrainSound {
     this.master = context.createGain();
     this.master.gain.value = VOLUME;
     this.master.connect(context.destination);
+    // Fahrgeräusch und alle Effekte laufen über diesen Regler (Einstellungen → Effekte); die Musik geht direkt an master
+    this.effectsBus = context.createGain();
+    this.effectsBus.gain.value = levels.effects;
+    this.effectsBus.connect(this.master);
 
     this.brownNoise = createNoiseBuffer(context, 4, true);
     this.whiteNoise = createNoiseBuffer(context, 2, false);
@@ -44,11 +50,11 @@ export class TrainSound {
     const echoFilter = lowpass(context, 1200);
     const feedback = gain(context, 0.45);
     this.echo.connect(delay).connect(echoFilter).connect(feedback).connect(delay);
-    echoFilter.connect(this.master);
+    echoFilter.connect(this.effectsBus);
 
     // Fahrgeräusch (Rumpeln + Zischen) – im Tunnel lauter
     this.body = gain(context, 1);
-    this.body.connect(this.master);
+    this.body.connect(this.effectsBus);
     this.body.connect(this.echo);
 
     // Tiefes Rumpeln
@@ -114,7 +120,7 @@ export class TrainSound {
     const whoomp = context.createBufferSource();
     whoomp.buffer = this.brownNoise;
     const whoompGain = envelope(context, now, inside ? 1.1 : 0.5, 0.03, 0.7);
-    whoomp.connect(lowpass(context, 260)).connect(whoompGain).connect(this.master);
+    whoomp.connect(lowpass(context, 260)).connect(whoompGain).connect(this.effectsBus);
     whoomp.start(now, Math.random() * 3, 0.8);
   }
 
@@ -148,13 +154,21 @@ export class TrainSound {
     const context = this.context;
     const node = context.createStereoPanner ? context.createStereoPanner() : gain(context, 1);
     if (node.pan) node.pan.value = pan;
-    node.connect(this.master);
+    node.connect(this.effectsBus);
     node.connect(this.echo);
     return node;
   }
 
+  // Regler aus dem Einstellungsmenü anwenden (Musik: src/audio/music.js, Stimmen: voices.js lesen selbst nach)
+  applyLevels() {
+    if (this.effectsBus) this.effectsBus.gain.setTargetAtTime(levels.effects, this.context.currentTime, 0.05);
+    this.onLevels?.();
+  }
+
   toggleMute() {
     this.muted = !this.muted;
+    levels.sound = !this.muted;
+    saveLevels();
     if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : VOLUME, this.context.currentTime, 0.05);
     if (!this.muted) this.start();
     return this.muted;

@@ -9,6 +9,7 @@
 // Läuft über denselben Ton-Kanal wie das Fahrgeräusch: Taste M schaltet sie mit stumm.
 
 import { COLORS } from '../ui/text.js';
+import { levels, musicLevel } from './levels.js';
 
 const MUSIC_LEVEL = 0.16; // Grundlautstärke der Musik (vor dem Gesamtregler in trainSound.js)
 const AMBIENCE_LEVEL = 0.3; // Grundlautstärke der Hintergrundgeräusche
@@ -123,8 +124,8 @@ export class Music {
     }
 
     const [musicDuck, ambienceDuck] = DUCK[mood(game)];
-    playing.music.gain.setTargetAtTime(MUSIC_LEVEL * playing.level * musicDuck, now, musicDuck < 0.2 ? 0.25 : 0.6);
-    playing.ambience.gain.setTargetAtTime(AMBIENCE_LEVEL * ambienceDuck, now, 0.6);
+    playing.music.gain.setTargetAtTime(MUSIC_LEVEL * playing.level * musicDuck * musicLevel(), now, musicDuck < 0.2 ? 0.25 : 0.6);
+    playing.ambience.gain.setTargetAtTime(AMBIENCE_LEVEL * ambienceDuck * levels.effects, now, 0.6); // Hintergrundgeräusche zählen zu den Effekten
     const tunnel = this.sound.inTunnel;
     playing.filter.frequency.setTargetAtTime(tunnel ? 650 : 18000, now, 0.4);
   }
@@ -139,10 +140,10 @@ export class Music {
     filter.frequency.value = 18000;
     bus.connect(filter).connect(this.sound.master);
     const music = context.createGain();
-    music.gain.value = MUSIC_LEVEL * 0.07;
+    music.gain.value = MUSIC_LEVEL * 0.07 * musicLevel();
     music.connect(bus);
     const ambience = context.createGain();
-    ambience.gain.value = AMBIENCE_LEVEL * 0.35;
+    ambience.gain.value = AMBIENCE_LEVEL * 0.35 * levels.effects;
     ambience.connect(bus);
     const playing = { bus, filter, music, ambience, level: track.level ?? 1, sources: new Set(), loop: null, every: [] };
     this.playing = playing;

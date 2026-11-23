@@ -12,6 +12,8 @@ import { Speech } from '../ui/speech.js';
 import { Voices } from '../audio/voices.js';
 import { Music, wagonTrack, MENU } from '../audio/music.js';
 import { Hints } from '../ui/hints.js';
+import { Settings } from '../ui/settings.js';
+import { levels } from '../audio/levels.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
 import { Overlay } from '../ui/overlay.js';
@@ -61,10 +63,11 @@ export class Game {
     this.input = new Input(canvas, this.screen);
     this.camera = new Camera();
     this.player = new Player();
-    this.sound = new TrainSound({ muted: START_MUTED });
+    this.sound = new TrainSound({ muted: START_MUTED || !levels.sound });
     this.effects = new SoundEffects(this.sound);
     this.voices = new Voices(this.sound);
     this.music = new Music(this.sound); // Hintergrundmusik je Wagen (src/audio/music.js)
+    this.sound.onLevels = () => this.voices.applyLevels();
     // Joseph reagiert mit kurzen Lauten auf Geräusche (Rätsel gelöst, Fehler, Schreck …)
     this.effects.onPlay = (name) => {
       const [kind, chance] = REACTIONS[name] ?? [];
@@ -89,6 +92,7 @@ export class Game {
     this.hints = new Hints();
     this.notebook = new Notebook();
     this.overlay = new Overlay();
+    this.settings = new Settings(this); // Zahnrad oben rechts: Lösungsweg, Ton, Lautstärken
 
     // Nahansichten: Zahlenschloss und Rätsel (immer höchstens eine ist offen), siehe src/puzzles/
     this.views = {
@@ -107,7 +111,10 @@ export class Game {
     }
 
     this.input.on('click', (click) => this.handleClick(click));
-    this.input.on('release', (point) => this.view?.pointerUp(point));
+    this.input.on('release', (point) => {
+      this.settings.pointerUp();
+      this.view?.pointerUp(point);
+    });
     this.input.on('key', (key) => this.handleKey(key));
   }
 
@@ -244,7 +251,9 @@ export class Game {
       this.calendar.update(dt, this.input.mouse);
       this.overlay.update(dt);
       this.music.update(dt, this);
-      const label = this.calendar.isOpen ? this.calendar.label : '';
+      this.settings.update(dt, this.input.mouse);
+      const onSettings = this.calendar.isOpen && this.settings.contains(this.input.mouse);
+      const label = onSettings ? this.settings.labelAt(this.input.mouse) : this.calendar.isOpen ? this.calendar.label : '';
       this.cursor.set({ kind: 'interact', label, visible: this.calendar.isOpen || this.overlay.blocksInput });
       return;
     }
@@ -254,7 +263,7 @@ export class Game {
     this.story.update(dt);
 
     // Lange nichts getan: Joseph gähnt
-    this.idleTime = this.story.isBusy || this.view || this.overlay.blocksInput ? 0 : this.idleTime + dt;
+    this.idleTime = this.story.isBusy || this.view || this.overlay.blocksInput || this.settings.isOpen ? 0 : this.idleTime + dt;
     if (this.idleTime > YAWN_AFTER) {
       this.idleTime = 0;
       this.voices.react('tired');
@@ -272,6 +281,7 @@ export class Game {
     for (const view of Object.values(this.views)) view.update(dt, this.input.mouse);
     this.overlay.update(dt);
     this.inventory.update(dt, this.input.mouse);
+    this.settings.update(dt, this.input.mouse);
     this.updateCursor();
     this.debug.update(dt);
   }
@@ -285,6 +295,7 @@ export class Game {
         ctx.fillRect(0, 0, 1280, 720);
       }
       this.overlay.draw(ctx);
+      if (this.calendar.isOpen) this.settings.draw(ctx);
       this.cursor.draw(ctx, this.input.mouse);
       return;
     }
@@ -304,6 +315,7 @@ export class Game {
     this.speech.draw(ctx); // über der Nahansicht: Joseph kommentiert, was er dort sieht
     this.notebook.drawPage(ctx);
     this.overlay.draw(ctx);
+    if (this.overlay.fade < 0.5) this.settings.draw(ctx);
     this.cursor.draw(ctx, this.input.mouse);
     this.debug.drawScreen(ctx, this);
   }
@@ -316,6 +328,9 @@ export class Game {
     const itemName = selected ? this.story.itemName(selected) : '';
 
     this.overlay.hover = this.overlay.optionAt(mouse);
+    if (this.overlay.fade < 0.5 && (this.settings.isOpen || this.settings.gearContains(mouse))) {
+      return this.cursor.set({ kind: 'interact', label: this.settings.labelAt(mouse) });
+    }
     if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
     if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
@@ -340,6 +355,9 @@ export class Game {
     this.idleTime = 0;
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     this.effects.prepareSamples();
+    const settingsVisible = this.inCalendar ? this.calendar.isOpen : this.overlay.fade < 0.5;
+    if (settingsVisible && !click.right && this.settings.handleClick(click)) return;
+    if (settingsVisible && this.settings.isOpen) return;
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
@@ -400,6 +418,7 @@ export class Game {
     this.idleTime = 0;
     this.sound.start();
     this.effects.prepareSamples();
+    if (key === KEYS.close && this.settings.isOpen) return this.settings.close();
     if (this.inCalendar) {
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
@@ -420,6 +439,7 @@ export class Game {
       else this.story.openNotebook();
     }
     if (key === KEYS.hint && free && !this.story.isBusy) {
+      this.settings.close();
       this.notebook.close();
       this.story.hint();
     }

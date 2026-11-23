@@ -3,6 +3,8 @@
 // In der Web-Fassung (tools/build-web.mjs) liegen die Sätze einer Figur je Wagen in einer Datei hintereinander;
 // dann steht im Manifest { file, start, end } (Sekunden) statt nur der Datei.
 
+import { levels } from './levels.js';
+
 const VOLUME = 1;
 const REACT_PAUSE = 3000; // ms zwischen zwei Lauten
 
@@ -68,7 +70,7 @@ export class Voices {
     if (!entry || this.trainSound.muted) return Promise.resolve(null);
     if (typeof entry === 'object') return this.playPart(entry);
     const audio = new Audio(entry);
-    audio.volume = VOLUME;
+    audio.volume = VOLUME * levels.voices;
     this.audio = audio;
     const length = new Promise((resolve) => {
       audio.addEventListener('loadedmetadata', () => resolve(audio.duration), { once: true });
@@ -99,13 +101,18 @@ export class Voices {
     this.sprite(file).then((audio) => {
       if (!audio || this.audio !== token) return;
       this.audio = audio;
-      audio.volume = VOLUME;
+      audio.volume = VOLUME * levels.voices;
       audio.currentTime = start;
       audio.play().catch(() => {});
       clearTimeout(this.timer);
       this.timer = setTimeout(() => { if (this.audio === audio) this.stop(); }, (end - start) * 1000 + 60);
     });
     return Promise.resolve(end - start);
+  }
+
+  // Regler „Stimmen“ geändert: laufenden Satz gleich anpassen
+  applyLevels() {
+    if (this.audio && 'volume' in this.audio) this.audio.volume = VOLUME * levels.voices;
   }
 
   stop() {
