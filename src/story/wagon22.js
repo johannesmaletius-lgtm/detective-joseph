@@ -218,7 +218,7 @@ async function confront(story) {
       await story.cutscene(async () => {
         await story.speakAs('other', '…');
         await story.say('Er schüttelt nur den Kopf. Und geht wortlos an mir vorbei.');
-        f.otherHere = false;
+        await walkOut(story, story.character('other'), () => { f.otherHere = false; });
         f.caught = false;
         await story.fadeOut(1);
         story.motion.skipToTunnel(1);
@@ -270,9 +270,7 @@ async function reveal(story) {
     await story.speakAs('conductor', 'Halb zwölf. Wie jede Runde.');
     story.sound('key');
     await story.say('Er zieht den Lok-Schlüssel ab, steckt ihn ein – und geht an mir vorbei. Einfach so.');
-    const conductor = story.character('conductor');
-    await conductor.moveTo(1180, 600, 2.6);
-    f.capOff = false;
+    await walkOut(story, story.character('conductor'), () => { f.capOff = false; });
     story.sound('door');
     story.note('Er nahm die Mütze ab: der Schaffner, älter, mit Schnurrbart. „Ich bin du. Wer hier bleibt, vergisst – und das Vergessen nimmt einem die Jahre. Ein Teil von mir hat alles vergessen, bis zu dem Jungen, der Detektiv werden wollte. Das bist du.“ Der Tunnel ist der Ausgang: Wer durchgeht, bekommt seine Jahre zurück und steht um 23:47 am Bahnsteig. Martha wartet dort. Das „Gift“ war ein Schlaftrunk. „Und du holst sie mir jede Runde zurück.“ Ich sagte: „Du lügst.“ Er ging mit dem Lok-Schlüssel.');
     await finishWagon(story, {
@@ -307,4 +305,18 @@ function currentGoal(story) {
     'Die Beweise in der richtigen Reihenfolge: wie es vorher war, was in jener Nacht geschah, und was Mira sich wünscht.',
     'Familienfoto, dann Pressefoto, dann Miras Karte.',
   ] };
+}
+
+// Er geht an Joseph vorbei (vorne entlang) nach links hinaus, zurück in den Zug. hide() blendet ihn über
+// den Merker aus; danach steht er unsichtbar wieder an seinem Platz – für die nächste Runde.
+async function walkOut(story, figure, hide) {
+  await figure.moveTo(700, 700, 0.7);
+  const going = figure.moveTo(-90, 700, 3.4);
+  await story.wait(2.9);
+  await figure.fade(0, 0.5);
+  await going;
+  hide();
+  figure.moveTo(figure.data.x, figure.data.y, 0);
+  figure.pose = figure.data.pose ?? 'front';
+  figure.alpha = 1;
 }
