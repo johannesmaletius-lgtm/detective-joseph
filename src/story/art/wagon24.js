@@ -475,26 +475,7 @@ export const CANDLE_SPOT = { id: 'candle', x: 528, y: 10, w: 46, h: 80, label: '
 
 export function drawFinal(ctx, { lit, time }) {
   drawPicture(ctx, 'assets/photos/schluss.webp', 0, FINAL_Y, 1280, 853);
-  // Zifferblatt in den ovalen Rahmen
-  const cx = 708, cy = 125 + FINAL_Y;
-  ctx.fillStyle = '#f2e6c8';
-  ctx.beginPath();
-  ctx.ellipse(cx, cy, 52, 62, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = INK;
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    ctx.lineWidth = i % 3 === 0 ? 3 : 1.5;
-    line(ctx, cx + Math.cos(a) * 40, cy + Math.sin(a) * 48, cx + Math.cos(a) * 48, cy + Math.sin(a) * 57);
-  }
-  const ma = -Math.PI / 2 + 47 / 60 * Math.PI * 2;
-  const ha = -Math.PI / 2 + (11 + 47 / 60) / 12 * Math.PI * 2;
-  ctx.lineCap = 'round';
-  ctx.lineWidth = 5;
-  line(ctx, cx, cy, cx + Math.cos(ha) * 26, cy + Math.sin(ha) * 30);
-  ctx.lineWidth = 3;
-  line(ctx, cx, cy, cx + Math.cos(ma) * 40, cy + Math.sin(ma) * 48);
-  ctx.lineCap = 'butt';
+  drawWallClock(ctx, 706, 128 + FINAL_Y, 56, 61, time);
   // Kerze
   if (lit) {
     const flicker = 1 + Math.sin(time * 18) * 0.12;
@@ -506,3 +487,134 @@ export function drawFinal(ctx, { lit, time }) {
   }
 }
 
+
+// Alte Wanduhr im ovalen Rahmen: vergilbtes Zifferblatt, römische Ziffern, Minutenring,
+// gebläute Zeiger mit Herzspitze, Messingkappe, tickender Sekundenzeiger, Glasreflex.
+const ROMAN = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+
+function drawWallClock(ctx, cx, cy, rx, ry, time = 0) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(1, ry / rx);
+  const R = rx;
+  // Zifferblatt: warmes Elfenbein, zur Mitte heller (Licht von Baum und Lampe)
+  const face = ctx.createRadialGradient(-R * 0.25, -R * 0.2, R * 0.1, 0, 0, R);
+  face.addColorStop(0, '#f3e2bd');
+  face.addColorStop(0.7, '#e3cc9c');
+  face.addColorStop(1, '#bf9c66');
+  ctx.fillStyle = face;
+  ctx.beginPath();
+  ctx.arc(0, 0, R, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.clip();
+  // Schatten des Rahmens am oberen Rand
+  const shade = ctx.createRadialGradient(0, R * 0.25, R * 0.75, 0, 0, R * 1.15);
+  shade.addColorStop(0, 'rgba(60, 30, 10, 0)');
+  shade.addColorStop(1, 'rgba(60, 30, 10, 0.45)');
+  ctx.fillStyle = shade;
+  ctx.fillRect(-R, -R, R * 2, R * 2);
+  ctx.restore();
+
+  const brown = '#2b1c12';
+  // Ringe
+  ctx.strokeStyle = brown;
+  ctx.lineWidth = 0.9;
+  for (const r of [R * 0.93, R * 0.84]) {
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Minutenstriche zwischen den äußeren Ringen
+  for (let i = 0; i < 60; i++) {
+    const a = (i / 60) * Math.PI * 2;
+    const big = i % 5 === 0;
+    ctx.lineWidth = big ? 1.8 : 0.8;
+    const r0 = big ? R * 0.82 : R * 0.86;
+    line(ctx, Math.sin(a) * r0, -Math.cos(a) * r0, Math.sin(a) * R * 0.93, -Math.cos(a) * R * 0.93);
+  }
+  // Römische Ziffern, aufrecht
+  ctx.fillStyle = brown;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    ctx.save();
+    ctx.translate(Math.sin(a) * R * 0.68, -Math.cos(a) * R * 0.68);
+    ctx.font = `bold ${i % 3 === 0 ? 12 : 10.5}px ${SERIF}`;
+    ctx.scale(i === 4 || i === 8 ? 0.82 : 0.9, 1);
+    ctx.fillText(ROMAN[i], 0, 0);
+    ctx.restore();
+  }
+  // kleine Signatur
+  ctx.font = `italic 6px ${SERIF}`;
+  ctx.fillStyle = 'rgba(43, 28, 18, 0.75)';
+  ctx.fillText('Ringbahn', 0, R * 0.3);
+
+  // Zeiger: 23:47, Sekunden ticken
+  const hand = (angle, len, tail, width, tip) => {
+    ctx.save();
+    ctx.rotate(angle);
+    ctx.fillStyle = '#1d2433';
+    ctx.strokeStyle = '#1d2433';
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    line(ctx, 0, tail, 0, -len * 0.62);
+    // Herzspitze (Breguet)
+    ctx.beginPath();
+    ctx.arc(0, -len * 0.7, tip, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e8d3a6';
+    ctx.beginPath();
+    ctx.arc(0, -len * 0.7, tip * 0.45, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1d2433';
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.9, -len * 0.76);
+    ctx.lineTo(0, -len);
+    ctx.lineTo(width * 0.9, -len * 0.76);
+    ctx.fill();
+    ctx.restore();
+  };
+  const sec = Math.floor(time) % 60;
+  const minute = 47 + sec / 60;
+  ctx.save();
+  ctx.shadowColor = 'rgba(40, 20, 5, 0.35)';
+  ctx.shadowOffsetX = 1.5;
+  ctx.shadowOffsetY = 2;
+  ctx.shadowBlur = 2;
+  hand(((11 + minute / 60) / 12) * Math.PI * 2, R * 0.55, R * 0.1, 3, 4.2);
+  hand((minute / 60) * Math.PI * 2, R * 0.86, R * 0.14, 2, 3.4);
+  // Sekundenzeiger, dünn und rötlich-messing
+  ctx.save();
+  ctx.rotate((sec / 60) * Math.PI * 2);
+  ctx.strokeStyle = '#8a2a1a';
+  ctx.lineWidth = 0.9;
+  line(ctx, 0, R * 0.2, 0, -R * 0.88);
+  ctx.restore();
+  ctx.restore();
+  // Messingkappe
+  const cap = ctx.createRadialGradient(-1, -1, 0.5, 0, 0, 4);
+  cap.addColorStop(0, '#fff0b8');
+  cap.addColorStop(1, '#9a6a24');
+  ctx.fillStyle = cap;
+  ctx.beginPath();
+  ctx.arc(0, 0, 3.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Glas: weicher Lichtreflex oben links
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, R, 0, Math.PI * 2);
+  ctx.clip();
+  const gloss = ctx.createLinearGradient(-R, -R, R * 0.2, R * 0.2);
+  gloss.addColorStop(0, 'rgba(255, 250, 235, 0.38)');
+  gloss.addColorStop(0.45, 'rgba(255, 250, 235, 0.06)');
+  gloss.addColorStop(0.5, 'rgba(255, 250, 235, 0)');
+  ctx.fillStyle = gloss;
+  ctx.beginPath();
+  ctx.ellipse(-R * 0.35, -R * 0.45, R * 0.75, R * 0.38, -0.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.restore();
+}
