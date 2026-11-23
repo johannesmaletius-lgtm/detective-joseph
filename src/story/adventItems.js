@@ -164,6 +164,36 @@ export const ADVENT_ITEMS = {
     },
     look: 'Das Notizbuch des anderen Joseph. Eine Liste der Fahrgäste.',
   },
+
+  // ---------------------------------------------------------------- Tür 18: Schaffnerabteil
+  telegram: {
+    name: 'Telegramm',
+    icon: (ctx) => paper(ctx, 18, 26, 92, 76, -0.05, (c) => {
+      c.fillStyle = '#c9a24a';
+      c.fillRect(0, 0, 92, 14);
+      lines(c, 8, 26, 74, 5, 10);
+    }),
+    look: 'Das Telegramm an den Schaffner. „Warte am Bahnsteig auf uns.“',
+  },
+  keyRing: {
+    name: 'Schlüsselbund',
+    icon: (ctx) => {
+      ctx.strokeStyle = '#8a8f99';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(52, 46, 22, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(-10, 10);
+      key(ctx, '#d6a645', '#7a5418', 0.8);
+      ctx.restore();
+      ctx.save();
+      ctx.translate(14, 18);
+      key(ctx, '#c9b06a', '#6e5420', 0.7);
+      ctx.restore();
+    },
+    look: 'Sieben Schlüssel an einem Ring. Jeder Griff hat eine andere Form.',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];

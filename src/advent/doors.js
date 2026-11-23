@@ -43,7 +43,7 @@ export const DOORS = [
   { door: 15, wagon: 'Spielzimmer', load: wagon('playroom', 'playroom', 'wagon15', 'wagon15') },
   { door: 16, wagon: 'Funkraum', load: wagon('radioRoom', 'radioRoom', 'wagon16', 'wagon16') },
   { door: 17, wagon: 'Gewächshaus', load: wagon('greenhouse', 'greenhouse', 'wagon17', 'wagon17') },
-  { door: 18, wagon: 'Schaffnerabteil' },
+  { door: 18, wagon: 'Schaffnerabteil', load: wagon('conductorCar', 'conductorCar', 'wagon18', 'wagon18') },
   { door: 19, wagon: 'Fotolabor' },
   { door: 20, wagon: 'Packwagen' },
   { door: 21, wagon: 'Kesselwagen' },
