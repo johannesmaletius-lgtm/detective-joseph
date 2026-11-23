@@ -118,6 +118,34 @@ export const ADVENT_ITEMS = {
     },
     look: 'Das Tonband aus Runde 108.',
   },
+
+  // ---------------------------------------------------------------- Tür 11: Uhrenwagen
+  gear: {
+    name: 'Zahnrad',
+    keep: true,
+    icon: (ctx) => {
+      ctx.save();
+      ctx.translate(64, 64);
+      ctx.fillStyle = '#c9a24a';
+      ctx.strokeStyle = '#6e5420';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const r = i % 2 ? 36 : 46;
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#6e5420';
+      ctx.beginPath();
+      ctx.arc(0, 0, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    },
+    look: 'Das Zahnrad von Herrn Tick. „Das wirst du vorne brauchen.“',
+  },
 };
 
 export const ADVENT_COMBINATIONS = [];

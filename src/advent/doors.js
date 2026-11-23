@@ -91,7 +91,14 @@ export const DOORS = [
       script: (await import('../story/wagon10.js')).wagon10,
     }),
   },
-  { door: 11, wagon: 'Uhrenwagen' },
+  {
+    door: 11,
+    wagon: 'Uhrenwagen',
+    load: async () => ({
+      scene: (await import('../scene/clockCar.js')).clockCar,
+      script: (await import('../story/wagon11.js')).wagon11,
+    }),
+  },
   { door: 12, wagon: 'Musiksalon' },
   { door: 13, wagon: 'Kapelle' },
   { door: 14, wagon: 'Zeitungswagen' },
