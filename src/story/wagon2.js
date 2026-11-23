@@ -1,629 +1,349 @@
-import { SEATS, glassBase } from '../scene/diningCar.js';
-import { drawBon, drawMenuBoard } from '../ui/cards2.js';
-import { VOICES, packFor, WINDOW_ITEMS, finishWagon, hintFor, inTunnel, lookOutside, tunnels, waitForTunnel } from './common.js';
+import { PILE_X, TAG_ORDER, TAG_SLOTS, drawPage1, drawPages23, drawScale, drawSign, drawStack, drawTag, drawTagBoard, pileSpots, tagTokens } from './art/wagon2.js';
+import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
-//  WAGEN 2 – Der Speisewagen
+//  TÜR 2 – Der Gepäckwagen (ohne Person)
 // ============================================================================================
 //
-// Tisch 4 ist gedeckt: vier Gläser, vier Tischkarten – Frau Adler, Herr Brandt (der Schaffner),
-// Dr. Corvin und „J.“. Die Gäste sieht man nie. Sie kommen im Tunnel: Im Dunkeln wird angestoßen,
-// und Herrn Brandts Rotwein ist vergiftet (Probe 41 – im Dunkeln leuchtet das Glas grün).
-// Wenn das Licht wieder angeht, ist Herr Brandt verschwunden. Danach serviert der Koch alles neu.
+// DIE RÄTSEL
+//   1. Zwölf Kofferanhänger nach Abfahrtszeit ordnen → Anfangsbuchstaben: WEICHE SIEBEN.
+//   2. Grüner Koffer mit Buchstabenschloss (6 Rädchen) → WEICHE. Darin Seite 1 der Akte:
+//      Seiten 2 und 3 liegen im untersten Koffer des Stapels; Code der Tür = sein Gewicht.
+//   3. Kofferstapel umschichten (Türme von Hanoi, 5 Koffer, zwei Kreidefelder, nie groß auf klein).
+//      Nach jedem Tunnel steht der Stapel wieder wie vorher.
+//   4. Den untersten Koffer auf die Gepäckwaage: 17,3 kg → Türcode 173. Im Koffer: Seiten 2 und 3.
 //
-// DAS ZIEL: Die Tür zum Schlafwagen hat ein Vierkantschloss. Den Schlüssel hat Herr Brandt.
-//
-// DIE RÄTSEL:
-//   1. Mit dem Koch reden (Durchreiche hinten links): Er beobachtet die Gläser – „Finger weg!“
-//   2. Einen Tunnel abwarten: Stimmen, Anstoßen, ein Glas leuchtet grün, Herr Brandt verschwindet
-//   3. Den Koch ablenken: Er liebt den Ringbahn-Walzer. Das Grammophon braucht eine Kurbel
-//      (in Herrn Brandts Mantel an der Garderobe) und die richtige Platte (Schublade darunter;
-//      auf dem Teller liegt ein Marsch – den hasst der Koch)
-//   4. Während der Walzer läuft, tanzt der Koch hinter dem Rollladen: Herrn Brandts Glas nehmen
-//      und bis zum Tunnel bei sich behalten
-//   5. Im Tunnel: Herr Brandt sucht sein Glas – und lebt. Zum Dank lässt er seinen Vierkant liegen
-//   6. Vierkantschlüssel → Tür → Schlafwagen
-//   Nebenbei: Der Bon aus der Küche (Koch fragen, nachdem man das Gift gesehen hat) ist von „J.“ unterschrieben.
+// ERGEBNIS: Die Akte ist komplett – „In jeder Runde verschwindet im Tunnel ein Fahrgast.“
 
-const POISON_SEAT = 2;
-const WALTZ_SECONDS = 42;   // so lange läuft der Walzer (und so lange tanzt der Koch)
-const MARCH_SECONDS = 6;
-const COOK = { x: 465, y: 205 }; // Stimme aus der Durchreiche
-const BAR = { waltz: 1.26, march: 1.2 }; // Länge eines Takts in Sekunden
+const DOOR_CODE = '173';
+const CASE_WEIGHT = 17.3;
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export const wagon2 = {
-  flags: {
-    shutter: 0,          // Rollladen der Durchreiche: 0 = offen (der Koch schaut heraus) … 1 = zu
-    shutterTarget: 0,
-    record: 'march',     // was auf dem Grammophon liegt
-    poisonSeat: POISON_SEAT,
-  },
-
-  // Wer direkt hier anfängt, hat die Sachen aus Wagen 1 dabei
-  prepare(story) {
-    story.note('Wagen 1 liegt hinter mir: Tunnel 5, Laternen 7 und 8, Turm 3. Die Tür ging auf.');
-  },
-
-  setup(story) {
-    story.flags.startedAt = performance.now();
-    story.flags.packed = packFor(story, ['flashlight']);
-  },
+  flags: {},
+  startItems: ['flashlight'],
+  recap: [
+    'Ich bin in einem Nachtzug aufgewacht, der im Kreis fährt. Nach jedem Tunnel springt alles zurück – nur was ich bei mir trage, bleibt.',
+    'Im ersten Abteil lag meine eigene Akte. Die Hälfte der Seiten fehlt.',
+  ],
 
   async intro(story) {
-    await arrive(story);
+    await wagonIntro(story, {
+      number: 2,
+      title: 'Der Gepäckwagen',
+      lines: [
+        'Der Gepäckwagen. Koffer, Kisten, Anhänger … und niemand da.',
+        'Meine Akte ist halb leer. Vielleicht finde ich hier, was fehlt.',
+      ],
+    });
   },
 
-  async skipIntro(story) {
-    story.game.overlay.fade = 0;
-    await arrive(story, { quick: true });
-  },
+  skipIntro: (story) => skipIntro(story),
 
-  update(story, dt) {
-    updateMusic(story, dt);
-    const f = story.flags;
-    f.shutter += Math.sign(f.shutterTarget - f.shutter) * Math.min(Math.abs(f.shutterTarget - f.shutter), dt * 2.5);
-    f.poisonVisible = story.isDark && f.takenSeat !== POISON_SEAT && !f.tipped;
-    // Die Gäste erscheinen als Schemen, solange im Tunnel angestoßen wird
-    const ghostTarget = f.toasting && story.isDark ? 1 : 0;
-    f.ghosts = (f.ghosts ?? 0) + (ghostTarget - (f.ghosts ?? 0)) * Math.min(1, dt * 2);
-  },
-
-  // ---------------------------------------------------------------- Anklickbare Stellen
   hotspots: {
+    tags: {
+      look: 'Ein Brett mit zwölf Kofferanhängern. Städte und Abfahrtszeiten – alles durcheinander.',
+      use: (story) => sortTags(story),
+    },
+    sign: {
+      look: async (story) => {
+        await story.card({ draw: drawSign });
+        await story.say('„Anhänger nach Abfahrt aufhängen – frühe zuerst.“');
+      },
+    },
+    greenCase: {
+      look: (story) => story.say(story.flags.greenOpen
+        ? 'Der grüne Koffer. Offen und leer.'
+        : 'Ein grüner Koffer mit einem Buchstabenschloss. Sechs Rädchen.'),
+      use: (story) => openGreenCase(story),
+    },
+    stack: {
+      look: (story) => story.say(story.flags.caseFree
+        ? 'Der Stapel ist umgeschichtet.'
+        : 'Fünf Koffer übereinander. Der größte ganz unten, die kleinsten oben.'),
+      use: (story) => restack(story),
+      items: { heavyCase: 'Den schleppe ich nicht wieder zurück.' },
+    },
+    chalk: {
+      look: 'Zwei Rechtecke aus Kreide auf dem Boden. Abstellplätze für Gepäck.',
+      use: (story) => restack(story),
+    },
+    scale: {
+      look: 'Eine große Gepäckwaage. Die Nadel steht auf null.',
+      use: (story) => openScale(story, false),
+      items: { heavyCase: (story) => openScale(story, true) },
+    },
+    panel: { look: 'Ein Schaltkasten. Nur Sicherungen, nichts Spannendes.' },
+    shelves: {
+      look: 'Regale voller Koffer und Kisten. Hunderte. Ohne Hinweis suche ich hier ewig.',
+      use: 'Hier wühle ich nicht blind herum. Ich brauche einen Hinweis.',
+    },
+    boxes: { look: 'Kisten bis unter die Decke.' },
     door: {
-      look: async (story) => {
-        await story.say('Die Tür zum Schlafwagen. Keine Klinke – nur ein Vierkantloch. So eins, für das Schaffner einen Schlüssel haben.');
-        if (!story.flags.doorLooked) {
-          story.flags.doorLooked = true;
-          story.note('Speisewagen: Die Tür zum Schlafwagen hat ein Vierkantschloss. Den Schlüssel hat bestimmt ein Schaffner.');
-        }
-      },
-      use: (story) => (story.has('vierkant') ? openDoor(story) : story.say('Abgeschlossen. Ohne Vierkantschlüssel komme ich hier nicht durch.')),
-      items: {
-        vierkant: (story) => openDoor(story),
-        knife: 'Das Vierkantloch ist viel zu groß für die Messerspitze.',
-        crank: 'Die Kurbel ist rund. Das Loch ist eckig.',
-        other: 'Das passt nicht ins Vierkantloch.',
-      },
-    },
-
-    hatch: {
-      look: (story) => (story.flags.dancing
-        ? story.say('Der Rollladen ist unten. Dahinter trampelt jemand im Walzertakt.')
-        : story.say('Die Durchreiche zur Küche. Unter der weißen Mütze funkeln zwei Augen. Sie lassen Tisch 4 nicht los.')),
-      use: (story) => talkToCook(story),
-      items: {
-        glass: 'Zurückgeben? Dann trinkt es nachher doch wieder jemand.',
-        poisonGlass: 'Zurückgeben? Dann trinkt es nachher doch wieder jemand.',
-        bon: 'Den Bon behalte ich. Er ist ein Beweis.',
-        other: 'Das will der Koch bestimmt nicht haben.',
-      },
-    },
-
-    bell: {
-      look: 'Eine Tischglocke aus Messing. „Bitte läuten“.',
-      use: async (story) => {
-        story.sound('bell');
-        await story.wait(0.6);
-        if (story.flags.dancing) return story.say('Keine Reaktion. Hinter dem Rollladen wird nur weitergetanzt.');
-        await story.speak('Ja, ja! Tisch vier ist doch längst serviert!', { at: COOK, color: VOICES.cook });
-        await talkToCook(story);
-      },
-    },
-
-    menu: {
-      look: async (story) => {
-        story.sound('paper');
-        await story.card({ draw: drawMenuBoard });
-        if (story.flags.menuRead) return;
-        story.flags.menuRead = true;
-        await story.say('Suppe, Braten, Pudding. Jede Runde dasselbe.');
-        story.note('Tafel im Speisewagen: Getränke an Tisch 4 – Weißwein, Rotwein, Wasser, Saft.');
-      },
-    },
-
-    coat: {
-      look: async (story) => {
-        await story.say('Ein Schaffnermantel, dunkelblau, mit Messingknöpfen. Am Kragen ein Namensschild: BRANDT.');
-        if (!story.flags.coatLooked) {
-          story.flags.coatLooked = true;
-          story.note('An der Garderobe hängt der Mantel des Schaffners. Name: Brandt.');
-        }
-      },
-      use: async (story) => {
-        if (story.flags.coatSearched) return story.say('Die Taschen sind leer. Nur die leere Schlüsselschlaufe baumelt da.');
-        story.flags.coatSearched = true;
-        story.sound('paper');
-        await story.say('Mal sehen, was ein Schaffner so in den Taschen hat …');
-        story.give('crank');
-        await story.say('Eine Kurbel! Die gehört doch zum Grammophon da vorne.');
-        await story.say('Und eine leere Schlüsselschlaufe. Hier hing sonst bestimmt sein Vierkantschlüssel. Den hat er wohl bei sich.');
-        story.note('In Herrn Brandts Manteltasche: die Kurbel vom Grammophon. Seinen Vierkantschlüssel trägt er wohl bei sich.');
-      },
-    },
-
-    plant: {
-      look: 'Eine Palme. Die Erde riecht nach Rotwein. Hier hat schon jemand sein Glas ausgekippt – und es kam trotzdem wieder.',
-      items: {
-        poisonGlass: 'Auskippen? Dann gießt der Koch ihm einfach nach. Ich behalte das Glas lieber bei mir.',
-        glass: 'Auskippen bringt nichts. Was ich hierlasse, kommt nach dem Tunnel wieder.',
-      },
-    },
-
-    gramophone: {
-      look: (story) => {
-        const f = story.flags;
-        if (!f.crankOn) return story.say('Ein Grammophon mit großem Messingtrichter. Die Kurbel fehlt – ohne sie dreht sich der Teller nicht.');
-        if (f.record === 'waltz') return story.say('Auf dem Teller liegt der Ringbahn-Walzer. Rotes Etikett.');
-        return story.say('Auf dem Teller liegt eine Platte mit blauem Etikett: „Marsch der Eisenbahner“.');
-      },
-      use: (story) => playGramophone(story),
-      items: {
-        crank: async (story) => {
-          story.remove('crank');
-          story.flags.crankOn = true;
-          story.sound('screw');
-          await story.say('Die Kurbel passt genau. Ein paar Umdrehungen – jetzt ist die Feder aufgezogen.');
-        },
-        record: async (story) => {
-          story.remove('record');
-          story.flags.record = 'waltz';
-          stopMusic(story);
-          story.sound('paper');
-          await story.say('Den Marsch zurück in die Schublade, den Walzer auf den Teller.');
-        },
-        other: 'Das gehört nicht aufs Grammophon.',
-      },
-    },
-
-    drawer: {
-      look: 'Eine Schublade unter dem Grammophon.',
-      use: async (story) => {
-        if (story.flags.recordTaken) return story.say('Nur noch Marschmusik. Platte um Platte.');
-        story.sound('creak');
-        await story.say('Lauter Schallplatten. Marsch, Marsch, Marsch …');
-        story.flags.recordTaken = true;
-        story.give('record');
-        await story.say('… und ganz unten: der „Ringbahn-Walzer“. Die nehme ich mit.');
-      },
-    },
-
-    keyOnPlate: {
-      look: 'Ein Vierkantschlüssel. Auf Herrn Brandts Teller.',
-      use: async (story) => {
-        story.flags.keyOnPlate = false;
-        story.give('vierkant');
-        await story.say('Herrn Brandts Vierkantschlüssel. Danke, Herr Brandt – wo immer Sie jetzt sind.');
-        story.note('Ich habe den Vierkantschlüssel des Schaffners. Er öffnet die Tür zum Schlafwagen.');
-      },
-    },
-
-    ...Object.fromEntries([1, 2, 3, 4].map((seat) => [`glass${seat}`, {
-      look: (story) => lookGlass(story, seat),
-      use: (story) => takeGlass(story, seat),
-      items: {
-        glass: (story) => putBack(story),
-        poisonGlass: (story) => putBack(story),
-        other: 'Das gehört nicht auf den Tisch.',
-      },
-    }])),
-
-    table: {
-      look: async (story) => {
-        await story.say('Tisch 4. Vier Gedecke, vier Gläser, vier Tischkarten.');
-        await story.say('Frau Adler, Herr Brandt, Dr. Corvin … und „J.“. Der Platz vorne rechts ist für mich gedeckt.');
-        if (!story.flags.tableLooked) {
-          story.flags.tableLooked = true;
-          story.note('Tisch 4 ist gedeckt: Platz 1 Frau Adler, Platz 2 Herr Brandt, Platz 3 Dr. Corvin, Platz 4 „J.“ – das bin wohl ich.');
-        }
-      },
-      use: (story) => waitForTunnel(story, { sit: 'Ich setze mich an meinen Platz und warte auf den Tunnel. Nicht einschlafen …' }),
-      items: { glass: (story) => putBack(story), poisonGlass: (story) => putBack(story) },
-    },
-    bench: {
-      look: 'Die Bank hinter Tisch 4. Hier könnte ich auf den nächsten Tunnel warten.',
-      use: (story) => waitForTunnel(story, { sit: 'Ich setze mich an Tisch 4 und warte auf den Tunnel. Nicht einschlafen …' }),
-    },
-    stool: { look: 'Zwei Hocker. Für Dr. Corvin und für mich, nehme ich an.' },
-    leftTable: {
-      look: 'Ein zweiter Tisch, nur halb gedeckt. Hier sitzt wohl nie jemand.',
-      use: 'Leere Teller. Kein Krümel.',
+      look: 'Die Tür nach vorne. Ein Zahlenschloss mit drei Rädchen.',
+      use: (story) => tryDoor(story),
     },
     window: {
-      look: (story) => lookOutside(story),
-      use: 'Die Fenster gehen nicht auf.',
-      items: WINDOW_ITEMS,
+      look: (story) => story.say(story.isDark ? 'Tunnelwand. Schwarz.' : 'Schnee, Wald – und der Turm mit dem roten Licht.'),
+      use: (story) => waitForTunnel(story, 'Ich setze mich auf eine Kiste und warte auf den Tunnel …'),
     },
-  },
-
-  itemName(story, id) {
-    if (id === 'glass') return `Glas von Platz ${story.flags.carriedSeat ?? '?'}`;
-    return null;
   },
 
   items: {
-    bon: { look: (story) => showBon(story) },
+    filePage: { look: (story) => readPage1(story) },
+    filePages: { look: (story) => readPages23(story) },
+    heavyCase: { look: (story) => openHeavyCase(story) },
   },
 
   hint: (story) => hintFor(story, currentGoal(story)),
 
-  // ---------------------------------------------------------------- Tunnel
   async onTunnel(story, inside) {
     if (inside) {
       story.flags.tunnels = tunnels(story) + 1;
       story.game.closeViewsInDark();
-      return toast(story);
+      return;
     }
-    return afterTunnel(story);
+    // Der Stapel steht wieder wie vorher – es sei denn, Joseph trägt den untersten Koffer bei sich
+    const f = story.flags;
+    if (f.piles && !f.caseFree) {
+      f.piles = null;
+      f.moves = 0;
+      await story.idle();
+      await story.say('Der Kofferstapel … steht wieder genau wie vorher. Alles zurückgesprungen.');
+      if (!f.stackResetSaid) {
+        f.stackResetSaid = true;
+        story.note('Nach dem Tunnel steht der Kofferstapel wieder wie vorher. Ich muss ihn in einer Runde schaffen.');
+      }
+    }
   },
 };
 
 // ============================================================================================
-//  Ankommen
+//  1. Kofferanhänger
 // ============================================================================================
 
-async function arrive(story, { quick = false } = {}) {
-  story.player.facing = 'back';
-  if (!quick) {
-    await story.cutscene(async () => {
-      await story.wait(0.4);
-      story.sound('door');
-      story.fadeIn(1.6);
-      await story.wait(1.2);
-      await story.say('Ein Speisewagen. Gedeckt für ein Festessen – und niemand da.');
-      await story.speak('Ah! Herr J.! Ihr Platz ist bereit. Tisch vier, wie immer!', { at: COOK, color: VOICES.cook });
-      await story.say('Wie … immer?');
-    });
+async function sortTags(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln kann ich die Zeiten nicht lesen.');
+  if (story.flags.tagsSorted) {
+    await story.say('Nach Abfahrt geordnet: W, E, I, C, H, E – S, I, E, B, E, N.');
+    return story.say('„Weiche sieben“. Was auch immer das heißen soll.');
   }
-  story.note('Speisewagen: Tisch 4 ist gedeckt, aber niemand sitzt dort. Aus der Küche ruft ein Koch: „Ihr Platz ist bereit, Herr J. – wie immer.“');
+  const solved = await story.view('arrange', {
+    id: 'tags',
+    title: 'Kofferanhänger',
+    slots: TAG_SLOTS,
+    tokens: tagTokens(),
+    drawBackground: drawTagBoard,
+    drawToken: drawTag,
+    check: (placement) => placement.every((id, i) => id === TAG_ORDER[i]),
+    help: 'Anhänger mit gedrückter Maustaste auf die Haken ziehen  ·  Rechtsklick: zurück',
+  });
+  if (!solved) return;
+  story.flags.tagsSorted = true;
+  await story.say('Die frühen zuerst … Wien, Essen, Innsbruck, Chur, Hamburg, Erfurt, Stuttgart …');
+  await story.say('Die Anfangsbuchstaben! W-E-I-C-H-E. S-I-E-B-E-N.');
+  await story.say('„Weiche sieben“? Eine Weiche ist da, wo sich Gleise teilen. Aber dieser Zug fährt doch nur im Kreis …');
+  story.note('Die Kofferanhänger nach Abfahrt geordnet: WEICHE SIEBEN. (Sechs und sechs Buchstaben.)');
 }
 
 // ============================================================================================
-//  Der Koch
+//  2. Grüner Koffer
 // ============================================================================================
 
-async function talkToCook(story) {
+async function openGreenCase(story) {
   const f = story.flags;
-  if (f.dancing) return story.say('Der Rollladen ist unten. Dahinter wird im Walzertakt getrampelt. Er hört mich nicht.');
-  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Durchreiche nicht mal.');
-  f.talkedCook = true;
-  const used = (f.cookTopics ??= {});
-  const cook = (text) => story.speak(text, { at: COOK, color: VOICES.cook });
-  for (;;) {
-    const topics = [
-      { id: 'who', text: 'Wer sind Sie?' },
-      { id: 'guests', text: 'Für wen ist Tisch 4 gedeckt?' },
-      { id: 'where', text: 'Wo sind denn die Gäste?' },
-      f.doorLooked && { id: 'key', text: 'Wer hat den Schlüssel für die Tür zum Schlafwagen?' },
-      { id: 'glasses', text: 'Darf ich mir ein Glas nehmen?' },
-      { id: 'music', text: 'Hören Sie gern Musik?' },
-      f.sawPoisoning && { id: 'poison', text: 'Herrn Brandts Glas war vergiftet! Wer hat das bestellt?' },
-      { id: 'bye', text: 'Bis später.' },
-    ].filter(Boolean);
-    const index = await story.choose(topics.map((topic) => ({ text: topic.text, used: used[topic.id] })), 'Der Koch');
-    const topic = topics[index];
-    if (!topic || topic.id === 'bye') {
-      if (topic) await cook('Bis gleich, Herr J. Wie immer!');
-      return;
-    }
-    used[topic.id] = true;
-    await story.say(topic.text);
-    if (topic.id === 'who') {
-      await cook('Der Koch! Ich koche. Jede Runde dasselbe: Suppe, Braten, Pudding. Für Tisch vier.');
-      await story.say('Und wer isst das alles?');
-      await cook('Na, die Herrschaften! Wenn sie kommen.');
-    } else if (topic.id === 'guests') {
-      await cook('Für Frau Adler, für Herrn Brandt – unseren Schaffner – und für Doktor Corvin.');
-      await cook('Und Platz vier ist für Sie, Herr J. Wie immer.');
-      story.note('Laut Koch sitzen an Tisch 4: Frau Adler, Herr Brandt (der Schaffner), Dr. Corvin – und ich.');
-    } else if (topic.id === 'where') {
-      await cook('Die kommen im Tunnel. Wenn es dunkel ist, wird angestoßen.');
-      await cook('Und wenn das Licht wieder angeht … fehlt einer. Jede Runde. Aber das geht mich nichts an.');
-      story.note('Koch: „Die Gäste kommen im Tunnel. Im Dunkeln wird angestoßen. Wenn das Licht wieder angeht, fehlt einer.“');
-    } else if (topic.id === 'key') {
-      await cook('Den Vierkant? Den hat Herr Brandt. Der rückt ihn nicht raus. Nicht mal für Sie.');
-      story.note('Den Vierkantschlüssel für die Tür hat Herr Brandt, der Schaffner (Platz 2).');
-    } else if (topic.id === 'glasses') {
-      await cook('Finger weg! Die Gläser sind für die Herrschaften. Ich hab ein Auge drauf. Immer.');
-      await story.say('Das glaube ich ihm sofort.');
-    } else if (topic.id === 'music') {
-      await cook('Musik! Den Ringbahn-Walzer! Wenn der läuft, kann ich nicht stillstehen. Dann muss ich tanzen!');
-      await cook('Aber das Grammophon hat keine Kurbel mehr. Herr Brandt hat sie eingesteckt. Er hasst Walzer.');
-      if (!f.knowsWaltz) {
-        f.knowsWaltz = true;
-        story.note('Der Koch liebt den „Ringbahn-Walzer“: Wenn der läuft, muss er tanzen. Die Kurbel vom Grammophon hat Herr Brandt eingesteckt.');
-      }
-    } else if (topic.id === 'poison') {
-      await cook('Vergiftet? Unsinn! Ich serviere nur, was bestellt ist. Hier – lesen Sie selbst!');
-      if (!story.has('bon')) {
-        story.give('bon');
-        await showBon(story);
-      }
-    }
+  if (f.greenOpen) {
+    if (!story.has('filePage') && !f.pageRead) return story.say('Leer.');
+    return story.say('Leer. Die Aktenseite habe ich.');
   }
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Buchstaben nicht.');
+  let tries = 0;
+  const opened = await story.codeLock({
+    id: 'greenCase',
+    digits: 6,
+    style: 'steel',
+    alphabet: LETTERS,
+    check: (code) => {
+      tries += 1;
+      return code === 'WEICHE';
+    },
+  });
+  if (!opened) {
+    if (tries > 0) await story.say(f.tagsSorted ? 'Falsch. Sechs Buchstaben … das erste Wort von den Anhängern?' : 'Falsch. Sechs Buchstaben. Irgendwo hier steht bestimmt ein Wort.');
+    return;
+  }
+  f.greenOpen = true;
+  story.sound('unlock');
+  await story.say('W-E-I-C-H-E. Klick!');
+  story.give('filePage');
+  await story.say('Ein Blatt Papier. „Akte J. – Seite 1“. Das ist eine Seite aus meiner Akte!');
+  await readPage1(story);
 }
 
-async function showBon(story) {
+async function readPage1(story) {
   story.sound('paper');
-  await story.card({ draw: drawBon });
-  if (story.flags.bonRead) return;
-  story.flags.bonRead = true;
-  story.sound('dread');
-  await story.say('„Platz 2: Rotwein – mit einem Schuss Probe 41.“');
-  await story.say('Unterschrieben mit „J.“ … Das ist meine Unterschrift.');
-  story.note('Der Bon aus der Küche: „Platz 2: Rotwein – mit einem Schuss Probe 41.“ Unterschrift: „J.“ – in meiner Schrift. Habe ICH das bestellt?!');
+  await story.card({ draw: drawPage1 });
+  if (story.flags.pageRead) return;
+  story.flags.pageRead = true;
+  await story.say('Meine Schrift. „Ich bin du – nur ein paar Runden früher.“');
+  await story.say('Also: den untersten Koffer aus dem Stapel holen, ohne einen großen auf einen kleinen zu stellen. Und ihn wiegen.');
+  story.note('Aktenseite 1: Seiten 2 und 3 liegen im untersten Koffer des Stapels. Nie einen größeren Koffer auf einen kleineren stellen, nur die zwei Kreidefelder sind frei. Türcode = Gewicht des untersten Koffers, ohne Komma.');
 }
 
 // ============================================================================================
-//  Grammophon und Musik
+//  3. Kofferstapel
 // ============================================================================================
 
-async function playGramophone(story) {
+function freshPiles() {
+  return [[5, 4, 3, 2, 1], [], []];
+}
+
+async function restack(story) {
   const f = story.flags;
-  if (!f.crankOn) return story.say('Ohne Kurbel dreht sich nichts. Irgendwer hat sie abgezogen.');
-  if (f.music) return story.say('Die Platte läuft doch schon.');
-  story.sound('screw');
-  await story.wait(0.4);
-  startMusic(story, f.record);
-  if (f.record === 'march') {
-    await story.say('Marschmusik. Laut und schief.');
-    await story.wait(0.8);
-    if (inTunnel(story)) return;
-    await story.speak('Aufhören! Diesen Krach halte ich nicht aus! Wenn schon Musik, dann einen Walzer!', { at: COOK, color: VOICES.cook });
-    stopMusic(story);
-    await story.say('Schon gut, schon gut. Der Koch mag keine Marschmusik.');
-    if (!f.marchNoted) {
-      f.marchNoted = true;
-      story.note('Auf dem Grammophon liegt ein Marsch – den hasst der Koch. Er will einen Walzer.');
-    }
+  if (f.caseFree) return story.say('Den untersten Koffer habe ich schon.');
+  if (inTunnel(story)) return story.say('Im Dunkeln lasse ich womöglich etwas fallen.');
+  if (!f.pageRead && !f.stackTried) {
+    f.stackTried = true;
+    await story.say('Einfach so in fremdem Gepäck wühlen? Erst will ich wissen, wonach ich suche.');
     return;
   }
-  // Der Walzer: Der Koch muss tanzen und lässt den Rollladen herunter
-  await story.say('Der Ringbahn-Walzer …');
-  await story.speak('Mein Walzer!! Oh, da kann ich nicht stillstehen!', { at: COOK, color: VOICES.cook });
-  f.dancing = true;
-  f.shutterTarget = 1;
-  story.sound('shutter');
-  await story.wait(0.6);
-  await story.say('Er hat den Rollladen heruntergelassen – und tanzt. Jetzt sieht er nicht hin!');
-  if (!f.danceNoted) {
-    f.danceNoted = true;
-    story.note('Wenn der Ringbahn-Walzer läuft, tanzt der Koch hinter dem heruntergelassenen Rollladen – und lässt Tisch 4 aus den Augen. Die Platte läuft nicht lange.');
-  }
-}
-
-function startMusic(story, record) {
-  const f = story.flags;
-  f.music = record;
-  f.musicTime = 0;
-  f.musicBar = 0;
-}
-
-function stopMusic(story) {
-  story.flags.music = false;
-}
-
-// In jedem Bild: Takt für Takt Musik spielen; wenn die Platte zu Ende ist, kommt der Koch zurück
-function updateMusic(story, dt) {
-  const f = story.flags;
-  if (!f.music) return;
-  const length = f.music === 'waltz' ? WALTZ_SECONDS : MARCH_SECONDS;
-  const bar = BAR[f.music];
-  if (f.musicTime >= f.musicBar * bar) {
-    story.sound(f.music, f.musicBar);
-    if (f.dancing) story.sound('stomp');
-    f.musicBar += 1;
-  }
-  f.musicTime += dt;
-  if (f.musicTime < length) return;
-  stopMusic(story);
-  if (f.dancing) endDance(story);
-}
-
-async function endDance(story) {
-  const f = story.flags;
-  f.dancing = false;
-  await story.wait(0.8);
-  f.shutterTarget = 0;
-  story.sound('shutter');
-  await story.wait(0.5);
-  if (story.isBusy) return;
-  await story.speak('Hach … Schön war das. So – wieder an die Arbeit!', { at: COOK, color: VOICES.cook });
-  if (story.flags.takenSeat === POISON_SEAT && !story.flags.saved) {
-    await story.say('Er sieht wieder hin. Aber Herrn Brandts Glas habe ich. Jetzt nur noch auf den Tunnel warten.');
-  }
-}
-
-// ============================================================================================
-//  Die Gläser
-// ============================================================================================
-
-const SEAT_NAMES = { 1: 'Frau Adler', 2: 'Herr Brandt', 3: 'Dr. Corvin', 4: 'J.' };
-const DRINKS = { 1: 'Weißwein', 2: 'Rotwein', 3: 'Wasser', 4: 'Orangensaft' };
-
-async function lookGlass(story, seat) {
-  const f = story.flags;
-  if (story.isDark && seat === POISON_SEAT && f.takenSeat !== seat) {
-    await story.say('Herrn Brandts Glas leuchtet grün. Wie das Glas im ersten Abteil – „Probe 41“.');
-    return;
-  }
-  if (f.takenSeat === seat) return story.say(`Das Glas von Platz ${seat} habe ich bei mir. Nur die Tischkarte steht noch da: ${SEAT_NAMES[seat]}.`);
-  if (f.tipped === seat) return story.say('Umgekippt und leer. Die Tischkarte liegt flach: Herr Brandt.');
-  const extra = seat === POISON_SEAT && f.sawPoisoning ? ' Das Glas, das im Dunkeln grün geleuchtet hat.' : seat === 4 ? ' Mein Platz.' : '';
-  await story.say(`Platz ${seat}: ${SEAT_NAMES[seat]}. ${DRINKS[seat]}.${extra}`);
-}
-
-function carriesGlass(story) {
-  return story.has('glass') || story.has('poisonGlass');
-}
-
-async function takeGlass(story, seat) {
-  const f = story.flags;
-  if (inTunnel(story)) return story.say('Im Dunkeln greife ich nicht nach fremden Gläsern.');
-  if (f.tipped === seat) return story.say('Umgekippt und leer. Da ist nichts mehr zu holen.');
-  if (f.takenSeat === seat) return story.say('Das Glas von diesem Platz habe ich schon.');
-  if (carriesGlass(story)) return story.say('Ich habe schon ein Glas in der Hand. Mehr kann ich nicht tragen, ohne zu kleckern.');
-  if (f.shutter < 0.6) {
-    await story.speak('Finger weg! Die Gläser sind für die Herrschaften!', { at: COOK, color: VOICES.cook });
-    await story.say('Der Koch lässt den Tisch keine Sekunde aus den Augen.');
-    if (!f.watchedNoted) {
-      f.watchedNoted = true;
-      story.note('Der Koch beobachtet Tisch 4 durch die Durchreiche. Solange er hinsieht, darf ich kein Glas anfassen. Ich muss ihn ablenken.');
-    }
-    return;
-  }
-  f.takenSeat = seat;
-  f.carriedSeat = seat;
-  story.give(seat === POISON_SEAT ? 'poisonGlass' : 'glass');
-  if (seat === POISON_SEAT) {
-    await story.say('Herrn Brandts Rotwein. Den nehme ich mit.');
-    await story.say('Was ich bei mir trage, bleibt bei mir – auch im Tunnel. Dann kann ihn keiner trinken.');
-  } else {
-    await story.say(`Das Glas von Platz ${seat}. ${DRINKS[seat]}.`);
-  }
-}
-
-async function putBack(story) {
-  const f = story.flags;
-  story.remove('glass');
-  story.remove('poisonGlass');
-  if (f.takenSeat) f.takenSeat = null;
-  story.sound('pickup');
-  await story.say('Ich stelle das Glas zurück an seinen Platz.');
-}
-
-// ============================================================================================
-//  Tunnel: Im Dunkeln wird angestoßen
-// ============================================================================================
-
-function seatVoice(seat) {
-  const [x, y] = glassBase(seat);
-  return { x: x - 10, y: y - 150 };
-}
-
-async function toast(story) {
-  const f = story.flags;
-  const saving = f.takenSeat === POISON_SEAT && !f.saved;
-  const ghost = (seat, text) => story.speak(text, { at: seatVoice(seat), color: VOICES.ghost });
-  f.brandtGone = Boolean(f.saved); // nach seiner Rettung sitzt Herr Brandt nicht mehr am Tisch
-  await story.cutscene(async () => {
-    try {
-      await toastScene();
-    } finally {
-      f.toasting = false;
-    }
+  f.piles ??= freshPiles();
+  f.moves ??= 0;
+  const state = { piles: f.piles, held: null, moves: f.moves };
+  await story.view('picture', {
+    state,
+    draw: (ctx, view) => drawStack(ctx, view.state),
+    spots: pileSpots(),
+    area: { x: 80, y: 80, w: 1120, h: 580 },
+    help: 'Klicken: obersten Koffer nehmen, dann auf einen anderen Platz klicken  ·  Rechtsklick: zurück',
+    onClick: async (spot, view) => {
+      const s = view.state;
+      const i = Number(spot.id.slice(4));
+      if (!s.held) {
+        if (!s.piles[i].length) return;
+        s.held = { from: i, size: s.piles[i].pop() };
+        story.sound('pickup');
+        return;
+      }
+      const top = s.piles[i].at(-1);
+      if (top !== undefined && top < s.held.size) {
+        s.piles[s.held.from].push(s.held.size);
+        s.held = null;
+        story.sound('wrong');
+        await story.say('Nein! Der größere Koffer würde den kleinen zerdrücken. „Glas!“');
+        return;
+      }
+      s.piles[i].push(s.held.size);
+      if (i !== s.held.from) s.moves += 1;
+      s.held = null;
+      story.sound('thud');
+      f.moves = s.moves;
+      // Liegt auf dem untersten Koffer nichts mehr?
+      if (s.piles[0].length === 1 && s.piles[0][0] === 5) {
+        await story.wait(0.4);
+        view.close(true);
+      }
+    },
   });
-
-  async function toastScene() {
-    await story.wait(0.4);
-    f.toasting = true;
-    if (!f.firstDark) {
-      f.firstDark = true;
-      await story.say(saving ? 'Licht aus. Jetzt kommt es drauf an …' : 'Licht aus … an Tisch 4 sitzen Schatten! Und ein Glas leuchtet grün.');
-    }
-    if (saving) {
-      await ghost(1, 'Auf die Ringbahn!');
-      await ghost(2, 'Moment – wo ist mein Glas?');
-      story.sound('clink');
-      await ghost(2, 'Sie da, mit der Lampe! Sie haben es? Riechen Sie mal: Probe 41!');
-      await ghost(2, 'Sie haben mir das Leben gerettet. Hier – mein Vierkant. Für die Tür.');
-      story.sound('key');
-      f.saved = true;
-      f.keyOnPlate = true;
-      f.brandtGone = true;
-      return;
-    }
-    if (f.saved) {
-      await ghost(1, 'Auf die Ringbahn!');
-      story.sound('clink');
-      await ghost(3, 'Zum Wohl!');
-      return;
-    }
-    await ghost(1, 'Auf die Ringbahn!');
-    await ghost(2, 'Und auf die nächste Runde!');
-    await ghost(3, 'Zum Wohl!');
-    story.sound('clink');
-    await story.wait(0.9);
-    story.sound('gasp');
-    await ghost(2, 'Was … ist … das …');
-    await story.wait(0.6);
-    f.tipped = POISON_SEAT;
-    f.brandtGone = true;
-    f.sawPoisoning = true;
-    await story.say('Herr Brandt?!');
+  // Koffer, der noch in der Hand war, zurücklegen
+  if (state.held) state.piles[state.held.from].push(state.held.size);
+  if (state.piles[0].length === 1 && state.piles[0][0] === 5 && !f.caseFree) {
+    f.caseFree = true;
+    story.give('heavyCase');
+    await story.say(`Geschafft – in ${state.moves} Zügen! Der unterste Koffer ist frei.`);
+    await story.say('Uff, ist der schwer. Mal sehen, was er wiegt.');
+    story.note('Den untersten Koffer aus dem Stapel geholt.');
   }
 }
 
-async function afterTunnel(story) {
-  const f = story.flags;
-  await story.idle();
-  if (f.saved && !f.savedNoted) {
-    f.savedNoted = true;
-    await story.cutscene(async () => {
-      await story.wait(0.5);
-      await story.say('Das Licht ist wieder da. Die Plätze sind leer – aber auf Herrn Brandts Teller liegt etwas. Sein Vierkantschlüssel!');
-      await story.say('Er hat nichts getrunken – und ist trotzdem verschwunden. Aber diesmal lebend, glaube ich.');
-    });
-    story.remove('poisonGlass');
-    f.takenSeat = null;
-    story.note('Ich hatte Herrn Brandts Glas bei mir, als der Tunnel kam. Er hat sein Glas gesucht – und mir zum Dank im Dunkeln seinen Vierkantschlüssel hingelegt. Das Giftglas habe ich weggestellt.');
-    return;
+// ============================================================================================
+//  4. Waage und Koffer
+// ============================================================================================
+
+async function openScale(story, withCase) {
+  if (inTunnel(story)) return story.say('Im Dunkeln kann ich die Skala nicht lesen.');
+  const state = { shown: 0, loaded: withCase, target: withCase ? CASE_WEIGHT : 0 };
+  if (withCase) story.sound('thud');
+  await story.view('picture', {
+    state,
+    draw: (ctx, view) => drawScale(ctx, view.state),
+    spots: [],
+    area: { x: 240, y: 40, w: 800, h: 640 },
+    update: (dt, view) => {
+      const s = view.state;
+      s.shown += (s.target - s.shown) * Math.min(1, dt * 2.2);
+    },
+    help: 'Rechtsklick: zurück',
+  });
+  if (!withCase) return story.say(story.has('heavyCase') ? 'Leer zeigt sie null. Ich muss den Koffer drauflegen.' : 'Null Kilo. Ich müsste etwas drauflegen.');
+  await story.say('Siebzehn Komma drei Kilo.');
+  if (!story.flags.weighed) {
+    story.flags.weighed = true;
+    await story.say('„Sein Gewicht ist der Code – ohne Komma.“ Also eins, sieben, drei.');
+    story.note('Der unterste Koffer wiegt 17,3 kg → Türcode 173.');
   }
-  if (f.tipped) {
-    await story.cutscene(async () => {
-      await story.wait(0.4);
-      if (!f.poisonNoted) {
-        await story.say('Das Licht ist wieder an. Platz 2: das Glas umgekippt, die Tischkarte umgefallen.');
-        await story.say('Herr Brandt hat getrunken – und ist verschwunden. Sein Glas hat im Dunkeln grün geleuchtet …');
-      } else {
-        await story.say('Wieder Platz 2. Wieder Herr Brandt.');
-      }
-      if (f.carriedSeat && carriesGlass(story) && f.carriedSeat !== POISON_SEAT) await story.say('Ich hatte das falsche Glas in der Hand.');
-    });
-    if (!f.poisonNoted) {
-      f.poisonNoted = true;
-      story.note('Im Tunnel stießen Stimmen an: Frau Adler, Herr Brandt, Dr. Corvin. Herrn Brandts Rotwein (Platz 2) leuchtete grün – Probe 41. Er röchelte, und als das Licht anging, war er fort.');
-    }
-    await story.wait(2.2);
-    if (inTunnel(story)) return;
-    await story.cutscene(async () => {
-      story.sound('bell');
-      story.flags.emptyTable = true;
-      await story.speak('Tisch vier wird neu serviert! Wie jede Runde!', { at: COOK, color: VOICES.cook });
-      story.sound('clink');
-      f.tipped = null;
-      f.takenSeat = null;
-      story.flags.emptyTable = false;
-      if (!f.resetNoted) {
-        f.resetNoted = true;
-        await story.say('Alles wieder da. Auch Herrn Brandts Glas. Und das Gift darin, wette ich.');
-        story.note('Nach dem Tunnel serviert der Koch alles neu – auch das vergiftete Glas an Platz 2. Wenn ich das Glas vom Tisch nehme und beim nächsten Tunnel bei mir trage …');
-      }
-    });
-    return;
-  }
-  // Nach dem Tunnel steht auf dem Tisch wieder alles – auch das Glas, das Joseph bei sich trägt
-  f.takenSeat = null;
+}
+
+async function openHeavyCase(story) {
+  if (story.flags.pagesFound) return story.say('Der Koffer ist leer. Die Seiten habe ich.');
+  story.sound('unlock');
+  await story.say('Die Schnallen gehen auf. Ganz unten, unter alten Decken …');
+  story.flags.pagesFound = true;
+  story.give('filePages');
+  await story.say('Zwei Seiten. Seite 2 und Seite 3!');
+  await readPages23(story);
+}
+
+async function readPages23(story) {
+  story.sound('paper');
+  await story.card({ draw: drawPages23 });
+  if (story.flags.pagesRead) return;
+  story.flags.pagesRead = true;
+  await story.say('„In jeder Runde verschwindet im Tunnel ein Fahrgast.“');
+  await story.say('Das habe ich geschrieben? Ich erinnere mich an nichts davon.');
+  story.note('Aktenseiten 2 und 3: IN JEDER RUNDE VERSCHWINDET IM TUNNEL EIN FAHRGAST. Im Postwagen liegt ein Brief für mich.');
 }
 
 // ============================================================================================
-//  Tür
+//  Tür und Ende
 // ============================================================================================
 
-async function openDoor(story) {
-  if (!story.has('vierkant')) return story.say('Ich brauche einen Vierkantschlüssel.');
+async function tryDoor(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Rädchen nicht.');
+  let tries = 0;
+  const opened = await story.codeLock({
+    id: 'door2',
+    digits: 3,
+    check: (code) => {
+      tries += 1;
+      return code === DOOR_CODE;
+    },
+  });
+  if (!opened) {
+    if (tries > 0) await story.say(story.flags.weighed ? 'Falsch. Eins, sieben, drei …' : 'Falsch. Drei Ziffern – ich habe noch keine Ahnung, welche.');
+    return;
+  }
+  await ending(story);
+}
+
+async function ending(story) {
   await story.cutscene(async () => {
-    story.sound('key');
-    await story.wait(0.7);
-    await story.say('Der Vierkant passt. Eine halbe Drehung …');
-    await story.speak('Gute Fahrt, Herr J.! Bis zur nächsten Runde!', { at: COOK, color: VOICES.cook });
-    await story.say('Der nächste Wagen: der Schlafwagen. Leise jetzt.');
+    story.sound('unlock');
+    await story.say('Eins, sieben, drei. Offen!');
+    if (!story.flags.pagesRead) {
+      await story.say('Halt – erst sehe ich nach, was im Koffer ist.');
+      if (story.has('heavyCase')) await openHeavyCase(story);
+    }
+    await story.say('Meine Akte ist jetzt vollständig. Und sie sagt: Jede Runde verschwindet jemand.');
+    await story.say('Wenn das stimmt … dann passiert es heute Nacht wieder.');
     story.sound('door');
-    await story.wait(0.8);
-    await story.fadeOut(1.4);
-    story.note('Mit Herrn Brandts Vierkant ging die Tür zum Schlafwagen auf.');
+    await finishWagon(story, {
+      number: 2,
+      title: 'Ende von Wagen 2',
+      lines: ['Die Akte ist komplett: In jeder Runde verschwindet im Tunnel ein Fahrgast.'],
+      nextTitle: 'im Postwagen',
+    });
   });
-  await finishWagon(story, { number: 2, next: 3, nextName: 'Schlafwagen' });
 }
 
 // ============================================================================================
@@ -632,43 +352,25 @@ async function openDoor(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (story.has('vierkant')) return { id: 'door', lines: ['Mit dem Vierkantschlüssel an die Tür zum Schlafwagen.'] };
-  if (f.keyOnPlate) return { id: 'plate', lines: ['Auf Herrn Brandts Teller liegt sein Vierkantschlüssel. Den sollte ich nehmen.'] };
-  if (!f.talkedCook) {
-    return { id: 'cook', lines: [
-      'Hinten links ist die Durchreiche zur Küche. Der Koch dort weiß bestimmt mehr.',
-      'Linksklick auf die Durchreiche: Dann kann ich mit dem Koch reden.',
+  if (!f.greenOpen) {
+    if (!f.tagsSorted) {
+      return { id: 'tags', lines: [
+        'Der grüne Koffer will ein Wort mit sechs Buchstaben. Das Brett mit den Anhängern links sieht nach einem Rätsel aus.',
+        'Das Schild neben der Tür sagt: Anhänger nach Abfahrt aufhängen – frühe zuerst.',
+        'Die Anhänger nach Uhrzeit sortieren, die früheste nach links. Dann die Anfangsbuchstaben lesen.',
+      ] };
+    }
+    return { id: 'green', lines: ['WEICHE SIEBEN – sechs Buchstaben für den grünen Koffer: WEICHE.'] };
+  }
+  if (!f.caseFree) {
+    return { id: 'stack', lines: [
+      'Seite 1 sagt: Die fehlenden Seiten liegen im untersten Koffer des Stapels.',
+      'Immer nur den obersten Koffer bewegen, nie einen größeren auf einen kleineren. Platz: der Stapel und zwei Kreidefelder.',
+      'Erst die drei kleinsten Koffer auf ein Kreidefeld bringen (das braucht sieben Züge), dann den vierten auf das andere Feld.',
+      'Klein auf Feld rechts, mittel auf Feld links, klein auf mittel. Dritter auf Feld rechts. Klein auf den Stapel, mittel auf Feld rechts, klein auf Feld rechts. Dann den vierten auf Feld links.',
     ] };
   }
-  if (!f.sawPoisoning) {
-    return { id: 'tunnel', lines: [
-      'Der Koch sagt: Die Gäste kommen im Tunnel. Ich sollte abwarten, was dann an Tisch 4 passiert.',
-      'An Tisch 4 (oder auf der Bank dahinter) kann ich mich setzen und auf den Tunnel warten.',
-    ] };
-  }
-  if (story.has('poisonGlass')) {
-    return { id: 'hold', lines: [
-      'Herrn Brandts Glas habe ich. Jetzt muss ich es nur bis zum nächsten Tunnel bei mir behalten.',
-      'An Tisch 4 kann ich auf den Tunnel warten.',
-    ] };
-  }
-  const distract = [
-    'Herrn Brandts Glas ist vergiftet. Wenn es im Tunnel nicht auf dem Tisch steht, kann er es nicht trinken.',
-    'Was ich bei mir trage, nimmt mir der Tunnel nicht weg. Aber der Koch passt auf die Gläser auf – ich muss ihn ablenken.',
-  ];
-  if (!f.knowsWaltz) return { id: 'music', lines: [...distract, 'Ich sollte den Koch fragen, was er gern mag – zum Beispiel Musik.'] };
-  if (!f.crankOn && !story.has('crank')) {
-    return { id: 'crank', lines: [...distract, 'Der Koch liebt Walzer. Das Grammophon braucht eine Kurbel – Herr Brandt hat sie eingesteckt.', 'Herrn Brandts Mantel hängt hinten links an der Garderobe. In der Tasche steckt die Kurbel.'] };
-  }
-  if (!f.crankOn) return { id: 'crankOn', lines: ['Die Kurbel gehört ans Grammophon: Kurbel im Inventar anklicken, dann das Grammophon.'] };
-  if (f.record !== 'waltz') {
-    return { id: 'record', lines: [
-      'Auf dem Grammophon liegt ein Marsch. Der Koch will einen Walzer.',
-      f.recordTaken ? 'Den Walzer habe ich: Schallplatte im Inventar anklicken, dann das Grammophon.' : 'In der Schublade unter dem Grammophon liegen noch mehr Platten.',
-    ] };
-  }
-  return { id: 'take', lines: [
-    'Wenn der Walzer läuft, tanzt der Koch und sieht nicht hin.',
-    'Grammophon anstellen, dann schnell das Glas von Platz 2 (Herr Brandt, Rotwein) nehmen – und bis zum Tunnel behalten.',
-  ] };
+  if (!f.weighed) return { id: 'weigh', lines: ['Den Koffer wiegen: Koffer im Inventar anklicken, dann die Gepäckwaage.'] };
+  if (!f.pagesRead) return { id: 'pages', lines: ['Was ist im Koffer? Rechtsklick auf den Koffer im Inventar.'] };
+  return { id: 'door', lines: ['17,3 kg, ohne Komma: 173 – das ist der Code für die Tür.'] };
 }

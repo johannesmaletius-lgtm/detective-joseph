@@ -64,8 +64,9 @@ export const wagon1 = {
 
   // ---------------------------------------------------------------- Anfang
   async intro(story) {
-    story.game.overlay.fade = 1; // das Titelbild zeigt das Spiel vorher (siehe Game.begin)
+    story.game.overlay.fade = 1;
     await story.cutscene(async () => {
+      await story.card({ kind: 'title', title: 'Detective Joseph', subtitle: 'Wagen 1 · Das Abteil', continueText: 'Klicken zum Starten' });
       story.motion.restartAt(FIRST_TUNNEL_IN); // die Zeit auf dem Titelbild zählt nicht
       story.player.facing = 'front';
       await story.wait(0.6);
@@ -83,6 +84,7 @@ export const wagon1 = {
 
   // Mit ?skipintro in der Adresse: gleich losspielen
   skipIntro(story) {
+    story.game.overlay.fade = 0;
     start(story);
   },
 
@@ -500,16 +502,16 @@ async function openDoor(story) {
     story.sound('door');
     await story.wait(1);
     await story.fadeOut(1.6);
-    story.note('Die Tür ist offen. Weiter nach vorne – zum Speisewagen.');
+    story.note('Die Tür ist offen. Weiter nach vorne – in den nächsten Wagen.');
     const minutes = Math.max(1, Math.round((performance.now() - story.flags.startedAt) / 60000));
     await story.card({
       kind: 'end',
-      title: 'Wagen 1 geschafft',
-      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Weiter geht es im Speisewagen.'],
-      continueText: 'Klicken zum Weiterspielen',
+      title: 'Ende von Wagen 1',
+      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, 'Morgen geht es weiter – im nächsten Wagen.'],
+      continueText: 'Klicken, um zum Adventskalender zurückzukehren',
     });
+    story.finish();
   });
-  await story.goToWagon(2);
 }
 
 // ============================================================================================

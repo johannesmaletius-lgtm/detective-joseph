@@ -37,7 +37,8 @@ export class Inventory {
 
   async load() {
     this.bar = await loadImage(BAR);
-    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, this.images[id] ?? (item.paint ? paintIcon(item.paint) : await loadImage(item.image))]));
+    // Gegenstände ab Wagen 4 sind im Code gezeichnet (icon oder paint), die aus Wagen 1 sind Bilder (image)
+    const entries = await Promise.all(Object.entries(ITEMS).map(async ([id, item]) => [id, this.images[id] ?? (item.icon ? drawIcon(item.icon) : item.paint ? paintIcon(item.paint) : await loadImage(item.image))]));
     this.images = Object.fromEntries(entries);
   }
 
@@ -53,6 +54,16 @@ export class Inventory {
     const hidden = 720 - PEEK;
     const shown = 720 - this.height;
     return hidden + (shown - hidden) * easeOut(this.slide);
+  }
+
+  // Neuer Wagen: leere Leiste – nur mit dem, was Joseph aus früheren Wagen mitbringt
+  clear(items = []) {
+    this.items = [...items];
+    this.selected = null;
+    this.offset = 0;
+    this.flash = null;
+    this.slide = 0;
+    this.revealTime = 0;
   }
 
   has(id) {
@@ -207,4 +218,15 @@ export class Inventory {
 
 function easeOut(t) {
   return 1 - (1 - t) * (1 - t);
+}
+
+// Zeichnet ein Gegenstandsbild (128 × 128) mit einer Zeichenfunktion icon(ctx)
+function drawIcon(icon) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  icon(ctx);
+  return canvas;
 }

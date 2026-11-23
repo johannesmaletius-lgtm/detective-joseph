@@ -1,596 +1,282 @@
-import { MIRROR_CENTER, MOON_WINDOW } from '../scene/sleepingCar.js';
-import { P } from '../scene/wagonPainter.js';
-import { VOICES, packFor, finishWagon, hintFor, inTunnel, tunnels, waitForTunnel } from './common.js';
+import {
+  COUPLED, DISK_SPOTS, HOLE_SLOTS, SHIFT, SWITCH_X, checkHoles, drawCipherLetter, drawHoles, drawLetterToken,
+  drawPostmasterNote, drawTubes, letterTokens, switchSpots,
+} from './art/wagon3.js';
+import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
-//  WAGEN 3 – Der Schlafwagen
+//  TÜR 3 – Der Postwagen (ohne Person)
 // ============================================================================================
 //
-// Im unteren Bett schläft Frau Adler (vom Tisch 4 im Speisewagen). Im Schlaf murmelt sie –
-// jede Runde ein anderes Stück desselben Satzes:
-//   „Das Wort für das Gitter steht im Spiegel, wenn der Mond ins Fenster schaut.
-//    Aber nur, wenn das Rollo oben ist.“
-//
-// DAS ZIEL: Das Gitter zum Gepäckwagen hat ein Buchstabenschloss mit fünf Rädchen: S C H A L.
-//
-// DIE RÄTSEL:
-//   1. Frau Adler zuhören – in jeder Runde (nach jedem Tunnel) kommt ein neues Stück dazu.
-//      Die Stücke auf dem Zettel (Rechtsklick im Inventar) in die richtige Reihenfolge bringen.
-//   2. Oberes Bett (über die Leiter): ein Zettel vom früheren Joseph – wie man sie weckt.
-//   3. Mit der Taschenlampe ins Gesicht leuchten → Frau Adler wacht auf, schreit, zieht die Notbremse.
-//      Der Ruck wirft die Hutschachtel von der Gepäckablage → darin: eine Hutnadel mit Haken.
-//      (Wach kann man mit ihr reden: über den Mann mit dem Schal, das Wort, ihren Papagei Kasimir.)
-//   4. Mit der Hutnadel die abgerissene Schlaufe des Rollos am mittleren rechten Fenster angeln → Rollo hoch.
-//   5. Warten, bis der Mond in dieses Fenster schaut (Stuhl: „warten, bis der Mond kommt“).
-//      Dann leuchtet im Spiegel ein Wort auf – in Spiegelschrift.
-//   6. S C H A L am Gitter → Gepäckwagen.
-// Nach jedem Tunnel ist alles wieder wie vorher: Frau Adler schläft, die Hutschachtel steht oben,
-// die Notbremse ist verplombt. Nur was Joseph bei sich trägt (die Hutnadel), bleibt.
+// DIE RÄTSEL
+//   1. 24 Fächer, eins pro Runde (römische Zahlen). Acht lose Briefe nach ihrem Rundenstempel
+//      einsortieren → vier Fächer bleiben leer: I, IV, VI, IX → Code 1469 für den Schrank des Postmeisters.
+//   2. Im Schrank: Dienstanweisung – der Brief an J. steckt in Rohrpost-Leitung 3. Vier Weichen,
+//      jede dreht ihre Nachbarn mit (Lichter-aus-Prinzip). Alle müssen gerade stehen.
+//   3. Der Brief ist verschlüsselt: „Runde 108, Verschiebung wie die Runde“ → 108 = 4 × 26 + 4,
+//      also jeden Buchstaben um 4 zurück. Mit der Chiffrierscheibe lesen.
+//      „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: STERN“
+//   4. Tür: Buchstabenschloss mit 5 Rädchen → STERN.
 
-const CODE = 'SCHAL';
+const CABINET_CODE = '1469';
+const DOOR_WORD = 'STERN';
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const LADY = (() => {
-  const [x, y] = P(-170, 82, 0.55);
-  return { x: x + 20, y: y - 70 };
-})();
-
-// Die Stücke des Satzes in der richtigen Reihenfolge – und was sie in welcher Runde murmelt
-export const CHUNKS = ['Das Wort', 'für das Gitter', 'steht im Spiegel,', 'wenn der Mond', 'ins Fenster schaut.', 'Aber nur,', 'wenn das Rollo oben ist.'];
-const MURMURS = [
-  { chunks: [1, 0], text: '… mmh … für das Gitter … das Wort … das Wort …' },
-  { chunks: [2], text: '… steht im Spiegel … im Spiegel … chrr …' },
-  { chunks: [4, 3], text: '… ins Fenster schaut … wenn der Mond … mmh …' },
-  { chunks: [6, 5], text: '… wenn das Rollo oben ist … aber nur … aber nur …' },
-];
 
 export const wagon3 = {
-  flags: {
-    blind: 1,          // Rollo: 1 = unten … 0 = oben
-    hatboxFall: 0,     // Hutschachtel: 0 = oben auf der Ablage … 1 = auf dem Boden
-    moonlight: 0,      // wie hell der Mond gerade auf den Spiegel scheint
-  },
-
-  prepare(story) {
-    story.note('Hinter mir liegen das erste Abteil und der Speisewagen. Herrn Brandt habe ich das Leben gerettet – und seinen Vierkantschlüssel bekommen.');
-  },
-
-  setup(story) {
-    story.flags.startedAt = performance.now();
-    story.flags.packed = packFor(story, ['flashlight', 'vierkant']);
-    story.flags.heard = [];
-  },
+  flags: {},
+  startItems: ['flashlight'],
+  recap: [
+    'Der Zug fährt im Kreis. Nach jedem Tunnel springt alles zurück – nur was ich bei mir trage, bleibt.',
+    'Meine Akte ist komplett: In jeder Runde verschwindet im Tunnel ein Fahrgast.',
+    'Auf Seite 3 stand: Im Postwagen liegt ein Brief für mich.',
+  ],
 
   async intro(story) {
-    await arrive(story);
+    await wagonIntro(story, {
+      number: 3,
+      title: 'Der Postwagen',
+      lines: [
+        'Der Postwagen. Säcke voller Briefe, und Fächer bis unter die Decke.',
+        'Irgendwo hier liegt ein Brief für mich.',
+      ],
+    });
   },
 
-  async skipIntro(story) {
-    story.game.overlay.fade = 0;
-    await arrive(story, { quick: true });
-  },
+  skipIntro: (story) => skipIntro(story),
 
-  update(story, dt) {
-    const f = story.flags;
-    // Rollo und Hutschachtel bewegen sich weich
-    const blindTarget = f.blindUp ? 0 : 1;
-    f.blind += Math.sign(blindTarget - f.blind) * Math.min(Math.abs(blindTarget - f.blind), dt * 4);
-    if (f.hatboxDown && f.hatboxFall < 1) f.hatboxFall = Math.min(1, f.hatboxFall + dt * 2.2);
-    // Mondlicht auf dem Spiegel: nur wenn das Rollo oben ist und der Mond in diesem Fenster steht
-    const lit = f.blindUp && !story.motion.inTunnel && moonNearWindow(story);
-    f.moonlight += ((lit ? 1 : 0) - f.moonlight) * Math.min(1, dt * 1.5);
-    if (f.moonlight > 0.6 && !f.moonNoticed && !story.isBusy && !story.game.view) {
-      f.moonNoticed = true;
-      noticeMoon(story);
-    }
-    // gelegentlich ein Schnarcher
-    f.snoreIn = (f.snoreIn ?? 3) - dt;
-    if (f.snoreIn <= 0) {
-      f.snoreIn = 5 + Math.random() * 4;
-      if (!f.ladyAwake && !story.isDark) story.sound('snore');
-    }
-  },
-
-  // ---------------------------------------------------------------- Anklickbare Stellen
   hotspots: {
-    grate: {
-      look: async (story) => {
-        await story.say('Ein Gitter vor dem Gepäckwagen. Davor ein Buchstabenschloss mit fünf Rädchen.');
-        if (!story.flags.grateLooked) {
-          story.flags.grateLooked = true;
-          story.note('Schlafwagen: Das Gitter zum Gepäckwagen hat ein Buchstabenschloss – fünf Buchstaben.');
-        }
-      },
-      use: (story) => tryLock(story),
-      items: {
-        vierkant: 'Kein Vierkantloch. Nur Buchstaben.',
-        hatpin: 'Mit der Hutnadel das Schloss knacken? So geschickt bin ich nicht.',
-        knife: 'Das Gitter ist aus Stahl. Da hilft kein Taschenmesser.',
-      },
+    holes: {
+      look: (story) => story.say(story.flags.holesSorted
+        ? 'Alles einsortiert. Leer bleiben die Fächer I, IV, VI und IX.'
+        : 'Vierundzwanzig Fächer, mit römischen Zahlen beschriftet. In manchen liegt Post, viele sind leer.'),
+      use: (story) => sortLetters(story),
     },
-
-    lady: {
-      look: (story) => (story.flags.ladyAwake
-        ? story.say('Frau Adler sitzt auf der Bettkante und zittert. Sie lässt mich nicht aus den Augen.')
-        : story.say('Eine alte Dame mit Nachthaube. Sie schläft tief – und murmelt dabei.')),
-      use: (story) => (story.flags.ladyAwake ? talkToLady(story) : visitSleeper(story)),
-      items: {
-        flashlight: (story) => wakeLady(story),
-        other: 'Das stecke ich ihr lieber nicht zu. Sie schläft.',
-      },
-    },
-
-    hatboxUp: {
-      look: 'Ganz oben auf der Gepäckablage: eine Hutschachtel mit Streifen. Viel zu hoch.',
-      use: 'Da komme ich nicht ran. Nicht mal von der Leiter aus – die Ablage ist über dem Gang.',
-      items: { other: 'Damit komme ich auch nicht höher.' },
-    },
-
-    hatboxDown: {
-      look: 'Die Hutschachtel. Beim Ruck der Notbremse ist sie heruntergefallen.',
-      use: (story) => openHatbox(story),
-    },
-
-    ladder: {
-      look: 'Eine Leiter zum oberen Bett.',
-      use: (story) => climbUp(story),
-    },
-    upperBunk: {
-      look: 'Das obere Bett. Der Vorhang ist halb zugezogen.',
-      use: (story) => climbUp(story),
-    },
-    bunk: {
-      look: 'Frau Adlers Bett. Die Decke ist bis zum Kinn hochgezogen.',
-      use: (story) => (story.flags.ladyAwake ? talkToLady(story) : visitSleeper(story)),
-    },
-
-    blind: {
-      look: (story) => (story.flags.blindUp
-        ? story.say('Das Rollo ist oben. Draußen: Wald, Schnee – und manchmal der Mond.')
-        : story.say('Das Rollo ist unten. Die Zugschlaufe ist abgerissen – oben in der Leiste hängt nur noch ein winziger Ring.')),
+    bags: {
+      look: 'Postsäcke, prall gefüllt. Ganz oben ein Korb mit acht losen Briefen.',
       use: async (story) => {
-        if (story.flags.blindUp) return story.say('Das bleibt oben.');
-        await story.say('Mit den Fingern komme ich nicht an den kleinen Ring. Zu klein, zu weit oben.');
-        if (!story.flags.blindNoted) {
-          story.flags.blindNoted = true;
-          story.note('Das Rollo am mittleren rechten Fenster ist unten. Die Schlaufe ist abgerissen; oben hängt ein winziger Ring. Ich bräuchte etwas Langes, Dünnes mit einem Haken.');
-        }
-      },
-      items: {
-        hatpin: (story) => raiseBlind(story),
-        knife: 'Mit der Messerspitze erwische ich den Ring nicht. Ich bräuchte einen Haken.',
-        vierkant: 'Am Rollo ist kein Vierkantloch.',
-        other: 'Damit angle ich den Ring nicht.',
+        await story.say('Acht lose Briefe, jeder mit einem runden Stempel: „Runde 14“, „Runde 3“, „Runde 21“ …');
+        await story.say('Die gehören in die Fächer.');
       },
     },
-
+    cabinet: {
+      look: (story) => story.say(story.flags.cabinetOpen
+        ? 'Der Schrank des Postmeisters. Offen.'
+        : 'Der Schrank des Postmeisters. Ein Vorhängeschloss mit vier Zahlen.'),
+      use: (story) => openCabinet(story),
+    },
+    tube: {
+      look: 'Eine Rohrpost-Station. Messingrohre führen von hier durch den ganzen Wagen.',
+      use: (story) => openTubes(story),
+    },
+    desk: {
+      look: 'Der Schreibtisch des Postmeisters. Stempel, Stempelkissen, eine grüne Lampe.',
+      use: async (story) => {
+        story.sound('stamp');
+        await story.say('Stempel: „Runde“ und eine Zahl zum Drehen. Jeder Brief bekommt hier die Runde, in der er ankam.');
+      },
+    },
+    keypad: { look: 'Ein Tastenfeld. Die Tasten sind verklebt. Das ist nicht das Schloss der Tür.' },
+    sorter: { look: 'Ein Briefständer. Leer bis auf Formulare.' },
+    door: {
+      look: 'Die Tür nach vorne. Ein Buchstabenschloss mit fünf Rädchen.',
+      use: (story) => tryDoor(story),
+    },
     window: {
-      look: 'Ein Rollo. Festgeschraubt – „Nachtruhe im Schlafwagen“.',
-      use: 'Festgeschraubt. Da rührt sich nichts.',
-      items: { hatpin: 'Dieses Rollo ist festgeschraubt. Nur das mittlere rechts hat eine Schlaufe.' },
-    },
-
-    mirror: {
-      look: (story) => watchMirror(story),
-      use: (story) => watchMirror(story),
-      items: { other: 'Den Spiegel will ich nicht zerkratzen.' },
-    },
-
-    basin: {
-      look: 'Ein kleines Waschbecken. Das Wasser läuft warm – deshalb ist der Spiegel beschlagen.',
-      use: 'Ich spritze mir Wasser ins Gesicht. Wach bleiben, Joseph. Wach bleiben.',
-    },
-
-    brake: {
-      look: (story) => (story.flags.brakePulled
-        ? story.say('Der Griff der Notbremse hängt unten, die Plombe ist ab. Gebremst hat der Zug trotzdem nicht.')
-        : story.say('Die Notbremse. Verplombt. „Missbrauch wird bestraft.“')),
-      use: (story) => (story.flags.brakePulled
-        ? story.say('Gezogen ist sie schon. Der Zug fährt einfach weiter.')
-        : story.say('Ich bin Detektiv, kein Zugräuber. Die Plombe bleibt dran.')),
-      items: { other: 'Die Plombe bleibt dran.' },
-    },
-
-    nightTable: {
-      look: async (story) => {
-        await story.say('Ein blaues Nachtlicht und eine Karaffe Wasser.');
-        await story.say('Und ein kleines Foto im Rahmen: Frau Adler mit einem grünen Papagei auf der Schulter.');
-        if (!story.flags.photoNoted) {
-          story.flags.photoNoted = true;
-          story.note('Auf dem Nachttisch: ein Foto von Frau Adler mit einem grünen Papagei.');
-        }
-      },
-      use: 'Ich lasse ihre Sachen lieber in Ruhe.',
-    },
-
-    chair: {
-      look: 'Ein Stuhl neben dem Nachttisch. Hier kann ich warten.',
-      use: (story) => sitDown(story),
-    },
-
-    suitcase: {
-      look: 'Ein Koffer mit Anhänger: „H. Adler – Ringbahnhof“.',
-      use: 'Abgeschlossen. Und es ist nicht meiner.',
+      look: (story) => story.say(story.isDark ? 'Nur Tunnel.' : 'Schnee und Wald. Der Turm blinkt.'),
+      use: (story) => waitForTunnel(story, 'Ich setze mich auf einen Postsack und warte auf den Tunnel …'),
     },
   },
 
   items: {
-    sleepNotes: { look: (story) => arrangeSentence(story) },
+    postNote: { look: (story) => readNote(story) },
+    cipherLetter: { look: (story) => readLetter(story) },
   },
 
   hint: (story) => hintFor(story, currentGoal(story)),
 
-  // ---------------------------------------------------------------- Tunnel
-  async onTunnel(story, inside) {
-    const f = story.flags;
+  onTunnel(story, inside) {
     if (inside) {
-      f.tunnels = tunnels(story) + 1;
+      story.flags.tunnels = tunnels(story) + 1;
       story.game.closeViewsInDark();
-      await story.idle();
-      if (!inTunnel(story)) return;
-      if (f.ladyAwake) {
-        await story.cutscene(async () => {
-          await story.speak('Oh … der Tunnel. Im Tunnel schlafe ich immer ein. Immer …', { at: LADY, color: VOICES.lady });
-        });
-      } else if (!f.darkNoted) {
-        f.darkNoted = true;
-        await story.say('Licht aus. Frau Adler schnarcht einfach weiter.');
-      }
-      return;
-    }
-    // Nach dem Tunnel: alles wieder wie vorher
-    const wasAwake = f.ladyAwake;
-    const boxWasDown = f.hatboxDown;
-    f.ladyAwake = false;
-    f.brakePulled = false;
-    f.hatboxDown = false;
-    f.hatboxOpen = false;
-    f.hatboxFall = 0;
-    await story.idle();
-    if ((wasAwake || boxWasDown) && !f.resetNoted) {
-      f.resetNoted = true;
-      await story.cutscene(async () => {
-        await story.wait(0.5);
-        await story.say('Frau Adler schläft wieder. Die Notbremse ist verplombt. Und die Hutschachtel steht wieder ganz oben.');
-        await story.say('Als wäre nichts gewesen. Nur was ich bei mir trage, bleibt.');
-      });
-    } else if ((f.heard?.length ?? 0) > 0 && f.heard.length < CHUNKS.length && !story.isBusy) {
-      await story.wait(1);
-      if (!story.isBusy && !inTunnel(story)) await story.say('Frau Adler murmelt wieder. Klingt anders als vorhin.');
     }
   },
 };
 
 // ============================================================================================
-//  Ankommen
+//  1. Fächer
 // ============================================================================================
 
-async function arrive(story, { quick = false } = {}) {
-  story.player.facing = 'back';
-  if (!quick) {
-    await story.cutscene(async () => {
-      await story.wait(0.4);
-      story.sound('door');
-      story.fadeIn(1.6);
-      await story.wait(1.4);
-      await story.say('Der Schlafwagen. Dunkel, warm … und jemand schnarcht.');
-      await story.speak('… mmh … das Wort … das Wort …', { at: LADY, color: VOICES.lady });
-      await story.say('Sie redet im Schlaf.');
-    });
-  }
-  story.note('Schlafwagen: Im unteren Bett schläft eine alte Dame und murmelt im Schlaf. Hinten ist ein Gitter zum Gepäckwagen.');
-}
-
-// ============================================================================================
-//  Frau Adler
-// ============================================================================================
-
-function murmur(story) {
-  return MURMURS[tunnels(story) % MURMURS.length];
-}
-
-async function visitSleeper(story) {
-  if (inTunnel(story)) return story.say('Im Dunkeln lasse ich sie lieber schlafen.');
-  const index = await story.choose(['Zuhören, was sie murmelt', 'Sie aufwecken', 'Sie schlafen lassen'], 'Frau Adler schläft');
-  if (index === 0) return listen(story);
-  if (index === 1) {
-    await story.say('Frau Adler? Hallo? Aufwachen!');
-    story.sound('snore');
-    await story.wait(0.8);
-    await story.say('Sie schläft wie ein Stein. Rufen hilft nicht.');
-    if (!story.flags.wakeNoted) {
-      story.flags.wakeNoted = true;
-      story.note('Frau Adler wacht nicht auf, wenn ich sie rufe. Sie schläft wie ein Stein.');
-    }
-  }
-}
-
-async function listen(story) {
-  const f = story.flags;
-  const { chunks, text } = murmur(story);
-  await story.say('Ich beuge mich zu ihr hinunter …');
-  f.ladyTalking = true;
-  await story.speak(text, { at: LADY, color: VOICES.lady });
-  f.ladyTalking = false;
-  const fresh = chunks.filter((chunk) => !f.heard.includes(chunk));
-  if (fresh.length === 0) {
-    await story.say(f.heard.length >= CHUNKS.length
-      ? 'Das habe ich schon. Ich habe alle Stücke.'
-      : 'Das hat sie vorhin schon gesagt. Nach dem nächsten Tunnel murmelt sie bestimmt etwas anderes.');
-    return;
-  }
-  f.heard.push(...fresh);
-  if (!story.has('sleepNotes')) {
-    story.give('sleepNotes');
-    await story.say('Das schreibe ich mir auf.');
-    story.note('Frau Adler murmelt im Schlaf Stücke eines Satzes. Ich schreibe sie auf einen Zettel (Rechtsklick auf den Zettel im Inventar).');
-  } else {
-    story.sound('paper');
-    await story.say('Ein neues Stück! Auf den Zettel damit.');
-  }
-  story.note(`Frau Adler murmelt (Runde ${story.lap}): „${fresh.map((chunk) => CHUNKS[chunk]).join(' … ')}“`);
-  if (f.heard.length >= CHUNKS.length) {
-    await story.say('Das müssten alle Stücke sein. Jetzt muss ich sie nur noch richtig zusammensetzen.');
-  } else if (!f.roundsNoted) {
-    f.roundsNoted = true;
-    await story.say('Das ist nur ein Stück. Vielleicht murmelt sie in jeder Runde etwas anderes …');
-  }
-}
-
-async function arrangeSentence(story) {
-  const f = story.flags;
-  if (inTunnel(story)) return story.say('Im Dunkeln kann ich meinen Zettel nicht lesen.');
-  story.sound('paper');
-  const done = await story.view('sentence', { chunks: CHUNKS, heard: f.heard ?? [] });
-  if (!done || f.sentenceDone) return;
-  f.sentenceDone = true;
-  await story.say('„Das Wort für das Gitter steht im Spiegel, wenn der Mond ins Fenster schaut. Aber nur, wenn das Rollo oben ist.“');
-  story.note('Frau Adlers Satz: „Das Wort für das Gitter steht im Spiegel, wenn der Mond ins Fenster schaut. Aber nur, wenn das Rollo oben ist.“');
-  await story.say(f.blindUp ? 'Das Rollo ist schon oben. Jetzt fehlt nur der Mond.' : 'Alle Rollos sind unten. Nur das mittlere rechts hat eine Schlaufe – eine abgerissene.');
-}
-
-// Mit der Taschenlampe ins Gesicht: Sie wacht auf, schreit, zieht die Notbremse
-async function wakeLady(story) {
-  const f = story.flags;
-  if (f.ladyAwake) return story.say('Sie ist doch schon wach. Und mehr als genug erschrocken.');
-  const lady = (text) => story.speak(text, { at: LADY, color: VOICES.lady });
-  await story.cutscene(async () => {
-    await story.say('Ich leuchte ihr ins Gesicht …');
-    f.ladyAwake = true;
-    f.ladyTalking = true;
-    story.sound('dread');
-    await lady('AAAH! Licht! Der Mann mit dem Schal!! Hilfe! Notbremse!!');
-    await story.say('Sie springt aus dem Bett, quer durch den Wagen – an die Notbremse!');
-    f.brakePulled = true;
-    story.sound('brake');
-    for (const [delay, strength] of [[0, 5], [0.25, 4], [0.6, 3], [1.1, 2]]) {
-      story.wait(delay).then(() => story.motion.bump(strength));
-    }
-    story.motion.flickerStart = story.motion.time;
-    await story.wait(0.6);
-    f.hatboxDown = true;
-    await story.wait(0.5);
-    story.sound('thud');
-    await story.wait(1.2);
-    await story.say('Die Räder kreischen … aber der Zug wird nicht langsamer. Kein bisschen.');
-    await story.say('Und von der Gepäckablage ist etwas heruntergefallen.');
-    await lady('Oh … Sie sind es gar nicht. Sie sehen nur aus wie er. Verzeihung.');
-    f.ladyTalking = false;
+async function sortLetters(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln kann ich die Stempel nicht lesen.');
+  if (story.flags.holesSorted) return story.say('Fertig sortiert. Leer bleiben I, IV, VI und IX.');
+  const solved = await story.view('arrange', {
+    id: 'holes',
+    title: 'Die Fächer des Postwagens',
+    slots: HOLE_SLOTS,
+    tokens: letterTokens(),
+    partial: true,
+    drawBackground: drawHoles,
+    drawToken: drawLetterToken,
+    check: checkHoles,
+    help: 'Briefe mit gedrückter Maustaste in die Fächer ziehen  ·  Rechtsklick: zurück',
   });
-  if (!f.brakeNoted) {
-    f.brakeNoted = true;
-    story.note('Mit der Taschenlampe geweckt, hat Frau Adler mich für „den Mann mit dem Schal“ gehalten und die Notbremse gezogen. Der Zug bremst nicht – aber der Ruck hat die Hutschachtel von der Gepäckablage geworfen.');
-  }
-}
-
-async function talkToLady(story) {
-  const f = story.flags;
-  if (inTunnel(story)) return story.say('Im Dunkeln erschrecke ich sie nur wieder.');
-  const used = (f.ladyTopics ??= {});
-  const lady = async (text) => {
-    f.ladyTalking = true;
-    await story.speak(text, { at: LADY, color: VOICES.lady });
-    f.ladyTalking = false;
-  };
-  for (;;) {
-    const topics = [
-      { id: 'who', text: 'Wer sind Sie?' },
-      { id: 'scarf', text: 'Wer ist der Mann mit dem Schal?' },
-      { id: 'word', text: 'Sie murmeln im Schlaf. Was bedeutet das?' },
-      { id: 'grate', text: 'Was ist hinter dem Gitter?' },
-      f.hatboxDown && { id: 'hatbox', text: 'Gehört Ihnen die Hutschachtel?' },
-      { id: 'bye', text: 'Schlafen Sie gut, Frau Adler.' },
-    ].filter(Boolean);
-    const index = await story.choose(topics.map((topic) => ({ text: topic.text, used: used[topic.id] })), 'Frau Adler');
-    const topic = topics[index];
-    if (!topic) return;
-    used[topic.id] = true;
-    await story.say(topic.text);
-    if (topic.id === 'bye') {
-      await lady('Ich versuche es. Im Tunnel schlafe ich sowieso immer ein.');
-      return;
-    }
-    if (topic.id === 'who') {
-      await lady('Henriette Adler. Eigentlich sitze ich im Speisewagen, an Tisch vier. Aber ich bin so müde …');
-      await lady('Jede Runde stoßen wir an. Und jede Runde verschwindet einer. Ich will das nicht mehr sehen.');
-    } else if (topic.id === 'scarf') {
-      await lady('Er sieht aus wie Sie. Nur … müder. Viel müder. Er schläft nie.');
-      await lady('Jede Runde leuchtet er mir ins Gesicht und fragt, ob ich das Wort noch weiß.');
-      story.note('Frau Adler über den Mann mit dem Schal: „Er sieht aus wie Sie. Nur müder. Er schläft nie.“');
-    } else if (topic.id === 'word') {
-      await lady('Das Wort? Er hat es in den Spiegel geschrieben – damit er es selbst nicht vergisst.');
-      await lady('Und dann hat er mein Rollo heruntergerissen. Damit es keiner lesen kann. Nur im Mondlicht sieht man es.');
-      story.note('Frau Adler: Der Mann mit dem Schal hat das Wort in den Spiegel geschrieben. Man sieht es nur im Mondlicht. Er hat das Rollo heruntergerissen.');
-    } else if (topic.id === 'grate') {
-      await lady('Der Gepäckwagen. Mein Kasimir ist da drin – mein Papagei! Ganz allein im Dunkeln.');
-      await lady('Bitte sehen Sie nach ihm. Und geben Sie ihm etwas zu fressen, sonst redet er kein Wort.');
-      story.note('Frau Adlers Papagei Kasimir ist im Gepäckwagen. „Geben Sie ihm etwas zu fressen, sonst redet er kein Wort.“');
-    } else if (topic.id === 'hatbox') {
-      await lady('Ach, die ist heruntergefallen? Nehmen Sie ruhig, was Sie brauchen. Hüte trage ich nachts nicht.');
-    }
-  }
+  if (!solved) return;
+  story.flags.holesSorted = true;
+  await story.say('Jeder Brief in seiner Runde. Und vier Fächer bleiben leer: Eins, vier, sechs und neun.');
+  await story.say('In diesen Runden kam keine Post an. Oder jemand hat sie herausgenommen.');
+  story.note('Fächer nach Runden sortiert: leer bleiben I, IV, VI, IX → 1, 4, 6, 9.');
 }
 
 // ============================================================================================
-//  Hutschachtel, oberes Bett, Rollo
+//  2. Schrank und Rohrpost
 // ============================================================================================
 
-async function openHatbox(story) {
+async function openCabinet(story) {
   const f = story.flags;
-  if (story.has('hatpin')) {
-    f.hatboxOpen = true;
-    return story.say('Nur noch der Hut mit den Federn. Der steht mir nicht.');
-  }
-  story.sound('paper');
-  f.hatboxOpen = true;
-  await story.say('Ein Hut mit drei Federn …');
-  story.give('hatpin');
-  await story.say('… und eine lange Hutnadel. Die Spitze ist zu einem kleinen Haken umgebogen.');
-  story.note('In Frau Adlers Hutschachtel: eine Hutnadel, deren Spitze zu einem Haken umgebogen ist.');
-}
-
-async function climbUp(story) {
-  const f = story.flags;
-  await story.say('Ich klettere die Leiter hoch …');
-  if (f.pillowNote) return story.say('Im oberen Bett liegt niemand. Unter dem Kissen war nur der Zettel.');
-  f.pillowNote = true;
-  await story.say('Niemand da. Aber unter dem Kopfkissen steckt ein Zettel.');
-  story.sound('paper');
-  await story.card({
-    kind: 'paper',
-    lines: [
-      'Joseph. Die alte Dame redet im Schlaf – jede Runde ein anderes Stück. Hör zu und schreib mit.',
-      'Rufen weckt sie nicht. Licht schon. Aber dann zieht sie die Notbremse.',
-      'Das Wort im Spiegel habe ICH geschrieben. Und ich habe das Rollo heruntergerissen. Es tut mir leid.',
-    ],
-    signature: '– J.',
-  });
-  await story.say('Wieder meine Schrift.');
-  story.note('Zettel im oberen Bett, in meiner Schrift: „Sie redet im Schlaf – jede Runde ein anderes Stück. Rufen weckt sie nicht, Licht schon. Dann zieht sie die Notbremse. Das Wort im Spiegel habe ich geschrieben.“');
-}
-
-async function raiseBlind(story) {
-  const f = story.flags;
-  if (f.blindUp) return story.say('Das Rollo ist schon oben.');
-  await story.say('Mit dem Haken der Hutnadel angle ich nach dem kleinen Ring …');
-  await story.wait(0.6);
-  story.sound('blind');
-  f.blindUp = true;
-  await story.wait(0.4);
-  await story.say('Hab ihn! Das Rollo schnellt hoch.');
-  story.note('Mit der Hutnadel habe ich das Rollo am mittleren rechten Fenster hochgezogen. Jetzt kann der Mond hereinscheinen.');
-  if (f.moonlight > 0.5) return;
-  await story.say(f.sentenceDone ? 'Jetzt muss nur noch der Mond in dieses Fenster schauen.' : 'Draußen Schnee und Wald. Und der Mond wandert, Runde um Runde.');
-}
-
-// ============================================================================================
-//  Spiegel und Mond
-// ============================================================================================
-
-async function noticeMoon(story) {
-  story.sound('shimmer');
-  await story.respond(async () => {
-    story.faceToward({ x: MIRROR_CENTER.x, y: MIRROR_CENTER.y });
-    await story.say('Der Mond scheint durchs Fenster – quer durch den Wagen, genau auf den Spiegel!');
-  });
-}
-
-async function watchMirror(story) {
-  const f = story.flags;
-  if (story.isDark) return story.say('Im Dunkeln sehe ich im Spiegel gar nichts.');
-  const watching = story.view('mirror', { light: () => f.moonlight, word: CODE });
-  if (f.moonlight < 0.5) {
-    await story.say('Beschlagen. Ich sehe nur mich selbst – müde und verschwommen.');
-    if (f.sentenceDone) await story.say('Das Wort steht im Spiegel, wenn der Mond ins Fenster schaut …');
-  }
-  const seen = await watching;
-  if (!seen || f.wordSeen) return;
-  f.wordSeen = true;
-  story.sound('dread');
-  await story.say('Ein Wort im Mondlicht – in Spiegelschrift. Von rechts nach links: S … C … H … A … L.');
-  await story.say('SCHAL.');
-  story.note('Im Mondlicht stand im Spiegel ein Wort in Spiegelschrift: SCHAL. Fünf Buchstaben – wie am Gitter.');
-}
-
-// Steht der Mond im (oder knapp am) freien Fenster? Etwas großzügig, damit Joseph Zeit hat, zum Spiegel zu gehen.
-const MOON_MARGIN = 45;
-function moonNearWindow(story, heading) {
-  const outside = story.scene.outside;
-  const moon = outside.layers.find((layer) => layer.bearing !== undefined);
-  const x = outside.skyObjectX(moon, heading);
-  return x > MOON_WINDOW.from - MOON_MARGIN && x < MOON_WINDOW.to + MOON_MARGIN;
-}
-
-// Auf dem Stuhl warten: auf den Tunnel – oder bis der Mond in das freie Fenster schaut
-async function sitDown(story) {
-  const f = story.flags;
-  const options = ['Bis zum nächsten Tunnel warten'];
-  if (f.blindUp) options.push('Warten, bis der Mond ins Fenster schaut');
-  options.push('Lieber nicht');
-  const index = await story.choose(options, 'Warten');
-  if (options[index] === 'Bis zum nächsten Tunnel warten') return waitForTunnel(story, { sit: 'Ich setz mich und warte auf den Tunnel. Nicht einschlafen …' });
-  if (options[index] === 'Warten, bis der Mond ins Fenster schaut') return waitForMoon(story);
-}
-
-async function waitForMoon(story) {
-  if (story.flags.moonlight > 0.5) return story.say('Der Mond scheint doch gerade herein!');
-  const motion = story.motion;
-  let ahead = null;
-  for (let d = 0.5; d < motion.lapLength; d += 0.25) {
-    const heading = (((motion.lapTime + d) % motion.lapLength) / motion.lapLength) * 360;
-    if (moonNearWindow(story, heading)) {
-      ahead = d;
-      break;
-    }
-  }
-  if (ahead === null) return story.say('Der Mond kommt nicht. Seltsam.');
-  if (ahead > motion.tunnelAhead) {
-    await story.say('Vorher kommt noch der Tunnel.');
-    return waitForTunnel(story, { sit: 'Ich setz mich und warte. Erst der Tunnel, dann der Mond. Nicht einschlafen …' });
-  }
-  await story.cutscene(async () => {
-    await story.say('Ich setz mich und sehe zum Fenster. Der Mond wandert … ganz langsam …');
-    await story.fadeOut(1);
-    motion.advance(ahead + 1);
-    await story.wait(0.6);
-    story.fadeIn(1);
-    await story.wait(0.8);
-  });
-}
-
-// ============================================================================================
-//  Gitter
-// ============================================================================================
-
-async function tryLock(story) {
+  if (f.cabinetOpen) return story.say(story.has('postNote') ? 'Leer. Die Dienstanweisung habe ich.' : 'Leer.');
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Zahlen nicht.');
   let tries = 0;
   const opened = await story.codeLock({
-    id: 'grate',
-    digits: CODE.length,
-    alphabet: LETTERS,
+    id: 'cabinet3',
+    digits: 4,
     style: 'steel',
     check: (code) => {
       tries += 1;
-      return code === CODE;
+      return code === CABINET_CODE;
     },
   });
-  if (opened) return openGrate(story);
-  if (tries === 0 || inTunnel(story)) return;
-  await story.say(story.flags.wordSeen ? 'Falsch. Das Wort aus dem Spiegel – rückwärts gelesen!' : 'Nichts. Fünf Buchstaben – raten bringt hier nichts.');
+  if (!opened) {
+    if (tries > 0) await story.say(f.holesSorted ? 'Falsch. Die leeren Fächer, der Reihe nach …' : 'Falsch. Der Postmeister hat sich den Code bestimmt irgendwo hier gemerkt.');
+    return;
+  }
+  f.cabinetOpen = true;
+  story.sound('unlock');
+  await story.say('Eins, vier, sechs, neun. Auf!');
+  story.give('postNote');
+  await story.say('Eine Dienstanweisung vom Postmeister.');
+  await readNote(story);
 }
 
-async function openGrate(story) {
-  await story.cutscene(async () => {
-    story.flags.grateOpen = true;
-    story.sound('chain');
-    await story.say('S – C – H – A – L. Das Schloss springt auf.');
-    await story.speak('… Kasimir … pass auf Kasimir auf …', { at: LADY, color: VOICES.lady });
-    await story.say('Mach ich, Frau Adler. Schlafen Sie gut.');
-    story.sound('slide');
-    await story.wait(1);
-    await story.fadeOut(1.4);
-    story.note('Das Gitter zum Gepäckwagen ging mit dem Wort SCHAL auf.');
+async function readNote(story) {
+  story.sound('paper');
+  await story.card({ draw: drawPostmasterNote });
+  if (story.flags.noteRead) return;
+  story.flags.noteRead = true;
+  await story.say('Der Brief an J. steckt in der Rohrpost. Leitung 3. Das ist die Station rechts neben der Tür.');
+  story.note('Dienstanweisung: Der Brief an J. (Runde 108) steckt in Rohrpost-Leitung 3. Alle vier Weichen müssen gerade stehen – jede dreht ihre Nachbarn mit.');
+}
+
+async function openTubes(story) {
+  const f = story.flags;
+  if (f.letterArrived) return story.say('Die Leitung ist leer. Den Brief habe ich.');
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Weichen nicht.');
+  f.switches ??= [false, true, true, false];
+  const state = { open: f.switches, capsule: null };
+  await story.view('picture', {
+    state,
+    draw: (ctx, view) => drawTubes(ctx, view.state),
+    spots: () => (state.capsule !== null ? [] : [...switchSpots(), { id: 'send', x: 1030, y: 300, w: 80, h: 120, label: 'Rohrpost anfordern' }]),
+    area: { x: 150, y: 110, w: 980, h: 500 },
+    help: 'Klicken: Weiche drehen  ·  rechts: Rohrpost anfordern  ·  Rechtsklick: zurück',
+    onClick: async (spot, view) => {
+      const s = view.state;
+      if (spot.id === 'send') {
+        if (!f.noteRead) return story.say('Was soll ich anfordern? Ich weiß ja nicht einmal, was in der Leitung steckt.');
+        story.sound('hiss');
+        const blocked = s.open.findIndex((open) => !open);
+        const stop = blocked < 0 ? 1060 : SWITCH_X[blocked];
+        for (let x = 220; x <= stop; x += 20) {
+          s.capsule = x;
+          await story.wait(0.03);
+        }
+        if (blocked >= 0) {
+          await story.say(`Fump … Die Büchse bleibt an Weiche ${blocked + 1} hängen und rutscht zu den Fundsachen.`);
+          s.capsule = null;
+          return;
+        }
+        story.sound('thud');
+        await story.wait(0.4);
+        view.close(true);
+        return;
+      }
+      const i = Number(spot.id.slice(1));
+      for (const j of COUPLED[i]) s.open[j] = !s.open[j];
+      story.sound('rotate');
+    },
   });
-  await finishWagon(story, { number: 3, next: 4, nextName: 'Gepäckwagen' });
+  if (state.capsule === 1060 && !f.letterArrived) {
+    f.letterArrived = true;
+    story.give('cipherLetter');
+    await story.say('Fump! Die Büchse ist da. Darin: ein Brief. „An J.“');
+    await readLetter(story);
+  }
+}
+
+// ============================================================================================
+//  3. Der verschlüsselte Brief
+// ============================================================================================
+
+async function readLetter(story) {
+  const f = story.flags;
+  const state = { turn: f.turn ?? 0 };
+  await story.view('picture', {
+    state,
+    draw: (ctx, view) => drawCipherLetter(ctx, view.state),
+    spots: DISK_SPOTS,
+    help: 'Pfeile: Chiffrierscheibe drehen  ·  Rechtsklick: zurück',
+    onClick: async (spot, view) => {
+      const s = view.state;
+      s.turn = (s.turn + (spot.id === 'right' ? 1 : 25)) % 26;
+      f.turn = s.turn;
+      story.sound('wheel');
+      if (s.turn === SHIFT && !f.decoded) {
+        f.decoded = true;
+        await story.wait(0.3);
+        await story.say('Jetzt! Vier Buchstaben zurück – hundertacht Runden sind vier ganze Alphabete und noch vier.');
+        await story.say('„Morgen verschwindet jemand. Achte auf die Gläser.“');
+        await story.say('„Das Wort für die Tür: Stern.“ Unterschrieben: „Dein J.“');
+        story.note('Der Brief an J. (Runde 108, um 4 verschoben): „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: STERN. Dein J.“');
+      }
+    },
+  });
+  if (!f.decoded && !f.letterSeen) {
+    f.letterSeen = true;
+    await story.say('Lauter Buchstabensalat. „Verschiebung: wie die Runde“ – und die Runde ist hundertacht.');
+  }
+}
+
+// ============================================================================================
+//  Tür und Ende
+// ============================================================================================
+
+async function tryDoor(story) {
+  if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die Buchstaben nicht.');
+  let tries = 0;
+  const opened = await story.codeLock({
+    id: 'door3',
+    digits: 5,
+    alphabet: LETTERS,
+    check: (code) => {
+      tries += 1;
+      return code === DOOR_WORD;
+    },
+  });
+  if (!opened) {
+    if (tries > 0) await story.say(story.flags.decoded ? 'Falsch. S-T-E-R-N …' : 'Falsch. Fünf Buchstaben.');
+    return;
+  }
+  await story.cutscene(async () => {
+    story.sound('unlock');
+    await story.say('S-T-E-R-N. Offen.');
+    await story.say('„Morgen verschwindet jemand. Achte auf die Gläser.“ Wer schreibt mir diese Briefe – in meiner eigenen Schrift?');
+    story.sound('door');
+    await finishWagon(story, {
+      number: 3,
+      title: 'Ende von Wagen 3',
+      lines: ['Der Brief an J.: „Morgen verschwindet jemand. Achte auf die Gläser.“'],
+      nextTitle: 'im Speisewagen',
+    });
+  });
 }
 
 // ============================================================================================
@@ -599,41 +285,28 @@ async function openGrate(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  const heard = f.heard?.length ?? 0;
-  if (f.wordSeen) {
-    return { id: 'grate', lines: ['Das Wort aus dem Spiegel gehört ans Gitter: S – C – H – A – L.'] };
-  }
-  if (heard === 0) {
-    return { id: 'listen', lines: [
-      'Die alte Dame murmelt im Schlaf. Ich sollte genau hinhören.',
-      'Linksklick auf Frau Adler, dann „Zuhören“.',
-    ] };
-  }
-  if (heard < CHUNKS.length) {
-    return { id: `more${heard}`, lines: [
-      'Sie murmelt nur Stücke eines Satzes. In jeder Runde vielleicht ein anderes?',
-      'Nach jedem Tunnel noch einmal zuhören. Auf dem Stuhl neben dem Nachttisch kann ich auf den Tunnel warten.',
-    ] };
-  }
-  if (!f.sentenceDone) {
-    return { id: 'sentence', lines: [
-      'Ich habe alle Stücke auf meinem Zettel. Rechtsklick auf den Zettel im Inventar – dann die Stücke ordnen.',
-      'Der Satz fängt mit „Das Wort“ an und hört mit „wenn das Rollo oben ist.“ auf.',
-    ] };
-  }
-  if (!f.blindUp) {
-    if (!story.has('hatpin')) {
-      return { id: 'hatpin', lines: [
-        'Das Rollo am mittleren rechten Fenster muss hoch. Die Schlaufe ist abgerissen – ich bräuchte etwas Langes mit einem Haken.',
-        'Ganz oben auf der Gepäckablage steht eine Hutschachtel. In Hutschachteln gibt es Hutnadeln. Wenn sie nur herunterfiele …',
-        f.pillowNote ? 'Der Zettel aus dem oberen Bett sagt: Licht weckt sie – und dann zieht sie die Notbremse. Ein ordentlicher Ruck …' : 'Im oberen Bett (über die Leiter) liegt vielleicht ein Hinweis.',
-        'Taschenlampe im Inventar anklicken, dann Frau Adler: Sie wacht auf und zieht die Notbremse. Der Ruck wirft die Hutschachtel herunter.',
+  if (!f.cabinetOpen) {
+    if (!f.holesSorted) {
+      return { id: 'holes', lines: [
+        'Der Schrank des Postmeisters will vier Ziffern. Und in den Fächern fehlt Post.',
+        'Die losen Briefe in die Fächer sortieren: Der Stempel sagt die Runde, das Fach hat die Runde als römische Zahl.',
+        'I = 1, V = 5, X = 10. IV = 4, IX = 9, XIV = 14, XIX = 19, XXI = 21. Welche Fächer bleiben am Ende leer?',
       ] };
     }
-    return { id: 'blind', lines: ['Mit dem Haken der Hutnadel komme ich an den Ring des Rollos: Hutnadel im Inventar anklicken, dann das mittlere rechte Fenster.'] };
+    return { id: 'cabinet', lines: ['Leer bleiben die Fächer I, IV, VI und IX – das ist der Code für den Schrank: 1469.'] };
   }
-  return { id: 'moon', lines: [
-    'Das Rollo ist oben. Jetzt muss der Mond in dieses Fenster schauen – dann in den Spiegel sehen.',
-    'Auf dem Stuhl kann ich warten, bis der Mond kommt. Dann den Spiegel hinten rechts ansehen.',
-  ] };
+  if (!f.letterArrived) {
+    return { id: 'tubes', lines: [
+      'Der Brief steckt in der Rohrpost – die Station rechts neben der Tür.',
+      'Alle vier Weichen müssen gerade stehen. Jede Weiche dreht ihre Nachbarn mit – ausprobieren und mitzählen.',
+      'Von krumm-gerade-gerade-krumm aus: Weiche 2 und Weiche 3 je einmal drehen. Dann rechts die Rohrpost anfordern.',
+    ] };
+  }
+  if (!f.decoded) {
+    return { id: 'decode', lines: [
+      'Der Brief: Rechtsklick auf ihn im Inventar. „Verschiebung: wie die Runde“ – Runde 108.',
+      'Das Alphabet hat 26 Buchstaben. 108 geteilt durch 26 … Rest 4. Die Scheibe um 4 drehen.',
+    ] };
+  }
+  return { id: 'door', lines: ['Das Wort für die Tür steht im Brief: STERN.'] };
 }

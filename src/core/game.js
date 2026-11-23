@@ -17,18 +17,24 @@ import { Jigsaw } from '../puzzles/jigsaw.js';
 import { Wires } from '../puzzles/wires.js';
 import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
-import { Sentence } from '../puzzles/sentence.js';
-import { Mirror } from '../puzzles/mirror.js';
-import { Choice } from '../ui/choice.js';
+import { PictureView } from '../puzzles/picture.js';
+import { ArrangeView } from '../puzzles/arrange.js';
+import { DialogueView } from '../ui/dialogue.js';
 import { Story } from '../story/story.js';
-import { WAGONS, loadProgress, saveProgress } from '../story/wagons.js';
-import { DEBUG_AT_START, KEYS, SKIP_INTRO, START_MUTED, START_WAGON } from '../config.js';
+import { ITEMS } from '../story/items.js';
+import { Calendar } from '../advent/calendar.js';
+import { SaveGame } from '../advent/save.js';
+import { doorInfo, today } from '../advent/doors.js';
+import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, TEST_MODE } from '../config.js';
 
 // Das Herz des Spiels.
 //
 // Verwaltet Bildschirm, Eingaben, Kamera, Ton, Joseph, die aktuelle Szene, die Benutzeroberfläche
 // (Mauszeiger, Inventar, Sprechtexte, Notizbuch …) und die Geschichte. Ruft ca. 60-mal pro Sekunde
 // update() (Spiellogik) und draw() (Zeichnen) auf.
+//
+// Zuerst kommt der Adventskalender (src/advent/calendar.js). Wer eine Tür wählt, steigt in diesen Wagen
+// (Szene + Drehbuch, siehe src/advent/doors.js). Ist der Wagen geschafft, geht es zurück zum Kalender.
 //
 // Ein Klick geht der Reihe nach an: Karte (Titelbild, Brief …) → Nahansicht (Zahlenschloss, Rätsel) →
 // Notizbuch → Zwischensequenz (Klick überspringt nur den Satz) → Notizbuch-Knopf → Inventar → Abteil.
@@ -45,6 +51,12 @@ export class Game {
     this.story = null;
     this.lastTime = 0;
 
+    // Adventskalender und Spielstand
+    this.calendar = new Calendar();
+    this.save = new SaveGame();
+    this.door = null;     // Tür, die gerade gespielt wird
+    this.finished = null; // beendet den laufenden Wagen (setzt playDoor)
+
     // Benutzeroberfläche
     this.cursor = new Cursor();
     this.inventory = new Inventory();
@@ -60,9 +72,9 @@ export class Game {
       wires: new Wires(),
       binoculars: new Binoculars(),
       crt: new Crt(),
-      sentence: new Sentence(),
-      mirror: new Mirror(),
-      choice: new Choice(),
+      picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
+      arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
+      dialogue: new DialogueView(), // Gesprächsauswahl
     };
     for (const view of Object.values(this.views)) {
       view.onSound = (name) => this.effects.play(name);
@@ -79,11 +91,63 @@ export class Game {
     return Object.values(this.views).find((view) => view.isOpen) ?? null;
   }
 
+  // Lädt alles, was Kalender und Wagen gemeinsam brauchen (Mauszeiger, Joseph, Inventar, Notizbuch)
+  prepare() {
+    return Promise.all([this.player.load(), this.cursor.load(), this.inventory.load(), this.notebook.load()]);
+  }
+
+  // Abwechselnd: Kalender zeigen, gewählte Tür spielen, zurück zum Kalender
+  async run() {
+    if (START_DOOR && doorInfo(START_DOOR)?.load) await this.playDoor(START_DOOR, { skipIntro: SKIP_INTRO });
+    for (;;) {
+      this.overlay.fade = 0;
+      this.sound.tunnel(false);
+      const door = await this.calendar.open({ save: this.save, now: today(FAKE_DATE), test: TEST_MODE });
+      await this.playDoor(door, { skipIntro: SKIP_INTRO });
+    }
+  }
+
+  // Eine Tür spielen: Wagen laden, Mitgebrachtes übergeben, warten bis er geschafft ist, Spielstand speichern
+  async playDoor(door, { skipIntro = false } = {}) {
+    const entry = doorInfo(door);
+    this.overlay.fade = 1;
+    this.scene = null;
+    const { scene, script } = await entry.load();
+    const carried = this.save.carriedInto(door);
+    await this.loadScene(scene, script, {
+      items: [...new Set([...carried.items, ...(script.startItems ?? [])])],
+      notes: carried.notes,
+    });
+    this.door = door;
+    const startedAt = performance.now();
+    const done = new Promise((resolve) => {
+      this.finished = resolve;
+    });
+    this.story.begin({ skipIntro });
+    await done;
+    this.finished = null;
+    this.save.complete(door, {
+      items: this.inventory.items.filter((id) => ITEMS[id]?.keep),
+      notes: this.notebook.entries.filter((entry) => !entry.carried).map((entry) => entry.text),
+      minutes: Math.max(1, Math.round((performance.now() - startedAt) / 60000)),
+    });
+    this.closeViews();
+    this.speech.finish();
+    this.hints.hide();
+  }
+
+  // Vom Drehbuch aufgerufen (story.finish()), wenn der Wagen geschafft ist
+  finishDoor() {
+    this.finished?.();
+  }
+
   // Lädt eine Szene samt Bildern, stellt Joseph an seine Startposition und bereitet die Geschichte vor.
-  // Kommt Joseph aus einem anderen Wagen, fährt der Zug einfach weiter (gleiche Stelle, gleiche Runde).
-  async loadScene(sceneData, script) {
+  // carried = was Joseph aus früheren Wagen mitbringt: { items: ['flashlight'], notes: [{ door, text }] }.
+  // Ohne carried (Teil 1, durch die Tür in den nächsten Wagen) behält Joseph Inventar und Notizbuch,
+  // und der Zug fährt einfach weiter (gleiche Stelle, gleiche Runde).
+  async loadScene(sceneData, script, carried = null) {
     const scene = new Scene(sceneData);
-    await Promise.all([scene.load(), this.player.load(), this.cursor.load(), this.inventory.load(), this.notebook.load()]);
+    await Promise.all([scene.load(), this.prepare()]);
     const previous = this.scene?.motion;
     this.story?.cancelAction();
     this.closeViews();
@@ -91,13 +155,21 @@ export class Game {
     this.speech.finish();
     this.hints.hide();
     this.inventory.selected = null;
+    if (carried) {
+      this.inventory.clear(carried.items);
+      this.notebook.clear(carried.notes);
+    }
+    this.overlay.card = null;
     this.scene = scene;
     this.story = new Story(this, script);
     scene.flags = this.story.flags;
     if (scene.motion) {
       if (previous) scene.motion.continueFrom(previous);
       scene.motion.onBump = (strength) => this.sound.clack(strength);
-      scene.motion.onSqueal = (duration) => this.sound.squeal(duration);
+      scene.motion.onSqueal = (duration) => {
+        this.sound.squeal(duration);
+        this.story.onSqueal(duration);
+      };
       scene.motion.onTunnel = (inside) => {
         this.sound.tunnel(inside);
         this.story.onTunnel(inside);
@@ -109,50 +181,17 @@ export class Game {
     this.player.enterScene(scene);
   }
 
-  // Lädt einen Wagen (1 bis 4, siehe src/story/wagons.js)
-  async loadWagon(number) {
-    const wagon = WAGONS[number];
-    this.wagon = number;
-    await this.loadScene(wagon.scene, wagon.script);
-  }
-
-  // Joseph geht durch die Tür in den nächsten Wagen. Der Spielstand merkt sich, wie weit er gekommen ist.
-  async goToWagon(number) {
-    saveProgress(number);
-    this.overlay.fade = 1;
-    await this.loadWagon(number);
-    await this.story.begin();
-  }
-
   start() {
     requestAnimationFrame((time) => {
       this.lastTime = time;
       requestAnimationFrame(this.loop);
     });
-    this.begin();
+    this.run();
   }
 
-  // Titelbild – und wer schon weiter war, kann dort weiterspielen
-  async begin() {
-    const fresh = this.wagon > 1; // direkt in einem späteren Wagen begonnen: Joseph bekommt seine Sachen
-    if (SKIP_INTRO) return this.story.begin({ skipIntro: true, fresh });
-    this.overlay.fade = 1;
-    const saved = loadProgress();
-    const offer = !START_WAGON && saved > 1 && WAGONS[saved];
-    const options = offer ? ['Neues Spiel', `Weiterspielen: Wagen ${saved} – ${WAGONS[saved].name}`] : null;
-    const choice = await this.overlay.showCard({
-      kind: 'title',
-      title: 'Detective Joseph',
-      subtitle: 'Die Ringbahn',
-      continueText: options ? 'Wähle aus' : 'Klicken zum Starten',
-      options,
-    });
-    if (offer && choice === 1) {
-      await this.loadWagon(saved);
-      return this.story.begin({ fresh: true });
-    }
-    if (offer) saveProgress(1);
-    return this.story.begin({ fresh });
+  // Ist gerade der Kalender zu sehen (oder wird ein Wagen geladen)?
+  get inCalendar() {
+    return this.calendar.isOpen || !this.scene;
   }
 
   loop = (time) => {
@@ -166,6 +205,13 @@ export class Game {
   };
 
   update(dt) {
+    if (this.inCalendar) {
+      this.calendar.update(dt, this.input.mouse);
+      this.overlay.update(dt);
+      const label = this.calendar.isOpen ? this.calendar.label : '';
+      this.cursor.set({ kind: 'interact', label, visible: this.calendar.isOpen || this.overlay.blocksInput });
+      return;
+    }
     this.scene.update(dt);
     this.camera.shakeY = this.scene.motion?.shakeY ?? 0; // der Zug rumpelt
     this.player.update(dt, this.scene);
@@ -188,6 +234,16 @@ export class Game {
 
   draw() {
     const ctx = this.screen.beginFrame();
+    if (this.inCalendar) {
+      if (this.calendar.isOpen) this.calendar.draw(ctx, this.input.mouse);
+      else {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 1280, 720);
+      }
+      this.overlay.draw(ctx);
+      this.cursor.draw(ctx, this.input.mouse);
+      return;
+    }
 
     // 1) Spielwelt – wird mit der Kamera verschoben
     ctx.save();
@@ -216,8 +272,8 @@ export class Game {
     const itemName = selected ? this.story.itemName(selected) : '';
 
     this.overlay.hover = this.overlay.optionAt(mouse);
-    if (this.overlay.blocksInput) return this.cursor.set({ kind: 'interact' });
-    if (this.view || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
+    if (this.view && !this.overlay.blocksInput) return this.cursor.set({ kind: 'interact', label: this.view.labelAt?.(mouse) ?? '' });
+    if (this.overlay.blocksInput || this.notebook.isOpen) return this.cursor.set({ kind: 'interact' });
     if (this.story.inCutscene || this.overlay.fade > 0.5) return this.cursor.set({ visible: false });
     if (this.notebook.buttonContains(mouse)) return this.cursor.set({ kind: 'interact', label: 'Notizbuch (N)' });
     if (this.inventory.contains(mouse)) {
@@ -239,6 +295,7 @@ export class Game {
   handleClick(click) {
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
+    if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {
       if (this.notebook.handleClick(click) === 'hint') this.story.hint();
@@ -292,6 +349,10 @@ export class Game {
 
   handleKey(key) {
     this.sound.start();
+    if (this.inCalendar) {
+      if (key === KEYS.toggleSound) this.sound.toggleMute();
+      return;
+    }
     if (key === KEYS.toggleDebug) this.debug.toggle();
     if (key === KEYS.toggleGrid) this.debug.toggleGrid();
     if (key === KEYS.toggleSound) this.sound.toggleMute();

@@ -17,14 +17,16 @@ import { COLORS } from '../ui/text.js';
 //   story.sound('pickup')               Geräusch abspielen (siehe src/audio/soundEffects.js)
 //   await story.card({ … })             Karte zeigen: Brief, gezeichnetes Blatt … (siehe src/ui/overlay.js)
 //   await story.view('wires')           Nahansicht öffnen: Rätsel, Zahlenschloss … (siehe src/puzzles/)
+//   story.finish()                      Wagen geschafft: Spielstand speichern, zurück zum Adventskalender
+//
+// Außerdem darf ein Drehbuch festlegen:
+//   startItems: ['flashlight']          Gegenstände, die Joseph zu Beginn sicher dabeihat (zusätzlich zu dem,
+//                                       was er aus dem letzten geschafften Wagen mitbringt, siehe items.js: keep)
 //   await story.choose(['A', 'B'])      Auswahl im Gespräch: Ergebnis 0, 1 … oder -1 (abgebrochen)
 //   await story.speak('…', { at })      jemand anderes spricht (Farbe und Stelle wählbar)
-//   await story.goToWagon(2)            durch die Tür in den nächsten Wagen
 //
 // Außerdem darf ein Drehbuch enthalten:
 //   itemName(story, id)                 eigener Name für einen Gegenstand (z. B. "Papierfetzen (3 von 6)")
-//   prepare(story)                      wer direkt in diesem Wagen anfängt (Spielstand, ?wagen=3), bekommt hier
-//                                       die Sachen, die er aus den Wagen davor hätte
 //   hint(story)                         Tipp, wenn der Spieler nicht weiterweiß (Taste H / Notizbuch)
 //   update(story, dt)                   wird in jedem Bild aufgerufen
 //
@@ -65,6 +67,24 @@ export class Story {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : this.headOf(this.player)) });
   }
 
+  // Eine Figur im Wagen spricht (siehe src/scene/character.js) – solange zeigt sie ihre Sprech-Pose
+  async speakAs(id, text) {
+    const character = this.scene.character(id);
+    character.talking = true;
+    try {
+      await this.game.speech.show(text, {
+        anchor: () => (this.game.view ? SUBTITLE : character.head(this.scene)),
+        color: character.data.color ?? COLORS.speaker,
+      });
+    } finally {
+      character.talking = false;
+    }
+  }
+
+  character(id) {
+    return this.scene.character(id);
+  }
+
   // Jemand anderes spricht, z. B. die Lautsprecherstimme
   speak(text, { at = SPEAKER, color = COLORS.speaker } = {}) {
     return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : at), color });
@@ -86,6 +106,11 @@ export class Story {
 
   has(id) {
     return this.game.inventory.has(id);
+  }
+
+  // Ein Ton (Klavier, Glocke, Morsepiepen …): story.tone(440, { duration: 0.5 })
+  tone(frequency, options) {
+    this.game.effects.note(frequency, options);
   }
 
   sound(name, ...args) {
@@ -131,6 +156,16 @@ export class Story {
     return this.game.overlay.fadeTo(0, seconds);
   }
 
+  // Wagen geschafft (meist nach der Abschlusskarte): Der Spielstand wird gespeichert, dann kommt der Kalender
+  finish() {
+    this.game.finishDoor();
+  }
+
+  // Die Tür des Adventskalenders, die gerade gespielt wird (1–24)
+  get door() {
+    return this.game.door;
+  }
+
   card(card) {
     return this.game.overlay.showCard(card);
   }
@@ -144,18 +179,9 @@ export class Story {
     return this.game.views[name].open(options);
   }
 
-  // Auswahl im Gespräch (siehe src/ui/choice.js)
-  async choose(options, title) {
-    this.busy += 1;
-    try {
-      return await this.game.views.choice.open({ options, title });
-    } finally {
-      this.busy -= 1;
-    }
-  }
-
-  goToWagon(number) {
-    return this.game.goToWagon(number);
+  // Gesprächsauswahl: Ergebnis = Nummer der Antwort (0, 1, …) oder -1, wenn der Spieler abbricht
+  choose(options) {
+    return this.game.views.dialogue.open({ options });
   }
 
   // So heißt ein Gegenstand gerade (das Drehbuch darf den Namen aus dem Katalog überschreiben)
@@ -193,6 +219,13 @@ export class Story {
 
   // ---------------------------------------------------------------- Ablauf
   async begin({ skipIntro = false, fresh = false } = {}) {
+    for (const id of this.script.startItems ?? []) this.game.inventory.add(id);
+    this.game.inventory.revealTime = 0;
+    // Was bisher geschah – nur, wenn keine Notizen aus früheren Wagen mitgekommen sind (z. B. im Test-Modus)
+    if (!this.game.notebook.entries.some((entry) => entry.carried)) {
+      for (const text of this.script.recap ?? []) this.game.notebook.add(text, 0);
+    }
+    this.game.notebook.unread = 0;
     if (fresh) await this.script.prepare?.(this);
     await this.script.setup?.(this);
     if (skipIntro) await this.script.skipIntro?.(this);
@@ -273,9 +306,19 @@ export class Story {
     this.event('openedNotebook');
   }
 
-  // Ereignisse vom Zug (Tunnel, Licht)
+  // Ereignisse vom Zug (Tunnel, Licht, quietschende Räder)
   onTunnel(inside) {
     this.script.onTunnel?.(this, inside);
+  }
+
+  onSqueal(duration) {
+    this.squealUntil = this.motion.time + duration;
+    this.script.onSqueal?.(this, duration);
+  }
+
+  // Quietschen die Räder gerade? (Dann hört und sieht niemand genau hin.)
+  get squealing() {
+    return (this.squealUntil ?? 0) > (this.motion?.time ?? 0);
   }
 
   // ---------------------------------------------------------------- Hilfen

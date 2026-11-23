@@ -1,15 +1,12 @@
-// Einstiegspunkt: Spiel erzeugen, ersten Wagen laden, loslegen.
-// Mit ?wagen=2 (3, 4) in der Adresse beginnt das Spiel gleich in einem späteren Wagen.
+// Einstiegspunkt: Spiel erzeugen, Adventskalender zeigen, loslegen.
 
 import { Game } from './core/game.js';
-import { START_WAGON } from './config.js';
-import { WAGONS } from './story/wagons.js';
 
 const status = document.getElementById('status');
 
 try {
   const game = new Game(document.getElementById('game-canvas'));
-  await game.loadWagon(WAGONS[START_WAGON] ? START_WAGON : 1);
+  await game.prepare();
   status.hidden = true;
   game.start();
 

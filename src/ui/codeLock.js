@@ -8,8 +8,8 @@ import { drawSymbol } from './symbols.js';
 //     id: 'door',                                   // jedes Schloss merkt sich seine Rädchen
 //     digits: 4,
 //     symbols: ['tunnel', 'lanternLeft', 'lanternRight', 'tower'],  // (optional) Zeichen über den Rädchen
+//     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',           // (optional) Buchstaben statt Ziffern auf den Rädchen
 //     style: 'brass',                               // 'brass' (Messing) oder 'steel' (Stahl, z. B. am Koffer)
-//     alphabet: '0123456789',                       // (optional) was auf den Rädchen steht, z. B. Buchstaben
 //     check: (code) => code === '5783',
 //   });
 //
