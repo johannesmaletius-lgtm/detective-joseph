@@ -2410,6 +2410,11 @@
   "kind": "moment"
  },
  {
+  "text": "Innen im Deckel ist etwas eingraviert: „Tür –  “.",
+  "file": "wagon6.js",
+  "kind": "moment"
+ },
+ {
   "text": "Offen! Seine Sachen tauchen erst ab Runde 109 auf. Dann verschwindet er erst im nächsten Tunnel – am Ende von Runde 108.",
   "file": "wagon6.js",
   "kind": "moment"
@@ -3510,6 +3515,31 @@
   "kind": "rest"
  },
  {
+  "text": "Und ganz unten klemmt ein Papierfetzen.",
+  "file": "wagon1.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Vorne links auf dem Boden liegt zerrissenes Papier. Das sollte ich aufheben.",
+  "file": "wagon1.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Auf der linken Sitzbank liegt eine Zeitung. Darunter schaut eine Papierecke hervor.",
+  "file": "wagon1.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Unter der Kiste vorne rechts klemmt ein Stück Papier.",
+  "file": "wagon1.js",
+  "kind": "rest"
+ },
+ {
+  "text": "In der Zigarrenkiste auf dem Tisch raschelt etwas. Der Deckel klemmt – mit der Messerklinge ginge er auf.",
+  "file": "wagon1.js",
+  "kind": "rest"
+ },
+ {
   "text": "„Anhänger nach Abfahrt aufhängen – frühe zuerst.“",
   "file": "wagon2.js",
   "kind": "rest"
@@ -3930,16 +3960,6 @@
   "kind": "rest"
  },
  {
-  "text": "Bruno: „Meine Rechnung! Rechnen müssen Sie selbst, junger Mann – ich hab zu tun.“",
-  "file": "wagon4.js",
-  "kind": "rest"
- },
- {
-  "text": "Bruno: „Die Karte kenne ich auswendig. Seit hundert Runden dieselbe.“",
-  "file": "wagon4.js",
-  "kind": "rest"
- },
- {
   "text": "Ich leuchte ihm nicht ins Gesicht. Er hat ein Messer in der Hand.",
   "file": "wagon4.js",
   "kind": "rest"
@@ -4206,6 +4226,81 @@
  },
  {
   "text": "Ich lehne mich ans Fenster und warte auf den Tunnel …",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Hutschachtel. Leer.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Den Hut hat er also mitgenommen.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Seine Brille liegt auf den Büchern.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ohne Brille sieht er doch kaum etwas. Wer geht ohne Brille los?",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Seine Schuhe, ordentlich nebeneinander.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Er ist auf Socken gegangen. Mitten im Winter.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Feuchte Fußspuren. Socken – vom Bett zur Tür.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Sie führen nach vorne. Richtung Lok … Richtung Tunnel.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Messingknopf mit einem Flügelrad darauf.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der stammt von einer Schaffneruniform. Herr K. trägt keine Uniform.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Fahrschein, in die Zeitung gesteckt: „Ringbahn – gültig für 1 Runde“.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Entwertet. Mit Stempel: „Runde 108“.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Sein Mantel hängt noch am Haken. Mit rotem Schal.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Tasse mit kaltem Tee. Halb ausgetrunken.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der Mond scheint herein. Aufs Bett – aber nicht unters Bett.",
   "file": "wagon5.js",
   "kind": "rest"
  },
@@ -4645,6 +4740,11 @@
   "kind": "rest"
  },
  {
+  "text": "Eine Kinokarte auf dem Sessel.",
+  "file": "wagon8.js",
+  "kind": "rest"
+ },
+ {
   "text": "Das Glasauge leuchtet.",
   "file": "wagon9.js",
   "kind": "rest"
@@ -4965,6 +5065,16 @@
   "kind": "rest"
  },
  {
+  "text": "Falsch. Wer ist der Nächste?",
+  "file": "wagon10.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Zwei Ziffern …",
+  "file": "wagon10.js",
+  "kind": "rest"
+ },
+ {
   "text": "Herrn Ticks Werkbank.",
   "file": "wagon11.js",
   "kind": "rest"
@@ -5076,6 +5186,31 @@
  },
  {
   "text": "Ein langes rotes Sofa.",
+  "file": "wagon11.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die steht still.",
+  "file": "wagon11.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die tickt ganz normal. Eine Sekunde pro Sekunde. Mit dem Mond hat die nichts zu tun.",
+  "file": "wagon11.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die läuft rückwärts!",
+  "file": "wagon11.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die rast. Einmal herum in zehn Sekunden.",
+  "file": "wagon11.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ich setze mich kurz und warte auf den Tunnel …",
   "file": "wagon11.js",
   "kind": "rest"
  },
@@ -5251,6 +5386,16 @@
  },
  {
   "text": "Ich setze mich kurz aufs Sofa und warte auf den Tunnel …",
+  "file": "wagon12.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Was sagen die Noten mit den Kreuzen?",
+  "file": "wagon12.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Vier Buchstaben …",
   "file": "wagon12.js",
   "kind": "rest"
  },
@@ -5840,12 +5985,42 @@
   "kind": "rest"
  },
  {
-  "text": "Ich setze mich kurz und warte auf den Tunnel …",
+  "text": "Die Kopfhörer des Funkers. Wer sie aufhat, hört nichts anderes mehr.",
   "file": "wagon16.js",
   "kind": "rest"
  },
  {
-  "text": "Die Kopfhörer des Funkers. Wer sie aufhat, hört nichts anderes mehr.",
+  "text": "Nur Rauschen. Welche Frequenz käme nach 270?",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Nur Rauschen.",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„HIER BAHNHOF …“",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„ZUG 24 SOFORT HALTEN …“",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„WEICHE 7 FALSCH …“",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„BITTE ANTWORTEN …“",
+  "file": "wagon16.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Die vier Morsezeichen vom Ende des Funkspruchs …",
   "file": "wagon16.js",
   "kind": "rest"
  },
@@ -6120,6 +6295,16 @@
   "kind": "rest"
  },
  {
+  "text": "Falsch. Wer hat den 24. am Ende wirklich gefahren?",
+  "file": "wagon18.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Vier Buchstaben – ein Name?",
+  "file": "wagon18.js",
+  "kind": "rest"
+ },
+ {
   "text": "Die Kameratasche. Offen.",
   "file": "wagon19.js",
   "kind": "rest"
@@ -6280,6 +6465,46 @@
   "kind": "rest"
  },
  {
+  "text": "Licht an.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Licht aus.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Vorhang zu.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Vorhang auf.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Rotlicht an.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Rotlicht aus.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Der Kilometerstein …",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Drei Ziffern.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
   "text": "Die Kisten stehen jetzt neben der Luke.",
   "file": "wagon20.js",
   "kind": "rest"
@@ -6341,6 +6566,16 @@
  },
  {
   "text": "Ein Lautsprecher. Still.",
+  "file": "wagon20.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Was steht auf der Kelle?",
+  "file": "wagon20.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Vier Ziffern.",
   "file": "wagon20.js",
   "kind": "rest"
  },
@@ -6431,6 +6666,16 @@
  },
  {
   "text": "Zwei Schalter. Licht.",
+  "file": "wagon21.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Kohlen im Bunker rutschen nach vorne! Es geht bergab – jetzt pumpen!",
+  "file": "wagon21.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Die Nummer am Ärmel …",
   "file": "wagon21.js",
   "kind": "rest"
  },
@@ -6535,6 +6780,31 @@
   "kind": "rest"
  },
  {
+  "text": "Falsch. Welche Uhrzeit steht bei Kilometer 24,7?",
+  "file": "wagon22.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Vier Ziffern – eine Uhrzeit?",
+  "file": "wagon22.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das bist du. Mit deiner Frau und deiner Tochter. Vor dem Weihnachtsbaum.",
+  "file": "wagon22.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Und das bist du am Bahnsteig. In der Nacht, als der Zug nicht kam.",
+  "file": "wagon22.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„Für Papa. Damit du uns nach Hause bringst.“ Von Mira.",
+  "file": "wagon22.js",
+  "kind": "rest"
+ },
+ {
   "text": "Ein Gittertor. Dahinter – Schnee? Im Mechanismus fehlt ein Zahnrad.",
   "file": "wagon23.js",
   "kind": "rest"
@@ -6620,6 +6890,16 @@
   "kind": "rest"
  },
  {
+  "text": "Ein Kreidezeichen: der Turm. Das Ziel?",
+  "file": "wagon23.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Hier ist die Lampe kaputt. Die Wand ist stockdunkel – ich sehe kein Zeichen.",
+  "file": "wagon23.js",
+  "kind": "rest"
+ },
+ {
   "text": "Der Mantel des Schaffners. Die Mütze habe ich auf.",
   "file": "wagon24.js",
   "kind": "rest"
@@ -6670,6 +6950,11 @@
   "kind": "rest"
  },
  {
+  "text": "Es fehlt noch jemand. Ein Wagen – ich darf niemanden zurücklassen.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
   "text": "Vierundzwanzig Komma sieben. Jetzt!",
   "file": "wagon24.js",
   "kind": "rest"
@@ -6686,6 +6971,36 @@
  },
  {
   "text": "Frohe Weihnachten.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ich erinnere mich. An alles. An Martha, an Mira, an die Nacht am Bahnsteig. Ich bin nicht mehr zwei.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Aus der Küche ruft Oma Ilse, die Plätzchen sind fertig. Am Haken hängt meine Uniform – und darüber ein weißer Schal.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.",
+  "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Oben auf dem Baum brennt eine Kerze noch nicht.",
   "file": "wagon24.js",
   "kind": "rest"
  },
@@ -6722,6 +7037,391 @@
  {
   "text": "Ich bleibe hier. Hier werde ich gebraucht.",
   "file": "wagon24.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Im Dunkeln sehe ich nichts.",
+  "file": "wagonCommon.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Brief, an „J.“ adressiert.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein kleiner Schlüssel. Auf dem Anhänger steht in meiner Schrift: „Werkzeug“.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein altes Taschenmesser. Die Spitze ist stumpf, als hätte jemand damit in Holz geritzt.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Fetzen von einem zerrissenen Fahrplan.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der zusammengesetzte Fahrplan der Ringbahn – mit den Lichtsignalen des Turms.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Fernglas. Damit sehe ich draußen mehr – zum Beispiel den Turm. Ich müsste es nur ans Fenster halten.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Taschenlampe. Im Griff ist Platz für zwei Batterien – beide Fächer sind leer.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Batterie steckt drin, das zweite Fach ist leer. So bleibt sie dunkel.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Taschenlampe geht. Wenn es dunkel wird, schalte ich sie ein.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine dicke Batterie. Hoffentlich ist noch Saft drin.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Batterie rein …",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Nichts. Sie braucht zwei – ein Fach ist noch leer.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Zweite Batterie rein, Deckel zu …",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Licht! Die Taschenlampe geht.",
+  "file": "items.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Speisekarte des Speisewagens. „Weihnachtsmenü“.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Glas, das für Tisch drei bestimmt war. Es riecht nach Bittermandel. Gift.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Brunos Rechnung für das Weihnachtsmenü. Die Summe ist verwischt.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein schwerer Messingschlüssel. Auf dem Griff: „Speisewagen – Durchgang“.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein dünnes Blatt aus dem Fahrgastbuch. Leer – bis auf die Linien.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine lange Stricknadel aus Oma Ilses Schublade. Dünn und fest.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der Schlüssel von Abteil 4. Das ist das Abteil von Herrn K.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein winziger Kofferschlüssel. Er lag dort, wo der Mond nie hinkommt.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein altes Foto: Herr K. und der Schaffner, Seite an Seite.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Fundschein: „Verlorene Gegenstände – bitte genau beschreiben.“",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine goldene Taschenuhr. Sie steht.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Münze. Zehn Pfennig. Genug für ein Lied.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Zeitung vom Tresen. Groß genug, um sich dahinter zu verstecken.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Übliche von Herrn K.: ein Whisky.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Herrn K.s Bierdeckel. Voller Striche.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die linke Hälfte einer Kinokarte. „Bordkino Ringbahn – Reihe …“",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die rechte Hälfte einer Kinokarte. „… Platz …“",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Kinokarte, wieder zusammengesetzt.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Acht einzelne Filmbilder, auseinandergeschnitten. Durcheinander.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Filmrolle – alle acht Bilder in der richtigen Reihenfolge zusammengeklebt.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die beiden Hälften passen genau aneinander.",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "„Bordkino Ringbahn. Die letzte Runde. Reihe 3, Platz 12.“",
+  "file": "wagonItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Tonband aus Runde 108. Die Runde, in der Herr K. verschwand.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Herrn Ticks Zahnrad. „Das wirst du vorne brauchen.“ Vorne – wo vorne?",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Zwei Stücke des Notenblatts. Es fehlt noch eins.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Herrn Molls Lied, wieder ganz. „Für die Weihnachtsfeier – Zug 24“.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein kleiner Messingschlüssel aus der Spieldose. Am Griff ein Notenschlüssel.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Dünnes Papier und ein weicher Bleistift aus der Altarschublade. „Für die Tafel.“",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der Abrieb der Gedenktafel. Rechtsklick zum Lesen.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine alte Laterne mit Scheiben aus Buntglas. In manchen sind winzige Löcher.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Laterne brennt. Durch die Löcher im Buntglas fallen kleine rote Punkte.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Familienfoto aus der Kapelle: ein junger Schaffner, seine Frau, ihre kleine Tochter, ein Weihnachtsbaum. Er sieht aus wie ich.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Eine Lupe vom Lesetisch.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Zeitung vom 25. Dezember – mit Löchern, wo jemand Wörter herausgeschnitten hat.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ausgeschnittene Wörter aus dem Papierkorb.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Zeitung vom 25. Dezember: „Weihnachtszug im Tunnel verschollen.“ Rechtsklick zum Lesen.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein kleiner roter Schlüssel aus dem Spielzeugtunnel. Er passt bestimmt in ein Puppenhaus.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Miras Zeichnung: Ein Mann mit meiner Mütze führt Leute in einen Tunnel. „Das ist Papa. Er bringt alle nach Hause.“",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die zwei Stücke passen aneinander.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Anfang und Schluss … dazwischen fehlt noch ein Stück, aber sie gehören zusammen.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Mitte und Schluss passen aneinander.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Alle drei Stücke! Das Notenblatt ist wieder ganz.",
+  "file": "wagonItems2.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Seite 1 meiner Akte. In meiner Schrift – und ich weiß nicht mehr, wann ich sie geschrieben habe.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der schwerste Koffer aus dem Stapel. Ganz schön schwer – was ist da drin?",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die fehlenden Seiten meiner Akte. Jetzt ist sie vollständig.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Dienstanweisung des Postmeisters.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein Brief an J. Verschlüsselt.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein winziger Schlüssel aus der Rosenblüte.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Notizbuch des anderen Joseph. Eine Liste der Fahrgäste.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Telegramm an den Schaffner. „Warte am Bahnsteig auf uns.“",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Sieben Schlüssel an einem Ring. Jeder Griff hat eine andere Form.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein unentwickelter Film.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Sechs Negative aus dem Tunnel.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Geschenkpapier mit ausgestanzten Sternen. Die Sterne sind Löcher.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Miras Paket. „Für Papa“.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Miras selbstgebastelte Schaffnerkelle. „Damit du uns nach Hause bringst.“",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Der Heizer und ein junger Schaffner. Der sieht aus wie ich.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Die Lochzange vom Schreibtisch des Schaffners.",
+  "file": "adventItems.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ich sehe mich am besten noch einmal gründlich um.",
+  "file": "story.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Nichts Besonderes.",
+  "file": "story.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das bringt nichts.",
+  "file": "story.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das passt nicht zusammen.",
+  "file": "story.js",
   "kind": "rest"
  }
 ]

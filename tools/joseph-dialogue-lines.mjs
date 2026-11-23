@@ -16,7 +16,11 @@ function lits(node, consts, acc = [], seen = new Set()) {
   if (node.type === 'Literal' && typeof node.value === 'string') acc.push(node.value);
   else if (node.type === 'TemplateLiteral') {
     if (!node.expressions.length) acc.push(node.quasis[0].value.cooked);
-    else unresolved.push(node.quasis.map((q) => q.value.cooked).join('${…}'));
+    else if (node.expressions.length === 1 && lits(node.expressions[0], consts, [], seen).length) {
+      // z. B. `Piep … ${word}` mit word aus einer Liste: jede Möglichkeit einzeln
+      const [before, after] = node.quasis.map((q) => q.value.cooked);
+      for (const v of lits(node.expressions[0], consts, [], new Set(seen))) acc.push(before + v + after);
+    } else unresolved.push(node.quasis.map((q) => q.value.cooked).join('${…}'));
   } else if (node.type === 'Identifier') {
     if (consts.has(node.name) && !seen.has(node.name)) { seen.add(node.name); lits(consts.get(node.name), consts, acc, seen); }
   } else if (node.type === 'MemberExpression') lits(node.object, consts, acc, seen);
@@ -88,7 +92,10 @@ const KEY_SOUNDS = new Set(['success', 'unlock', 'dread']);
 for (const name of readdirSync(DIR).filter((f) => /^wagon(\d+|Common)\.js$/.test(f))) {
   const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
   const consts = new Map();
-  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  walk.full(ast, (n) => {
+    if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init);
+    if (n.type === 'ForOfStatement' && n.left.type === 'VariableDeclaration') consts.set(n.left.declarations[0].id.name, n.right);
+  });
   const add = (text) => { if (/\p{L}/u.test(text) && !out.has(text)) out.set(text, { text, file: name, kind: 'moment' }); };
   const says = (node) => walk.full(node, (c) => { if (c.type === 'CallExpression' && method(c) === 'say') lits(c.arguments[0], consts).forEach(add); });
   if (name === 'wagonCommon.js') {
@@ -110,7 +117,10 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon(\d+|Common)\.js$/.test
 for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
   const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
   const consts = new Map();
-  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  walk.full(ast, (n) => {
+    if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init);
+    if (n.type === 'ForOfStatement' && n.left.type === 'VariableDeclaration') consts.set(n.left.declarations[0].id.name, n.right);
+  });
   const add = (text) => { if (/\p{L}/u.test(text) && !out.has(text)) out.set(text, { text, file: name, kind: 'door' }); };
   walk.full(ast, (h) => {
     if (h.type !== 'Property' || !/door|lock/i.test(h.key.name ?? '') || h.value.type !== 'ObjectExpression') return;
@@ -131,13 +141,18 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
 // Nicht: Sätze der Figuren (speakAs/speak), Notizbuch (note, recap), Karten (card), Tipps (lines in hintFor-Zielen).
 const npcLines = new Set(JSON.parse(readFileSync(new URL('voice-lines.json', import.meta.url), 'utf8')).map((l) => l.text));
 const SKIP_CALLS = new Set(['speakAs', 'speak', 'note', 'card', 'hintFor']);
-const SKIP_KEYS = new Set(['recap', 'lines', 'name', 'label', 'title', 'subtitle', 'id']);
-const sentence = (t) => /\p{L}/u.test(t) && /\s/.test(t) && /[.!?…“”)]$/.test(t.trim());
+const SKIP_KEYS = new Set(['recap', 'lines', 'name', 'label', 'title', 'subtitle', 'id', 'nextTitle', 'help']);
+// ganzer Satz; nicht: Farben, Hinweiskärtchen („Bruno: …“), Lücken aus Platzhaltern
+const sentence = (t) => /\p{L}/u.test(t) && /\s/.test(t) && /[.!?…“”)]$/.test(t.trim())
+  && !/^rgba|^Bruno: |  | ,|^Herr K\.$/.test(t) && t === t.trim();
 const wagonFiles = readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f)).sort((a, b) => parseInt(a.slice(5)) - parseInt(b.slice(5)));
 for (const name of [...wagonFiles, 'wagonCommon.js']) {
   const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
   const consts = new Map();
-  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  walk.full(ast, (n) => {
+    if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init);
+    if (n.type === 'ForOfStatement' && n.left.type === 'VariableDeclaration') consts.set(n.left.declarations[0].id.name, n.right);
+  });
   const add = (text) => { if (sentence(text) && !out.has(text) && !npcLines.has(text)) out.set(text, { text, file: name, kind: 'rest' }); };
   const skip = new Set(); // Knoten in Aufrufen/Eigenschaften, die nicht gesprochen werden
   walk.full(ast, (n) => {
@@ -147,6 +162,17 @@ for (const name of [...wagonFiles, 'wagonCommon.js']) {
   walk.full(ast, (p) => {
     if (p.type !== 'Property' || !['hotspots', 'items'].includes(p.key?.name)) return;
     walk.full(p.value, (n) => { if (!skip.has(n) && ((n.type === 'Literal' && typeof n.value === 'string') || (n.type === 'TemplateLiteral' && !n.expressions.length))) add(n.value ?? n.quasis[0].value.cooked); });
+  });
+  // Übrige ganze Sätze im Wagen (Listen, die Joseph nacheinander sagt, Rückgaben, Bedingungen …)
+  walk.full(ast, (n) => { if (!skip.has(n) && n.type === 'Literal' && typeof n.value === 'string') add(n.value); });
+}
+// Gegenstände: was Joseph beim Anschauen (look) und beim Kombinieren (say) sagt; dazu die allgemeinen Antworten in story.js
+for (const name of ['items.js', 'wagonItems.js', 'wagonItems2.js', 'adventItems.js', 'story.js']) {
+  const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  const add = (text) => { if (sentence(text) && !out.has(text) && !npcLines.has(text)) out.set(text, { text, file: name, kind: 'rest' }); };
+  walk.full(ast, (p) => {
+    if (p.type === 'Property' && ['look', 'say'].includes(p.key?.name)) walk.full(p.value, (n) => { if (n.type === 'Literal' && typeof n.value === 'string') add(n.value); });
+    if (name === 'story.js' && p.type === 'CallExpression' && ['say', 'respond'].includes(method(p))) walk.full(p, (n) => { if (n.type === 'Literal' && typeof n.value === 'string') add(n.value); });
   });
 }
 
