@@ -3,7 +3,7 @@
 // - tiefes Rumpeln (gefiltertes Rauschen) und leises Rauschen von Fahrtwind und Rädern
 // - "Klack" bei jedem Schienenstoß, mal etwas mehr links, mal rechts (wird von trainMotion.js ausgelöst)
 // - Tunnel: dumpfer Druckstoß beim Hineinfahren, dann lauter und hohl (kurzes Echo)
-// - Quietschen der Räder in der endlosen Kurve
+// - leises, tiefes Schleifen der Räder in der endlosen Kurve
 //
 // Browser erlauben Ton erst nach der ersten Eingabe. Deshalb startet der Ton beim ersten
 // Klick oder Tastendruck. Taste M schaltet ihn stumm. Später lassen sich hier echte
@@ -118,33 +118,27 @@ export class TrainSound {
     whoomp.start(now, Math.random() * 3, 0.8);
   }
 
-  // Räder quietschen in der Kurve: hoher, leicht zitternder Ton, der an- und abschwillt
+  // Räder in der Kurve: leises, tiefes Schleifen (gefiltertes Rauschen, kein heller Ton), das an- und abschwillt
   squeal(duration = 2) {
     const context = this.context;
     if (!context || context.state !== 'running') return;
     const now = context.currentTime;
     const level = gain(context, 0);
     level.gain.setValueAtTime(0, now);
-    level.gain.linearRampToValueAtTime(0.022, now + duration * 0.3);
-    level.gain.linearRampToValueAtTime(0.016, now + duration * 0.7);
+    level.gain.linearRampToValueAtTime(0.09, now + duration * 0.35);
+    level.gain.linearRampToValueAtTime(0.07, now + duration * 0.7);
     level.gain.linearRampToValueAtTime(0, now + duration);
-    level.connect(this.output(0.25));
+    level.connect(this.output(0.2));
 
-    const vibrato = context.createOscillator();
-    vibrato.frequency.value = 5.5;
-    const vibratoDepth = gain(context, 35);
-    vibrato.connect(vibratoDepth);
-    for (const [frequency, volume] of [[3150, 1], [4720, 0.4]]) {
-      const tone = context.createOscillator();
-      tone.frequency.setValueAtTime(frequency, now);
-      tone.frequency.linearRampToValueAtTime(frequency * 1.03, now + duration);
-      vibratoDepth.connect(tone.frequency);
-      tone.connect(gain(context, volume)).connect(level);
-      tone.start(now);
-      tone.stop(now + duration);
-    }
-    vibrato.start(now);
-    vibrato.stop(now + duration);
+    const grind = context.createBufferSource();
+    grind.buffer = this.whiteNoise;
+    const filter = context.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(380, now);
+    filter.frequency.linearRampToValueAtTime(320, now + duration);
+    filter.Q.value = 2.5;
+    grind.connect(filter).connect(lowpass(context, 700)).connect(level);
+    grind.start(now, Math.random() * 0.5, duration);
   }
 
   // Ausgang für ein einzelnes Geräusch: etwas links (−1) bis rechts (1), im Tunnel mit Hall
