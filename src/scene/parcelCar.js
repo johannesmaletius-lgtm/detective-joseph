@@ -23,7 +23,7 @@ export const parcelCar = {
     {
       id: 'mira', name: 'Mira', poses: 'assets/characters/mira',
       x: 530, y: 490, pose: 'front', size: 0.66,
-      walkTo: [620, 520], facing: 'left', color: '#ffc8d8',
+      walkTo: [620, 520], facing: 'left', color: '#ffc8d8', idle: ['blink', 'busy'],
     },
   ],
 
