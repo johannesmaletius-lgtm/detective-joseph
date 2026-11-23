@@ -41,6 +41,9 @@ const AMBIENCE = {
 // Schlussbild in Wagen 24: warme Musik und eine Stube mit Kaminfeuer
 export const ENDING = { music: 'ende', ambience: [{ file: 'stube', gain: 0.9 }] };
 
+// Hauptmenü (Wagenübersicht): eigenes Stück, etwas lauter, weil dort niemand spricht
+export const MENU = { music: 'menu', level: 1.8 };
+
 export function wagonTrack(door) {
   return { music: `wagen-${String(door).padStart(2, '0')}`, ambience: AMBIENCE[door] ?? [] };
 }
@@ -55,7 +58,7 @@ export class Music {
   }
 
   url(name) {
-    return name.startsWith('wagen-') || name === 'ende' ? `assets/music/${name}.mp3` : `assets/sfx/${name}.mp3`;
+    return name.startsWith('wagen-') || name === 'ende' || name === 'menu' ? `assets/music/${name}.mp3` : `assets/sfx/${name}.mp3`;
   }
 
   // Dateien schon mal laden (beim Öffnen des Wagens)
@@ -120,7 +123,7 @@ export class Music {
     }
 
     const [musicDuck, ambienceDuck] = DUCK[mood(game)];
-    playing.music.gain.setTargetAtTime(MUSIC_LEVEL * musicDuck, now, musicDuck < 0.2 ? 0.25 : 0.6);
+    playing.music.gain.setTargetAtTime(MUSIC_LEVEL * playing.level * musicDuck, now, musicDuck < 0.2 ? 0.25 : 0.6);
     playing.ambience.gain.setTargetAtTime(AMBIENCE_LEVEL * ambienceDuck, now, 0.6);
     const tunnel = this.sound.inTunnel;
     playing.filter.frequency.setTargetAtTime(tunnel ? 650 : 18000, now, 0.4);
@@ -141,7 +144,7 @@ export class Music {
     const ambience = context.createGain();
     ambience.gain.value = AMBIENCE_LEVEL * 0.35;
     ambience.connect(bus);
-    const playing = { bus, filter, music, ambience, sources: new Set(), loop: null, every: [] };
+    const playing = { bus, filter, music, ambience, level: track.level ?? 1, sources: new Set(), loop: null, every: [] };
     this.playing = playing;
 
     if (track.music) {
@@ -206,6 +209,7 @@ export class Music {
 
 // Was gerade passiert – danach richtet sich, wie leise die Musik wird
 function mood(game) {
+  if (game.inCalendar) return 'free';
   const line = game.speech.line;
   const story = game.story;
   if (game.views.dialogue?.isOpen) return 'important';

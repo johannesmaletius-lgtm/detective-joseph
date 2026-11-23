@@ -17,6 +17,10 @@ const STYLE =
 
 // Musik: je Wagen ein Stück (gleiche Klangfarbe, eigene Stimmung)
 const MUSIC = {
+  'menu':
+    'Main menu theme for a mysterious Christmas detective adventure on a night train in winter: a gentle music box and celesta playing a ' +
+    'wistful, slightly unsettling Christmas-like melody in a minor key, soft sleigh bells far away, warm low strings and a pizzicato ' +
+    'detective bass line, snow falling, curiosity and secrets. Instrumental, no vocals, no drums, steady and loopable. 72 BPM.',
   'wagen-02': 'Baggage car: slow pulsing double bass, muted piano clusters, creaking wood textures, curious but uneasy. 66 BPM.',
   'wagen-03': 'Empty mail car: lonely celesta motif, soft string pad, distant ticking, paper-like rustle, a ghostly feeling of letters from the past. 68 BPM.',
   'wagen-04': 'Dining car: a faded, slightly out-of-tune salon waltz on a distant piano, warped like a memory, under low brooding cello. Suspicion of poison. 72 BPM.',
@@ -87,7 +91,7 @@ if (wantMusic) {
     const file = new URL(`assets/music/${name}.mp3`, root);
     if (existsSync(file)) continue;
     await save('https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128', {
-      prompt: name === 'ende' ? prompt : STYLE + prompt,
+      prompt: name === 'ende' || name === 'menu' ? prompt : STYLE + prompt,
       music_length_ms: LENGTH_MS,
       force_instrumental: true,
     }, file);
