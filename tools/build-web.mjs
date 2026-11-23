@@ -6,11 +6,11 @@
 // - alle 24 Wagen sind sofort auswählbar (Test-Modus an)
 import { cpSync, mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const out = process.argv[2];
+const out = process.argv[2] && resolve(process.argv[2]);
 if (!out) throw new Error('Zielordner angeben: node tools/build-web.mjs <ordner>');
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
