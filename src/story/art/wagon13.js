@@ -260,16 +260,10 @@ function drawLanternDots(ctx, time) {
 
 // Die Tafel ohne Abrieb: Ruß
 export function drawSootyPlaque(ctx) {
-  ctx.fillStyle = '#2c2218';
-  ctx.fillRect(300, 150, 680, 420);
-  const soot = ctx.createRadialGradient(640, 360, 40, 640, 360, 400);
-  soot.addColorStop(0, '#4a3a28');
-  soot.addColorStop(1, '#1a130d');
-  ctx.fillStyle = soot;
-  ctx.fillRect(320, 170, 640, 380);
-  ctx.fillStyle = 'rgba(120, 100, 70, 0.25)';
-  for (let i = 0; i < 6; i++) ctx.fillRect(380, 210 + i * 56, 520 - (i % 3) * 60, 14);
-  text(ctx, 'Unter dem Ruß ahnt man eingravierte Zeilen.', 640, 610, { font: `18px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  drawPicture(ctx, 'assets/closeups/gedenktafel.webp', 0, 0, 1280, 720);
+  ctx.fillStyle = 'rgba(20, 10, 4, 0.7)';
+  ctx.fillRect(420, 690, 440, 26);
+  text(ctx, 'Unter dem Ruß ahnt man eingravierte Zeilen.', 640, 709, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 // ---------------------------------------------------------------- Familienfoto

@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 11 (Uhrenwagen): die Wand voller Uhren (eine geht mit dem Mond),
 // die Rundenuhr, Standuhr und Kuckucksuhr zum Stellen.
@@ -14,21 +14,21 @@ const STOPPED = [[10, 10], [3, 40], [7, 25]];
 export function clockSpots() {
   return KINDS.map((kind, i) => ({
     id: `c${i}`, kind,
-    cx: 380 + (i % 3) * 260, cy: 160 + Math.floor(i / 3) * 200, r: 82,
+    cx: [381, 639, 896][i % 3], cy: [153, 364, 578][Math.floor(i / 3)], r: 74, // Zifferblätter im Bild uhrenwand.webp
     label: 'Uhr',
   }));
 }
 
 export function drawClockWall(ctx, { progress, age }) {
-  wood(ctx, 220, 40, 840, 640, [104, 62, 30]);
+  drawPicture(ctx, 'assets/closeups/uhrenwand.webp', 0, 0, 1280, 720);
   let stoppedIndex = 0;
   for (const spot of clockSpots()) {
     const { cx, cy, r, kind } = spot;
     if (kind === 'moon') {
-      drawRoundClock(ctx, cx, cy, r, progress);
+      drawRoundClock(ctx, cx, cy, r, progress, { bare: true });
       continue;
     }
-    face(ctx, cx, cy, r);
+    ticks(ctx, cx, cy, r);
     let hour, minute, second = null;
     if (kind === 'stopped') {
       [hour, minute] = STOPPED[stoppedIndex++ % STOPPED.length];
@@ -41,7 +41,18 @@ export function drawClockWall(ctx, { progress, age }) {
     }
     hands(ctx, cx, cy, r, hour, minute, second);
   }
-  text(ctx, 'Herrn Ticks Uhren. Welche geht mit dem Mond?', 640, 668, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  ctx.fillStyle = 'rgba(20, 10, 4, 0.7)';
+  ctx.fillRect(420, 690, 440, 26);
+  text(ctx, 'Herrn Ticks Uhren. Welche geht mit dem Mond?', 640, 709, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+}
+
+function ticks(ctx, cx, cy, r, color = INK) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    line(ctx, cx + Math.cos(a) * r * 0.82, cy + Math.sin(a) * r * 0.82, cx + Math.cos(a) * r * 0.94, cy + Math.sin(a) * r * 0.94);
+  }
 }
 
 function face(ctx, cx, cy, r, color = '#efe3c2') {
@@ -83,8 +94,10 @@ function hands(ctx, cx, cy, r, hour, minute, second) {
 }
 
 // Die Rundenuhr: ein Zeiger, einmal herum pro Runde. Oben „Tunnel“, roter Strich beim Ruf.
-export function drawRoundClock(ctx, cx, cy, r, progress, { big = false } = {}) {
-  face(ctx, cx, cy, r, '#d9d2c0');
+export function drawRoundClock(ctx, cx, cy, r, progress, { big = false, bare = false } = {}) {
+  if (bare) ticks(ctx, cx, cy, r, '#d9c88a');
+  else face(ctx, cx, cy, r, '#d9d2c0');
+  if (!bare) {
   ctx.save();
   // Nachthimmel im Zifferblatt
   ctx.fillStyle = '#1c2340';
@@ -94,6 +107,7 @@ export function drawRoundClock(ctx, cx, cy, r, progress, { big = false } = {}) {
   ctx.fillStyle = '#f4ecc8';
   for (let i = 0; i < 14; i++) ctx.fillRect(cx + Math.cos(i * 2.3) * r * 0.55, cy + Math.sin(i * 1.7) * r * 0.5, 2, 2);
   ctx.restore();
+  }
   // Tunnel oben
   ctx.fillStyle = '#20160e';
   ctx.beginPath();

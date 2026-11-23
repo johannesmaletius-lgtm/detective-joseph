@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, TYPEWRITER, drawPicture, glow, line, picture, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 10 (Lautsprecherwagen): Sicherungskasten, Tonbandregal, Tonbandgerät.
 
@@ -122,84 +122,62 @@ export function drawTapeShelf(ctx, taken) {
 
 // ---------------------------------------------------------------- Tonbandgerät
 export const SPEEDS = ['4¾', '9½', '19'];
+// Knöpfe und Spulen im Bild tonband.webp
+const RECORDER = 'assets/closeups/tonband.webp';
+const REELS = [[406, 207], [869, 207]];
 export const RECORDER_SPOTS = [
-  { id: 'speed', cx: 430, cy: 520, r: 56, label: 'Geschwindigkeit' },
-  { id: 'direction', cx: 640, cy: 520, r: 56, label: 'Richtung' },
-  { id: 'play', x: 790, y: 480, w: 120, h: 80, label: 'Abspielen' },
+  { id: 'speed', cx: 448, cy: 574, r: 66, label: 'Geschwindigkeit' },
+  { id: 'direction', cx: 643, cy: 574, r: 66, label: 'Richtung' },
+  { id: 'play', cx: 834, cy: 570, r: 62, label: 'Abspielen' },
 ];
 
 export function drawRecorder(ctx, state, time) {
-  ctx.save();
-  // Gehäuse
-  ctx.fillStyle = '#5b3a20';
-  ctx.fillRect(250, 110, 780, 520);
-  ctx.fillStyle = '#7d5530';
-  ctx.fillRect(266, 126, 748, 488);
-  // Spulen
-  for (const cx of [460, 820]) {
-    ctx.save();
-    ctx.translate(cx, 270);
-    ctx.rotate(state.playing ? time * (state.direction === 'back' ? -4 : 4) * (1 + state.speed) : 0);
-    ctx.fillStyle = '#c8bfa8';
-    ctx.beginPath();
-    ctx.arc(0, 0, 112, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#3e2c1a';
-    for (let i = 0; i < 3; i++) {
-      ctx.rotate((Math.PI * 2) / 3);
+  drawPicture(ctx, RECORDER, 0, 0, 1280, 720);
+  const image = picture(RECORDER);
+  // Spulen drehen sich beim Abspielen
+  if (state.playing && image.complete && image.naturalWidth) {
+    const k = image.naturalWidth / 1280, rr = 176;
+    const turn = time * (state.direction === 'back' ? -4 : 4) * (1 + state.speed);
+    for (const [cx, cy] of REELS) {
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(0, -58, 30, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.translate(cx, cy);
+      ctx.rotate(turn);
+      ctx.drawImage(image, (cx - rr) * k, (cy - rr) * k, rr * 2 * k, rr * 2 * k, -rr, -rr, rr * 2, rr * 2);
+      ctx.restore();
     }
-    ctx.fillStyle = '#5b5345';
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
   }
-  ctx.strokeStyle = '#2c1d10';
-  ctx.lineWidth = 3;
-  line(ctx, 460, 382, 820, 382);
-  // Geschwindigkeit
-  dial(ctx, 430, 520, SPEEDS, state.speed, 'cm/s');
-  dial(ctx, 640, 520, ['vor', 'zurück'], state.direction === 'back' ? 1 : 0, 'Richtung');
-  // Abspielen
-  ctx.fillStyle = state.playing ? '#3d8f4a' : '#2f3a2c';
-  ctx.fillRect(790, 480, 120, 80);
-  ctx.fillStyle = '#e8f0d8';
-  ctx.beginPath();
-  ctx.moveTo(835, 498);
-  ctx.lineTo(870, 520);
-  ctx.lineTo(835, 542);
-  ctx.fill();
+  dial(ctx, 448, 574, SPEEDS, state.speed, 'cm/s');
+  dial(ctx, 643, 574, ['vor', 'zurück'], state.direction === 'back' ? 1 : 0, 'Richtung');
+  if (state.playing) glow(ctx, 834, 570, 90, '255, 120, 90', 0.45);
+  text(ctx, state.playing ? 'läuft' : 'Start', 834, 669, { font: `bold 15px ${PRINT}`, color: '#e9d8b0', align: 'center' });
   if (state.loaded) {
     ctx.fillStyle = '#f1e5c6';
-    ctx.fillRect(590, 150, 100, 40);
-    text(ctx, 'Band 108', 640, 177, { font: `bold 18px ${TYPEWRITER}`, align: 'center' });
+    ctx.fillRect(585, 400, 100, 34);
+    text(ctx, 'Band 108', 635, 424, { font: `bold 17px ${TYPEWRITER}`, align: 'center' });
   }
-  if (state.power) glow(ctx, 980, 150, 40, '120, 255, 140', 0.6);
-  ctx.restore();
+  if (state.power) glow(ctx, 1020, 80, 30, '120, 255, 140', 0.7);
 }
 
+// Zeiger auf einem Knopf des Bilds, Beschriftung im Bogen darüber
 function dial(ctx, cx, cy, labels, index, title) {
-  ctx.fillStyle = '#2a2018';
-  ctx.beginPath();
-  ctx.arc(cx, cy, 46, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#c9a24c';
-  ctx.lineWidth = 4;
-  ctx.stroke();
   const n = labels.length;
   labels.forEach((label, i) => {
-    const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.9;
-    text(ctx, label, cx + Math.cos(a) * 74, cy + Math.sin(a) * 74 + 6, { font: `bold 17px ${PRINT}`, color: i === index ? '#ffe9a6' : '#cdbb94', align: 'center' });
+    const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.7;
+    const lx = cx + Math.cos(a) * 92, ly = cy + Math.sin(a) * 92 + 6;
+    ctx.fillStyle = 'rgba(30, 18, 8, 0.7)';
+    ctx.fillRect(lx - 26, ly - 17, 52, 22);
+    text(ctx, label, lx, ly, { font: `bold 16px ${PRINT}`, color: i === index ? '#ffe9a6' : '#a8987a', align: 'center' });
   });
-  const a = -Math.PI / 2 + (index - (n - 1) / 2) * 0.9;
+  const a = -Math.PI / 2 + (index - (n - 1) / 2) * 0.7;
   ctx.strokeStyle = '#f4e3b8';
   ctx.lineWidth = 7;
   ctx.lineCap = 'round';
-  line(ctx, cx, cy, cx + Math.cos(a) * 36, cy + Math.sin(a) * 36);
-  text(ctx, title, cx, cy + 74, { font: `15px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  line(ctx, cx, cy, cx + Math.cos(a) * 46, cy + Math.sin(a) * 46);
+  ctx.lineCap = 'butt';
+  text(ctx, title, cx, cy + 95, { font: `bold 15px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 // Lämpchen im Wagen, sobald Strom da ist
