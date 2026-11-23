@@ -11,7 +11,8 @@ const MAX_WIDTH = 460;
 const LINE_HEIGHT = 27;
 
 export class Speech {
-  constructor() {
+  constructor(voices = null) {
+    this.voices = voices; // gesprochene Sätze (src/audio/voices.js)
     this.line = null; // { lines, anchor, color, age, duration, resolve }
   }
 
@@ -23,7 +24,12 @@ export class Speech {
     this.finish();
     return new Promise((resolve) => {
       const duration = Math.max(1.7, 1 + text.length * 0.055);
-      this.line = { text, anchor, color, age: 0, duration, resolve };
+      const line = { text, anchor, color, age: 0, duration, resolve };
+      this.line = line;
+      // Gibt es den Satz gesprochen, bleibt er stehen, bis die Stimme fertig ist
+      this.voices?.play(text).then((length) => {
+        if (length) line.duration = Math.max(duration, length + 0.35);
+      });
     });
   }
 
@@ -35,6 +41,7 @@ export class Speech {
   finish() {
     const line = this.line;
     this.line = null;
+    if (line) this.voices?.stop();
     line?.resolve();
   }
 

@@ -1,0 +1,49 @@
+// Erzeugt die Tondateien für die Sprechtexte der Figuren mit ElevenLabs.
+//   node tools/voice-lines.mjs              (erst die Sätze sammeln)
+//   node tools/voice-generate.mjs bruno     (dann eine oder mehrere Figuren vertonen)
+// Bereits vorhandene Dateien werden übersprungen. Ergebnis: assets/voices/<figur>/<nr>.mp3
+// und assets/voices/manifest.json (Satz → Datei), das das Spiel beim Start lädt.
+// Der Schlüssel kommt aus ELEVENLABS_API_KEY (in der Cloud setzt ihn der Proxy ein; dort mit
+//   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt starten).
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+const VOICES = {
+  bruno: 'JBFqnCBsd6RMkjVDRZzb', // George
+};
+const MODEL = 'eleven_multilingual_v2';
+
+const root = new URL('../', import.meta.url);
+const lines = JSON.parse(readFileSync(new URL('tools/voice-lines.json', root), 'utf8'));
+const manifestUrl = new URL('assets/voices/manifest.json', root);
+const manifest = existsSync(manifestUrl) ? JSON.parse(readFileSync(manifestUrl, 'utf8')) : {};
+const key = process.env.ELEVENLABS_API_KEY ?? 'proxy-injected';
+
+const speakers = process.argv.slice(2);
+if (!speakers.length) throw new Error('Welche Figur? z. B. node tools/voice-generate.mjs bruno');
+let chars = 0;
+for (const speaker of speakers) {
+  const voice = VOICES[speaker];
+  if (!voice) throw new Error(`Keine Stimme für „${speaker}“ in VOICES eingetragen`);
+  mkdirSync(new URL(`assets/voices/${speaker}/`, root), { recursive: true });
+  for (const { text } of lines.filter((l) => l.speaker === speaker)) {
+    const id = createHash('sha1').update(speaker + '|' + text).digest('hex').slice(0, 10);
+    const file = `assets/voices/${speaker}/${id}.mp3`;
+    if (!existsSync(new URL(file, root))) {
+      // Anführungszeichen gehören nicht zur Aussprache
+      const spoken = text.replace(/[„“”"]/g, '');
+      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`, {
+        method: 'POST',
+        headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: spoken, model_id: MODEL, language_code: 'de' }),
+      });
+      if (!res.ok) throw new Error(`${res.status} bei „${text}“: ${await res.text()}`);
+      writeFileSync(new URL(file, root), Buffer.from(await res.arrayBuffer()));
+      chars += spoken.length;
+      console.log('✓', speaker, text);
+    }
+    manifest[text] = file;
+  }
+}
+writeFileSync(manifestUrl, JSON.stringify(manifest, null, 1));
+console.log('Fertig. Verbrauchte Zeichen:', chars);

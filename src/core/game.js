@@ -9,6 +9,7 @@ import { DebugOverlay } from '../debug/debugOverlay.js';
 import { Cursor } from '../ui/cursor.js';
 import { Inventory } from '../ui/inventory.js';
 import { Speech } from '../ui/speech.js';
+import { Voices } from '../audio/voices.js';
 import { Hints } from '../ui/hints.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
@@ -46,6 +47,7 @@ export class Game {
     this.player = new Player();
     this.sound = new TrainSound({ muted: START_MUTED });
     this.effects = new SoundEffects(this.sound);
+    this.voices = new Voices(this.sound);
     this.debug = new DebugOverlay(DEBUG_AT_START);
     this.scene = null;
     this.story = null;
@@ -60,7 +62,7 @@ export class Game {
     // Benutzeroberfläche
     this.cursor = new Cursor();
     this.inventory = new Inventory();
-    this.speech = new Speech();
+    this.speech = new Speech(this.voices);
     this.hints = new Hints();
     this.notebook = new Notebook();
     this.overlay = new Overlay();
