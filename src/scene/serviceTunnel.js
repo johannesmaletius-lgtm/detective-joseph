@@ -18,7 +18,7 @@ export const serviceTunnel = {
     {
       id: 'tick', name: 'Herr Tick', poses: 'assets/characters/tick',
       x: 730, y: 490, pose: 'front', size: 0.8, when: 'tickHere',
-      walkTo: [640, 560], facing: 'back', color: '#f3d9a0',
+      walkTo: [640, 560], facing: 'back', color: '#f3d9a0', idle: ['blink', 'busy'],
     },
   ],
 

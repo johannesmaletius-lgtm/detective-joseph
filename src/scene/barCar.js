@@ -25,7 +25,7 @@ export const barCar = {
     {
       id: 'barkeeper', name: 'Barkeeper', poses: 'assets/characters/barkeeper',
       x: 1050, y: 476, pose: 'front', size: 1.02, clipBottom: 324,
-      walkTo: [780, 560], facing: 'right', color: '#f0c9a0',
+      walkTo: [780, 560], facing: 'right', color: '#f0c9a0', idle: ['blink', 'busy'],
     },
   ],
 
