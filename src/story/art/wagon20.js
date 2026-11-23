@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 20 (Packwagen): Pakete und Anhänger, Frachtliste mit Sternen-Schablone,
 // Kisten über der Bodenluke (Schiebepuzzle), Miras Paket mit fünf Bändern, Kelle und Karte.
@@ -240,40 +240,15 @@ export function drawGiftBox(ctx, { left }) {
 
 // ---------------------------------------------------------------- Kelle und Karte
 export function drawPaddleAndCard(ctx) {
-  ctx.fillStyle = 'rgba(0,0,0,0.0)';
-  // Kelle
+  drawPicture(ctx, 'assets/closeups/kelle-karte.webp', 0, 0, 1280, 720);
+  // Kelle: Türcode in Kinderschrift auf dem weißen Kreis
   ctx.save();
-  ctx.translate(420, 380);
-  ctx.rotate(-0.2);
-  ctx.fillStyle = '#8a5a2a';
-  ctx.fillRect(-14, 40, 28, 230);
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(0, -40, 110, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#c0302a';
-  ctx.beginPath();
-  ctx.arc(0, -40, 90, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(0, -40, 60, 0, Math.PI * 2);
-  ctx.fill();
-  text(ctx, '2512', 0, -28, { font: `bold 34px ${HAND}`, color: '#c0302a', align: 'center' });
+  ctx.translate(276, 222);
+  ctx.rotate(-0.08);
+  text(ctx, '2512', 0, 18, { font: `bold 54px ${HAND}`, color: '#c0302a', align: 'center' });
   ctx.restore();
   // Karte
-  sheet(ctx, 640, 170, 460, 330, {
-    angle: 0.05,
-    color: '#f6edd8',
-    inner: (c) => {
-      c.fillStyle = '#2f6a3a';
-      for (let i = 0; i < 6; i++) {
-        c.beginPath();
-        c.arc(40 + i * 76, 30, 10, 0, Math.PI * 2);
-        c.fill();
-      }
-      ['Für Papa.', 'Damit du uns', 'nach Hause bringst.', '', 'Deine Mira'].forEach((value, i) => text(c, value, 40, 100 + i * 44, { font: `bold 30px ${HAND}`, color: RED }));
-    },
-  });
+  text(ctx, 'Für Papa.', 648, 300, { font: `bold 40px ${HAND}`, color: RED, align: 'center' });
+  ['Damit du uns', 'nach Hause', 'bringst.', '', 'Deine Mira'].forEach((value, i) => text(ctx, value, 985, 220 + i * 52, { font: `bold 32px ${HAND}`, color: RED, align: 'center' }));
   return INK;
 }

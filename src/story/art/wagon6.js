@@ -1,5 +1,5 @@
 import { loadImage } from '../../core/assets.js';
-import { HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 6 (Fundbüro): Karteikarten, Regal-Suchbild, Schließfächer, Taschenuhr.
 
@@ -160,7 +160,8 @@ export function drawLockers(ctx, open = []) {
 }
 
 // ---------------------------------------------------------------- Taschenuhr
-export const WATCH = { x: 560, y: 380, r: 190 };
+export const WATCH = { x: 494, y: 393, r: 184 }; // Zifferblatt im Bild taschenuhr.webp
+const LID = { x: 145, y: 390 };                   // Innenseite des Deckels
 export const WATCH_SPOTS = [
   { id: 'hours', cx: 900, cy: 300, r: 56, label: 'Stundenrad' },
   { id: 'minutes', cx: 900, cy: 470, r: 56, label: 'Minutenrad' },
@@ -168,49 +169,15 @@ export const WATCH_SPOTS = [
 
 export function drawWatch(ctx, { hours, minutes, open, code }) {
   const { x, y, r } = WATCH;
-  // Kette und Krone
-  ctx.strokeStyle = '#a07a2c';
-  ctx.lineWidth = 10;
-  ctx.beginPath();
-  ctx.arc(x, y - r - 28, 22, 0, Math.PI * 2);
-  ctx.stroke();
-  // Deckel (aufgeklappt nach links)
+  drawPicture(ctx, 'assets/closeups/taschenuhr.webp', 0, 0, 1280, 720);
+  // Gravur im Deckel – und wenn das Fach aufspringt, der Türcode
+  text(ctx, 'Für K.', LID.x, LID.y - 80, { font: `italic bold 30px ${SERIF}`, color: '#3e2606', align: 'center' });
+  text(ctx, '– dein Schaffner', LID.x, LID.y - 46, { font: `italic bold 20px ${SERIF}`, color: '#3e2606', align: 'center' });
   if (open) {
-    ctx.save();
-    ctx.fillStyle = '#c99a3a';
-    ctx.beginPath();
-    ctx.ellipse(x - r * 1.55, y, r * 0.55, r, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#e8c56a';
-    ctx.beginPath();
-    ctx.ellipse(x - r * 1.55, y, r * 0.47, r * 0.9, 0, 0, Math.PI * 2);
-    ctx.fill();
-    text(ctx, 'Tür', x - r * 1.55, y - 50, { font: `italic 22px ${SERIF}`, color: '#6b4a15', align: 'center' });
-    text(ctx, code.split('').join(' '), x - r * 1.55, y + 10, { font: `bold 34px ${SERIF}`, color: '#5a3a0d', align: 'center' });
-    glow(ctx, x - r * 1.55, y, 120, '255, 230, 150', 0.35);
-    ctx.restore();
+    glow(ctx, LID.x, LID.y + 30, 120, '255, 230, 150', 0.35);
+    text(ctx, 'Tür', LID.x, LID.y + 20, { font: `italic 22px ${SERIF}`, color: '#6b4a15', align: 'center' });
+    text(ctx, code.split('').join(' '), LID.x, LID.y + 70, { font: `bold 34px ${SERIF}`, color: '#5a3a0d', align: 'center' });
   }
-  // Gehäuse
-  ctx.fillStyle = '#d4a63f';
-  ctx.beginPath();
-  ctx.arc(x, y, r + 16, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#f6efdc';
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fill();
-  // Ziffern
-  for (let i = 1; i <= 12; i++) {
-    const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    text(ctx, ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][i - 1], x + Math.cos(a) * (r - 34), y + Math.sin(a) * (r - 34) + 9, { font: `26px ${SERIF}`, align: 'center' });
-  }
-  for (let i = 0; i < 60; i++) {
-    const a = (i / 60) * Math.PI * 2;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = i % 5 === 0 ? 3 : 1;
-    line(ctx, x + Math.cos(a) * (r - 8), y + Math.sin(a) * (r - 8), x + Math.cos(a) * (r - (i % 5 === 0 ? 18 : 13)), y + Math.sin(a) * (r - (i % 5 === 0 ? 18 : 13)));
-  }
-  text(ctx, 'Für K. – dein Schaffner', x, y + 70, { font: `italic 17px ${SERIF}`, color: '#7a5418', align: 'center' });
   // Zeiger
   const hourAngle = (((hours % 12) + minutes / 60) / 12) * Math.PI * 2 - Math.PI / 2;
   const minuteAngle = (minutes / 60) * Math.PI * 2 - Math.PI / 2;
