@@ -2678,5 +2678,205 @@
   "text": "Ich warte kurz auf den Tunnel. Aber nicht einschlafen …",
   "file": "wagonCommon.js",
   "kind": "moment"
+ },
+ {
+  "text": "Die Tür zum nächsten Wagen. Abgeschlossen – mit einem dicken Messingschloss.",
+  "file": "wagon1.js",
+  "kind": "door"
+ },
+ {
+  "text": "Vier Rädchen. Über jedem ist ein Zeichen eingraviert: ein Tunnel, eine Laterne mit Pfeil nach links, eine mit Pfeil nach rechts, ein Turm.",
+  "file": "wagon1.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Kein Schloss, kein Griff – nur ein Schild: „Öffnung über Mischpult“.",
+  "file": "wagon10.js",
+  "kind": "door"
+ },
+ {
+  "text": "Uhren über Uhren. Manche stehen, manche laufen rückwärts.",
+  "file": "wagon11.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür ist offen.",
+  "file": "wagon11.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein kleines Uhrwerk statt eines Schlosses.",
+  "file": "wagon11.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Statt eines Schlosses: ein Notenschlüssel aus Messing.",
+  "file": "wagon12.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Darüber hängen die drei Glocken.",
+  "file": "wagon13.js",
+  "kind": "door"
+ },
+ {
+  "text": "Falsch. Vier Buchstaben.",
+  "file": "wagon13.js",
+  "kind": "door"
+ },
+ {
+  "text": "Ein Schloss mit sechs Buchstaben-Rädchen.",
+  "file": "wagon14.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Zahlenschloss mit vier Ziffern.",
+  "file": "wagon14.js",
+  "kind": "door"
+ },
+ {
+  "text": "Falsch. Sechs Buchstaben …",
+  "file": "wagon14.js",
+  "kind": "door"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Tasten nicht.",
+  "file": "wagon14.js",
+  "kind": "door"
+ },
+ {
+  "text": "Falsch. Vier Ziffern …",
+  "file": "wagon14.js",
+  "kind": "door"
+ },
+ {
+  "text": "Bauklötze.",
+  "file": "wagon15.js",
+  "kind": "door"
+ },
+ {
+  "text": "Im Dunkeln sehe ich die Skala nicht.",
+  "file": "wagon16.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Zahlenschloss mit zwei Rädchen. Darüber, mit dem Finger in den Staub geschrieben: „Alle zusammen.“",
+  "file": "wagon17.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür ist entriegelt.",
+  "file": "wagon18.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Verriegelt – sie hängt am Stellwerk.",
+  "file": "wagon18.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Zahlenschloss mit drei Rädchen.",
+  "file": "wagon19.js",
+  "kind": "door"
+ },
+ {
+  "text": "Falsch. Fast kein Licht … welche Blende, welche Zeit?",
+  "file": "wagon19.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Zahlenschloss mit vier Rädchen.",
+  "file": "wagon20.js",
+  "kind": "door"
+ },
+ {
+  "text": "Der Spind des Heizers. Abgeschlossen.",
+  "file": "wagon21.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne – zur Lok. Ein Zahlenschloss mit drei Rädchen.",
+  "file": "wagon21.js",
+  "kind": "door"
+ },
+ {
+  "text": "Eine kleine Uhr im Führerstand. Es ist kurz nach elf.",
+  "file": "wagon22.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach hinten. Dort sitzen die anderen.",
+  "file": "wagon24.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Buchstabenschloss mit fünf Rädchen.",
+  "file": "wagon3.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Kein Schloss, kein Griff – nur ein Riegel, der mit einem Kabel zur Kasse führt.",
+  "file": "wagon4.js",
+  "kind": "door"
+ },
+ {
+  "text": "Abteil 1. Leer.",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Abteil 2. Leer.",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Abteil 3 – die Tür steht offen. Da schläft die alte Dame.",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Abteil 4. Die Tür ist offen. Herrn K.s Abteil.",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Abteil 4. Abgeschlossen. Ich schaue durchs Schlüsselloch … dunkel. Der Schlüssel steckt von innen!",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Unter der Tür liegt mein Blatt Papier.",
+  "file": "wagon5.js",
+  "kind": "door"
+ },
+ {
+  "text": "Ein Vorhängeschloss an der Klappe im Tresen. Vier Rädchen.",
+  "file": "wagon6.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Tastenfeld mit vier Ziffern.",
+  "file": "wagon6.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne – hinter dem Tresen. Ohne die Klappe komme ich nicht hin.",
+  "file": "wagon6.js",
+  "kind": "door"
+ },
+ {
+  "text": "Zwölf Schließfächer aus Blech, nummeriert von 1 bis 12.",
+  "file": "wagon6.js",
+  "kind": "door"
+ },
+ {
+  "text": "Die Tür nach vorne. Ein Schloss mit vier Rädchen – darüber Zeichen: ein Turm, eine Laterne mit Pfeil nach rechts, ein Tunnel, eine Laterne mit Pfeil nach links.",
+  "file": "wagon7.js",
+  "kind": "door"
+ },
+ {
+  "text": "Kein Griff, kein Schloss. Nur ein Glasauge.",
+  "file": "wagon9.js",
+  "kind": "door"
  }
 ]

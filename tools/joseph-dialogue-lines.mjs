@@ -1,6 +1,6 @@
 // Sammelt Josephs Sätze, die er im Gespräch mit anderen Figuren sagt: alle story.say(...) in Funktionen,
 // in denen auch eine Figur spricht (speakAs/speak), dazu die Fragen aus den Gesprächsauswahlen (choose)
-// und die Sätze am Anfang jedes Wagens (intro) und wichtige Momente (moment, siehe unten).
+// und die Sätze am Anfang jedes Wagens (intro) und wichtige Momente (moment) sowie Türen und Schlösser (door), siehe unten.
 // Ausgabe: tools/joseph-dialogue-lines.json  [{ text, file, kind }]
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -106,9 +106,29 @@ for (const name of readdirSync(DIR).filter((f) => /^wagon(\d+|Common)\.js$/.test
   });
 }
 
+// Türen und Schlösser: was Joseph beim Anschauen sagt (look), und die Sätze bei falschem Code (tryCode: wrong, dark)
+for (const name of readdirSync(DIR).filter((f) => /^wagon\d+\.js$/.test(f))) {
+  const ast = acorn.parse(readFileSync(new URL(name, DIR), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  const consts = new Map();
+  walk.full(ast, (n) => { if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier' && n.init) consts.set(n.id.name, n.init); });
+  const add = (text) => { if (/\p{L}/u.test(text) && !out.has(text)) out.set(text, { text, file: name, kind: 'door' }); };
+  walk.full(ast, (h) => {
+    if (h.type !== 'Property' || !/door|lock/i.test(h.key.name ?? '') || h.value.type !== 'ObjectExpression') return;
+    for (const p of h.value.properties) {
+      if (p.key?.name !== 'look') continue;
+      if (FN.has(p.value.type)) walk.full(p.value, (c) => { if (c.type === 'CallExpression' && method(c) === 'say') lits(c.arguments[0], consts).forEach(add); });
+      else lits(p.value, consts).forEach(add);
+    }
+  });
+  walk.full(ast, (c) => {
+    if (c.type !== 'CallExpression' || method(c) !== 'tryCode') return;
+    for (const p of c.arguments[1]?.properties ?? []) if (['wrong', 'dark'].includes(p.key?.name)) lits(p.value, consts).forEach(add);
+  });
+}
+
 const list = [...out.values()];
 writeFileSync(new URL('joseph-dialogue-lines.json', import.meta.url), JSON.stringify(list, null, 1));
-for (const kind of ['say', 'choice', 'intro', 'moment']) {
+for (const kind of ['say', 'choice', 'intro', 'moment', 'door']) {
   const l = list.filter((x) => x.kind === kind);
   console.log(kind, l.length, 'Sätze,', l.reduce((s, x) => s + x.text.length, 0), 'Zeichen');
 }
