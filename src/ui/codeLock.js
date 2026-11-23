@@ -35,6 +35,8 @@ export class CodeLock extends View {
     this.shake = 0;       // wackelt kurz, wenn die Zahl falsch ist
     this.unlocked = 0;    // 0 … 1: Bügel springt auf
     this.staysInDark = false;
+    this.jams = {};       // id → { wrong, until }: kurze Schlösser (≤ 100 Möglichkeiten) klemmen nach 4 Fehlversuchen
+    this.id = null;
     this.help = 'Pfeile oder Rädchen: Zahl drehen  ·  Bügel: öffnen  ·  Rechtsklick: zurück';
   }
 
@@ -45,6 +47,7 @@ export class CodeLock extends View {
     this.shake = 0;
     this.symbols = symbols;
     this.style = STYLES[style] ?? STYLES.brass;
+    this.id = id;
     this.states[id] ??= Array.from({ length: digits }, () => ({ value: 0, roll: 0 }));
     this.wheels = this.states[id];
   }
@@ -93,14 +96,35 @@ export class CodeLock extends View {
       }
     }
     if (this.onShackle(point)) {
+      // Gegen stures Durchprobieren: Ein kurzes Schloss klemmt nach 4 Fehlversuchen eine Weile
+      const small = this.alphabet.length ** this.wheels.length <= 100;
+      const jam = (this.jams[this.id] ??= { wrong: 0, until: 0 });
+      if (small && performance.now() < jam.until) {
+        this.shake = 1;
+        this.sound('locked');
+        return;
+      }
       if (this.check(this.code)) {
         this.unlocked = 0.001;
         this.sound('unlock');
       } else {
         this.shake = 1;
         this.sound('locked');
+        if (small && ++jam.wrong >= 4) {
+          jam.wrong = 0;
+          jam.until = performance.now() + 40000;
+        }
       }
     }
+  }
+
+  // Schon aufgesprungen und dann mit Esc/Rechtsklick geschlossen: zählt trotzdem als offen
+  result() {
+    return this.unlocked > 0;
+  }
+
+  get jammed() {
+    return performance.now() < (this.jams[this.id]?.until ?? 0);
   }
 
   onShackle(point) {
@@ -207,6 +231,14 @@ export class CodeLock extends View {
       arrow(ctx, x, y + WHEEL.height / 2 + 30, 1);
     });
     ctx.restore();
+    if (this.jammed) {
+      ctx.save();
+      ctx.font = 'bold 22px "Trebuchet MS", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffb27a';
+      ctx.fillText('Das Schloss klemmt. Nicht einfach durchprobieren – kurz warten …', CENTER.x, top + height + 62);
+      ctx.restore();
+    }
     this.drawHelp(ctx);
   }
 }

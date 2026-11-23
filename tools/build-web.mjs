@@ -3,7 +3,7 @@
 // - kopiert index.html, style.css, src/ und die Bilder aus assets/ (ohne assets/reference/)
 // - fasst die Sprachdateien jeder Figur zu EINER Datei zusammen (assets/voices/<figur>.mp3, braucht ffmpeg),
 //   das Manifest bekommt dann { file, start, end } – so bleibt die Seite unter 511 Dateien
-// - alle 24 Wagen sind sofort auswählbar (Test-Modus an)
+// - Türen öffnen sich nach Datum wie im echten Spiel (zum Ausprobieren ?test anhängen)
 import { cpSync, mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -23,12 +23,6 @@ cpSync(join(root, 'assets'), join(out, 'assets'), {
   recursive: true,
   filter: (src) => !src.includes(`${join('assets', 'reference')}`) && !src.includes(join('assets', 'voices')),
 });
-
-// Test-Modus: alle Wagen offen
-const config = join(out, 'src', 'config.js');
-const configText = readFileSync(config, 'utf8').replace(/export const TEST_MODE = .*;/, 'export const TEST_MODE = true; // Web-Fassung: alle 24 Wagen auswählbar');
-if (!configText.includes('TEST_MODE = true')) throw new Error('TEST_MODE in src/config.js nicht gefunden');
-writeFileSync(config, configText);
 
 // Seite: index.html wie im Projekt, nur ohne den Hinweis für lokal geöffnete Dateien
 const html = readFileSync(join(root, 'index.html'), 'utf8').replace(/\s*<script>[\s\S]*?<\/script>/, '');

@@ -48,6 +48,11 @@ export class ArrangeView extends View {
     });
   }
 
+  // Schon richtig gelegt und dann mit Esc/Rechtsklick geschlossen: zählt trotzdem als gelöst
+  result() {
+    return this.solved > 0;
+  }
+
   placement() {
     return this.options.slots.map((_, i) => this.tokens.find((token) => token.place.slot === i)?.id ?? null);
   }

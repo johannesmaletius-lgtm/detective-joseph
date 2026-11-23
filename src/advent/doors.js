@@ -82,6 +82,16 @@ export function isUnlocked(door, now, test = false) {
   return test || now >= opensOn(door);
 }
 
+// Die Geschichte läuft der Reihe nach: Eine Tür ist erst spielbar, wenn die davor geschafft ist
+// (geschaffte Türen lassen sich immer noch einmal spielen). Im Test-Modus geht alles.
+export function previousMissing(door, save, test = false) {
+  return !test && door > 1 && !save.isDone(door) && !save.isDone(door - 1);
+}
+
+export function canPlay(door, { save, now, test = false }) {
+  return isUnlocked(door, now, test) && !previousMissing(door, save, test);
+}
+
 // Ganze Tage bis zur Tür (0 = heute oder schon offen)
 export function daysUntil(door, now) {
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());

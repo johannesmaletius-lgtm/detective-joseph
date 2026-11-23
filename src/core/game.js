@@ -28,8 +28,8 @@ import { Story } from '../story/story.js';
 import { ITEMS } from '../story/items.js';
 import { Calendar } from '../advent/calendar.js';
 import { SaveGame } from '../advent/save.js';
-import { doorInfo, today } from '../advent/doors.js';
-import { DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, TEST_MODE } from '../config.js';
+import { canPlay, doorInfo, today } from '../advent/doors.js';
+import { DEBUG_ALLOWED, DEBUG_AT_START, FAKE_DATE, KEYS, SKIP_INTRO, START_DOOR, START_MUTED, TEST_MODE } from '../config.js';
 
 // Geräusch → Laut von Joseph [Art, Wahrscheinlichkeit] (siehe Voices.react)
 const REACTIONS = {
@@ -130,7 +130,9 @@ export class Game {
 
   // Abwechselnd: Kalender zeigen, gewählte Tür spielen, zurück zum Kalender
   async run() {
-    if (START_DOOR && doorInfo(START_DOOR)?.load) await this.playDoor(START_DOOR, { skipIntro: SKIP_INTRO });
+    // ?tuer=N nur, wenn die Tür heute schon offen und an der Reihe ist (sonst wäre die Datumssperre umgangen)
+    const startOk = START_DOOR && doorInfo(START_DOOR)?.load && canPlay(START_DOOR, { save: this.save, now: today(FAKE_DATE), test: TEST_MODE });
+    if (startOk) await this.playDoor(START_DOOR, { skipIntro: SKIP_INTRO });
     for (;;) {
       this.overlay.fade = 0;
       this.sound.tunnel(false);
@@ -423,8 +425,8 @@ export class Game {
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
     }
-    if (key === KEYS.toggleDebug) this.debug.toggle();
-    if (key === KEYS.toggleGrid) this.debug.toggleGrid();
+    if (key === KEYS.toggleDebug && DEBUG_ALLOWED) this.debug.toggle();
+    if (key === KEYS.toggleGrid && DEBUG_ALLOWED) this.debug.toggleGrid();
     if (key === KEYS.toggleSound) this.sound.toggleMute();
     if (key === KEYS.skipToTunnel && this.debug.enabled) this.scene.motion?.skipToTunnel();
     if (key === KEYS.skip) this.speech.skip();

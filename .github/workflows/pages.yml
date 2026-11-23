@@ -1,4 +1,4 @@
-# Veröffentlicht das Spiel bei jedem Push auf main auf GitHub Pages (Web-Fassung, alle 24 Wagen offen).
+# Veröffentlicht das Spiel bei jedem Push auf main auf GitHub Pages (Web-Fassung, Türen öffnen nach Datum – zum Testen ?test anhängen).
 # Einmalig nötig: GitHub → Settings → Pages → „Build and deployment“ → Source: „GitHub Actions“.
 name: Spiel online stellen
 

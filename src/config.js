@@ -28,10 +28,13 @@ export const START_MUTED = params.has('mute');     // ohne Ton starten
 export const SKIP_INTRO = params.has('skipintro'); // ohne Titelbild und Anfangsszene beginnen
 
 // Wagenübersicht mit den 24 Türen (siehe src/advent/):
-//   ?test               alle 24 Türen offen, unabhängig vom Datum (dazu ein Knopf „Spielstand löschen“)
-//   ?datum=2026-12-05   so tun, als wäre heute dieser Tag
-//   ?tuer=2             ohne Kalender direkt in diese Tür (gut mit &skipintro)
-// Online (GitHub Pages) sind zum Testen immer alle 24 Wagen offen.
-export const TEST_MODE = params.has('test') || location.hostname.endsWith('github.io');
-export const FAKE_DATE = params.get('datum');
+//   ?test               alle 24 Türen offen, unabhängig vom Datum und der Reihenfolge (dazu ein Knopf „Spielstand löschen“)
+//   ?datum=2026-12-05   so tun, als wäre heute dieser Tag (nur lokal oder mit ?test)
+//   ?tuer=2             ohne Kalender direkt in diese Tür (gut mit &skipintro) – nur, wenn sie schon offen ist
+// Online (GitHub Pages) gilt das Datum wie im echten Spiel; zum Ausprobieren ?test anhängen.
+// Die Debug-Ansicht (Taste D/G/T) gibt es nur lokal, mit ?debug oder mit ?test – sonst verrät sie die Klickflächen.
+export const LOCAL = ['localhost', '127.0.0.1', '::1', ''].includes(location.hostname);
+export const TEST_MODE = params.has('test');
+export const FAKE_DATE = LOCAL || TEST_MODE ? params.get('datum') : null;
+export const DEBUG_ALLOWED = LOCAL || TEST_MODE || DEBUG_AT_START;
 export const START_DOOR = Number(params.get('tuer') ?? params.get('wagen')) || null; // ?wagen=N geht auch

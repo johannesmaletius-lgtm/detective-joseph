@@ -44,7 +44,7 @@ Noch einfacher: im Finder `start.command` doppelklicken – das startet den Serv
 Zum Testen mit allen 24 Wagen sofort auswählbar: `start-alle-wagen.command` doppelklicken.
 
 **Online:** <https://johannesmaletius-lgtm.github.io/detective-joseph/> – wird bei jedem Push auf `main` neu gebaut
-(`.github/workflows/pages.yml`, Web-Fassung aus `tools/build-web.mjs`, alle 24 Wagen offen).
+(`.github/workflows/pages.yml`, Web-Fassung aus `tools/build-web.mjs`; Türen öffnen nach Datum, zum Testen `?test` anhängen).
 Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 
 > **Warum ein Server?** Das Spiel ist auf viele kleine JavaScript-Dateien (Module) verteilt.
@@ -58,9 +58,9 @@ Das Spiel beginnt mit der Wagenübersicht „Die Ringbahn“: 24 Wagen, jeden Ta
 
 | Adresse | Wirkung |
 | --- | --- |
-| `?test` | alle Türen offen, dazu ein Knopf „Spielstand löschen“ |
-| `?datum=2026-12-05` | so tun, als wäre heute der 5. Dezember |
-| `?tuer=1&skipintro` | direkt in Tür 1, ohne Kalender und Anfangsszene |
+| `?test` | alle Türen offen (auch online), unabhängig von Datum und Reihenfolge, dazu ein Knopf „Spielstand löschen“ |
+| `?datum=2026-12-05` | so tun, als wäre heute der 5. Dezember (nur lokal oder mit `?test`) |
+| `?tuer=1&skipintro` | direkt in Tür 1, ohne Kalender und Anfangsszene (nur wenn die Tür schon offen ist) |
 
 ## Steuerung
 

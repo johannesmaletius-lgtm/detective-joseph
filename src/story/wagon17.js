@@ -252,7 +252,7 @@ async function readList(story) {
     await story.say('Da! Hinter der beschlagenen Scheibe! Jemand rennt weg – mit meiner Mütze!');
     await story.say('Weg. Er war die ganze Zeit hier.');
   });
-  story.note('Notizbuch des anderen Joseph: „Wer ist schon zu Hause“. Abgehakt bis Herr K. (Runde 108). Offen: Ilse (Wagen 5), Tick (11), Moll (12), Mira (15, „will nicht ohne Papa“), J. (Wagen 1). „Der Letzte ist J. Dann sind alle wieder zusammen.“');
+  story.note('Notizbuch des anderen Joseph: „Wer ist schon zu Hause“. Abgehakt bis Herr K. (Runde 108). Offen: Ilse (Wagen 5), Tick (11), Moll (12), Mira (15, „will nicht ohne Papa“), J. (Wagen 1). Ohne Wagennummer darunter: „Personal (Bruno, Barkeeper, Heizer): ganz zum Schluss.“ – „Der Letzte ist J. Dann sind alle wieder zusammen.“');
   story.note('Letzte Seite im Notizbuch: Der Tunnel wird jede Runde länger (Runde 1: drei Ticks, Runde 109: elf, danach jede Runde einer mehr). „Bei fünfundzwanzig wird es nicht mehr hell. Beeil dich, Junge.“ Der Tunnel dauert jetzt siebzehn Ticks.');
 }
 

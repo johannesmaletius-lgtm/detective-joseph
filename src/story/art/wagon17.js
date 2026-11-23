@@ -210,6 +210,7 @@ export function drawGuestList(ctx) {
           line(c, 66, y - 7, 300, y - 7);
         }
       });
+      text(c, 'Personal (Bruno, Barkeeper, Heizer): ganz zum Schluss.', 310, 560, { font: `19px ${HAND}`, color: BLUE_INK, align: 'center' });
       text(c, 'Der Letzte ist J. Dann sind alle wieder zusammen.', 310, 630, { font: `bold 18px ${HAND}`, color: RED, align: 'center' });
     },
   });

@@ -1,3 +1,6 @@
+import { isUnlocked, today } from '../advent/doors.js';
+import { FAKE_DATE, TEST_MODE } from '../config.js';
+
 // Helfer, die alle Wagen ab Wagen 4 benutzen: Tunnel zählen, Zahlwörter, Anfang und Ende eines
 // Wagens, auf den Tunnel warten, Tipps.
 
@@ -83,10 +86,17 @@ export async function finishWagon(story, { number, title, lines = [], nextTitle 
     kind: 'end',
     title,
     lines: [...lines, `Gelöst in Runde ${story.lap} – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`,
-      ...(number < 24 ? [`Morgen geht es weiter – ${nextTitle ?? 'im nächsten Wagen'}.`] : [])],
+      ...(number < 24 ? [nextLine(number, nextTitle)] : [])],
     continueText: 'Klicken – zurück zu Detective Joseph',
   });
   story.finish();
+}
+
+// Schlusszeile der Endkarte: „Morgen …“ nur, wenn die nächste Tür wirklich erst morgen aufgeht
+export function nextLine(number, nextTitle = 'im nächsten Wagen') {
+  return isUnlocked(number + 1, today(FAKE_DATE), TEST_MODE)
+    ? `Die nächste Tür ist schon offen – weiter geht es ${nextTitle}.`
+    : `Morgen geht es weiter – ${nextTitle}.`;
 }
 
 // Ein Zahlen- oder Buchstabenschloss öffnen. Ergebnis: true, wenn es aufgeht.

@@ -1,4 +1,4 @@
-import { DOORS, dateText, daysUntil, isUnlocked } from './doors.js';
+import { DOORS, dateText, daysUntil, isUnlocked, previousMissing } from './doors.js';
 import { COLORS, FONTS, outlinedText, roundedRect } from '../ui/text.js';
 
 // Die Wagenübersicht von Detective Joseph: Die Ringbahn von oben – 24 Wagen auf einem Gleiskreis, in der Mitte der Turm.
@@ -49,7 +49,7 @@ export class Calendar {
 
   // Die Tür, die als Nächstes dran ist: die erste offene Tür, die noch nicht geschafft ist
   get current() {
-    const open = DOORS.filter(({ door }) => this.unlocked(door) && !this.save.isDone(door));
+    const open = DOORS.filter(({ door }) => this.unlocked(door) && !this.save.isDone(door) && !previousMissing(door, this.save, this.test));
     return open.length ? open[0].door : null;
   }
 
@@ -88,6 +88,7 @@ export class Calendar {
     const entry = DOORS[door - 1];
     if (this.save.isDone(door)) return `Tür ${door}: ${entry.wagon} – noch einmal spielen`;
     if (!this.unlocked(door)) return `Tür ${door}`;
+    if (previousMissing(door, this.save, this.test)) return `Tür ${door} – erst Tür ${door - 1} schaffen`;
     return `Tür ${door} öffnen`;
   }
 
@@ -109,6 +110,9 @@ export class Calendar {
     if (!this.unlocked(door)) {
       const days = daysUntil(door, this.now);
       return this.say(`Tür ${door} öffnet erst am ${dateText(door)}.${days > 1 ? ` Noch ${days} Tage!` : days === 1 ? ' Also morgen!' : ''}`);
+    }
+    if (previousMissing(door, this.save, this.test)) {
+      return this.say(`Erst Tür ${door - 1} schaffen – die Geschichte geht der Reihe nach.`);
     }
     if (!entry.load) return this.say(`Wagen ${door} wird gerade noch gebaut. Bald geht es hier weiter!`);
     this.isOpen = false;
