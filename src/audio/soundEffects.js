@@ -11,10 +11,10 @@ export class SoundEffects {
     this.sound = trainSound;
   }
 
-  play(name) {
+  play(name, ...args) {
     const context = this.sound.context;
     if (!context || context.state !== 'running') return;
-    EFFECTS[name]?.(this, context.currentTime);
+    EFFECTS[name]?.(this, context.currentTime, ...args);
   }
 
   // Gefiltertes Rauschen: Rascheln, Klicken, Zischen, Poltern
@@ -228,6 +228,59 @@ const EFFECTS = {
   brake(fx, t) {
     fx.noise(t, { type: 'lowpass', frequency: 300, gain: 0.5, duration: 0.3, brown: true });
     fx.noise(t + 0.2, { frequency: 5000, q: 0.5, gain: 0.12, duration: 1.4, attack: 0.1 });
+  },
+  // Etwas Schweres wird abgestellt
+  thud(fx, t) {
+    fx.noise(t, { type: 'lowpass', frequency: 220, gain: 0.55, duration: 0.22, brown: true });
+  },
+  // Ein Ton (Klavier, Glocke, Spieluhr …): frequency in Hertz
+  note(fx, t, frequency = 440, kind = 'piano') {
+    if (kind === 'bell') {
+      fx.tone(t, { frequency, type: 'sine', gain: 0.14, duration: 2.2 });
+      fx.tone(t, { frequency: frequency * 2.76, type: 'sine', gain: 0.04, duration: 1.2 });
+      return;
+    }
+    fx.tone(t, { frequency, type: 'triangle', gain: 0.12, duration: 0.9 });
+    fx.tone(t, { frequency: frequency * 2, type: 'sine', gain: 0.03, duration: 0.5 });
+  },
+  // Uhr tickt
+  tick(fx, t) {
+    fx.noise(t, { frequency: 3200, q: 8, gain: 0.12, duration: 0.02 });
+  },
+  // Kuckucksuhr
+  cuckoo(fx, t) {
+    fx.tone(t, { frequency: 784, type: 'sine', gain: 0.12, duration: 0.25 });
+    fx.tone(t + 0.3, { frequency: 622, type: 'sine', gain: 0.12, duration: 0.35 });
+  },
+  // Standuhr: tiefer Gong
+  gong(fx, t) {
+    fx.tone(t, { frequency: 196, type: 'sine', gain: 0.2, duration: 2.6 });
+    fx.tone(t, { frequency: 392, type: 'sine', gain: 0.06, duration: 1.6 });
+  },
+  // Funkrauschen
+  static(fx, t) {
+    fx.noise(t, { frequency: 2500, q: 0.4, gain: 0.08, duration: 0.8, attack: 0.05 });
+  },
+  // Morse-Piepton (lang oder kurz)
+  beep(fx, t, long = false) {
+    fx.tone(t, { frequency: 760, type: 'sine', gain: 0.09, duration: long ? 0.36 : 0.12, attack: 0.005 });
+  },
+  // Dampf zischt
+  hiss(fx, t) {
+    fx.noise(t, { frequency: 6000, q: 0.5, gain: 0.14, duration: 1.2, attack: 0.08 });
+  },
+  // Stempel / Klappe
+  stamp(fx, t) {
+    fx.noise(t, { frequency: 900, q: 1.5, gain: 0.3, duration: 0.06 });
+  },
+  // Wasser plätschert
+  water(fx, t) {
+    for (let i = 0; i < 8; i++) fx.noise(t + i * 0.07, { frequency: 1200 + (i % 3) * 400, q: 4, gain: 0.07, duration: 0.06 });
+  },
+  // Entgleisen: Kreischen, Krachen
+  crash(fx, t) {
+    fx.noise(t, { frequency: 4000, q: 2, gain: 0.2, duration: 1.2, attack: 0.05 });
+    fx.noise(t + 0.9, { type: 'lowpass', frequency: 260, gain: 0.7, duration: 1.6, brown: true });
   },
 };
 

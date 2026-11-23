@@ -255,20 +255,20 @@ export const WAGON_COMBINATIONS = [
 ];
 
 // ---------------------------------------------------------------- Zeichenhilfen
-function line(ctx, x0, y0, x1, y1) {
+export function line(ctx, x0, y0, x1, y1) {
   ctx.beginPath();
   ctx.moveTo(x0, y0);
   ctx.lineTo(x1, y1);
   ctx.stroke();
 }
 
-function lines(ctx, x, y, width, count, gap) {
+export function lines(ctx, x, y, width, count, gap) {
   ctx.strokeStyle = 'rgba(43, 28, 16, 0.55)';
   ctx.lineWidth = 2;
   for (let i = 0; i < count; i++) line(ctx, x, y + i * gap, x + width * (i % 3 === 2 ? 0.6 : 1), y + i * gap);
 }
 
-function paper(ctx, x, y, w, h, angle, inner) {
+export function paper(ctx, x, y, w, h, angle, inner) {
   ctx.save();
   ctx.translate(x + w / 2, y + h / 2);
   ctx.rotate(angle);
@@ -281,7 +281,7 @@ function paper(ctx, x, y, w, h, angle, inner) {
   ctx.restore();
 }
 
-function key(ctx, light, dark, size = 1) {
+export function key(ctx, light, dark, size = 1) {
   ctx.save();
   ctx.translate(64, 64);
   ctx.scale(size, size);

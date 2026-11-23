@@ -188,12 +188,49 @@ def prepare_picture(src, dest, width=1280):
     print(f'{dest.relative_to(ROOT)}  {im.size}')
 
 
+def mirror_pose(name, src_pose, dest_pose):
+    """Eine Seitenansicht spiegeln (wenn beide Seitenansichten im Bogen in dieselbe Richtung schauen)."""
+    out = CHARS / name
+    Image.open(out / f'{src_pose}.webp').transpose(Image.FLIP_LEFT_RIGHT).save(out / f'{dest_pose}.webp', quality=90, method=6)
+
+
+def prepare_photo(src, dest, width=900):
+    """Foto/Bild für eine Karte: nur verkleinern."""
+    im = Image.open(src).convert('RGBA')
+    height = round(im.height * width / im.width)
+    im = im.resize((width, height), Image.LANCZOS)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    im.save(dest, quality=88, method=6)
+    print(f'{dest.relative_to(ROOT)}  {im.size}')
+
+
 if __name__ == '__main__':
-    for number in (4, 5, 6, 7, 8):
-        prepare_background(number)
+    import sys
+    only = {int(a) for a in sys.argv[1:]}
+    for number in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23):
+        if not only or number in only:
+            prepare_background(number)
+    if only:
+        sys.exit()
     prepare_sheet(REF / 'tuer-04' / 'tuer-04-bruno.webp', 'bruno')
     prepare_sheet(REF / 'tuer-07' / 'tuer-07-herr-k.webp', 'herr-k')
     prepare_sheet(REF / 'tuer-07' / 'tuer-07-barkeeper.webp', 'barkeeper')
+    prepare_sheet(REF / 'tuer-11' / 'tuer-11-tick.webp', 'tick')
+    prepare_sheet(REF / 'tuer-12' / 'tuer-12-moll.webp', 'moll')
+    prepare_sheet(REF / 'tuer-15' / 'tuer-15-mira.webp', 'mira')
+    prepare_sheet(REF / 'tuer-21' / 'tuer-21-heizer.webp', 'heizer')
+    mirror_pose('heizer', 'right', 'left')
+    prepare_sheet(REF / 'tuer-22' / 'tuer-22-anderer-joseph.webp', 'anderer-joseph')
+    mirror_pose('anderer-joseph', 'right', 'left')
+    prepare_sheet(REF / 'tuer-22' / 'tuer-22-anderer-joseph-ohne-muetze.webp', 'schaffner')
+    mirror_pose('schaffner', 'right', 'left')
     prepare_picture(REF / 'tuer-05' / 'tuer-05-abteil-k.webp', SCENES / 'wagon-05' / 'abteil-k.webp')
     prepare_picture(REF / 'tuer-06' / 'tuer-06-regal.webp', SCENES / 'wagon-06' / 'regal.webp')
     prepare_picture(REF / 'tuer-08' / 'tuer-08-standbild.webp', SCENES / 'wagon-08' / 'standbild.webp')
+    PHOTOS = ROOT / 'assets' / 'photos'
+    prepare_photo(REF / 'tuer-13' / 'tuer-13-familienfoto.webp', PHOTOS / 'familienfoto.webp', 620)
+    prepare_photo(REF / 'tuer-14' / 'tuer-14-pressefoto.webp', PHOTOS / 'pressefoto.webp', 900)
+    prepare_photo(REF / 'tuer-19' / 'tuer-19-tunnelfoto.webp', PHOTOS / 'tunnelfoto.webp', 900)
+    prepare_photo(REF / 'tuer-21' / 'tuer-21-spindfoto.webp', PHOTOS / 'spindfoto.webp', 860)
+    prepare_photo(REF / 'tuer-23' / 'tuer-23-ausgang.webp', PHOTOS / 'ausgang.webp', 1280)
+    prepare_photo(REF / 'tuer-24' / 'tuer-24-schluss.webp', PHOTOS / 'schluss.webp', 1280)

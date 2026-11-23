@@ -10,6 +10,7 @@
 // Anschauen passiert (z. B. öffnet sich bei den Papierfetzen das Puzzle).
 
 import { WAGON_COMBINATIONS, WAGON_ITEMS } from './wagonItems.js';
+import { ADVENT_COMBINATIONS, ADVENT_ITEMS } from './adventItems.js';
 
 export const ITEMS = {
   letter: {
@@ -83,6 +84,8 @@ export const COMBINATIONS = [
 // Gegenstände und Kombinationen ab Wagen 4 (Bilder im Code gezeichnet)
 Object.assign(ITEMS, WAGON_ITEMS);
 COMBINATIONS.push(...WAGON_COMBINATIONS);
+Object.assign(ITEMS, ADVENT_ITEMS);
+COMBINATIONS.push(...ADVENT_COMBINATIONS);
 
 export function findCombination(a, b) {
   return COMBINATIONS.find(({ items }) => (items[0] === a && items[1] === b) || (items[0] === b && items[1] === a));

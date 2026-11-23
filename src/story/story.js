@@ -111,8 +111,8 @@ export class Story {
     return this.game.inventory.has(id);
   }
 
-  sound(name) {
-    this.game.effects.play(name);
+  sound(name, ...args) {
+    this.game.effects.play(name, ...args);
   }
 
   // Für das Tutorial: merken, dass etwas passiert ist

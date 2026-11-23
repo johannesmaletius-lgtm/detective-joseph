@@ -80,3 +80,77 @@ export function glow(ctx, x, y, r, color = '255, 220, 150', strength = 0.4) {
   ctx.fillStyle = gradient;
   ctx.fillRect(x - r, y - r, r * 2, r * 2);
 }
+
+// Ein Bild (z. B. ein Foto von ChatGPT) für Karten und Nahansichten. Wird beim ersten Aufruf geladen;
+// bis es da ist, zeichnet drawPicture einfach nichts.
+const PICTURES = {};
+export function picture(src) {
+  if (!PICTURES[src]) {
+    const image = new Image();
+    image.src = src;
+    PICTURES[src] = image;
+  }
+  return PICTURES[src];
+}
+
+export function drawPicture(ctx, src, x, y, w, h) {
+  const image = picture(src);
+  if (image.complete && image.naturalWidth) ctx.drawImage(image, x, y, w, h);
+}
+
+// Ein Foto mit weißem Rand und Schatten (leicht gedreht)
+export function photoCard(ctx, src, cx, cy, w, h, angle = 0) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 26;
+  ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#efe6d2';
+  ctx.fillRect(-w / 2 - 14, -h / 2 - 14, w + 28, h + 28);
+  ctx.shadowColor = 'transparent';
+  drawPicture(ctx, src, -w / 2, -h / 2, w, h);
+  ctx.restore();
+}
+
+// Mehrzeiliger Text mit Zeilenumbruch. Ergebnis: y unter der letzten Zeile
+export function paragraph(ctx, value, x, y, width, { font = `20px ${HAND}`, color = INK, lineHeight = 26, align = 'left' } = {}) {
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'alphabetic';
+  for (const block of String(value).split('\n')) {
+    let row = '';
+    for (const word of block.split(' ')) {
+      const test = row ? `${row} ${word}` : word;
+      if (ctx.measureText(test).width > width && row) {
+        ctx.fillText(row, x, y);
+        y += lineHeight;
+        row = word;
+      } else row = test;
+    }
+    ctx.fillText(row, x, y);
+    y += lineHeight;
+  }
+  return y;
+}
+
+// Ein Blatt aus Josephs Akte (Seite n), Text in seiner Handschrift
+export function drawFilePage(ctx, { x = 330, y = 40, w = 620, h = 640, angle = 0, page, title = 'AKTE J. – DIE RINGBAHN', lines = [] }) {
+  sheet(ctx, x, y, w, h, {
+    angle,
+    color: '#efe4c4',
+    shade: '#d9c79a',
+    inner: (c) => {
+      c.strokeStyle = 'rgba(39, 64, 143, 0.25)';
+      c.lineWidth = 1;
+      for (let ly = 120; ly < h - 20; ly += 30) line(c, 30, ly, w - 30, ly);
+      c.strokeStyle = 'rgba(179, 38, 30, 0.45)';
+      line(c, 70, 0, 70, h);
+      text(c, title, w / 2, 52, { font: `bold 26px ${TYPEWRITER}`, align: 'center' });
+      if (page) text(c, `Seite ${page}`, w - 40, 86, { font: `18px ${TYPEWRITER}`, align: 'right' });
+      let ly = 140;
+      for (const value of lines) ly = paragraph(c, value, 84, ly, w - 120, { font: `21px ${HAND}`, color: BLUE_INK, lineHeight: 30 });
+    },
+  });
+}
