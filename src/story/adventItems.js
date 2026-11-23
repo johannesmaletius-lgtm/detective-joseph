@@ -80,72 +80,10 @@ export const ADVENT_ITEMS = {
     look: 'Ein Brief an J. Verschlüsselt.',
   },
 
-  // ---------------------------------------------------------------- Tür 10: Lautsprecherwagen
-  fuseBox: {
-    name: 'Ersatzsicherungen',
-    icon: (ctx) => {
-      ctx.fillStyle = '#5a4a32';
-      ctx.fillRect(16, 40, 96, 60);
-      for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = '#efe9da';
-        ctx.fillRect(24 + i * 18, 30, 12, 50);
-        ctx.fillStyle = '#b8b2a2';
-        ctx.fillRect(24 + i * 18, 26, 12, 8);
-      }
-    },
-    look: 'Fünf Sicherungen: 2, 6, 10, 16 und 25 Ampere.',
-  },
-  reel108: {
-    name: 'Tonband „Runde 108“',
-    icon: (ctx) => {
-      ctx.fillStyle = '#c8c4bc';
-      ctx.beginPath();
-      ctx.arc(64, 64, 46, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#5a4630';
-      ctx.beginPath();
-      ctx.arc(64, 64, 34, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#c8c4bc';
-      ctx.beginPath();
-      ctx.arc(64, 64, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#efe3c2';
-      ctx.fillRect(30, 96, 68, 20);
-      ctx.fillStyle = '#2b1c10';
-      ctx.font = 'bold 13px monospace';
-      ctx.fillText('R. 108', 40, 111);
-    },
-    look: 'Das Tonband aus Runde 108.',
-  },
 
-  // ---------------------------------------------------------------- Tür 11: Uhrenwagen
-  gear: {
-    name: 'Zahnrad',
-    keep: true,
-    icon: (ctx) => {
-      ctx.save();
-      ctx.translate(64, 64);
-      ctx.fillStyle = '#c9a24a';
-      ctx.strokeStyle = '#6e5420';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let i = 0; i < 24; i++) {
-        const a = (i / 24) * Math.PI * 2;
-        const r = i % 2 ? 36 : 46;
-        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#6e5420';
-      ctx.beginPath();
-      ctx.arc(0, 0, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    },
-    look: 'Das Zahnrad von Herrn Tick. „Das wirst du vorne brauchen.“',
-  },
+
+
+
 
   // ---------------------------------------------------------------- Tür 17: Gewächshaus
   tinyKey: {
