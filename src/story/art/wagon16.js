@@ -1,5 +1,5 @@
 import { MORSE_DIGITS } from '../../effects/morse.js';
-import { HAND, INK, PRINT, SERIF, TYPEWRITER, glow, line, sheet, smudge, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, smudge, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 16 (Funkraum): Antennenkurbel mit Empfangsanzeige, Logbuch,
 // Funkgerät mit Frequenzanzeige und die Morsetafel an der Wand.
@@ -129,30 +129,24 @@ export function drawLogbook(ctx) {
 
 // ---------------------------------------------------------------- Funkgerät
 export function drawRadioPanel(ctx, { frequency, antenna, listening, light, time }) {
-  ctx.fillStyle = '#3e3a30';
-  ctx.fillRect(240, 140, 800, 440);
-  ctx.strokeStyle = '#1e1b15';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(240, 140, 800, 440);
-  // Röhren
-  for (let i = 0; i < 3; i++) {
-    const x = 330 + i * 70;
-    ctx.fillStyle = 'rgba(255, 190, 110, 0.25)';
-    ctx.fillRect(x - 20, 170, 40, 90);
-    glow(ctx, x, 230, 40, '255, 160, 80', 0.5 + 0.1 * Math.sin(time * 7 + i));
+  drawPicture(ctx, 'assets/closeups/funkgeraet.webp', 0, 0, 1280, 720);
+  // Röhren flackern
+  for (const x of [203, 299, 394]) glow(ctx, x, 191, 46, '255, 160, 80', 0.25 + 0.1 * Math.sin(time * 7 + x));
+  // Frequenzanzeige im dunklen Fenster
+  glow(ctx, 811, 176, 200, '90, 255, 130', 0.08);
+  text(ctx, `${frequency ?? '---'} kHz`, 811, 192, { font: `bold 56px ${TYPEWRITER}`, color: '#7dff9a', align: 'center' });
+  text(ctx, antenna ? 'Antenne: gut' : 'Antenne: schwach', 811, 238, { font: `18px ${PRINT}`, color: antenna ? '#9fe7a8' : '#e7a89f', align: 'center' });
+  // Signallampe für das Morsesignal
+  if (light) {
+    ctx.fillStyle = 'rgba(255, 236, 138, 0.9)';
+    ctx.beginPath();
+    ctx.arc(233, 532, 46, 0, Math.PI * 2);
+    ctx.fill();
+    glow(ctx, 233, 532, 110, '255, 240, 160', 0.7);
   }
-  // Frequenzanzeige
-  ctx.fillStyle = '#0d1a10';
-  ctx.fillRect(560, 180, 360, 90);
-  text(ctx, `${frequency ?? '---'} kHz`, 740, 242, { font: `bold 44px ${TYPEWRITER}`, color: '#7dff9a', align: 'center' });
-  text(ctx, antenna ? 'Antenne: gut' : 'Antenne: schwach', 740, 300, { font: `16px ${PRINT}`, color: antenna ? '#9fe7a8' : '#e7a89f', align: 'center' });
-  // Lämpchen für das Morsesignal
-  ctx.fillStyle = light ? '#ffec8a' : '#3a3420';
-  ctx.beginPath();
-  ctx.arc(330, 450, 28, 0, Math.PI * 2);
-  ctx.fill();
-  if (light) glow(ctx, 330, 450, 80, '255, 240, 160', 0.7);
-  text(ctx, listening ? 'Kopfhörer: auf' : 'Lautsprecher kaputt – nur Kopfhörer', 640, 540, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  ctx.fillStyle = 'rgba(20, 14, 8, 0.7)';
+  ctx.fillRect(400, 690, 480, 26);
+  text(ctx, listening ? 'Kopfhörer: auf' : 'Lautsprecher kaputt – nur Kopfhörer', 640, 709, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 // Lämpchen im Wagen

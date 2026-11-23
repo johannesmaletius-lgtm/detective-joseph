@@ -1,6 +1,6 @@
 import { loadImage } from '../../core/assets.js';
 import { STAINED } from '../../scene/chapelCar.js';
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 13 (Kapelle): Buntglas, Kerzenschein, der Adventskranz mit zwölf
 // Kerzen (je ein Zeichen für die Wagen 1–12), der Abrieb der Gedenktafel, die roten Lichtpunkte
@@ -70,65 +70,45 @@ export function drawChapelLight(ctx, { lit = 0, lanternLit = false, lanternTaken
 export const CANDLE_SYMBOLS = ['bench', 'suitcase', 'letter', 'glass', 'bed', 'umbrella', 'whisky', 'film', 'mirror', 'horn', 'clock', 'note'];
 const SHUFFLED = [6, 2, 10, 0, 8, 4, 11, 1, 7, 3, 9, 5]; // Platz auf dem Kranz → Wagen-Index
 
+// Docht und Kärtchen jeder Kerze im Bild kranz.webp (Bildpunkte 1672 × 941), im Uhrzeigersinn ab oben
+const S = 1280 / 1672;
+const CANDLES = [
+  [840, 25, 840, 195], [1100, 50, 1065, 225], [1330, 135, 1290, 320], [1435, 282, 1425, 490],
+  [1310, 425, 1310, 645], [1100, 525, 1095, 735], [840, 565, 835, 790], [565, 520, 575, 740],
+  [360, 430, 365, 645], [240, 275, 245, 490], [360, 115, 390, 315], [575, 45, 595, 230],
+].map(([wx, wy, cx, cy]) => ({ wx: wx * S, wy: wy * S, cx: cx * S, cy: cy * S }));
+
 export function candleSpots() {
   return SHUFFLED.map((wagon, i) => {
-    const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    return { id: `candle${i}`, wagon, x: 640 + Math.cos(a) * 250 - 26, y: 350 + Math.sin(a) * 200 - 70, w: 52, h: 110, label: 'Kerze' };
+    const c = CANDLES[i];
+    return { id: `candle${i}`, wagon, slot: i, x: c.wx - 30, y: c.wy - 8, w: 60, h: c.cy + 24 - (c.wy - 8), label: 'Kerze' };
   });
 }
 
 export function drawWreathCard(ctx, litOrder, time) {
-  ctx.fillStyle = 'rgba(14, 8, 4, 0.6)';
-  ctx.fillRect(160, 60, 960, 620);
-  // Tannengrün
-  ctx.save();
-  ctx.strokeStyle = '#26452a';
-  ctx.lineWidth = 70;
-  ctx.beginPath();
-  ctx.ellipse(640, 360, 250, 200, 0, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.strokeStyle = '#3c6b3c';
-  ctx.lineWidth = 6;
-  for (let i = 0; i < 90; i++) {
-    const a = (i / 90) * Math.PI * 2;
-    const x = 640 + Math.cos(a) * 250, y = 360 + Math.sin(a) * 200;
-    line(ctx, x, y, x + Math.cos(a * 7) * 30, y + Math.sin(a * 5) * 24);
-  }
-  ctx.fillStyle = '#b3261e';
-  for (let i = 0; i < 12; i++) {
-    const a = ((i + 0.5) / 12) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.arc(640 + Math.cos(a) * 262, 360 + Math.sin(a) * 212, 9, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
+  drawPicture(ctx, 'assets/closeups/kranz.webp', 0, 0, 1280, 720);
   for (const spot of candleSpots()) {
-    const lit = litOrder.includes(spot.wagon);
-    const { x, y, w, h } = spot;
-    const wax = ctx.createLinearGradient(x, 0, x + w, 0);
-    wax.addColorStop(0, '#e9dfc6');
-    wax.addColorStop(0.5, '#fbf5e6');
-    wax.addColorStop(1, '#d6c9aa');
-    ctx.fillStyle = wax;
-    ctx.fillRect(x + 6, y + 20, w - 12, h - 20);
-    drawSymbol(ctx, CANDLE_SYMBOLS[spot.wagon], x + w / 2, y + 66);
-    ctx.strokeStyle = '#2a1f16';
-    ctx.lineWidth = 2;
-    line(ctx, x + w / 2, y + 20, x + w / 2, y + 10);
-    if (lit) {
+    const c = CANDLES[spot.slot];
+    ctx.save();
+    ctx.translate(c.cx, c.cy);
+    ctx.scale(1.4, 1.4);
+    drawSymbol(ctx, CANDLE_SYMBOLS[spot.wagon], 0, 0);
+    ctx.restore();
+    if (litOrder.includes(spot.wagon)) {
       const flicker = 0.85 + 0.15 * Math.sin(time * 10 + spot.wagon);
-      glow(ctx, x + w / 2, y + 2, 40, '255, 200, 110', 0.6);
+      const fx = c.wx, fy = c.wy - 6;
+      glow(ctx, fx, fy, 46, '255, 200, 110', 0.6);
       ctx.fillStyle = '#ffd36b';
       ctx.beginPath();
-      ctx.ellipse(x + w / 2, y, 6, 13 * flicker, 0, 0, Math.PI * 2);
+      ctx.ellipse(fx, fy, 6, 13 * flicker, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#fff6d0';
       ctx.beginPath();
-      ctx.ellipse(x + w / 2, y + 3, 3, 6 * flicker, 0, 0, Math.PI * 2);
+      ctx.ellipse(fx, fy + 3, 3, 6 * flicker, 0, 0, Math.PI * 2);
       ctx.fill();
     }
   }
-  text(ctx, '„Zünde sie an in der Reihenfolge deines Weges.“', 640, 660, { font: `italic 20px ${SERIF}`, color: '#f3e2b4', align: 'center' });
+  text(ctx, '„Zünde sie an in der Reihenfolge deines Weges.“', 640, 380, { font: `italic 22px ${SERIF}`, color: '#f3e2b4', align: 'center' });
 }
 
 // kleine Zeichen auf den Kerzen (24 × 24 um die Mitte) – auch auf den Modellbahn-Wagen in Wagen 15
@@ -280,16 +260,10 @@ function drawLanternDots(ctx, time) {
 
 // Die Tafel ohne Abrieb: Ruß
 export function drawSootyPlaque(ctx) {
-  ctx.fillStyle = '#2c2218';
-  ctx.fillRect(300, 150, 680, 420);
-  const soot = ctx.createRadialGradient(640, 360, 40, 640, 360, 400);
-  soot.addColorStop(0, '#4a3a28');
-  soot.addColorStop(1, '#1a130d');
-  ctx.fillStyle = soot;
-  ctx.fillRect(320, 170, 640, 380);
-  ctx.fillStyle = 'rgba(120, 100, 70, 0.25)';
-  for (let i = 0; i < 6; i++) ctx.fillRect(380, 210 + i * 56, 520 - (i % 3) * 60, 14);
-  text(ctx, 'Unter dem Ruß ahnt man eingravierte Zeilen.', 640, 610, { font: `18px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  drawPicture(ctx, 'assets/closeups/gedenktafel.webp', 0, 0, 1280, 720);
+  ctx.fillStyle = 'rgba(20, 10, 4, 0.7)';
+  ctx.fillRect(420, 690, 440, 26);
+  text(ctx, 'Unter dem Ruß ahnt man eingravierte Zeilen.', 640, 709, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 // ---------------------------------------------------------------- Familienfoto

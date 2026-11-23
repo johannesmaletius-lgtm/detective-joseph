@@ -1,5 +1,5 @@
 import { drawSymbol } from './wagon13.js';
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 15 (Spielzimmer): die vierzehn Modellbahn-Wagen, das Innere des
 // Puppenhaus-Bahnhofs mit den Figuren und Miras Zeichnung.
@@ -10,9 +10,10 @@ export const MINI = ['bench', 'suitcase', 'letter', 'glass', 'bed', 'umbrella', 
 const COLORS = ['#3a6ea5', '#a5463a', '#3a8a5a', '#8a3a7a', '#b07a2a', '#4a4a8a', '#7a5a3a', '#2a2a2a', '#9aa0a8', '#6a7a3a', '#a0703a', '#5a2a4a', '#8a6a4a', '#606060'];
 const START = [9, 3, 12, 0, 6, 13, 2, 10, 5, 8, 1, 11, 4, 7]; // Mini-Wagen auf Platz 0, 1, …
 
+// Plätze auf den beiden Gleisen des Bilds (oben hinter der Lok, unten bis zum Tunnel)
 export const MINI_SLOTS = Array.from({ length: 14 }, (_, i) => ({
-  x: 160 + (i % 7) * 140,
-  y: 210 + Math.floor(i / 7) * 220,
+  x: (i < 7 ? 232 : 80) + (i % 7) * 140,
+  y: i < 7 ? 148 : 424,
   w: 124,
   h: 86,
   label: `${i + 1}`,
@@ -21,29 +22,10 @@ export const MINI_SLOTS = Array.from({ length: 14 }, (_, i) => ({
 export const MINI_TOKENS = START.map((wagon, slot) => ({ id: `mini${wagon}`, wagon, slot }));
 
 export function drawRailwayTable(ctx) {
-  wood(ctx, 100, 80, 1080, 580, [110, 70, 36]);
-  ctx.fillStyle = '#4f7a3a';
-  ctx.fillRect(130, 110, 1020, 520);
-  // Gleise unter den Plätzen
-  for (let r = 0; r < 2; r++) {
-    const y = 210 + r * 220 + 70;
-    ctx.strokeStyle = '#5a4630';
-    ctx.lineWidth = 6;
-    for (let x = 140; x < 1140; x += 22) line(ctx, x, y - 8, x, y + 18);
-    ctx.strokeStyle = '#a9a9a9';
-    ctx.lineWidth = 3;
-    line(ctx, 130, y - 2, 1150, y - 2);
-    line(ctx, 130, y + 12, 1150, y + 12);
-  }
-  // Spielzeugtunnel rechts, Lok links
-  ctx.fillStyle = '#c96a4a';
-  ctx.beginPath();
-  ctx.arc(1150, 500, 80, Math.PI, Math.PI * 1.5);
-  ctx.lineTo(1150, 500);
-  ctx.fill();
-  text(ctx, 'Lok →', 120, 300, { font: `bold 16px ${PRINT}`, color: '#f3e2b4' });
-  text(ctx, '→ Tunnel', 1060, 610, { font: `bold 16px ${PRINT}`, color: '#f3e2b4' });
-  text(ctx, 'Hinter der Lok der erste Wagen. „Papa hat sie immer richtig hingestellt.“', 640, 645, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  drawPicture(ctx, 'assets/closeups/modellbahn.webp', 0, 0, 1280, 720);
+  ctx.fillStyle = 'rgba(20, 12, 6, 0.7)';
+  ctx.fillRect(300, 692, 680, 26);
+  text(ctx, 'Hinter der Lok der erste Wagen. „Papa hat sie immer richtig hingestellt.“', 640, 711, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 export function drawMini(ctx, token, x, y) {
@@ -70,9 +52,9 @@ export function drawMini(ctx, token, x, y) {
 
 // ---------------------------------------------------------------- Puppenhaus-Bahnhof
 export const FIGURE_SLOTS = [
-  { id: 'platform', x: 340, y: 430, w: 110, h: 170, label: 'Bahnsteig' },
-  { id: 'train1', x: 700, y: 250, w: 110, h: 150, label: 'Zug, Fenster 1' },
-  { id: 'train2', x: 840, y: 250, w: 110, h: 150, label: 'Zug, Fenster 2' },
+  { id: 'platform', x: 463, y: 320, w: 100, h: 165, label: 'Bahnsteig' },
+  { id: 'train1', x: 748, y: 320, w: 100, h: 165, label: 'Zug, Tür' },
+  { id: 'train2', x: 880, y: 320, w: 100, h: 165, label: 'Zug, Fenster' },
 ];
 export const FIGURES = [
   { id: 'conductor', name: 'Schaffner', home: { x: 1130, y: 200 } },
@@ -87,171 +69,28 @@ export function figuresCorrect(placement) {
   return platform === 'conductor' && [a, b].includes('woman') && [a, b].includes('girl');
 }
 
+// Bild 1672 × 941, verkleinert auf 900 × 506 in die Mitte (links und rechts warten die Figuren)
+const HOUSE = { x: 190, y: 107, w: 900, h: 506 };
 export function drawDollhouseInside(ctx) {
-  // Rahmen des Puppenhauses mit Dach
-  wood(ctx, 240, 70, 800, 590, [120, 70, 36]);
-  ctx.fillStyle = '#6a3a1a';
-  ctx.beginPath();
-  ctx.moveTo(220, 92);
-  ctx.lineTo(640, 30);
-  ctx.lineTo(1060, 92);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#e8dcc0';
-  ctx.fillRect(560, 54, 160, 26);
-  text(ctx, 'RINGBAHNHOF', 640, 74, { font: `bold 18px ${SERIF}`, color: '#3a2412', align: 'center' });
-
-  // Rückwand: Tapete mit kleinen Rauten
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(270, 100, 740, 360);
-  ctx.clip();
-  const wall = ctx.createLinearGradient(0, 100, 0, 460);
-  wall.addColorStop(0, '#e6d6ae');
-  wall.addColorStop(1, '#c9b386');
-  ctx.fillStyle = wall;
-  ctx.fillRect(270, 100, 740, 360);
-  ctx.fillStyle = 'rgba(150, 90, 50, 0.18)';
-  for (let y = 112; y < 460; y += 28) for (let x = 282 + ((y / 28) % 2) * 14; x < 1010; x += 28) {
-    ctx.beginPath();
-    ctx.moveTo(x, y - 5);
-    ctx.lineTo(x + 5, y);
-    ctx.lineTo(x, y + 5);
-    ctx.lineTo(x - 5, y);
-    ctx.fill();
-  }
-  // Rundbogenfenster mit Schneenacht
-  for (const wx of [330, 560]) {
-    ctx.fillStyle = '#5a3a1c';
-    archPath(ctx, wx - 6, 136, 102, 150);
-    ctx.fill();
-    const night = ctx.createLinearGradient(0, 140, 0, 290);
-    night.addColorStop(0, '#16223e');
-    night.addColorStop(1, '#2c3c5e');
-    ctx.fillStyle = night;
-    archPath(ctx, wx, 142, 90, 140);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-    for (let k = 0; k < 14; k++) {
-      ctx.beginPath();
-      ctx.arc(wx + 8 + ((k * 37) % 76), 160 + ((k * 53) % 110), 1.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.fillStyle = '#eef2f8';
-    ctx.fillRect(wx, 262, 90, 20);
-    ctx.strokeStyle = '#5a3a1c';
-    ctx.lineWidth = 4;
-    line(ctx, wx + 45, 142, wx + 45, 282);
-    line(ctx, wx, 220, wx + 90, 220);
-  }
-  // Hängelampen
-  for (const lx of [455, 845]) {
-    ctx.strokeStyle = '#3a2a1a';
-    ctx.lineWidth = 2;
-    line(ctx, lx, 100, lx, 140);
-    glow(ctx, lx, 150, 120, '255, 210, 130', 0.35);
-    ctx.fillStyle = '#2f4a3a';
-    ctx.beginPath();
-    ctx.moveTo(lx - 18, 152);
-    ctx.lineTo(lx + 18, 152);
-    ctx.lineTo(lx + 8, 138);
-    ctx.lineTo(lx - 8, 138);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#ffe6a0';
-    ctx.beginPath();
-    ctx.arc(lx, 154, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  // Bahnhofsuhr am Ausleger – sie zeigt 23:47
-  ctx.strokeStyle = '#3a2a1a';
-  ctx.lineWidth = 5;
-  line(ctx, 500, 100, 500, 128);
-  ctx.fillStyle = '#2a1a0e';
-  ctx.beginPath();
-  ctx.arc(500, 170, 44, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#f6efdc';
-  ctx.beginPath();
-  ctx.arc(500, 170, 38, 0, Math.PI * 2);
-  ctx.fill();
+  drawPicture(ctx, 'assets/closeups/puppenhaus.webp', HOUSE.x, HOUSE.y, HOUSE.w, HOUSE.h);
+  // Bahnhofsuhr: 23:47
+  const cx = 352, cy = 287, r = 40;
   ctx.strokeStyle = INK;
-  for (let k = 0; k < 12; k++) {
-    const a = (k / 12) * Math.PI * 2;
-    ctx.lineWidth = k % 3 ? 1.5 : 3;
-    line(ctx, 500 + Math.cos(a) * 30, 170 + Math.sin(a) * 30, 500 + Math.cos(a) * 36, 170 + Math.sin(a) * 36);
-  }
-  const ha = ((11 + 47 / 60) / 12) * Math.PI * 2 - Math.PI / 2, ma = (47 / 60) * Math.PI * 2 - Math.PI / 2;
   ctx.lineCap = 'round';
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    ctx.lineWidth = 2;
+    line(ctx, cx + Math.cos(a) * r * 0.8, cy + Math.sin(a) * r * 0.8, cx + Math.cos(a) * r * 0.95, cy + Math.sin(a) * r * 0.95);
+  }
+  const minute = ((47 / 60) * Math.PI * 2) - Math.PI / 2;
+  const hour = (((11 + 47 / 60) / 12) * Math.PI * 2) - Math.PI / 2;
   ctx.lineWidth = 4;
-  line(ctx, 500, 170, 500 + Math.cos(ha) * 18, 170 + Math.sin(ha) * 18);
-  ctx.lineWidth = 2.5;
-  line(ctx, 500, 170, 500 + Math.cos(ma) * 28, 170 + Math.sin(ma) * 28);
+  line(ctx, cx, cy, cx + Math.cos(hour) * r * 0.5, cy + Math.sin(hour) * r * 0.5);
+  ctx.lineWidth = 3;
+  line(ctx, cx, cy, cx + Math.cos(minute) * r * 0.78, cy + Math.sin(minute) * r * 0.78);
   ctx.lineCap = 'butt';
-  ctx.restore();
-
-  // Bahnsteig: Fliesen, gelbe Kante
-  const plat = ctx.createLinearGradient(0, 460, 0, 630);
-  plat.addColorStop(0, '#b9bfc8');
-  plat.addColorStop(1, '#8a929e');
-  ctx.fillStyle = plat;
-  ctx.fillRect(270, 460, 740, 170);
-  ctx.strokeStyle = 'rgba(60, 60, 70, 0.25)';
-  ctx.lineWidth = 1;
-  for (let y = 490; y < 630; y += 30) line(ctx, 270, y, 1010, y);
-  for (let x = 270; x < 1010; x += 40) line(ctx, x, 460, x - 30, 630);
-  ctx.fillStyle = '#e0b84a';
-  ctx.fillRect(270, 452, 740, 8);
-  // Bank am Bahnsteig
-  ctx.fillStyle = '#7a4a24';
-  ctx.fillRect(490, 520, 120, 10);
-  ctx.fillRect(490, 498, 120, 8);
-  ctx.fillStyle = '#3a2a1a';
-  ctx.fillRect(496, 530, 6, 26);
-  ctx.fillRect(598, 530, 6, 26);
-
-  // Der Spielzeugwagen von Zug 24 mit zwei Fenstern (dort sitzen die Figuren)
-  const car = ctx.createLinearGradient(0, 230, 0, 432);
-  car.addColorStop(0, '#3f6fa2');
-  car.addColorStop(1, '#1f3a5e');
-  ctx.fillStyle = car;
-  ctx.beginPath();
-  ctx.moveTo(660, 244);
-  ctx.quadraticCurveTo(825, 214, 990, 244);
-  ctx.lineTo(990, 432);
-  ctx.lineTo(660, 432);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#d9b25a';
-  ctx.fillRect(660, 404, 330, 6);
-  for (const slot of FIGURE_SLOTS.slice(1)) {
-    ctx.fillStyle = '#ffe2a0';
-    ctx.fillRect(slot.x - 4, slot.y - 4, slot.w + 8, slot.h + 8);
-    const inside = ctx.createLinearGradient(0, slot.y, 0, slot.y + slot.h);
-    inside.addColorStop(0, '#7a4a2a');
-    inside.addColorStop(1, '#3a2010');
-    ctx.fillStyle = inside;
-    ctx.fillRect(slot.x, slot.y, slot.w, slot.h);
-    glow(ctx, slot.x + slot.w / 2, slot.y + 20, 70, '255, 220, 150', 0.35);
-  }
-  ctx.fillStyle = '#121a26';
-  for (const wx of [690, 950]) {
-    ctx.beginPath();
-    ctx.arc(wx, 436, 14, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  text(ctx, 'ZUG 24', 825, 236, { font: `bold 18px ${PRINT}`, color: '#f6e7c0', align: 'center' });
-
-  text(ctx, 'Wo stand wer in jener Nacht?', 640, 650, { font: `italic 18px ${SERIF}`, color: '#f1e0b8', align: 'center' });
-}
-
-function archPath(ctx, x, y, w, h) {
-  ctx.beginPath();
-  ctx.moveTo(x, y + h);
-  ctx.lineTo(x, y + w / 2);
-  ctx.arc(x + w / 2, y + w / 2, w / 2, Math.PI, 0);
-  ctx.lineTo(x + w, y + h);
-  ctx.closePath();
+  text(ctx, 'ZUG 24', 865, 332, { font: `bold 15px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+  text(ctx, 'Wo stand wer in jener Nacht?', 640, 650, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
 export function drawFigure(ctx, token, x, y) {
@@ -342,7 +181,7 @@ export function drawFigure(ctx, token, x, y) {
 
 // ---------------------------------------------------------------- Miras Zeichnung
 export function drawMiraDrawing(ctx, { back = false } = {}) {
-  sheet(ctx, 290, 110, 700, 500, {
+  if (back) sheet(ctx, 290, 110, 700, 500, {
     angle: 0.02,
     color: '#fbf6e6',
     shade: '#efe6cc',
@@ -352,57 +191,23 @@ export function drawMiraDrawing(ctx, { back = false } = {}) {
         text(c, 'Die Tür-Geheimzahl', 350, 220, { font: `32px ${HAND}`, color: '#2a63c9', align: 'center' });
         text(c, 'ist Heiligabend!', 350, 270, { font: `32px ${HAND}`, color: '#2a63c9', align: 'center' });
         text(c, '♥  Deine Mira  ♥', 350, 380, { font: `30px ${HAND}`, color: '#c0392b', align: 'center' });
-        return;
       }
-      // Wachsmalstift: ein großer schwarzer Tunnel, ein Mann mit Mütze und Schal, kleine Leute dahinter
-      c.fillStyle = '#2a2a2a';
-      c.beginPath();
-      c.arc(520, 330, 130, Math.PI, 0);
-      c.lineTo(650, 460);
-      c.lineTo(390, 460);
-      c.fill();
-      c.strokeStyle = '#5a5a5a';
-      c.lineWidth = 6;
-      line(c, 40, 460, 660, 460);
-      const people = [[110, '#c0392b'], [170, '#2a63c9'], [230, '#3f8f5a'], [290, '#a0703a']];
-      for (const [px, color] of people) {
-        c.strokeStyle = color;
-        c.lineWidth = 5;
-        c.beginPath();
-        c.arc(px, 340, 16, 0, Math.PI * 2);
-        c.stroke();
-        line(c, px, 356, px, 410);
-        line(c, px, 410, px - 14, 456);
-        line(c, px, 410, px + 14, 456);
-        line(c, px - 18, 376, px + 18, 376);
-      }
-      // der Mann vorne – mit Mütze und weißem Schal
-      const mx = 370;
-      c.strokeStyle = '#6b3a1a';
-      c.lineWidth = 6;
-      c.beginPath();
-      c.arc(mx, 300, 22, 0, Math.PI * 2);
-      c.stroke();
-      c.fillStyle = '#6b3a1a';
-      c.fillRect(mx - 26, 270, 52, 14);
-      c.strokeStyle = '#d8d8d8';
-      c.lineWidth = 8;
-      line(c, mx - 18, 330, mx + 22, 330);
-      line(c, mx + 18, 330, mx + 26, 360);
-      c.strokeStyle = '#6b3a1a';
-      c.lineWidth = 6;
-      line(c, mx, 324, mx, 400);
-      line(c, mx, 400, mx - 18, 456);
-      line(c, mx, 400, mx + 18, 456);
-      line(c, mx, 350, mx - 44, 372); // Hand zum Nächsten
-      text(c, 'PAPA', mx, 240, { font: `bold 30px ${HAND}`, color: '#6b3a1a', align: 'center' });
-      text(c, 'Er bringt alle nach Hause', 350, 60, { font: `30px ${HAND}`, color: '#c0392b', align: 'center' });
-      c.fillStyle = '#f3c95a';
-      c.beginPath();
-      c.arc(620, 80, 34, 0, Math.PI * 2);
-      c.fill();
     },
   });
+  if (!back) {
+    const x = 300, y = 102, w = 680, h = 510; // Bild 4:3
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.rotate(0.02);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 8;
+    drawPicture(ctx, 'assets/closeups/mira-zeichnung.webp', -w / 2, -h / 2, w, h);
+    ctx.shadowColor = 'transparent';
+    text(ctx, 'Er bringt alle nach Hause', 0, -h / 2 + 62, { font: `bold 34px ${HAND}`, color: '#c0392b', align: 'center' });
+    text(ctx, 'PAPA', w * 0.0, -h / 2 + h * 0.3, { font: `bold 28px ${HAND}`, color: '#fff3c4', align: 'center' });
+    ctx.restore();
+  }
   text(ctx, back ? 'Die Rückseite' : 'Rechtsklick: zurück  ·  Klicken: umdrehen', 640, 650, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 

@@ -253,56 +253,43 @@ function lighten(hex, amount) {
 // ---------------------------------------------------------------- Gepäckwaage
 // kg = was auf der Waage liegt (0 = leer). Die Nadel dreht sich langsam dorthin (shown).
 export function drawScale(ctx, { shown, loaded }) {
-  ctx.fillStyle = '#1a120c';
-  ctx.fillRect(240, 40, 800, 640);
-  const cx = 640, cy = 300, r = 220;
-  glow(ctx, cx, cy, 360, '255, 220, 160', 0.18);
-  ctx.fillStyle = '#4a3a22';
-  ctx.beginPath();
-  ctx.arc(cx, cy, r + 24, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#efe4c8';
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fill();
+  drawPicture(ctx, 'assets/closeups/waage.webp', 0, 0, 1280, 720);
+  const cx = 635, cy = 213, r = 128;
   // Skala 0 … 50 kg auf 300°
   const angle = (kg) => (-240 + (kg / 50) * 300) * Math.PI / 180;
   ctx.strokeStyle = INK;
   for (let kg = 0; kg <= 50; kg += 1) {
     const a = angle(kg), long = kg % 5 === 0;
     ctx.lineWidth = long ? 3 : 1.5;
-    line(ctx, cx + Math.cos(a) * (r - (long ? 30 : 16)), cy + Math.sin(a) * (r - (long ? 30 : 16)), cx + Math.cos(a) * (r - 6), cy + Math.sin(a) * (r - 6));
-    if (kg % 10 === 0) text(ctx, String(kg), cx + Math.cos(a) * (r - 56), cy + Math.sin(a) * (r - 56) + 8, { font: `bold 22px ${PRINT}`, align: 'center' });
+    line(ctx, cx + Math.cos(a) * (r - (long ? 20 : 11)), cy + Math.sin(a) * (r - (long ? 20 : 11)), cx + Math.cos(a) * (r - 3), cy + Math.sin(a) * (r - 3));
+    if (kg % 10 === 0) text(ctx, String(kg), cx + Math.cos(a) * (r - 38), cy + Math.sin(a) * (r - 38) + 7, { font: `bold 18px ${PRINT}`, align: 'center' });
   }
-  text(ctx, 'kg', cx, cy + 90, { font: `bold 24px ${PRINT}`, align: 'center' });
-  text(ctx, 'RINGBAHN · GEPÄCKWAAGE', cx, cy - 70, { font: `14px ${PRINT}`, align: 'center' });
+  text(ctx, 'kg', cx, cy + 58, { font: `bold 20px ${PRINT}`, align: 'center' });
+  text(ctx, 'RINGBAHN · GEPÄCKWAAGE', cx, cy - 44, { font: `11px ${PRINT}`, align: 'center' });
   const a = angle(shown);
   ctx.strokeStyle = RED;
-  ctx.lineWidth = 6;
-  line(ctx, cx, cy, cx + Math.cos(a) * (r - 24), cy + Math.sin(a) * (r - 24));
+  ctx.lineWidth = 5;
+  line(ctx, cx, cy, cx + Math.cos(a) * (r - 16), cy + Math.sin(a) * (r - 16));
   ctx.fillStyle = '#3a2c1c';
   ctx.beginPath();
-  ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+  ctx.arc(cx, cy, 11, 0, Math.PI * 2);
   ctx.fill();
-  // Plattform
-  ctx.fillStyle = '#5b5047';
-  ctx.fillRect(380, 560, 520, 50);
-  ctx.fillStyle = '#7a6e62';
-  ctx.fillRect(400, 548, 480, 16);
   if (loaded) {
     ctx.fillStyle = CASE_COLORS[4];
-    ctx.fillRect(500, 470, 280, 80);
+    ctx.fillRect(500, 478, 280, 84);
     ctx.strokeStyle = 'rgba(30, 16, 8, 0.9)';
     ctx.lineWidth = 3;
-    ctx.strokeRect(500, 470, 280, 80);
+    ctx.strokeRect(500, 478, 280, 84);
+    ctx.fillStyle = '#c9a24c';
+    ctx.fillRect(610, 468, 60, 12);
   }
   // Ablesehilfe: feine Lupe auf die Nadelspitze
   if (shown > 0) {
-    const tip = { x: cx + Math.cos(a) * (r - 24), y: cy + Math.sin(a) * (r - 24) };
+    const tip = { x: cx + Math.cos(a) * (r - 16), y: cy + Math.sin(a) * (r - 16) };
     ctx.strokeStyle = '#d6a645';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(tip.x, tip.y, 26, 0, Math.PI * 2);
+    ctx.arc(tip.x, tip.y, 22, 0, Math.PI * 2);
     ctx.stroke();
   }
 }

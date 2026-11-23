@@ -1,4 +1,4 @@
-import { INK, PRINT, SERIF, drawPicture, glow, line, text } from './common.js';
+import { INK, PRINT, SERIF, drawPicture, glow, line, picture, text } from './common.js';
 
 // Gezeichnetes für Tür 24 (Heiligabend): Lautsprecheranlage mit 24 Wagen, der Blick aus dem Fenster
 // auf die Kilometersteine, das Entgleisen und das Schlussbild (ChatGPT-Bild) mit Wanduhr und Kerze.
@@ -9,42 +9,55 @@ export const OCCUPIED = [4, 5, 7, 12, 15, 21];
 const NAMES = ['Abteil', 'Gepäck', 'Post', 'Speise', 'Schlaf', 'Fundbüro', 'Bar', 'Kino', 'Spiegel', 'Lautspr.', 'Uhren', 'Musik',
   'Kapelle', 'Zeitung', 'Spielzi.', 'Funk', 'Gewächsh.', 'Schaffner', 'Foto', 'Pack', 'Kessel', 'Lok', 'Gang', '—'];
 
+// Drehpunkt jedes Kippschalters und Mitte seines Schildchens im Bild lautsprecher.webp (1672 × 941)
+const S = 1280 / 1672;
+const PANEL = 'assets/closeups/lautsprecher.webp';
+function switchAt(n) {
+  const i = n - 1;
+  const row = Math.floor(i / 8), col = i % 8;
+  const x = row < 2 ? 372 + col * 134.7 : 397 + col * 147.7;
+  const y = [135, 320, 500][row];
+  const plate = [211, 398, 580][row];
+  return { x: x * S, y: y * S, plate: plate * S };
+}
+
 function switchRect(n) {
-  const i = n - 1, col = i % 8, row = Math.floor(i / 8);
-  return { x: 190 + col * 115, y: 150 + row * 140, w: 100, h: 110 };
+  const s = switchAt(n);
+  return { x: s.x - 42, y: s.y - 44, w: 84, h: s.plate + 16 - (s.y - 44) };
 }
 
 export function panelSpots() {
   return [
     ...Array.from({ length: 23 }, (_, i) => ({ id: `w${i + 1}`, ...switchRect(i + 1), label: `Wagen ${i + 1}` })),
-    { id: 'speak', x: 540, y: 590, w: 200, h: 56, label: 'Durchsage sprechen' },
+    { id: 'speak', cx: 705 * S, cy: 740 * S, r: 72, label: 'Durchsage sprechen' },
   ];
 }
 
 export function drawPanel(ctx, { on }) {
-  ctx.fillStyle = '#2a2420';
-  ctx.fillRect(150, 70, 980, 600);
-  text(ctx, 'LAUTSPRECHERANLAGE · Wagen einschalten', 640, 112, { font: `bold 22px ${PRINT}`, color: '#e8d8b0', align: 'center' });
+  drawPicture(ctx, PANEL, 0, 0, 1280, 720);
+  const image = picture(PANEL);
+  const ready = image.complete && image.naturalWidth;
   for (let n = 1; n <= 23; n++) {
-    const r = switchRect(n);
-    const active = on.includes(n);
-    ctx.fillStyle = '#3d3630';
-    ctx.fillRect(r.x, r.y, r.w, r.h);
-    text(ctx, String(n), r.x + r.w / 2, r.y + 26, { font: `bold 20px ${PRINT}`, color: '#efe3c2', align: 'center' });
-    text(ctx, NAMES[n - 1], r.x + r.w / 2, r.y + r.h - 10, { font: `13px ${PRINT}`, color: '#b8a888', align: 'center' });
-    // Kippschalter
-    ctx.fillStyle = '#6a6058';
-    ctx.fillRect(r.x + 38, r.y + 36, 24, 44);
-    ctx.fillStyle = active ? '#d8d0c0' : '#8a8078';
-    ctx.fillRect(r.x + 36, active ? r.y + 34 : r.y + 58, 28, 24);
-    ctx.fillStyle = active ? '#5adc6a' : '#3a2a2a';
+    const s = switchAt(n);
+    // Schildchen: Nummer und Wagen
+    text(ctx, `${n} ${NAMES[n - 1]}`, s.x, s.plate + 4, { font: `bold 11px ${PRINT}`, color: '#3a2410', align: 'center' });
+    if (!on.includes(n)) continue;
+    // eingeschaltet: Schalter senkrecht gespiegelt, der Hebel zeigt nach oben
+    if (ready) {
+      const hw = 38, hh = 43;
+      const sx = image.naturalWidth / 1280;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.scale(1, -1);
+      ctx.drawImage(image, (s.x - hw) * sx, (s.y - hh) * sx, hw * 2 * sx, hh * 2 * sx, -hw, -hh, hw * 2, hh * 2);
+      ctx.restore();
+    }
+    glow(ctx, s.x + 30, s.y - 30, 18, '120, 255, 140', 0.8);
+    ctx.fillStyle = '#7dff8a';
     ctx.beginPath();
-    ctx.arc(r.x + 84, r.y + 18, 7, 0, Math.PI * 2);
+    ctx.arc(s.x + 30, s.y - 30, 5, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.fillStyle = '#6a2a1a';
-  ctx.fillRect(540, 590, 200, 56);
-  text(ctx, '🎙 Durchsage', 640, 626, { font: `bold 22px ${PRINT}`, color: '#ffe7a0', align: 'center' });
 }
 
 // ---------------------------------------------------------------- Kilometersteine am Fenster
