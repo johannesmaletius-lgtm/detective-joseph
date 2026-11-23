@@ -10,7 +10,7 @@ import { Cursor } from '../ui/cursor.js';
 import { Inventory } from '../ui/inventory.js';
 import { Speech } from '../ui/speech.js';
 import { Voices } from '../audio/voices.js';
-import { Music, wagonTrack } from '../audio/music.js';
+import { Music, wagonTrack, MENU } from '../audio/music.js';
 import { Hints } from '../ui/hints.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
@@ -127,6 +127,7 @@ export class Game {
     for (;;) {
       this.overlay.fade = 0;
       this.sound.tunnel(false);
+      this.music.play(MENU, 0.5); // eigene Musik im Hauptmenü
       const door = await this.calendar.open({ save: this.save, now: today(FAKE_DATE), test: TEST_MODE });
       await this.playDoor(door, { skipIntro: SKIP_INTRO });
     }
@@ -242,6 +243,7 @@ export class Game {
     if (this.inCalendar) {
       this.calendar.update(dt, this.input.mouse);
       this.overlay.update(dt);
+      this.music.update(dt, this);
       const label = this.calendar.isOpen ? this.calendar.label : '';
       this.cursor.set({ kind: 'interact', label, visible: this.calendar.isOpen || this.overlay.blocksInput });
       return;
