@@ -12,7 +12,7 @@ import { reactionLines } from './joseph-reactions.mjs';
 
 const VOICES = {
   // Stimmen aus der ElevenLabs-Bibliothek (deutsche Muttersprachler, ab Starter-Tarif)
-  mira: 'cQIPwmwhLZssddrp5o3h', // Laura – Magical Fairytales
+  mira: '7Nj1UduP6iY6hWpEDibS', // Bibi Blume – Warm and Soft (kindlich, frech)
   bruno: 'U2swAVvmpE98PJAkPUMP', // Willy Lübke – Rough & Bold
   tick: 'Lbm7qDmJUxIxpWx9qhZO', // Eldric – Verrücktes Genie
   moll: 'xouqnknI7nCiPaJ9gwt8', // Tom – Gloomy and Disappointed
