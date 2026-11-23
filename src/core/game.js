@@ -170,6 +170,7 @@ export class Game {
   // und der Zug fährt einfach weiter (gleiche Stelle, gleiche Runde).
   async loadScene(sceneData, script, carried = null) {
     const scene = new Scene(sceneData);
+    scene.fitCursors(script);
     await Promise.all([scene.load(), this.prepare()]);
     const previous = this.scene?.motion;
     this.story?.cancelAction();

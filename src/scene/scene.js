@@ -64,6 +64,18 @@ export class Scene {
     this.animations = spots.map((spot, i) => ({ ...spot, player: players[i], off: false }));
   }
 
+  // Passt den Mauszeiger jeder Stelle an das an, was ein Linksklick wirklich tut:
+  // Kann man dort etwas tun (use) oder einen Gegenstand benutzen (items), zeigt er die Hand –
+  // gibt es nur etwas anzuschauen, das Auge. Ein Sprech-Zeiger ('talk') bleibt, wie er ist.
+  fitCursors(script) {
+    for (const hotspot of this.hotspots) {
+      if (hotspot.cursor === 'talk') continue;
+      const reactions = script?.hotspots?.[hotspot.id] ?? {};
+      const canUse = Boolean(reactions.use) || Object.keys(reactions.items ?? {}).length > 0;
+      hotspot.cursor = canUse ? 'interact' : 'look';
+    }
+  }
+
   // Wie groß (in Pixeln) ist Joseph, wenn seine Füße auf Höhe y stehen?
   // Hinten im Raum (kleines y) wirkt er kleiner, vorne (großes y) größer.
   // Zwischen den beiden Messpunkten "far" und "near" wird gleichmäßig umgerechnet.

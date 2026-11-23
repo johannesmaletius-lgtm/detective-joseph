@@ -152,16 +152,16 @@ export const trainCompartment = {
     outline: [
       [552, 414],  //  0 hinten links, neben dem Tisch
       [842, 410],  //  1 hinten rechts, an der Wand
-      [860, 470],  //  2 entlang der rechten Sitzbank …
-      [955, 537],  //  3
-      [1043, 596], //  4 … bis zur vorderen Armlehne
-      [1110, 606], //  5 unter der Armlehne, vor der grauen Kiste
-      [1112, 690], //  6 vorne rechts, neben der Kiste
-      [152, 690],  //  7 vorne links, neben der türkisen Kiste
-      [165, 662],  //  8 vor der linken Sitzbank …
+      [842, 472],  //  2 entlang der rechten Sitzbank …
+      [926, 546],  //  3
+      [1006, 606], //  4 … bis zur vorderen Armlehne
+      [1062, 612], //  5 unter der Armlehne, vor der grauen Kiste
+      [1064, 690], //  6 vorne rechts, neben der Kiste
+      [205, 690],  //  7 vorne links, neben der türkisen Kiste
+      [215, 664],  //  8 vor der linken Sitzbank …
       [312, 642],  //  9
       [392, 577],  // 10 vor der kleinen Kiste
-      [457, 543],  // 11 vor dem Sessel
+      [478, 545],  // 11 vor dem Sessel
       [512, 468],  // 12 neben dem Tisch
     ],
     // Hindernisse mitten auf dem Boden (Vielecke) – im ersten Abteil noch keine.
