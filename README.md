@@ -2,8 +2,8 @@
 
 2D-Point-and-Click-Adventure im Browser (HTML5 Canvas, reines JavaScript, keine Frameworks).
 
-**Stand: Alle 24 Wagen des Adventskalenders „Die Ringbahn“ sind spielbar** (Planung in
-[`docs/adventskalender.md`](docs/adventskalender.md), Erzählung in [`docs/geschichte.md`](docs/geschichte.md)).
+**Stand: Alle 24 Wagen von „Die Ringbahn“ sind spielbar** (Planung in
+[`docs/planung.md`](docs/planung.md), Erzählung in [`docs/geschichte.md`](docs/geschichte.md)).
 Alle Hintergründe, Figuren und Fotos ab Wagen 2 sind die ChatGPT-Bilder aus `assets/reference/`. Zum Ausprobieren
 alle Türen öffnen: <http://localhost:8150/?test> (Lösungen: [Wagen 2, 3 und 17–24](#wagen-2-3-und-1724),
 [Wagen 4–8](#wagen-48), [Wagen 9–16](#wagen-916)). **Wagen 1:** etwa 20 Minuten Rätsel, mit Geschichte, Tutorial und Tipps. Joseph wacht
@@ -47,9 +47,9 @@ Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 > Browser laden Module nicht direkt von der Festplatte – ein Doppelklick auf `index.html` reicht deshalb nicht.
 > Der Server (`server.js`) braucht nur Node.js, keine weiteren Pakete.
 
-## Adventskalender
+## Die 24 Wagen
 
-Das Spiel beginnt mit dem Adventskalender „Die Ringbahn“: 24 Wagen, jeden Tag vom 1. bis 24. Dezember 2026
+Das Spiel beginnt mit der Wagenübersicht „Die Ringbahn“: 24 Wagen, jeden Tag vom 1. bis 24. Dezember 2026
 öffnet sich einer. Geschaffte Wagen bekommen einen Stern, der Spielstand bleibt im Browser gespeichert.
 
 | Adresse | Wirkung |
@@ -108,7 +108,7 @@ detective-joseph/
 │   ├── ui/                    Mauszeiger (cursors/), Inventarleiste, Notizbuch-Knopf
 │   └── reference/             Originale und Material für spätere Schritte
 ├── docs/story-ideen.md        Vorschläge für die Geschichte (Zug im Kreis, Rätsel pro Abteil)
-├── docs/adventskalender.md    Planung des Adventskalenders: 24 Wagen, Rätsel, roter Faden, Grafiken
+├── docs/planung.md           Planung von Detective Joseph: 24 Wagen, Rätsel, roter Faden, Grafiken
 ├── tools/                     Werkzeuge, die Platzhalter-Grafiken erzeugen (siehe unten)
 └── src/
     ├── main.js                Einstieg: Spiel erzeugen, den Wagen (?wagen=N) mit seiner Geschichte laden, starten
@@ -320,7 +320,7 @@ Nahansichten: `src/story/art/wagonN.js`, Szenen: `baggageCar`, `postCar`, `green
 ## Wagen 4–8
 
 Starten: über den Kalender (<http://localhost:8150/?test>) oder direkt <http://localhost:8150/?test&tuer=4> (oder 5–8).
-Am Ende eines Wagens geht es zurück zum Adventskalender. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
+Am Ende eines Wagens geht es zurück zur Wagenübersicht. Joseph hat in jedem Wagen dabei, was er vorher eingesteckt hat und noch braucht (Taschenlampe, Messer,
 später Foto, Taschenuhr, Bierdeckel); das Notizbuch beginnt mit „Was bisher geschah“. Jeder Wagen hat Tipps
 auf Taste **H**. Die ganze Rätselkette steht oben in der jeweiligen Datei `src/story/wagonN.js`.
 
@@ -432,9 +432,9 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagen 1:** Geschichte, Tutorial, Notizbuch, Zahlenschloss, Licht aus im Tunnel, Taschenlampe, Totenkopf-Animation
 - [x] **Wagen 1, neue Rätsel (~20 Minuten):** Nahansichten (Papierpuzzle, Verteilerkasten, Fernglas, Bildschirm mit Tunnelkamera, Schlösser), Zahlenquadrat, Turmsignal, Batterie-Trick mit der Zeitschleife, Tipps auf Taste H
 - [x] **Wagenwechsel, Figuren, Gespräche:** `?wagen=N`, weiter zum nächsten Wagen, Bruno/Herr K./Barkeeper, Gesprächsauswahl
-- [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/adventskalender.md`)
+- [x] **Wagen 4–8:** Speisewagen, Schlafwagen, Fundbüro, Barwagen, Bordkino (siehe `docs/planung.md`)
 - [ ] **Wagen 2 und 3:** Gepäckwagen, Postwagen
-- [x] **Adventskalender:** Kalender als Startbild, Türchen-Sperre nach Datum, Spielstand
+- [x] **Wagenübersicht:** Ringbahn als Startbild, Türchen-Sperre nach Datum, Spielstand
 - [x] **Wagen 9–16:** Spiegelwagen, Lautsprecherwagen, Uhrenwagen, Musiksalon, Kapelle, Zeitungswagen, Spielzimmer, Funkraum
 - [ ] **Wagen 17–24**, Online stellen
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds

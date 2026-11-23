@@ -74,7 +74,7 @@ export function hintFor(story, goal) {
   return goal.lines[level];
 }
 
-// Das Ende eines Wagens: abblenden, Endkarte, dann zurück zum Adventskalender (der Spielstand wird gespeichert)
+// Das Ende eines Wagens: abblenden, Endkarte, dann zurück zur Wagenübersicht von Detective Joseph (der Spielstand wird gespeichert)
 export async function finishWagon(story, { number, title, lines = [], nextTitle }) {
   await story.fadeOut(1.6);
   const minutes = Math.max(1, Math.round((performance.now() - (story.flags.startedAt ?? performance.now())) / 60000));
@@ -82,8 +82,8 @@ export async function finishWagon(story, { number, title, lines = [], nextTitle 
     kind: 'end',
     title,
     lines: [...lines, `Gelöst in Runde ${story.lap} – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`,
-      number < 24 ? `Morgen geht es weiter – ${nextTitle ?? 'im nächsten Wagen'}.` : ''],
-    continueText: 'Klicken, um zum Adventskalender zurückzukehren',
+      ...(number < 24 ? [`Morgen geht es weiter – ${nextTitle ?? 'im nächsten Wagen'}.`] : [])],
+    continueText: 'Klicken – zurück zu Detective Joseph',
   });
   story.finish();
 }

@@ -1,4 +1,4 @@
-// Einstiegspunkt: Spiel erzeugen, Adventskalender zeigen, loslegen.
+// Einstiegspunkt: Spiel erzeugen, Wagenübersicht zeigen, loslegen.
 
 import { Game } from './core/game.js';
 

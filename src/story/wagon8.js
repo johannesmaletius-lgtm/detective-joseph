@@ -129,7 +129,10 @@ export const wagon8 = {
   },
 
   async onCombine(story, result) {
-    if (result === 'ticket') story.note('Die Kinokarte, zusammengesetzt: „Die letzte Runde – Reihe 3, Platz 12“.');
+    if (result === 'ticket' && !story.flags.ticketRead) {
+      story.flags.ticketRead = true; // sonst steht dieselbe Notiz beim Lesen der Karte ein zweites Mal im Notizbuch
+      story.note('Die Kinokarte, zusammengesetzt: „Die letzte Runde – Reihe 3, Platz 12“.');
+    }
   },
 
   hint: (story) => hintFor(story, currentGoal(story)),

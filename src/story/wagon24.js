@@ -244,12 +244,14 @@ async function finale(story) {
     await story.say('Schnee.');
   });
   story.game.overlay.fade = 0;
-  const state = { lit: false, time: 0 };
-  await story.view('picture', {
+  // Erst erzählt Joseph, wo er aufgewacht ist – danach lässt sich die letzte Kerze anzünden.
+  // (Früher kamen diese Sätze nur bei einem Klick neben die Kerze und gingen leicht verloren.)
+  const state = { lit: false, time: 0, ready: false };
+  const shown = story.view('picture', {
     state,
     backdrop: 1,
     draw: (ctx, view) => drawFinal(ctx, view.state),
-    spots: () => (state.lit ? [] : [CANDLE_SPOT]),
+    spots: () => (state.lit || !state.ready ? [] : [CANDLE_SPOT]),
     update: (dt, view) => {
       view.state.time += dt;
     },
@@ -262,16 +264,25 @@ async function finale(story) {
       await story.wait(1.5);
       view.close(true);
     },
-    onMiss: async () => {
-      if (!f.finalSaid) {
-        f.finalSaid = true;
-        await story.say('Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.');
-        await story.say('Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.');
-        await story.say('Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.');
-        await story.say('Oben auf dem Baum brennt eine Kerze noch nicht.');
-      }
+    onMiss: () => {
+      story.game.speech.skip();
     },
   });
+  await story.wait(1.6);
+  if (!f.finalSaid) {
+    f.finalSaid = true;
+    for (const line of [
+      'Eine warme Stube. Ein Weihnachtsbaum. Und ich – in meinem Sessel, mit Schnurrbart.',
+      'Mira: „Papa, du bist ja wach! Frohe Weihnachten!“ Und in der Tür steht Martha und lacht.',
+      'Die Wanduhr zeigt 23:47. Die Zeit, zu der der Zug ankommen sollte. Jetzt ist er angekommen.',
+      'Oben auf dem Baum brennt eine Kerze noch nicht.',
+    ]) {
+      if (!story.game.views.picture.isOpen) break;
+      await story.say(line);
+    }
+  }
+  state.ready = true;
+  await shown;
   story.note('Ich bin zu Hause. Mira, Martha, der Weihnachtsbaum. Die Wanduhr zeigt 23:47 – der Zug ist angekommen. Frohe Weihnachten.');
   await story.cutscene(async () => {
     await finishWagon(story, {

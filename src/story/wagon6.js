@@ -20,7 +20,8 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wago
 //      (das Kamerabild aus Wagen 1). Uhr auf 12 Uhr stellen und auf den Tunnel warten: Im Dunkeln
 //      springt der Deckel auf, innen ist der Türcode eingraviert: 0612.
 //
-// Ergebnis: Herr K. verschwindet erst in Runde 109 – in der nächsten. Ich kann ihn noch warnen.
+// Ergebnis: Herrn K.s Sachen tauchen erst ab Runde 109 auf – er verschwindet erst im nächsten Tunnel (Ende von Runde 108).
+//           Ich kann ihn noch warnen.
 
 const PADLOCK_CODE = '7249';
 const DOOR_CODE = '0612';
@@ -370,9 +371,9 @@ async function tryDoor(story) {
   }
   await story.cutscene(async () => {
     story.sound('door');
-    await story.say('Offen! Herr K. verschwindet erst in Runde 109. Das ist die nächste Runde.');
+    await story.say('Offen! Seine Sachen tauchen erst ab Runde 109 auf. Dann verschwindet er erst im nächsten Tunnel – am Ende von Runde 108.');
     await story.say('Dann ist er noch irgendwo im Zug. Und ich kann ihn noch warnen!');
-    story.note('Herr K. verschwindet erst in der nächsten Runde. Ich kann ihn noch warnen!');
+    story.note('Herrn K.s Sachen tauchen erst ab Runde 109 auf: Er verschwindet erst im nächsten Tunnel, am Ende von Runde 108. Ich kann ihn noch warnen!');
     await finishWagon(story, {
       number: 6,
       title: 'Ende von Wagen 6',

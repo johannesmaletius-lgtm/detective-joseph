@@ -271,7 +271,7 @@ async function playTape(story, view) {
     }
     await voice('„Fahrgast K., bitte zum Tunnel. Fahrgast K., bitte zum Tunnel.“');
     await voice('„Haben Sie keine Angst. Sie kommen nach Hause …“');
-    await voice('„… nerednA eid eiw … tsdhcäN red tsi flE …“');
+    await voice('„… nerednA eid eiw … etshcäN red tsi flE …“');
     if (!f.forwardHeard) {
       f.forwardHeard = true;
       await story.say('„Fahrgast K., bitte zum Tunnel.“ Das ist der Ruf, dem Herr K. gefolgt ist.');

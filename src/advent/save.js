@@ -1,4 +1,4 @@
-// Spielstand des Adventskalenders – liegt im Browser (localStorage) und bleibt auch nach dem Schließen erhalten.
+// Spielstand von Detective Joseph – liegt im Browser (localStorage) und bleibt auch nach dem Schließen erhalten.
 //
 // Gespeichert wird pro geschaffter Tür:
 //   items    Gegenstände, die Joseph in den nächsten Wagen mitnimmt (nur solche mit keep: true, siehe items.js)

@@ -154,16 +154,17 @@ export function drawPressPhoto(ctx) {
   ctx.fillRect(0, 0, 1280, 720);
   if (!press) return;
   ctx.drawImage(press, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
-  // ohne Lupe nur verschwommen zu erkennen (grober Zeitungsdruck)
-  ctx.save();
-  ctx.filter = 'blur(6px)';
-  ctx.globalAlpha = 0.45;
-  clockHands(ctx, PHOTO.x + CLOCK.cx, PHOTO.y + CLOCK.cy, CLOCK.r * 0.92);
-  ctx.restore();
+  // ohne Lupe nur verschwommen zu erkennen (grober Zeitungsdruck): erst das Zifferblatt unscharf,
+  // dann die Zeiger als verwaschene Schatten darüber – sonst wirkt die Uhr wie ohne Zeiger
   ctx.save();
   ctx.filter = 'blur(3px)';
   ctx.globalAlpha = 0.5;
   ctx.drawImage(press, CLOCK.cx - CLOCK.r, CLOCK.cy - CLOCK.r, CLOCK.r * 2, CLOCK.r * 2, PHOTO.x + CLOCK.cx - CLOCK.r, PHOTO.y + CLOCK.cy - CLOCK.r, CLOCK.r * 2, CLOCK.r * 2);
+  ctx.restore();
+  ctx.save();
+  ctx.filter = 'blur(5px)';
+  ctx.globalAlpha = 0.55;
+  clockHands(ctx, PHOTO.x + CLOCK.cx, PHOTO.y + CLOCK.cy, CLOCK.r * 0.92);
   ctx.restore();
   // Zeitungsraster: im kleinen Bild kaum zu erkennen
   ctx.fillStyle = 'rgba(235, 227, 207, 0.12)';

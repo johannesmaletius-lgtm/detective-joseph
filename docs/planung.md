@@ -1,6 +1,6 @@
-# Adventskalender „Die Ringbahn“ – Planungsstand
+# Detective Joseph – „Die Ringbahn“ – Planungsstand
 
-Detective Joseph als Adventskalender für Johannes' Freundin: 24 Waggons, jeden Tag (1.–24. Dezember 2026) ein neuer Wagen.
+Detective Joseph für Johannes' Freundin: 24 Waggons, jeden Tag (1.–24. Dezember 2026) ein neuer Wagen.
 Planungsseite (Artifact, mit Grafik-Befehlen und Haken pro Bild): https://claude.ai/artifact/PJZU72QAUCiWMff7BHSQmT
 Die ganze Geschichte als Erzählung (mit Hintergrund und Korrekturliste): `docs/geschichte.md` und Reiter „Geschichte“ auf der Planungsseite.
 
@@ -88,7 +88,7 @@ Alle unter `assets/reference/tuer-XX/` (WebP, so wie von ChatGPT).
 
 ## Code-Stand
 
-**Gebaut:** Adventskalender als Startbild (Ringbahn von oben, 24 Wagen, `src/advent/`), Türchen-Sperre nach Datum, Spielstand im Browser (geschaffte Türen, Notizen, mitgenommene Gegenstände), Wagenwechsel (Kalender → Wagen → zurück zum Kalender), Inventar über Wagen hinweg (Gegenstände mit `keep: true` in `src/story/items.js`, zusätzlich `startItems` im Drehbuch), Notizen früherer Wagen bleiben im Notizbuch (Überschrift „Wagen N“).
+**Gebaut:** Wagenübersicht als Startbild (Ringbahn von oben, 24 Wagen, `src/advent/`), Türchen-Sperre nach Datum, Spielstand im Browser (geschaffte Türen, Notizen, mitgenommene Gegenstände), Wagenwechsel (Kalender → Wagen → zurück zum Kalender), Inventar über Wagen hinweg (Gegenstände mit `keep: true` in `src/story/items.js`, zusätzlich `startItems` im Drehbuch), Notizen früherer Wagen bleiben im Notizbuch (Überschrift „Wagen N“).
 
 - Neuen Wagen eintragen: in `src/advent/doors.js` bei der Tür `load` ergänzen (Szene + Drehbuch). Am Ende des Wagens `story.finish()` aufrufen.
 - Testen: `?test` (alle Türen offen + Knopf „Spielstand löschen“), `?datum=2026-12-05` (anderes Datum), `?tuer=2&skipintro` (direkt in eine Tür).
