@@ -12,12 +12,20 @@ import { loadImage } from '../core/assets.js';
 //     walkTo: [700, 440], facing: 'right', // hier stellt sich Joseph zum Sprechen hin
 //     color: '#ffd9a0',                 // Farbe seiner Sprechtexte
 //     when: 'merker',                   // (optional) nur sichtbar, solange der Merker gesetzt ist
-//   }]
+//     idle: ['blink', 'busy'],          // (optional) Zusatzbilder blink.webp und busy.webp im Ordner (nur Pose 'front'):
+//   }]                                  // blinzelt ab und zu und tut ab und zu etwas (Topf rühren, Kragen zupfen …)
 //
 // Eine Figur ist zugleich eine anklickbare Stelle (cursor: 'talk'); ihre Reaktionen stehen im
 // Drehbuch unter hotspots mit derselben id.
 
 const POSES = ['front', 'left', 'right', 'talk'];
+
+// Lebenszeichen beim Herumstehen: alle Figuren atmen; blinzeln und "beschäftigt" nur mit data.idle
+const BREATH_SECONDS = 3.9;
+const BREATH_AMOUNT = 0.007;
+const BLINK_SECONDS = 0.14;
+const BUSY_EVERY = [5, 11];  // so lange (Sekunden, zufällig) steht die Figur still, bevor sie etwas tut
+const BUSY_SECONDS = 3;
 
 export class Character {
   constructor(data) {
@@ -37,11 +45,21 @@ export class Character {
     this.facing = data.facing;
     this.when = data.when;
     this.isCharacter = true;
+    this.clock = Math.random() * 10; // damit nicht alle Figuren im Gleichtakt atmen
+    this.nextBlink = 1 + Math.random() * 3;
+    this.blinkLeft = 0;
+    this.nextBusy = this.randomBusyDelay();
+    this.busyLeft = 0;
+  }
+
+  randomBusyDelay() {
+    return BUSY_EVERY[0] + Math.random() * (BUSY_EVERY[1] - BUSY_EVERY[0]);
   }
 
   async load() {
     const entries = await Promise.all(POSES.map(async (pose) => [pose, await loadImage(`${this.data.poses}/${pose}.webp`)]));
     this.images = Object.fromEntries(entries);
+    for (const name of this.data.idle ?? []) this.images[name] = await loadImage(`${this.data.poses}/${name}.webp`);
   }
 
   // Wie hoch die Figur auf dem Bildschirm ist
@@ -50,7 +68,12 @@ export class Character {
   }
 
   image() {
-    return this.images[this.talking ? 'talk' : this.pose] ?? this.images.front;
+    if (this.talking) return this.images.talk ?? this.images.front;
+    if (this.pose === 'front' && !this.walk) {
+      if (this.busyLeft > 0 && this.images.busy) return this.images.busy;
+      if (this.blinkLeft > 0 && this.images.blink) return this.images.blink;
+    }
+    return this.images[this.pose] ?? this.images.front;
   }
 
   // Umriss (für Klicks): das Rechteck um die Figur
@@ -68,6 +91,7 @@ export class Character {
   }
 
   update(dt) {
+    this.updateIdle(dt);
     if (!this.walk) return;
     const w = this.walk;
     w.age += dt;
@@ -79,6 +103,27 @@ export class Character {
       this.walk = null;
       this.bounce = 0;
       w.resolve();
+    }
+  }
+
+  updateIdle(dt) {
+    this.clock += dt;
+    if (this.walk || this.talking) {
+      this.blinkLeft = 0;
+      this.busyLeft = 0;
+      return;
+    }
+    if (this.blinkLeft > 0) this.blinkLeft -= dt;
+    if (this.busyLeft > 0) this.busyLeft -= dt;
+    this.nextBlink -= dt;
+    if (this.nextBlink <= 0) {
+      this.blinkLeft = BLINK_SECONDS;
+      this.nextBlink = 2.5 + Math.random() * 3.5;
+    }
+    this.nextBusy -= dt;
+    if (this.nextBusy <= 0) {
+      this.nextBusy = this.randomBusyDelay() + BUSY_SECONDS;
+      this.busyLeft = BUSY_SECONDS;
     }
   }
 
@@ -107,7 +152,11 @@ export class Character {
     }
     ctx.globalAlpha = this.alpha;
     if (!this.data.clipBottom) drawShadow(ctx, this.x, this.y, height);
-    ctx.drawImage(image, this.x - width / 2, top, width, drawHeight);
+    // Atmen: minimal nach oben dehnen, die Füße bleiben stehen
+    const breath = this.walk ? 0 : (Math.sin((this.clock * Math.PI * 2) / BREATH_SECONDS) * 0.5 + 0.5) * BREATH_AMOUNT;
+    ctx.translate(this.x, top + drawHeight);
+    ctx.scale(1, 1 + breath);
+    ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
     ctx.restore();
   }
 

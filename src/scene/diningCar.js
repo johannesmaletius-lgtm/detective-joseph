@@ -22,7 +22,7 @@ export const diningCar = {
     {
       id: 'bruno', name: 'Koch Bruno', poses: 'assets/characters/bruno',
       x: 548, y: 434, pose: 'front', size: 1.02,
-      walkTo: [636, 452], facing: 'left', color: '#ffd29a',
+      walkTo: [636, 452], facing: 'left', color: '#ffd29a', idle: ['blink', 'busy'],
     },
   ],
 
