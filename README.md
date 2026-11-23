@@ -42,6 +42,9 @@ Nahtstelle jeder Runde fährt der Zug durch einen Tunnel, in dem im Abteil das L
 
 Noch einfacher: im Finder `start.command` doppelklicken – das startet den Server und öffnet den Browser.
 Zum Testen mit allen 24 Wagen sofort auswählbar: `start-alle-wagen.command` doppelklicken.
+
+**Online:** <https://johannesmaletius-lgtm.github.io/detective-joseph/> – wird bei jedem Push auf `main` neu gebaut
+(`.github/workflows/pages.yml`, Web-Fassung aus `tools/build-web.mjs`, alle 24 Wagen offen).
 Beenden: das Terminal-Fenster schließen (oder dort `ctrl + C`).
 
 > **Warum ein Server?** Das Spiel ist auf viele kleine JavaScript-Dateien (Module) verteilt.

@@ -1,4 +1,4 @@
-// Baut eine Web-Fassung des Spiels zum Weitergeben (z. B. als Artifact):
+// Baut eine Web-Fassung des Spiels zum Weitergeben (GitHub Pages, siehe .github/workflows/pages.yml):
 //   node tools/build-web.mjs <zielordner>
 // - kopiert index.html, style.css, src/ und die Bilder aus assets/ (ohne assets/reference/)
 // - fasst die Sprachdateien jeder Figur zu EINER Datei zusammen (assets/voices/<figur>.mp3, braucht ffmpeg),
@@ -26,18 +26,10 @@ cpSync(join(root, 'assets'), join(out, 'assets'), {
 const config = join(out, 'src', 'config.js');
 writeFileSync(config, readFileSync(config, 'utf8').replace("export const TEST_MODE = params.has('test');", 'export const TEST_MODE = true; // Web-Fassung: alle 24 Wagen auswählbar'));
 
-// Seite (ohne <html>/<head>/<body> – das ergänzt das Artifact beim Veröffentlichen)
-const html = readFileSync(join(root, 'index.html'), 'utf8');
-const icon = html.match(/<link rel="icon"[^>]*>/)[0];
-writeFileSync(join(out, 'index.html'), `<title>Detective Joseph</title>
-${icon}
-<link rel="stylesheet" href="style.css">
-<main class="stage">
-  <canvas id="game-canvas" width="1280" height="720" aria-label="Detective Joseph – Spielszene"></canvas>
-  <p id="status" class="status">Lade Detective Joseph …</p>
-</main>
-<script type="module" src="src/main.js"></script>
-`);
+// Seite: index.html wie im Projekt, nur ohne den Hinweis für lokal geöffnete Dateien
+const html = readFileSync(join(root, 'index.html'), 'utf8').replace(/\s*<script>[\s\S]*?<\/script>/, '');
+writeFileSync(join(out, 'index.html'), html);
+writeFileSync(join(out, '.nojekyll'), '');
 
 // Sprachdateien je Figur hintereinander (mit kurzer Stille), Startzeiten messen
 const manifest = JSON.parse(readFileSync(join(root, 'assets/voices/manifest.json'), 'utf8'));

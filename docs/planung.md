@@ -119,6 +119,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (23.11.2026, online):** Das Spiel geht bei jedem Push auf `main` automatisch auf GitHub Pages (`.github/workflows/pages.yml` → `tools/build-web.mjs`: alle 24 Wagen offen, Stimmen je Figur in einer Datei). Adresse: https://johannesmaletius-lgtm.github.io/detective-joseph/
+
 **Stand (23.11.2026, Zusammenführung):** Alle Zweige vom 23.11. sind in `main` (Stimmen, Wagen-1-Fix, Nahansichten als Bilder – Rätselwerte von main behalten –, Story-Überarbeitung; geänderte Sätze neu vertont). Taste H zeigt jetzt den kompletten Lösungsweg (`src/story/solutions.js`). `start-alle-wagen.command` startet mit allen 24 Wagen offen. Ältere Zweige vom 18./19.11. nicht zusammengeführt (überholt).
 
 **Stand (23.11.2026, Stimmen):** Die Figuren bekommen echte Stimmen von ElevenLabs, Josephs Sätze bleiben vorerst Text. Ablauf: `node tools/voice-lines.mjs` sammelt alle Sätze der Figuren (≈ 13.000 Zeichen), `node tools/voice-generate.mjs <figur>` vertont sie nach `assets/voices/` + `manifest.json`; das Spiel spielt sie in `src/audio/voices.js` ab (Text bleibt stehen, bis die Stimme fertig ist). Fertig: alle 9 Figuren mit deutschen Bibliotheksstimmen (Starter-Tarif, Liste in `tools/voice-generate.mjs`), 242 Sätze. Nicht vertont: der Barkeeper-Satz mit Flaschennamen (Template). Joseph (Ben) spricht nur im Gespräch (`tools/joseph-dialogue-lines.mjs`, 178 Sätze); gewählte Gesprächsfragen sagt er laut (`story.choose`). Seine übrigen Kommentare bleiben Text. Wird ein Satz geändert, `voice-lines.mjs` + `voice-generate.mjs` erneut laufen lassen. Der ElevenLabs-Schlüssel liegt als Network secret in der Umgebung „detective-joseph“.
