@@ -63,8 +63,14 @@ export class Story {
   get inCutscene() { return this.scenes > 0; }
 
   // ---------------------------------------------------------------- Befehle für das Drehbuch
-  say(text) {
-    return this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : this.headOf(this.player)) });
+  async say(text) {
+    this.player.talking = true;
+    this.player.gesture = null;
+    try {
+      await this.game.speech.show(text, { anchor: () => (this.game.view ? SUBTITLE : this.headOf(this.player)) });
+    } finally {
+      this.player.talking = false;
+    }
   }
 
   // Eine Figur im Wagen spricht (siehe src/scene/character.js) – solange zeigt sie ihre Sprech-Pose

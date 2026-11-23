@@ -1,4 +1,5 @@
 import { loadAnimations } from '../animation/animation.js';
+import { loadImage } from '../core/assets.js';
 import { AnimationPlayer } from '../animation/animationPlayer.js';
 import { PlayerMovement, RUN_SPEED, WALK_SPEED } from './playerMovement.js';
 
@@ -8,6 +9,15 @@ import { PlayerMovement, RUN_SPEED, WALK_SPEED } from './playerMovement.js';
 const SPRITE_HEIGHT = 720;
 
 const DIRECTIONS = ['front', 'back', 'left', 'right'];
+
+// Zusatzposen von vorn (assets/characters/joseph/pose-….png, gleicher Maßstab wie front.png).
+// Sie machen Joseph beim Herumstehen lebendig: atmen, blinzeln, ab und zu nachdenken.
+const POSES = ['neutral', 'blinzeln', 'sprechen', 'denken', 'zeigen'];
+const BREATH_SECONDS = 3.6;   // ein Atemzug
+const BREATH_AMOUNT = 0.009;  // wie stark sich der Oberkörper hebt (Anteil der Höhe)
+const BLINK_SECONDS = 0.14;
+const THINK_AFTER = [9, 16];  // so lange (Sekunden, zufällig) steht er still, bevor er nachdenkt
+const THINK_SECONDS = 2.8;
 
 // Joseph – die Spielfigur.
 //
@@ -22,6 +32,23 @@ export class Player {
     this.movement = new PlayerMovement();
     this.animations = null;
     this.animator = null;
+    this.images = {};
+    this.talking = false;     // true, solange Joseph spricht (zeigt die Pose "sprechen")
+    this.gesture = null;      // { pose, left } – eine Pose, die kurz gezeigt wird
+    this.idleTime = 0;        // wie lange er schon steht
+    this.clock = 0;
+    this.nextBlink = 2;
+    this.blinkLeft = 0;
+    this.nextThink = this.randomThinkDelay();
+  }
+
+  randomThinkDelay() {
+    return THINK_AFTER[0] + Math.random() * (THINK_AFTER[1] - THINK_AFTER[0]);
+  }
+
+  // Zeigt eine Pose kurz (z. B. player.showPose('zeigen', 2) beim Hinzeigen) – nur beim Stehen, von vorn.
+  showPose(pose, seconds = 2) {
+    this.gesture = { pose, left: seconds };
   }
 
   async load() {
@@ -29,6 +56,8 @@ export class Player {
     const names = DIRECTIONS.flatMap((direction) => [`joseph-idle-${direction}`, `joseph-walk-${direction}`]);
     this.animations = await loadAnimations(names);
     this.animator = new AnimationPlayer(this.animations['joseph-idle-front']);
+    const entries = await Promise.all(POSES.map(async (pose) => [pose, await loadImage(`assets/characters/joseph/pose-${pose}.png`)]));
+    this.images = Object.fromEntries(entries);
   }
 
   enterScene(scene) {
@@ -53,6 +82,44 @@ export class Player {
     if (facing) this.facing = facing;
     this.updateAnimation();
     this.animator.update(dt);
+    this.updateIdle(dt);
+  }
+
+  // Kleine Lebenszeichen beim Stehen: Atmen läuft immer, Blinzeln und Nachdenken nur von vorn.
+  updateIdle(dt) {
+    this.clock += dt;
+    if (this.movement.isMoving) {
+      this.idleTime = 0;
+      this.gesture = null;
+      this.blinkLeft = 0;
+      return;
+    }
+    this.idleTime += dt;
+    if (this.blinkLeft > 0) this.blinkLeft -= dt;
+    this.nextBlink -= dt;
+    if (this.nextBlink <= 0) {
+      this.blinkLeft = BLINK_SECONDS;
+      this.nextBlink = 2.5 + Math.random() * 3.5;
+      if (Math.random() < 0.2) this.nextBlink = 0.35; // manchmal zweimal hintereinander
+    }
+    if (this.gesture) {
+      this.gesture.left -= dt;
+      if (this.gesture.left <= 0) this.gesture = null;
+    }
+    this.nextThink -= dt;
+    if (this.nextThink <= 0) {
+      this.nextThink = this.randomThinkDelay();
+      if (!this.talking && !this.gesture && this.facing === 'front') this.showPose('denken', THINK_SECONDS);
+    }
+  }
+
+  // Welches Bild gerade gezeigt wird: beim Stehen von vorn eine der Zusatzposen, sonst die Animation
+  currentImage() {
+    if (this.facing !== 'front' || this.movement.isMoving || !this.images.neutral) return this.animator.image;
+    if (this.talking) return this.images.sprechen;
+    if (this.gesture) return this.images[this.gesture.pose] ?? this.images.neutral;
+    if (this.blinkLeft > 0) return this.images.blinzeln;
+    return this.images.neutral;
   }
 
   // Passende Animation wählen: stehen oder laufen, in der aktuellen Blickrichtung.
@@ -68,12 +135,18 @@ export class Player {
   draw(ctx, scene) {
     const height = scene.characterHeightAt(this.y);
     const scale = height / SPRITE_HEIGHT;
-    const image = this.animator.image;
+    const image = this.currentImage();
     const width = image.width * scale;
     const drawHeight = image.height * scale;
 
     this.drawShadow(ctx, height);
-    ctx.drawImage(image, this.x - width / 2, this.y - drawHeight, width, drawHeight);
+    // Atmen: der Körper dehnt sich minimal nach oben, die Füße bleiben stehen
+    const breath = this.movement.isMoving ? 0 : (Math.sin((this.clock * Math.PI * 2) / BREATH_SECONDS) * 0.5 + 0.5) * BREATH_AMOUNT;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.scale(1, 1 + breath);
+    ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
+    ctx.restore();
   }
 
   // Weicher, flacher Schatten unter den Füßen
