@@ -6,9 +6,9 @@ import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, 
 // ---------------------------------------------------------------- Dienstbuch
 // Ursprünglicher Plan der Weihnachtswoche, dazu Tauschvermerke in der Reihenfolge, in der sie
 // eingetragen wurden. Wer fuhr am 24.? J. tauscht den 24. mit Moser (gegen den 27.),
-// danach tauscht Moser den 24. mit Falk (gegen den 20.) → FALK.
+// danach tauscht Moser den 24. mit Kern (gegen den 20.) → KERN.
 const DAYS = ['20.', '21.', '22.', '23.', '24.', '25.', '26.', '27.'];
-const PLAN = ['Moser', 'J.', 'Falk', 'Moser', 'J.', 'Falk', 'Moser', 'J.'];
+const PLAN = ['Moser', 'J.', 'Kern', 'Moser', 'J.', 'Kern', 'Moser', 'J.'];
 
 export function drawDutyBook(ctx) {
   sheet(ctx, 110, 50, 1060, 620, {
@@ -27,13 +27,14 @@ export function drawDutyBook(ctx) {
       const notes = [
         '1) 18.12. – J. gibt seinen Dienst am 24. an Moser ab und übernimmt dafür Mosers 26.',
         '    „Will zu Hause alles vorbereiten. Frau und Kind kommen mit dem Zug nach.“  – J.',
-        '2) 19.12. – Moser gibt den 24. weiter an Falk und übernimmt dafür Falks 22.',
+        '2) 19.12. – Moser gibt den 24. weiter an Kern und übernimmt dafür Kerns 22.',
         '    „Meine Mutter feiert Geburtstag.“  – Moser',
-        '3) 21.12. – Falk tauscht den 25. mit J. gegen J.s 27.',
+        '    „Gern. Meine letzte Weihnachtsfahrt vor der Rente.“  – Kern',
+        '3) 21.12. – Kern tauscht den 25. mit J. gegen J.s 27.',
       ];
       notes.forEach((value, i) => text(c, value, 60, 296 + i * 38, { font: `20px ${HAND}`, color: BLUE_INK }));
-      text(c, 'Am 24. Dezember fuhr: ________', 60, 520, { font: `bold 22px ${TYPEWRITER}` });
-      text(c, 'Wer fuhr, hat den Schlüssel zur Schublade: Sein Name ist das Wort.', 60, 566, { font: `italic 18px ${SERIF}`, color: RED });
+      text(c, 'Am 24. Dezember fuhr: ________', 60, 548, { font: `bold 22px ${TYPEWRITER}` });
+      text(c, 'Wer fuhr, hat den Schlüssel zur Schublade: Sein Name ist das Wort.', 60, 584, { font: `italic 18px ${SERIF}`, color: RED });
     },
   });
 }

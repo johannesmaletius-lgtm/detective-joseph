@@ -175,6 +175,13 @@ async function listen(story) {
   story.sound('page');
   if (heard >= available) {
     if (heard >= FRAGMENTS.length) {
+      if (!f.dreamHeard) {
+        f.dreamHeard = true;
+        await story.speak('… Mira, Schätzchen … schlaf noch ein bisschen … gleich sind wir bei Papa …', { at: ILSE, color: ILSE_COLOR });
+        await story.say('Mira? Wer ist Mira? Und wer ist Papa?');
+        story.note('Ilse murmelt im Schlaf: „Mira, Schätzchen … gleich sind wir bei Papa.“ Wer ist Mira?');
+        return;
+      }
       await story.speak('… chrrr … pfffff …', { at: ILSE, color: ILSE_COLOR });
       await story.say('Sie hat alles gesagt: Er hat den Koffer unter Bett vier versteckt, und der Schlüssel liegt, wo der Mond nicht hinkommt.');
       return;
@@ -213,11 +220,17 @@ async function ilseWakes(story) {
   await story.speak('Die Notbremse! Ich ziehe die Notbremse!', { at: ILSE, color: ILSE_COLOR });
   await story.wait(1);
   await story.say('Nichts passiert. Der Zug fährt einfach weiter.');
-  await story.speak('… sie geht nicht … sie ging noch nie … chrrr …', { at: ILSE, color: ILSE_COLOR });
-  await story.say('Und schon schläft sie wieder. Als wäre nichts gewesen.');
+  await story.speak('… sie geht nicht … sie ging noch nie …', { at: ILSE, color: ILSE_COLOR });
+  if (!story.flags.woke) {
+    await story.speak('… Joseph? Ach, du bist es, Junge. Du trägst ja meinen Schal … chrrr …', { at: ILSE, color: ILSE_COLOR });
+    await story.say('Und schon schläft sie wieder. … IHREN Schal?');
+    await story.say('Den hab ich doch … ich weiß gar nicht, woher ich den habe.');
+  } else {
+    await story.say('Und schon schläft sie wieder. Als wäre nichts gewesen.');
+  }
   if (!story.flags.woke) {
     story.flags.woke = true;
-    story.note('Wenn Ilse aufwacht, schreit sie und zieht die Notbremse. Die funktioniert nicht – und Ilse schläft sofort wieder ein.');
+    story.note('Wenn Ilse aufwacht, schreit sie und zieht die Notbremse. Die funktioniert nicht – und Ilse schläft sofort wieder ein. Vorher hat sie mich „Joseph“ genannt: „Du trägst ja meinen Schal.“ Ich weiß nicht, woher ich meinen Schal habe.');
   }
 }
 

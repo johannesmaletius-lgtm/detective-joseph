@@ -255,7 +255,13 @@ async function playTape(story, view) {
       view.close(true);
       await story.say('„Elf ist der Nächste.“ Wagen elf. Der nächste Fahrgast sitzt im nächsten Wagen!');
       await story.say('Und das ist SEINE Stimme. Die Stimme des Schaffners. Er ruft sie.');
-      story.note('Tonband 108 rückwärts: „… wie die anderen. Elf ist der Nächste.“ Der Schaffner ruft die Fahrgäste. Als Nächstes ist jemand in Wagen 11 dran.');
+      await story.wait(0.6);
+      story.sound('speaker');
+      await story.speak('„Lass die Bänder liegen, Junge.“', { at: { x: 640, y: 150 }, color: '#f5d7a1' });
+      await story.speak('„Du verstehst das noch nicht. Geh zurück in dein Abteil und schlaf.“', { at: { x: 640, y: 150 }, color: '#f5d7a1' });
+      story.sound('dread');
+      await story.say('Das war kein Band. Das war jetzt. Er sieht mich.');
+      story.note('Tonband 108 rückwärts: „… wie die anderen. Elf ist der Nächste.“ Der Schaffner ruft die Fahrgäste. Als Nächstes ist jemand in Wagen 11 dran. Dann sprach er live aus den Trichtern – zu mir: „Lass die Bänder liegen, Junge. Geh zurück in dein Abteil und schlaf.“');
       return;
     }
     await story.wait(0.6);
@@ -293,6 +299,11 @@ async function speakIntoMic(story) {
   story.sound('speaker');
   await story.speak('„Hallo? … Ist da jemand?“', { at: { x: 640, y: 150 }, color: '#f2e6c4' });
   await story.say('Meine eigene Stimme aus allen Trichtern. Gruselig.');
+  if (story.flags.reversedHeard && !story.flags.micAnswered) {
+    story.flags.micAnswered = true;
+    await story.wait(0.8);
+    await story.speak('„Ich bin da, Junge. Ich bin immer da.“', { at: { x: 640, y: 150 }, color: '#f5d7a1' });
+  }
 }
 
 async function openCabinet(story) {

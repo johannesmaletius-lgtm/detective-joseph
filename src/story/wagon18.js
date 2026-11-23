@@ -9,7 +9,7 @@ import { LETTERS, finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, w
 //
 // DIE RÄTSEL
 //   1. Dienstbuch: Schichtplan der Weihnachtswoche mit Tauschvermerken. Am 24. hätte J. (der Schaffner)
-//      fahren sollen, gab den Dienst aber an Moser ab, und Moser gab ihn weiter an Falk → FALK.
+//      fahren sollen, gab den Dienst aber an Moser ab, und Moser gab ihn weiter an Kern → KERN.
 //      Das ist das Wort fürs Buchstabenschloss der Schublade. Darin: Telegramm der Familie und ein
 //      Bund mit sieben Schlüsseln.
 //   2. Schlüsselbrett: Sieben Schlüssel nach der Form ihres Griffs den acht Umrissen zuordnen.
@@ -31,6 +31,7 @@ export const wagon18 = {
     'Der Zug ist der Weihnachtszug vom 24. Dezember. Frau und Tochter des Schaffners saßen darin; er selbst wartete am Bahnsteig.',
     'Im Funkraum: Der Schaffner hatte gewarnt – „Weiche 7 falsch“ –, aber niemand im Zug hörte es.',
     'Im Gewächshaus fand ich die Liste des anderen Joseph: „Der Letzte ist J. Dann sind alle wieder zusammen.“',
+    'Der Tunnel: achtzehn Ticks. Im Notizbuch des anderen Joseph steht: „Bei fünfundzwanzig wird es nicht mehr hell.“',
   ],
 
   async intro(story) {
@@ -122,20 +123,23 @@ async function readBook(story) {
   if (story.flags.bookRead) return;
   story.flags.bookRead = true;
   await story.say('Am 24. sollte „J.“ fahren. Aber dann wurde getauscht … und noch einmal.');
-  story.note('Dienstbuch: Am 24.12. sollte J. (der Schaffner) fahren. Tauschvermerke: J. gab den 24. an Moser, Moser gab ihn an Falk, Falk tauschte den 25. mit J. Wer fuhr am 24.? Der Name öffnet die Schublade.');
+  story.note('Dienstbuch: Am 24.12. sollte J. (der Schaffner) fahren. Tauschvermerke: J. gab den 24. an Moser, Moser gab ihn an Kern, Kern tauschte den 25. mit J. Wer fuhr am 24.? Der Name öffnet die Schublade.');
 }
 
 async function openDrawer(story) {
   const f = story.flags;
   if (f.drawerOpen) return story.say('Leer.');
   const opened = await tryCode(story, {
-    id: 'drawer18', code: 'FALK', alphabet: LETTERS, style: 'brass',
+    id: 'drawer18', code: 'KERN', alphabet: LETTERS, style: 'brass',
     wrong: (s) => (s.flags.bookRead ? 'Falsch. Wer hat den 24. am Ende wirklich gefahren?' : 'Falsch. Vier Buchstaben – ein Name?'),
   });
   if (!opened) return;
   f.drawerOpen = true;
   story.sound('drawer');
-  await story.say('F-A-L-K. Auf!');
+  await story.say('K-E-R-N. Auf!');
+  await story.say('Kern … K. – Herr K.! ER hatte in jener Nacht Dienst. Er hätte am Funk sitzen müssen.');
+  await story.say('„Einmal hab ich ihn im Stich gelassen“, hat er gesagt. Deshalb ist er freiwillig gegangen.');
+  story.note('Am 24.12. fuhr Kern – Herr K.! Er hatte den Dienst seines Freundes übernommen (seine letzte Weihnachtsfahrt vor der Rente) und saß bei der Feier statt am Funk. „Einmal hab ich ihn im Stich gelassen.“');
   story.give('telegram');
   story.give('keyRing');
   await story.say('Ein Telegramm. Und ein Bund mit sieben Schlüsseln.');
@@ -260,8 +264,8 @@ function currentGoal(story) {
     if (!f.bookRead) return { id: 'book', lines: ['Die Schublade will einen Namen. Auf dem Schreibtisch liegt das Dienstbuch.'] };
     return { id: 'drawer', lines: [
       'Die Tauschvermerke der Reihe nach durchgehen: Wer hatte am Ende den 24.?',
-      'J. gab den 24. an Moser. Moser gab den 24. an Falk. Der dritte Tausch betrifft den 25. – nicht den 24.',
-      'FALK.',
+      'J. gab den 24. an Moser. Moser gab den 24. an Kern. Der dritte Tausch betrifft den 25. – nicht den 24.',
+      'KERN.',
     ] };
   }
   if (!f.keysHung) {

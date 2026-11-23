@@ -43,6 +43,12 @@ In jeder Runde verschwindet im Tunnel ein Fahrgast. Der Schaffner ruft sie per L
 - Der Schaffner legt Joseph absichtlich die Spur (Akte, Briefe, Noten, Kreidezeichen in derselben Handschrift), weil Weiche 7 nur zu zweit (Lok + Schaffnerabteil gleichzeitig) gestellt werden kann.
 - Das „Gift“ (Tür 4) ist ein Schlaftrunk, den der Schaffner ängstlichen Fahrgästen gibt.
 - Die Frau des Schaffners ging als Erste (Runde 1); Mira will nicht ohne Papa gehen.
+- **Regel (neu):** Wer in der Nacht bleibt, vergisst, und das Vergessen nimmt die Jahre. Ein Teil des Schaffners hat alles vergessen bis zum Siebzehnjährigen: das ist Joseph (will alle retten, kann nicht loslassen). Wer durch den Tunnel geht, bekommt seine Jahre zurück und steht um 23:47 jener Nacht am Bahnsteig. Am 24. ziehen beide Josephs gleichzeitig und werden wieder eins.
+- **Countdown (neu):** Der Tunnel wird jede Runde länger (Herr Tick misst in „Ticks“). Bei 25 wird es nicht mehr hell. Notizen von Tür 12–24 zählen mit (12 … 24).
+- **Herr K. = Kern** (neu): alter Freund und Lehrmeister des Schaffners, fuhr am 24. den Dienst (letzte Fahrt vor der Rente) und saß bei der Feier statt am Funk. Schubladenwort Tür 18: **KERN**.
+- **Oma Ilse = Miras Oma** (neu), Marthas Mutter. Sie hat den weißen Schal gestrickt, den Joseph trägt.
+- **Mira taucht früh auf** (neu): Hase Hoppel (2), Zettel im Mantel (4), Ilses Traum (5), Kakao (7), Mädchen im Spiegel (9).
+- **Der Schaffner wirkt bedrohlich** (neu): Tür 8 steht er hinter Joseph im Kino, Tür 10 spricht er ihn live an.
 - Vollständige Erzählung mit Hintergrund: `docs/geschichte.md`.
 
 ## Die Türen
@@ -110,6 +116,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 **Noch zu bauen:** Wagen 2, 3 und 17–24 umsetzen, Schlussszene, neue Rätselarten (Sortieren, Waage, Regler, Töne, Licht/Spiegel, Uhrzeiger, Suchbild, Takt, Runden planen, Logik, Umfüllen, Schiebepuzzle, Schablone, Beweise vorlegen, Timing), Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
+
+**Stand (23.11.2026, Story-Überarbeitung):** Geschichte spannender und glaubwürdiger gemacht – nur Texte, keine neuen Grafiken und keine geänderten Rätsel außer dem Schubladenwort in Tür 18 (FALK → **KERN**). Countdown „Der Tunnel wird länger“, Schaffner als Bedrohung (8, 10), Herr K. = Kern, Ilse = Miras Oma mit dem Schal, Mira früh als Spur (2, 4, 5, 7, 9), Regeln in Tür 22 erklärt, Schluss „nicht mehr zwei“. Details: `docs/geschichte.md`, Abschnitt „Überarbeitung“. Die Planungsseite (Reiter „Geschichte“) ist noch auf altem Stand.
 
 **Stand (23.11.2026, Spieltest):** Alle 24 Wagen automatisch im Browser durchgespielt (einzeln und nacheinander mit Spielstand) – alle lösbar, keine Fehler. Danach geändert: kein Kalender-Begriff mehr im Spiel; Finale (Tür 24) mit neu gezeichnetem Tunnelfenster, Entgleisen als Bild und Schnee-Übergang, Schlussbild erzählt von selbst; leichte Rätsel schwerer (2, 3, 6, 10, 11, 19, 20, 21, 23 – neue Lösungen im README); schönere Nahansichten (Kofferstapel, Flaschen, Tonband, Puppenhaus, Pakete). Geschätzte Spielzeit gesamt ≈ 6–7 Stunden. Offen: In Tür 1 brechen kurze Szenen nach dem Tunnel Klicks ab.
 

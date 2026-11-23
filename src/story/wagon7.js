@@ -75,7 +75,7 @@ export const wagon7 = {
       },
     },
     barkeeper: {
-      look: 'Der Barkeeper. Schnurrbart, Weste, ein Tuch über dem Arm. Er poliert dasselbe Glas – schon die ganze Zeit.',
+      look: 'Der Barkeeper. Schnurrbart, Weste, ein Tuch über dem Arm. Er poliert dasselbe Glas – schon die ganze Zeit. Neben ihm steht ein Becher Kakao mit Strohhalm. Für wen der wohl ist?',
       use: (story) => talkToBarkeeper(story),
       items: {
         coin: 'Barkeeper: „Behalten Sie die. Die Musikbox will Münzen, nicht ich.“',
@@ -212,8 +212,9 @@ async function showPhoto(story) {
   story.flags.showedPhoto = true;
   await story.say('Das hier lag in Ihrem Koffer. Sie und der Schaffner.');
   await story.speakAs('k', '… Woher hast du das?');
-  await story.speakAs('k', 'Das war eine schöne Feier. Damals. Leg es weg, Junge. Bitte.');
-  story.note('Herr K. wurde ganz still, als ich ihm das Foto gezeigt habe: „Das war eine schöne Feier. Damals.“');
+  await story.speakAs('k', 'Das war eine schöne Feier. Damals. Zwanzig Jahre sind wir zusammen gefahren, er und ich.');
+  await story.speakAs('k', 'Ich hab ihm alles beigebracht. Und dann hab ich ihn im Stich gelassen. Leg es weg, Junge. Bitte.');
+  story.note('Herr K. wurde ganz still, als ich ihm das Foto gezeigt habe: „Zwanzig Jahre sind wir zusammen gefahren. Ich hab ihm alles beigebracht. Und dann hab ich ihn im Stich gelassen.“');
 }
 
 async function serveDrink(story) {
@@ -312,9 +313,10 @@ async function eavesdrop(story, hidden) {
     await story.speakAs('k', 'Heute ruft er mich. Ich spür’s. Und wenn der Schaffner ruft, dann gehe ich.');
     await story.speakAs('barkeeper', 'Freiwillig?');
     await story.speakAs('k', 'Er war mein Freund. Er bringt uns nach Hause.');
+    await story.speakAs('k', 'Einmal hab ich ihn im Stich gelassen. In jener Nacht. Ein zweites Mal nicht.');
     await story.say('Nach Hause? Durch den Tunnel?');
   });
-  story.note('Belauscht: Herr K. weiß, dass ihn der Schaffner heute ruft – und er will gehen. „Er war mein Freund. Er bringt uns nach Hause.“ Sein Übliches lässt er auf seinen Bierdeckel schreiben.');
+  story.note('Belauscht: Herr K. weiß, dass ihn der Schaffner heute ruft – und er will gehen. „Er war mein Freund. Er bringt uns nach Hause. Einmal hab ich ihn im Stich gelassen. In jener Nacht.“ Sein Übliches lässt er auf seinen Bierdeckel schreiben.');
 }
 
 // ============================================================================================

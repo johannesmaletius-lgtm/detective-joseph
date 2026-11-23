@@ -27,6 +27,7 @@ export const wagon19 = {
   recap: [
     'Der Weihnachtszug vom 24. Dezember erreichte seinen Bahnhof nie. Der Schaffner wartete am Bahnsteig auf seine Frau Martha und seine Tochter Mira.',
     'Im Schaffnerabteil: Weiche 7 ist der Weg aus dem Ring hinaus. Sie lässt sich nur von der Lok aus stellen – und der Lok-Schlüssel fehlt.',
+    'Der Tunnel: neunzehn Ticks. Noch sechs, dann wird es nicht mehr hell.',
   ],
 
   async intro(story) {

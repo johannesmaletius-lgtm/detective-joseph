@@ -35,6 +35,7 @@ export const wagon15 = {
     'Jede Runde verschwindet ein Fahrgast. Eine Gestalt mit meinen Sachen führt sie in den Tunnel. Der Schaffner ruft sie.',
     'Kapelle: Alle Fahrgäste saßen in der Weihnachtsnacht in diesem Zug. Auf der Gedenktafel stehen auch Mira und J. Das Familienfoto zeigt den Schaffner mit Frau und Tochter.',
     'Zeitung vom 25.12.: „Weihnachtszug im Tunnel verschollen.“ Frau und Tochter des Schaffners waren im Zug, er selbst wartete am Bahnsteig. Er lief in der Nacht allein in den Tunnel und wird seitdem vermisst.',
+    'Der Tunnel: fünfzehn Ticks. Jedes Mal bleibt es ein bisschen länger dunkel.',
   ],
 
   setup(story) {
@@ -167,7 +168,9 @@ async function talkMira(story) {
     await story.speakAs('mira', 'Hallo. Ich bin Mira. Ich bin sieben.');
     await story.speakAs('mira', 'Schon ganz lange.');
     await story.say('Sie hat den Stoffhasen vom Familienfoto im Arm. Das ist die Tochter des Schaffners!');
-    story.note('Im Spielzimmer: Mira, sieben Jahre alt – „schon ganz lange“. Sie hat den Stoffhasen vom Familienfoto. Sie ist die Tochter des Schaffners.');
+    await story.say('… Und der Hase hat ein Schlappohr. Der saß im Gepäckwagen. Und das Mädchen im Spiegel …');
+    await story.speakAs('mira', 'Das ist Hoppel. Wir haben dich schon ganz oft gesehen. Du hast uns nur nie bemerkt.');
+    story.note('Im Spielzimmer: Mira, sieben Jahre alt – „schon ganz lange“. Sie hat den Stoffhasen vom Familienfoto (Hoppel, mit Schlappohr – der aus dem Gepäckwagen). Sie war das Mädchen im Spiegel. Sie ist die Tochter des Schaffners.');
   }
   for (;;) {
     const topics = [
@@ -194,7 +197,10 @@ async function talkMira(story) {
     if (topic === 'cap') {
       f.askedCap = true;
       await story.speakAs('mira', 'Du hast die gleiche Mütze wie Papa. Und den gleichen Schal.');
-      await story.say('… Die gleiche Mütze wie der Täter im Film.');
+      await story.speakAs('mira', 'Den hat Oma Ilse gestrickt. Oma schläft immer. Sie ist so müde.');
+      await story.say('Oma Ilse … die alte Dame aus dem Schlafwagen? Woher habe ich eigentlich meinen Schal?');
+      await story.say('… Und die gleiche Mütze wie der Täter im Film.');
+      story.note('Mira: Ich habe die gleiche Mütze und den gleichen Schal wie ihr Papa. Den Schal hat Oma Ilse gestrickt – Ilse aus dem Schlafwagen ist Miras Oma.');
     }
   }
 }

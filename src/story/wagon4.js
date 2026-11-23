@@ -124,7 +124,7 @@ export const wagon4 = {
     },
     coatBrown: { look: 'Ein brauner Wollmantel. In der Tasche nur Krümel.', use: 'Nur Krümel in den Taschen.' },
     coatGrey: {
-      look: 'Ein grauer Damenmantel. In der Tasche ein kleiner, roter Kinderhandschuh.',
+      look: 'Ein grauer Damenmantel. In der Tasche ein kleiner, roter Kinderhandschuh und ein Zettel: „Mira – nicht wieder den Hasen liegen lassen! Papa wartet am Bahnsteig.“',
       use: 'Ein Kinderhandschuh in der Manteltasche. Eine Mutter mit Kind also.',
     },
     towel: { look: 'Ein Geschirrtuch. Brunos wahrscheinlich.', use: 'Das gehört in die Küche.' },

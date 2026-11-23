@@ -253,6 +253,7 @@ async function talkTick(story) {
 async function tickAfter(story) {
   await story.speakAs('tick', 'Ich bin noch da. Hundertneun Runden. Danke, Junge.');
   await story.speakAs('tick', 'Komisch nur … manchmal denke ich, draußen wartet jemand auf mich.');
+  await story.speakAs('tick', 'Und ich weiß nicht mehr, wie alt ich bin. Jede Runde vergesse ich ein Stück. Als würde das Vergessen mir die Jahre wegnehmen.');
 }
 
 // ============================================================================================
@@ -358,6 +359,12 @@ async function saved(story) {
   await story.speakAs('tick', 'Ich habe nichts verstanden – und ich bin noch hier!');
   await story.say('Die Uhren haben ihn übertönt. Genau beim Ruf.');
   await story.speakAs('tick', 'Hundertneun Runden. Die erste, in der niemand gegangen ist.');
+  await story.speakAs('tick', 'Aber hör zu, Junge. Ich zähle nicht nur die Runden. Ich zähle auch den Tunnel.');
+  await story.speakAs('tick', 'Vor hundert Runden war er nach drei Ticks vorbei. Heute dauert er elf. Er wird jede Runde länger.');
+  await story.speakAs('tick', 'Irgendwann wird es im Tunnel nicht mehr hell. Dann kommt keiner mehr heraus. Nie mehr.');
+  await story.say('Wie lange noch?');
+  await story.speakAs('tick', 'Nicht mehr lange. Beeil dich, Junge.');
+  story.note('Herr Tick misst den Tunnel: Vor hundert Runden dauerte er drei Ticks, heute elf. Er wird jede Runde länger. Wenn es darin nicht mehr hell wird, kommt keiner mehr heraus. „Nicht mehr lange. Beeil dich.“');
   await story.speakAs('tick', 'Hier, Junge. Das ist für dich. Ein Zahnrad aus meiner besten Uhr.');
   story.give('gear');
   await story.speakAs('tick', 'Das wirst du vorne brauchen.');

@@ -27,6 +27,7 @@ export const wagon14 = {
     'Eine Gestalt mit meinen Sachen führt die Fahrgäste in den Tunnel. Der Schaffner ruft sie. Herrn Tick habe ich gerettet.',
     'Herr Moll hat an einem Weihnachtsabend im Zug für die Frau und die Tochter des Schaffners gespielt. „Seitdem fährt der Zug im Kreis.“',
     'Kapelle: „Zum Gedenken an den Weihnachtszug vom 24. Dezember, der seinen Bahnhof nie erreichte.“ Auf der Tafel stehen alle Fahrgäste – und J. Im Opferstock lag ein Familienfoto: Der junge Schaffner sieht aus wie ich.',
+    'Der Tunnel: vierzehn Ticks. Herr Tick sagt: „Nicht mehr lange. Beeil dich, Junge.“',
   ],
 
   setup(story) {

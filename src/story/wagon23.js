@@ -29,13 +29,14 @@ export const wagon23 = {
     'Der andere Joseph ist der Schaffner – älter, mit Schnurrbart. „Ich bin du. Der Tunnel ist kein Ende, er ist der Ausgang. Und du holst sie mir jede Runde zurück.“',
     'Ich habe ihm gesagt, dass er lügt.',
     'Herr Tick hat mir ein Zahnrad gegeben: „Das wirst du vorne brauchen.“ Aus dem Funkraum habe ich Kopfhörer.',
+    'Der Tunnel: dreiundzwanzig Ticks. Noch zwei.',
   ],
 
   async intro(story) {
     await wagonIntro(story, {
       number: 23,
       title: 'Der Wartungsgang',
-      lines: [],
+      lines: ['Dreiundzwanzig Ticks Dunkelheit. Noch zwei.'],
       firstTunnelIn: 140,
     });
     await theCall(story);
@@ -222,12 +223,14 @@ async function insertGear(story) {
     await story.card({ draw: drawExit });
     await story.say('Schnee. Ein Feld. Und weit hinten die Lichter eines Bahnhofs.');
     await story.speakAs('tick', 'Ach … wie die Luft riecht. Nach Schnee.');
-    await story.say('Herr Tick geht hinaus. Mit jedem Schritt wird er ein bisschen älter. Sein Rücken krümmt sich, seine Haare werden weiß.');
+    await story.say('Herr Tick geht hinaus. Mit jedem Schritt wird er ein bisschen älter. Sein Rücken krümmt sich, seine Haare werden weiß. Er bekommt seine Jahre zurück.');
+    await story.speakAs('tick', 'Jetzt weiß ich es wieder. Meine Tochter. Sie wartet am Bahnsteig. Sie hat immer gewartet.');
+    await story.say('Weit hinten, über dem Bahnhof, leuchtet eine Uhr. Dreiundzwanzig Uhr siebenundvierzig.');
     await story.speakAs('tick', 'Danke, Junge.');
     await story.say('Er lächelt. Und dann ist er zwischen den Schneeflocken verschwunden.');
     await story.say('Der Tunnel ist wirklich der Ausgang. Ich habe niemanden gerettet. Ich habe sie festgehalten.');
     await story.say('Und die anderen sitzen noch im Zug.');
-    story.note('Hinter dem Tor: Schnee und die Lichter eines Bahnhofs. Herr Tick ging hinaus, wurde mit jedem Schritt älter und sagte: „Danke, Junge.“ Der Tunnel ist der Ausgang. Ich habe niemanden gerettet – ich habe sie festgehalten. Die anderen sitzen noch im Zug.');
+    story.note('Hinter dem Tor: Schnee und die Lichter eines Bahnhofs. Herr Tick ging hinaus, wurde mit jedem Schritt älter – er bekam seine Jahre zurück – und erinnerte sich: Seine Tochter wartet am Bahnsteig. Die Bahnhofsuhr zeigte 23:47. „Danke, Junge.“ Der Tunnel ist der Ausgang. Ich habe niemanden gerettet – ich habe sie festgehalten. Die anderen sitzen noch im Zug.');
     await finishWagon(story, {
       number: 23,
       title: 'Ende von Wagen 23',

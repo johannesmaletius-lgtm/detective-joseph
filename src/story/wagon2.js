@@ -75,7 +75,13 @@ export const wagon2 = {
     },
     panel: { look: 'Ein Schaltkasten. Nur Sicherungen, nichts Spannendes.' },
     shelves: {
-      look: 'Regale voller Koffer und Kisten. Hunderte. Ohne Hinweis suche ich hier ewig.',
+      look: async (story) => {
+        await story.say('Regale voller Koffer und Kisten. Hunderte. Ohne Hinweis suche ich hier ewig.');
+        if (story.flags.bunnySeen) return;
+        story.flags.bunnySeen = true;
+        await story.say('Ganz oben zwischen zwei Koffern sitzt ein Stoffhase mit einem Schlappohr. Wer vergisst denn so was?');
+        story.note('Im Gepäckregal saß ein Stoffhase mit einem Schlappohr. Gehört wohl einem Kind. Aber ich habe hier noch kein Kind gesehen.');
+      },
       use: 'Hier wühle ich nicht blind herum. Ich brauche einen Hinweis.',
     },
     boxes: { look: 'Kisten bis unter die Decke.' },
