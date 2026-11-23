@@ -27,6 +27,7 @@ import { morseSignal } from '../effects/morse.js';
 // Die linke Wagenseite wird so berechnet, die rechte ist dieselbe Rechnung gespiegelt.
 
 const BAND = { top: 80, height: 240 }; // nur in diesem waagerechten Band liegen Fenster
+const SLICE_DISTANCE = 260;   // in diesem Abstand vom Fluchtpunkt gelten die feinsten Streifen (siehe sliceWidth)
 const TUNNEL_SLICE = 2;        // Breite der Streifen, in denen der Tunnel geprüft und gezeichnet wird
 const RIGHT_SIDE_SHIFT = 0.37; // die rechte Seite zeigt einen anderen Teil der Landschaft (Anteil der Bildbreite)
 const LANTERN_HEIGHT = 112;    // Höhe der Laternen draußen (y beim Referenzabstand)
@@ -88,13 +89,17 @@ export class OutsideView {
   // ---------------------------------------------------------------- Zeichnen (hinter dem Hintergrund)
   // Die Außenwelt entsteht zuerst in einem eigenen Zwischenbild, in dem alle Streifen genau auf
   // ganzen Pixeln liegen (sonst gäbe es feine Nähte). Erst das fertige Bild wird geneigt und verschoben.
-  draw(ctx) {
+  // reuse = true: das Zwischenbild aus diesem Bild nicht neu malen (für die Scheiben in der Dunkelheit)
+  draw(ctx, { reuse = false } = {}) {
     const buffer = this.prepareBuffer(ctx);
-    const outside = buffer.getContext('2d');
-    const zoom = buffer.width / GAME_WIDTH;
-    outside.setTransform(zoom, 0, 0, zoom, 0, -BAND.top * zoom);
-    outside.clearRect(0, BAND.top, GAME_WIDTH, BAND.height);
-    this.drawWorld(outside);
+    if (!reuse || !this.painted) {
+      const outside = buffer.getContext('2d');
+      const zoom = buffer.width / GAME_WIDTH;
+      outside.setTransform(zoom, 0, 0, zoom, 0, -BAND.top * zoom);
+      outside.clearRect(0, BAND.top, GAME_WIDTH, BAND.height);
+      this.drawWorld(outside);
+      this.painted = true;
+    }
 
     // Der Wagen schaukelt und federt – draußen bewegt sich die Welt deshalb leicht gegen die Fensterrahmen.
     const { x: vx, y: vy } = this.vanishingPoint;
@@ -102,6 +107,7 @@ export class OutsideView {
     ctx.translate(vx, vy + this.train.bob);
     ctx.rotate(this.train.roll);
     ctx.translate(-vx, -vy);
+    ctx.imageSmoothingQuality = 'low'; // das Zwischenbild hat schon die richtige Größe
     ctx.drawImage(buffer, 0, BAND.top, GAME_WIDTH, BAND.height);
     ctx.restore();
   }
@@ -113,6 +119,7 @@ export class OutsideView {
       this.buffer = document.createElement('canvas');
       this.buffer.width = GAME_WIDTH * zoom;
       this.buffer.height = BAND.height * zoom;
+      this.painted = false;
     }
     return this.buffer;
   }
@@ -163,9 +170,11 @@ export class OutsideView {
     const ref = this.referenceDistance;
     const { picture, speed, y } = layer;
     const scroll = this.train.distance * speed + (side === 'right' ? RIGHT_SIDE_SHIFT * picture.width : 0);
-    const step = sliceWidth(speed, window.to - window.from);
-    for (let x = window.from; x < window.to; x += step) {
-      const right = Math.min(x + step, window.to);
+    const fine = sliceWidth(speed, window.to - window.from);
+    for (let x = window.from, right; x < window.to; x = right) {
+      // Weiter weg vom Fluchtpunkt ändert sich der Maßstab langsamer – dort reichen breitere Streifen.
+      const step = fine >= window.to - window.from ? fine : Math.max(fine, Math.round((fine * (vx - x)) / SLICE_DISTANCE));
+      right = Math.min(x + step, window.to);
       // Wo im Bildstreifen liegen die linke und die rechte Kante dieses Streifens?
       const sourceFrom = (ref * ref) / (vx - x) + scroll;
       const sourceTo = (ref * ref) / (vx - right) + scroll;
@@ -248,31 +257,50 @@ export class OutsideView {
   drawTunnel(ctx, window, side) {
     const train = this.train;
     if (!this.nearLayer || !train.tunnelAt) return;
-    const { x: vx, y: vy } = this.vanishingPoint;
-    const ref = this.referenceDistance;
-    let wall = null;
-    for (let x = window.from; x < window.to; x += TUNNEL_SLICE) {
-      const distance = vx - x - TUNNEL_SLICE / 2;
-      if (!train.tunnelAt(train.distance + this.aheadAt(distance))) continue;
-      if (!wall) {
-        // Fast schwarz – nur oben spiegeln sich schwach die warmen Lampen des Abteils in der Scheibe.
-        wall = ctx.createLinearGradient(0, window.top, 0, window.bottom);
-        wall.addColorStop(0, '#1e1214');
-        wall.addColorStop(0.35, '#09070f');
-        wall.addColorStop(1, '#07050c');
+    const { x: vx } = this.vanishingPoint;
+    // Zusammenhängende Streifen, die schon im Tunnel liegen, werden in einem Rutsch gezeichnet.
+    let start = null;
+    let x = window.from;
+    for (; x < window.to; x += TUNNEL_SLICE) {
+      const inside = train.tunnelAt(train.distance + this.aheadAt(vx - x - TUNNEL_SLICE / 2));
+      if (inside && start === null) start = x;
+      if (!inside && start !== null) {
+        this.drawTunnelWall(ctx, window, start, x);
+        start = null;
       }
-      const scale = distance / ref;
-      ctx.fillStyle = wall;
-      ctx.fillRect(x, window.top - 12, TUNNEL_SLICE, window.bottom - window.top + 24);
-      ctx.fillStyle = 'rgba(70, 60, 90, 0.35)';
-      for (const streak of TUNNEL_STREAKS) ctx.fillRect(x, vy + (streak - vy) * scale, TUNNEL_SLICE, Math.max(1, 2 * scale));
     }
+    if (start !== null) this.drawTunnelWall(ctx, window, start, x);
     if (side !== 'left') return;
     const { every } = train.tunnelLamps;
     const first = Math.ceil((train.distance + this.aheadAt(vx - window.from)) / every) * every;
     for (let at = first; at - train.distance < this.aheadAt(vx - window.to); at += every) {
       if (train.tunnelAt(at)) this.drawPassingLight(ctx, window, at - train.distance, TUNNEL_LAMP_HEIGHT, 34, [255, 170, 80], 0.9);
     }
+  }
+
+  // Ein Stück Tunnelwand von x0 bis x1: fast schwarz, die Fugen laufen perspektivisch auf den Fluchtpunkt zu
+  drawTunnelWall(ctx, window, x0, x1) {
+    const { x: vx, y: vy } = this.vanishingPoint;
+    const ref = this.referenceDistance;
+    // Fast schwarz – nur oben spiegeln sich schwach die warmen Lampen des Abteils in der Scheibe.
+    const wall = ctx.createLinearGradient(0, window.top, 0, window.bottom);
+    wall.addColorStop(0, '#1e1214');
+    wall.addColorStop(0.35, '#09070f');
+    wall.addColorStop(1, '#07050c');
+    ctx.fillStyle = wall;
+    ctx.fillRect(x0, window.top - 12, x1 - x0, window.bottom - window.top + 24);
+    const s0 = (vx - x0) / ref, s1 = (vx - x1) / ref;
+    ctx.fillStyle = 'rgba(70, 60, 90, 0.35)';
+    ctx.beginPath();
+    for (const streak of TUNNEL_STREAKS) {
+      const y0 = vy + (streak - vy) * s0, y1 = vy + (streak - vy) * s1;
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.lineTo(x1, y1 + Math.max(1, 2 * s1));
+      ctx.lineTo(x0, y0 + Math.max(1, 2 * s0));
+      ctx.closePath();
+    }
+    ctx.fill();
   }
 
   // Ein Licht direkt an der Strecke, "ahead" Fahrsekunden voraus: wo und wie groß es im Fenster erscheint.
