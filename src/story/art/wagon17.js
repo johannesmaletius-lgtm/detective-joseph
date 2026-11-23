@@ -1,9 +1,13 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, picture, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 17 (Gewächshaus): Nachthimmel hinter dem Glas, Heizungsplan, Gießkannen,
 // beschlagene Scheibe, das Notizbuch des anderen Joseph.
 
 // ---------------------------------------------------------------- Himmel hinter dem Glas
+
+// Der andere Joseph rennt draußen vorbei (Laufbilder schon jetzt laden, damit nichts flackert)
+const GHOST_FRAMES = Array.from({ length: 8 }, (_, i) => `assets/characters/anderer-joseph/walk-left/frame_00${i + 1}.webp`);
+GHOST_FRAMES.forEach((src) => picture(src));
 const FLAKES = Array.from({ length: 140 }, (_, i) => ({ x: (i * 977) % 1280, y: (i * 421) % 720, s: 1 + (i % 3), v: 20 + (i % 5) * 9 }));
 
 // fog = 0 … 1 (beschlagene Scheiben), ghost = x-Position der Gestalt draußen (oder null)
@@ -32,10 +36,12 @@ export function paintSky(ctx, { time, dark, fog = 0, ghost = null }) {
   ctx.lineTo(0, 720);
   ctx.fill();
   if (ghost !== null) {
+    // er rennt nach links davon: Laufbilder, ein Durchlauf (zwei Schritte) alle 150 Pixel
+    const frame = Math.floor(((1300 - ghost) / 150) * GHOST_FRAMES.length) % GHOST_FRAMES.length;
     ctx.save();
     ctx.globalAlpha = 0.85;
     ctx.filter = 'brightness(0.25)';
-    drawPicture(ctx, 'assets/characters/anderer-joseph/right.webp', ghost, 150, 90, 300);
+    drawPicture(ctx, GHOST_FRAMES[frame], ghost - 34, 150, 159, 300);
     ctx.restore();
   }
   ctx.fillStyle = 'rgba(255,255,255,0.85)';

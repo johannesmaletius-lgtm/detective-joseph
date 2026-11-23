@@ -148,6 +148,10 @@ async function announce(story) {
   await theCall(story);
 }
 
+// Mira: in der Tür (hinten) und neben Joseph
+const MIRA_DOOR = [648, 410];
+const MIRA_SPOT = [790, 520];
+
 async function theCall(story) {
   const f = story.flags;
   await story.cutscene(async () => {
@@ -161,16 +165,30 @@ async function theCall(story) {
     await story.say('Schritte im ganzen Zug. Ruhige Schritte. Einer nach dem anderen gehen sie nach hinten, zum Tunnel.');
     await story.say('Bruno mit seiner Schürze. Der Barkeeper. Herr Moll. Der Heizer, der mir zuzwinkert.');
     await story.say('Oma Ilse mit ihrem Strickzeug. Im Vorbeigehen zupft sie mir den Schal zurecht: „Steht dir immer noch, Junge.“');
+    // Mira kommt durch die Tür herein und läuft zu Joseph
+    const mira = story.character('mira');
+    await story.walkTo(600, 610, 'right');
+    mira.moveTo(...MIRA_DOOR, 0);
+    mira.alpha = 0;
     f.miraHere = true;
     story.sound('door');
-    await story.wait(0.6);
+    mira.fade(1, 0.5);
+    await mira.moveTo(...MIRA_SPOT, 2.4);
+    mira.pose = 'front';
+    story.faceToward(mira);
     await story.speakAs('mira', 'Papa?');
     await story.speakAs('mira', 'Kommst du nach, Papa?');
     await story.say('Papa. Zum ersten Mal klingt das Wort nicht falsch.');
     await story.say('… Ja, Mira. Ich komme nach. Versprochen.');
     await story.speakAs('mira', 'Dann geh ich schon mal vor. Mama wartet.');
-    await story.character('mira').moveTo(640, 400, 1.6);
+    // … und läuft zurück zur Tür, hinaus zum Tunnel
+    const going = mira.moveTo(...MIRA_DOOR, 2.6);
+    await story.wait(1.9);
+    await mira.fade(0, 0.6);
+    await going;
     f.miraHere = false;
+    mira.alpha = 1;
+    mira.pose = 'front';
   });
   story.note('Die letzte Durchsage: Alle Fahrgäste sind ruhig zum Tunnel gegangen. Mira als Letzte: „Kommst du nach, Papa?“ – „Ja. Versprochen.“');
 }

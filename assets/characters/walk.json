@@ -1,0 +1,76 @@
+{
+ "anderer-joseph": {
+  "frames": 8,
+  "right": {
+   "stride": 0.2315,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.2315,
+   "pad": 70
+  }
+ },
+ "herr-k": {
+  "frames": 8,
+  "right": {
+   "stride": 0.1681,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.1679,
+   "pad": 70
+  }
+ },
+ "mira": {
+  "frames": 8,
+  "right": {
+   "stride": 0.1916,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.1919,
+   "pad": 70
+  },
+  "front": {
+   "stride": 0.1394,
+   "pad": 70
+  }
+ },
+ "moll": {
+  "frames": 8,
+  "right": {
+   "stride": 0.2411,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.2411,
+   "pad": 70
+  }
+ },
+ "schaffner": {
+  "frames": 8,
+  "right": {
+   "stride": 0.232,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.232,
+   "pad": 70
+  }
+ },
+ "tick": {
+  "frames": 8,
+  "right": {
+   "stride": 0.1815,
+   "pad": 70
+  },
+  "left": {
+   "stride": 0.1821,
+   "pad": 70
+  },
+  "front": {
+   "stride": 0.1818,
+   "pad": 70
+  }
+ }
+}

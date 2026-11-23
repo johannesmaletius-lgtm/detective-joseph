@@ -95,11 +95,18 @@ export const wagon23 = {
 
 async function theCall(story) {
   const f = story.flags;
+  // Herr Tick kommt von vorne rechts und geht wie im Schlaf an Joseph vorbei in den Gang
+  const tick = story.character('tick');
+  const spot = [tick.data.x, tick.data.y];
+  tick.moveTo(1190, 716, 0);
   f.tickHere = true;
   await story.cutscene(async () => {
     story.sound('speaker');
+    const walking = tick.moveTo(...spot, 4.2);
     await story.speak('… Fahrgast Tick … bitte zum Tunnel …', { at: { x: 640, y: 120 }, color: VOICE });
     await story.say('Nein! Herr Tick hat den Ruf gehört. Er geht einfach los – hier in den Wartungsgang.');
+    await walking;
+    tick.pose = 'front';
     await story.speakAs('tick', '… ich komme …');
     await story.say('Und die Stimme … sie zieht auch an mir. Meine Füße werden schwer …');
   });
