@@ -111,13 +111,15 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 12: Die Kreuze ergeben „HASE“ (Miras Stoffhase) – das Wort für die Spieldose mit dem Klavierschlüssel. Schluss = Anfang rückwärts (D H A G). Beim letzten Ton geht die Tür auf.
 - Tür 13: Statt der Münze aus dem Barwagen hat der Opferstock ein Buchstabenschloss: Die Laterne (am Kranz angezündet) wirft rote Punkte auf H-E-I-M im Abrieb. Glocken G – A – H öffnen die Tür. Auf der Tafel stehen auch Lokführer und Funker.
 - Tür 14: Lösungswort des Kreuzworträtsels ist WEICHE. Die Zeitung gibt es nur einmal im Archiv.
-- Tür 15: Mira nennt ihren Hasen „Hoppel“; Türcode „Heiligabend“ = 2412 (Rückseite der Zeichnung).
-- Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
+- Tür 15: Mira nennt ihren Hasen „Hoppel“; Türcode „mein Geburtstag (der 7. 11.)“ = 0711 (Rückseite der Zeichnung).
+- Tür 16: Der Morsefunkspruch endet mit „23:41“ und vier Ziffern 9999 (= Notruf, steht unten auf der Morsetafel), die Joseph mit der Morsetafel übersetzen muss.
 - Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
 
 **Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen).
 
 ## Übergabe für die nächste Session
+
+**Stand (24.11.2026, neue Codes):** Statt der sich ähnelnden Codes (2341/2343/2347, 2412 doppelt): Tür 5 **2004** (Fotorückseite: „ab dem 20. 04. bist du Rentner – merk ihn dir!“, 24.12. ist falsche Fährte), Tür 15 **0711** (Miras Geburtstag), Tür 16 **9999** (Notruf am Ende des Funkspruchs), Tür 22 **2704** (Luke: „Wofür ich das alles tue“ → Familienfoto „Martha und ich – seit dem 27. 04.“). Tür 14 behält 2347 (23:47). Neue/geänderte Joseph-Sätze ohne Stimme: Tür 5 (Unterstreichung), Tür 15 (falscher Code), Tür 22 (Luke geöffnet, Inschrift, Fotorückseite) – mit eigenem ElevenLabs-Schlüssel `node tools/joseph-dialogue-lines.mjs` + `node tools/voice-generate.mjs joseph` nachvertonen.
 
 **Stand (24.11.2026, Story-Lücken):** Herr K. in Tür 5–7 schlüssig (Endkarten 5 und 6, Notiz 7). Finale begründet: Brief des anderen Joseph am Tor in Tür 23 („Wer ruft, muss bleiben“ → Weiche 7 zu zweit), auch im Rückblick von Tür 24. Brief in Tür 3: „eingeworfen in Runde 107, zuzustellen in Runde 108“ (Dienstanweisung + Briefkopf), damit „Morgen verschwindet jemand“ zu Herrn K. in Runde 108 passt. Nur Endkarten, Notizen und Briefe geändert – keine gesprochenen Sätze, also keine neuen Aufnahmen nötig.
 

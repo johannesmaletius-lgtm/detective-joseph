@@ -6,8 +6,9 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 // ============================================================================================
 //
 // DIE RÄTSEL
-//   1. Fahrtenschreiber: Der Papierstreifen der Unglücksnacht. Bei Kilometer 24,7 (Weiche 7, vom
-//      Tunnelfoto) steht die Uhrzeit 23:43 → 2343 öffnet die Luke zum Kohlentender.
+//   1. Fahrtenschreiber: Der Papierstreifen der Unglücksnacht – bei Kilometer 24,7 (Weiche 7) 23:43,
+//      niemand hat gebremst. Die Luke zum Kohlentender: in die Luke geritzt „Wofür ich das alles tue“
+//      → das Familienfoto, Rückseite „Martha und ich – seit dem 27. 04.“ → 2704.
 //   2. Im Tender verstecken und durch den Spalt warten, bis es genau halb zwölf ist. Um 23:30 kommt
 //      er herein, um 23:31 steht er am Pult. Wer zu früh herauskommt, verscheucht ihn; wer zu spät
 //      kommt, verpasst ihn. Dann: nächste Runde, noch einmal.
@@ -17,7 +18,7 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 // ERGEBNIS: Er nimmt die Mütze ab – der Schaffner, älter, mit Schnurrbart. „Ich bin du. Der Tunnel ist
 // kein Ende, er ist der Ausgang. Und du holst sie mir jede Runde zurück.“ – „Du lügst.“ Er geht.
 
-const HATCH_CODE = '2343';
+const HATCH_CODE = '2704';
 const ORDER = ['family', 'press', 'card'];
 const EVIDENCE = { family: 'Das Familienfoto', press: 'Das Pressefoto', card: 'Miras Karte' };
 
@@ -51,7 +52,11 @@ export const wagon22 = {
       use: (story) => readStrip(story),
     },
     hatch: {
-      look: (story) => story.say(story.flags.hatchOpen ? 'Die Luke zum Kohlentender ist offen.' : 'Eine Bodenluke – darunter der Kohlentender. Ein Zahlenschloss mit vier Rädchen.'),
+      look: async (story) => {
+        if (story.flags.hatchOpen) return story.say('Die Luke zum Kohlentender ist offen.');
+        await story.say('Eine Bodenluke – darunter der Kohlentender. Ein Zahlenschloss mit vier Rädchen.');
+        await story.say('Daneben eingeritzt, in meiner Schrift: „Wofür ich das alles tue.“');
+      },
       use: (story) => openHatch(story),
     },
     desk: {
@@ -74,7 +79,16 @@ export const wagon22 = {
   },
 
   items: {
-    familyPhoto: { look: (story) => story.card({ draw: (ctx) => drawEvidence(ctx, 'family') }) },
+    familyPhoto: {
+      look: async (story) => {
+        await story.card({ draw: (ctx) => drawEvidence(ctx, 'family') });
+        await story.say('Hinten drauf, mit Füller: „Martha und ich – seit dem 27. 04.“');
+        if (!story.flags.photoBackNoted) {
+          story.flags.photoBackNoted = true;
+          story.note('Rückseite des Familienfotos: „Martha und ich – seit dem 27. 04.“');
+        }
+      },
+    },
     pressPhoto: { look: (story) => story.card({ draw: (ctx) => drawEvidence(ctx, 'press') }) },
   },
 
@@ -118,12 +132,12 @@ async function openHatch(story) {
   if (f.hatchOpen) return hide(story);
   const opened = await tryCode(story, {
     id: 'hatch22', code: HATCH_CODE, style: 'steel',
-    wrong: (s) => (s.flags.stripRead ? 'Falsch. Welche Uhrzeit steht bei Kilometer 24,7?' : 'Falsch. Vier Ziffern – eine Uhrzeit?'),
+    wrong: 'Falsch. In die Luke geritzt: „Wofür ich das alles tue.“ Vier Ziffern …',
   });
   if (!opened) return;
   f.hatchOpen = true;
   story.sound('creak');
-  await story.say('Dreiundzwanzig Uhr dreiundvierzig. Genau da ist der Zug an Weiche 7 abgebogen. Die Luke ist auf.');
+  await story.say('Der 27. April. Wofür er das alles tut: für sie. Die Luke ist auf.');
   await hide(story);
 }
 
@@ -290,9 +304,9 @@ function currentGoal(story) {
   const f = story.flags;
   if (!f.hatchOpen) {
     return { id: 'hatch', lines: [
-      'Die Luke zum Kohlentender will vier Ziffern. Der Fahrtenschreiber zeigt Kilometer und Uhrzeiten aus jener Nacht.',
-      'Weiche 7 lag bei Kilometer 24,7 (das Tunnelfoto). Welche Uhrzeit steht dort? Den Streifen weiterrollen.',
-      '23:43 → 2343.',
+      'Die Luke zum Kohlentender will vier Ziffern. Neben dem Schloss eingeritzt: „Wofür ich das alles tue.“',
+      'Für seine Familie. Das Familienfoto im Inventar ansehen (Rechtsklick) – auf der Rückseite steht ein Datum.',
+      '„Martha und ich – seit dem 27. 04.“ → 2704.',
     ] };
   }
   if (!f.caught) {

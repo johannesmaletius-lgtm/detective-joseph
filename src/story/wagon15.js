@@ -19,9 +19,9 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 //      den Spielzeugtunnel und hält; darin ein kleiner roter Schlüssel.
 //   3. Puppenhaus-Bahnhof: Figuren aufstellen wie in jener Nacht (Pressefoto/Zeitung): der
 //      Schaffner auf den Bahnsteig, Frau und Mädchen in den Zug. Koch und Hund gehören nicht dazu.
-//      Im Fach: Miras Zeichnung. Rückseite: „Die Tür-Geheimzahl ist Heiligabend!“ → 2412.
+//      Im Fach: Miras Zeichnung. Rückseite: „Die Tür-Geheimzahl ist mein Geburtstag! (der 7. 11.)“ → 0711.
 
-const DOOR_CODE = '2412';
+const DOOR_CODE = '0711';
 const ISPY = [
   { answer: 'drum', clue: '… und das ist rot und rund und macht BUMM.', wrong: 'Nein! Rot und rund und BUMM!' },
   { answer: 'horse', clue: '… und das reitet und reitet und kommt nie an.', wrong: 'Nein! Es reitet und reitet und kommt nie an. Wie wir.' },
@@ -324,7 +324,7 @@ async function showDrawing(story) {
   await story.card({ draw: (ctx) => drawMiraDrawing(ctx, { back: true }) });
   if (!f.backSeen) {
     f.backSeen = true;
-    story.note('Auf der Rückseite von Miras Zeichnung: „Für Papa – Die Tür-Geheimzahl ist Heiligabend!“');
+    story.note('Auf der Rückseite von Miras Zeichnung: „Für Papa – Die Tür-Geheimzahl ist mein Geburtstag! (der 7. 11. – nicht vergessen!!)“');
   }
 }
 
@@ -337,7 +337,7 @@ async function tryDoor(story) {
     id: 'door15',
     code: DOOR_CODE,
     dark: 'Im Dunkeln sehe ich die Tasten nicht.',
-    wrong: (s) => (s.flags.backSeen ? 'Falsch. Heiligabend … welcher Tag ist das?' : 'Falsch. Vier Ziffern …'),
+    wrong: (s) => (s.flags.backSeen ? 'Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.' : 'Falsch. Vier Ziffern …'),
   });
   if (!opened) return;
   if (!story.flags.drawingSeen) return story.say('Offen. Aber Mira wollte mir noch etwas zeigen.');
@@ -382,5 +382,5 @@ function currentGoal(story) {
       'Der Schaffner wartete auf dem Bahnsteig. Seine Frau und seine Tochter saßen im Zug. Koch und Hund gehören nicht dazu.',
     ] };
   }
-  return { id: 'door', lines: ['„Die Tür-Geheimzahl ist Heiligabend!“ – der 24.12. Die Tür will vier Ziffern: 2 – 4 – 1 – 2.'] };
+  return { id: 'door', lines: ['„Die Tür-Geheimzahl ist mein Geburtstag!“ – der 7. 11. Die Tür will vier Ziffern: 0 – 7 – 1 – 1.'] };
 }

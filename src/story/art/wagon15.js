@@ -189,7 +189,8 @@ export function drawMiraDrawing(ctx, { back = false } = {}) {
       if (back) {
         text(c, 'Für Papa', 350, 120, { font: `bold 42px ${HAND}`, color: '#c0392b', align: 'center' });
         text(c, 'Die Tür-Geheimzahl', 350, 220, { font: `32px ${HAND}`, color: '#2a63c9', align: 'center' });
-        text(c, 'ist Heiligabend!', 350, 270, { font: `32px ${HAND}`, color: '#2a63c9', align: 'center' });
+        text(c, 'ist mein Geburtstag!', 350, 270, { font: `32px ${HAND}`, color: '#2a63c9', align: 'center' });
+        text(c, '(der 7. 11. – nicht vergessen!!)', 350, 318, { font: `26px ${HAND}`, color: '#2a63c9', align: 'center' });
         text(c, '♥  Deine Mira  ♥', 350, 380, { font: `30px ${HAND}`, color: '#c0392b', align: 'center' });
       }
     },

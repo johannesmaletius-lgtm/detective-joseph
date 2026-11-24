@@ -175,7 +175,8 @@ export function drawMorseBoard(ctx) {
           } else c.fillRect(x + 56 + k * 36, y + 1, 28, 10);
         });
       });
-      text(c, '· kurz     — lang', 340, 510, { font: `18px ${PRINT}`, align: 'center' });
+      text(c, '· kurz     — lang', 340, 490, { font: `18px ${PRINT}`, align: 'center' });
+      text(c, '9 9 9 9 = Notruf – sofort antworten!', 340, 522, { font: `bold 18px ${PRINT}`, color: '#a12218', align: 'center' });
     },
   });
 }

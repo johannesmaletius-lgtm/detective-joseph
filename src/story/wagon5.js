@@ -19,10 +19,11 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wago
 //   3. Ilse spricht im Schlaf, nach jedem Tunnel ein Stück mehr:
 //      „Er hat den Koffer …“ – „… unter Bett vier …“ – „… der Schlüssel liegt, wo der Mond nicht hinkommt.“
 //   4. Wo der Mond nicht hinkommt: der Schatten unter dem Tischchen am Fenster → Kofferschlüssel →
-//      Koffer im Bettkasten von Abteil 4 → Foto: Herr K. und der Schaffner, Rückseite „24. 12.“
-//   5. Türschloss nach vorne: 2412.
+//      Koffer im Bettkasten von Abteil 4 → Foto: Herr K. und der Schaffner, Rückseite „Weihnachtsfeier 24. 12. –
+//      und ab dem 20. 04. bist du Rentner, merk ihn dir!“
+//   5. Türschloss nach vorne: 2004 (24.12. ist die falsche Fährte).
 
-const DOOR_CODE = '2412';
+const DOOR_CODE = '2004';
 const ILSE = { x: 380, y: 270 }; // hier steht, was Ilse im Schlaf murmelt
 const ILSE_COLOR = '#f3c6d8';
 const FRAGMENTS = [
@@ -418,7 +419,8 @@ async function lookPhoto(story) {
   story.flags.photoSeen = true;
   await story.say('Herr K. und der Schaffner. Seite an Seite, vor einem Weihnachtsbaum.');
   await story.say('Sie kennen sich. Gut sogar. Auf der Rückseite: „K. und ich – Weihnachtsfeier im Speisewagen. 24. 12. – dein Schaffner.“');
-  story.note('Im Koffer von Herrn K.: ein Foto von ihm und dem Schaffner, Seite an Seite vor einem Weihnachtsbaum. Rückseite: „K. und ich – Weihnachtsfeier im Speisewagen. 24. 12. – dein Schaffner.“');
+  await story.say('Und dazwischen, dick unterstrichen: „Und ab dem 20. 04. bist du Rentner – merk ihn dir!“');
+  story.note('Im Koffer von Herrn K.: ein Foto von ihm und dem Schaffner, Seite an Seite vor einem Weihnachtsbaum. Rückseite: „K. und ich – Weihnachtsfeier im Speisewagen, 24. 12. Und ab dem 20. 04. bist du Rentner – merk ihn dir! – dein Schaffner.“ (20. 04. dick unterstrichen)');
 }
 
 // ============================================================================================
@@ -507,7 +509,7 @@ function currentGoal(story) {
   }
   if (!f.suitcaseOpen) return { id: 'suitcase', lines: ['„Den Koffer unter Bett vier.“ In Abteil 4 den Bettkasten unter dem Bett ansehen.'] };
   return { id: 'door', lines: [
-    'Die Tür nach vorne will vier Ziffern. Auf dem Foto steht ein Datum.',
-    'Rückseite des Fotos: 24. 12. – also 2412.',
+    'Die Tür nach vorne will vier Ziffern. Auf dem Foto stehen zwei Daten – eins ist dick unterstrichen.',
+    'Nicht Weihnachten: „Ab dem 20. 04. bist du Rentner – merk ihn dir!“ – also 2004.',
   ] };
 }
