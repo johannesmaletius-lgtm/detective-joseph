@@ -4,7 +4,7 @@
 //   voices, musicVolume, effects   0 … 1
 
 const KEY = 'detective-joseph-einstellungen';
-const DEFAULTS = { sound: true, music: true, voices: 1, musicVolume: 1, effects: 1 };
+const DEFAULTS = { sound: true, music: true, voices: 1, musicVolume: 1, effects: 0.5 };
 
 function load() {
   try {
