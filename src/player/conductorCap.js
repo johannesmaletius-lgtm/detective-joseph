@@ -40,9 +40,9 @@ function headOf(image) {
 // width = Mützenbreite im Verhältnis zur Kopfbreite, bottom = Unterkante unter der Kopfoberkante (Bildpixel).
 // squash = Höhe gestaucht (die Mütze sitzt tief auf dem Kopf statt hoch obenauf).
 export const CAPS = {
-  front: { src: 'assets/characters/joseph/cap-front.webp', body: 233, center: 142, width: 1.2, bottom: 73, squash: 0.7 },
-  side: { src: 'assets/characters/joseph/cap-side.webp', body: 250, center: 140, width: 1.15, bottom: 74, squash: 0.7 },
-  back: { src: 'assets/characters/joseph/cap-back.webp', body: 245, center: 146, width: 1.2, bottom: 73, squash: 0.7 },
+  front: { src: 'assets/characters/joseph/cap-front.webp', body: 233, center: 142, width: 1.08, bottom: 73, squash: 0.74 },
+  side: { src: 'assets/characters/joseph/cap-side.webp', body: 250, center: 140, width: 1.04, bottom: 74, squash: 0.74 },
+  back: { src: 'assets/characters/joseph/cap-back.webp', body: 245, center: 146, width: 1.08, bottom: 73, squash: 0.74 },
 };
 const IMAGES = {};
 function capImage(kind) {
