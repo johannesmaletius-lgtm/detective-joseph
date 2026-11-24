@@ -443,6 +443,6 @@ gut einer Minute kommt (`FIRST_TUNNEL_IN` in `wagon1.js`).
 - [x] **Wagenübersicht:** Ringbahn als Startbild, Türchen-Sperre nach Datum, Spielstand
 - [x] **Wagen 9–16:** Spiegelwagen, Lautsprecherwagen, Uhrenwagen, Musiksalon, Kapelle, Zeitungswagen, Spielzimmer, Funkraum
 - [x] **Wagen 17–24:** Fotolabor bis Finale
-- [ ] Online stellen (GitHub Pages)
+- [x] Online stellen (GitHub Pages)
 - [ ] Später: Vordergrund-Ebenen (Joseph hinter Sitzen), echte Sounds
 - [x] Wagenwechsel, Spielstand (welcher Wagen), Titelbild mit „Weiterspielen“, `?wagen=N`
