@@ -67,7 +67,7 @@ export const wagon1 = {
   async intro(story) {
     story.game.overlay.fade = 1;
     await story.cutscene(async () => {
-      await story.card({ kind: 'title', title: 'Detective Joseph', subtitle: 'Wagen 1 · Das Abteil', continueText: 'Klicken zum Starten' });
+      await story.card({ kind: 'title', title: 'Wagen 1', subtitle: 'Das Abteil', continueText: 'Klicken zum Starten' });
       story.motion.restartAt(FIRST_TUNNEL_IN); // die Zeit auf dem Titelbild zählt nicht
       story.player.facing = 'front';
       await story.wait(0.6);

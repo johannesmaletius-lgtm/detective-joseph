@@ -133,6 +133,7 @@ export class Game {
     // ?tuer=N nur, wenn die Tür heute schon offen und an der Reihe ist (sonst wäre die Datumssperre umgangen)
     const startOk = START_DOOR && doorInfo(START_DOOR)?.load && canPlay(START_DOOR, { save: this.save, now: today(FAKE_DATE), test: TEST_MODE });
     if (startOk) await this.playDoor(START_DOOR, { skipIntro: SKIP_INTRO });
+    else await this.overlay.showCard({ kind: 'title', title: 'Detective Joseph', subtitle: 'Der Rätsel-Adventskalender von Johannes', continueText: 'Klicken zum Starten' });
     for (;;) {
       this.overlay.fade = 0;
       this.sound.tunnel(false);
