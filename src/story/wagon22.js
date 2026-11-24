@@ -8,8 +8,8 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 // DIE RÄTSEL
 //   1. Fahrtenschreiber: Der Papierstreifen der Unglücksnacht. Bei Kilometer 24,7 (Weiche 7, vom
 //      Tunnelfoto) steht die Uhrzeit 23:43 → 2343 öffnet die Luke zum Kohlentender.
-//   2. Im Tender verstecken und durch den Spalt warten, bis es genau halb zwölf ist. Um 23:30 kommt
-//      er herein, um 23:31 steht er am Pult. Wer zu früh herauskommt, verscheucht ihn; wer zu spät
+//   2. Im Tender verstecken und durch den Spalt warten, bis es halb zwölf ist. Um 23:30 kommt er
+//      herein, um 23:31 steht er am Pult – beides gilt. Wer zu früh herauskommt, verscheucht ihn; wer zu spät
 //      kommt, verpasst ihn. Dann: nächste Runde, noch einmal.
 //   3. Ihn zur Rede stellen: die Beweise in der richtigen Reihenfolge vorlegen –
 //      Familienfoto (vorher), Pressefoto (jene Nacht), Miras Karte (ihr Wunsch). Falsch: Er geht wortlos.
@@ -153,7 +153,7 @@ async function hide(story) {
         if (s.minute >= 33) view.close('late');
       }
     },
-    onClick: async (spot, view) => view.close(view.state.minute < 30 ? 'early' : view.state.minute < 31 ? 'early2' : 'ok'),
+    onClick: async (spot, view) => view.close(view.state.minute < 30 ? 'early' : 'ok'),
   });
   if (result === false) return story.say('Ich klettere wieder hinaus. Noch ist es nicht so weit.');
   if (result !== 'ok') return missed(story, result);
@@ -179,8 +179,6 @@ async function missed(story, how) {
     if (how === 'early') {
       await story.say('Ich klettere hinaus – zu früh! Die Tür geht auf, er sieht mich …');
       await story.say('… und weg ist er. Zurück in den Zug.');
-    } else if (how === 'early2') {
-      await story.say('Er kommt gerade herein – und sieht mich, bevor er am Pult ist. Er dreht sich um und rennt.');
     } else {
       await story.say('Zu spät! Er hat den Schlüssel schon wieder abgezogen und ist fort.');
     }
@@ -192,7 +190,7 @@ async function missed(story, how) {
   });
   if (!story.flags.timingNoted) {
     story.flags.timingNoted = true;
-    story.note('Im Tender warten: Um 23:30 kommt er herein, um 23:31 steckt er den Schlüssel ins Pult. Dann – und nicht früher – herauskommen.');
+    story.note('Im Tender warten: Um 23:30 kommt er herein, um 23:31 steckt er den Schlüssel ins Pult. Dann herauskommen – nicht früher, aber auch nicht viel später.');
   }
 }
 
@@ -298,7 +296,7 @@ function currentGoal(story) {
   if (!f.caught) {
     return { id: 'wait', lines: [
       'Im Tender verstecken und warten: Er kommt um halb zwölf.',
-      'Um 23:30 geht die Tür auf, um 23:31 steckt er den Schlüssel ins Pult. Erst dann herauskommen.',
+      'Um 23:30 geht die Tür auf, um 23:31 steckt er den Schlüssel ins Pult. Genau dann herauskommen – nicht vorher, nicht nach 23:32.',
     ] };
   }
   return { id: 'evidence', lines: [

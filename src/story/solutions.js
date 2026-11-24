@@ -154,7 +154,7 @@ export const SOLUTIONS = {
   ],
   22: [
     'Fahrtenschreiber: bei Kilometer 24,7 steht 23:43 → Luke zum Tender: 2343.',
-    'Im Tender verstecken und warten; genau um 23:31 herauskommen (zu früh verscheucht ihn, zu spät verpasst ihn – dann nächste Runde).',
+    'Im Tender verstecken und warten; um halb zwölf herauskommen (23:30–23:32) (zu früh verscheucht ihn, zu spät verpasst ihn – dann nächste Runde).',
     'Beweise in dieser Reihenfolge vorlegen: Familienfoto, Pressefoto, Miras Karte → er nimmt die Mütze ab.',
   ],
   23: [
