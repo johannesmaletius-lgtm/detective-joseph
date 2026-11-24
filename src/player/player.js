@@ -1,6 +1,7 @@
 import { loadAnimations } from '../animation/animation.js';
 import { loadImage } from '../core/assets.js';
 import { AnimationPlayer } from '../animation/animationPlayer.js';
+import { BodyLife } from '../animation/bodyLife.js';
 import { PlayerMovement, RUN_SPEED, WALK_SPEED } from './playerMovement.js';
 
 // So groß (in Pixeln) ist Joseph in seinen Bilddateien – daraus wird der Maßstab berechnet.
@@ -19,7 +20,7 @@ const POSES = [
 const SIDE_NAMES = { left: 'links', right: 'rechts' };
 const BREATH_SECONDS = 3.6;   // ein Atemzug
 const BREATH_AMOUNT = 0.009;  // wie stark sich der Oberkörper hebt (Anteil der Höhe)
-const BLINK_SECONDS = 0.14;
+const BLINK_SECONDS = [0.1, 0.18];
 const THINK_AFTER = [9, 16];  // so lange (Sekunden, zufällig) steht er still, bevor er nachdenkt
 const THINK_SECONDS = 2.8;
 
@@ -40,7 +41,7 @@ export class Player {
     this.talking = false;     // true, solange Joseph spricht (zeigt die Pose "sprechen")
     this.gesture = null;      // { pose, left } – eine Pose, die kurz gezeigt wird
     this.idleTime = 0;        // wie lange er schon steht
-    this.clock = 0;
+    this.life = new BodyLife({ breathSeconds: BREATH_SECONDS, breathAmount: BREATH_AMOUNT, sway: 0.003 });
     this.nextBlink = 2;
     this.blinkLeft = 0;
     this.nextThink = this.randomThinkDelay();
@@ -91,19 +92,24 @@ export class Player {
 
   // Kleine Lebenszeichen beim Stehen: Atmen läuft immer, Blinzeln und Sprechen von vorn und von der Seite, Nachdenken nur von vorn.
   updateIdle(dt) {
-    this.clock += dt;
+    const moving = this.movement.isMoving;
+    const direction = moving ? { left: -1, right: 1 }[this.facing] ?? 0 : 0;
+    this.life.update(dt, { moving, running: moving && this.movement.running, talking: this.talking, direction });
     if (this.movement.isMoving) {
       this.idleTime = 0;
       this.gesture = null;
       this.blinkLeft = 0;
+      this.lastFacing = this.facing;
       return;
     }
     this.idleTime += dt;
+    if (this.facing !== this.lastFacing) this.blinkLeft = 0.12; // beim Umdrehen im Stehen blinzelt man fast immer
+    this.lastFacing = this.facing;
     if (this.blinkLeft > 0) this.blinkLeft -= dt;
     this.nextBlink -= dt;
     if (this.nextBlink <= 0) {
-      this.blinkLeft = BLINK_SECONDS;
-      this.nextBlink = 2.5 + Math.random() * 3.5;
+      this.blinkLeft = BLINK_SECONDS[0] + Math.random() * (BLINK_SECONDS[1] - BLINK_SECONDS[0]);
+      this.nextBlink = 2 + Math.random() * 4.5;
       if (Math.random() < 0.2) this.nextBlink = 0.35; // manchmal zweimal hintereinander
     }
     if (this.gesture) {
@@ -140,7 +146,8 @@ export class Player {
     // Beim Richtungswechsel im Laufen an derselben Stelle im Schritt weitermachen
     const wasWalking = this.animator.animation.name.startsWith('joseph-walk');
     this.animator.setAnimation(animation, { keepPhase: walking && wasWalking });
-    this.animator.speed = walking && this.movement.running ? RUN_SPEED / WALK_SPEED : 1;
+    // Die Beine bewegen sich so schnell, wie Joseph gerade wirklich geht (auch beim Anlaufen und Abbremsen)
+    this.animator.speed = walking ? this.movement.speed / WALK_SPEED : 1;
   }
 
   draw(ctx, scene) {
@@ -151,11 +158,10 @@ export class Player {
     const drawHeight = image.height * scale;
 
     this.drawShadow(ctx, height);
-    // Atmen: der Körper dehnt sich minimal nach oben, die Füße bleiben stehen
-    const breath = this.movement.isMoving ? 0 : (Math.sin((this.clock * Math.PI * 2) / BREATH_SECONDS) * 0.5 + 0.5) * BREATH_AMOUNT;
+    // Atmen, Gewicht verlagern, Nicken, Lehnen (src/animation/bodyLife.js) – die Füße bleiben stehen
     ctx.save();
     ctx.translate(this.x, this.y);
-    ctx.scale(1, 1 + breath);
+    this.life.apply(ctx);
     ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
     ctx.restore();
   }

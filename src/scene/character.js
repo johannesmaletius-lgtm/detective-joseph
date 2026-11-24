@@ -1,4 +1,5 @@
 import { loadImage } from '../core/assets.js';
+import { BodyLife } from '../animation/bodyLife.js';
 
 // Eine Figur im Wagen, die nicht Joseph ist (Koch Bruno, Herr K., der Barkeeper …).
 //
@@ -32,15 +33,25 @@ function loadWalkIndex() {
   return walkIndex;
 }
 
-// Sprechen: der Oberkörper nickt ganz leicht mit
-const TALK_NOD = 0.006;
-
-// Lebenszeichen beim Herumstehen: alle Figuren atmen; blinzeln und "beschäftigt" nur mit data.idle
+// Lebenszeichen: alle Figuren atmen, verlagern das Gewicht, nicken beim Sprechen, lehnen sich beim Laufen
+// nach vorn und federn beim Anhalten nach (src/animation/bodyLife.js). Blinzeln und "beschäftigt" nur mit data.idle.
 const BREATH_SECONDS = 3.9;
 const BREATH_AMOUNT = 0.007;
-const BLINK_SECONDS = 0.14;
+const BLINK_SECONDS = [0.1, 0.18];
 const BUSY_EVERY = [5, 11];  // so lange (Sekunden, zufällig) steht die Figur still, bevor sie etwas tut
-const BUSY_SECONDS = 3;
+const BUSY_SECONDS = [2.2, 3.8];
+const ACCELERATE = 0.3;      // so lange (Sekunden) braucht eine Figur, um loszulaufen bzw. abzubremsen
+
+const between = ([a, b]) => a + Math.random() * (b - a);
+
+// Anteil der Strecke nach Anteil der Zeit: anlaufen – gleichmäßig gehen – abbremsen
+function walkProgress(t, duration) {
+  const ramp = Math.min(ACCELERATE / duration, 0.3);
+  const top = 1 / (1 - ramp); // Höchsttempo, damit die ganze Strecke in der Zeit geschafft wird
+  if (t < ramp) return (0.5 * top * t * t) / ramp;
+  if (t > 1 - ramp) return 1 - (0.5 * top * (1 - t) ** 2) / ramp;
+  return 0.5 * top * ramp + top * (t - ramp);
+}
 
 export class Character {
   constructor(data) {
@@ -65,7 +76,7 @@ export class Character {
     this.facing = data.facing;
     this.when = data.when;
     this.isCharacter = true;
-    this.clock = Math.random() * 10; // damit nicht alle Figuren im Gleichtakt atmen
+    this.life = new BodyLife({ breathSeconds: BREATH_SECONDS * (0.9 + Math.random() * 0.2), breathAmount: BREATH_AMOUNT });
     this.nextBlink = 1 + Math.random() * 3;
     this.blinkLeft = 0;
     this.nextBusy = this.randomBusyDelay();
@@ -73,7 +84,7 @@ export class Character {
   }
 
   randomBusyDelay() {
-    return BUSY_EVERY[0] + Math.random() * (BUSY_EVERY[1] - BUSY_EVERY[0]);
+    return between(BUSY_EVERY);
   }
 
   async load() {
@@ -148,15 +159,16 @@ export class Character {
     const w = this.walk;
     w.age += dt;
     const t = Math.min(1, w.age / w.duration);
-    const x = w.from.x + (w.to.x - w.from.x) * t;
-    const y = w.from.y + (w.to.y - w.from.y) * t;
+    const s = walkProgress(t, w.duration);
+    const x = w.from.x + (w.to.x - w.from.x) * s;
+    const y = w.from.y + (w.to.y - w.from.y) * s;
     // Schritte passend zur Strecke: ein Durchlauf (zwei Schritte) = 2 × Schrittlänge
     const stride = this.walkMeta?.[w.view]?.stride ?? 0.2;
     this.stepPhase = (this.stepPhase + Math.hypot(x - this.x, y - this.y) / (2 * stride * this.lastHeight)) % 1;
     this.x = x;
     this.y = y;
     const gliding = !this.walkFrames[w.view];
-    this.bounce = gliding && t < 1 ? Math.abs(Math.sin(w.age * 9)) * 4 : 0;
+    this.bounce = gliding && t < 1 ? Math.abs(Math.sin(w.age * 9)) * 4 * Math.min(1, s * 6, (1 - s) * 6) : 0;
     if (t >= 1) {
       this.walk = null;
       this.bounce = 0;
@@ -177,7 +189,9 @@ export class Character {
   }
 
   updateIdle(dt) {
-    this.clock += dt;
+    const w = this.walk;
+    const direction = w && w.view !== 'front' ? Math.sign(w.to.x - w.from.x) : 0;
+    this.life.update(dt, { moving: !!w, talking: this.talking, direction });
     if (this.walk || this.talking) {
       this.blinkLeft = 0;
       this.busyLeft = 0;
@@ -187,13 +201,14 @@ export class Character {
     if (this.busyLeft > 0) this.busyLeft -= dt;
     this.nextBlink -= dt;
     if (this.nextBlink <= 0) {
-      this.blinkLeft = BLINK_SECONDS;
-      this.nextBlink = 2.5 + Math.random() * 3.5;
+      this.blinkLeft = between(BLINK_SECONDS);
+      this.nextBlink = 2 + Math.random() * 4.5;
+      if (Math.random() < 0.15) this.nextBlink = 0.3; // manchmal zweimal hintereinander
     }
     this.nextBusy -= dt;
     if (this.nextBusy <= 0) {
-      this.nextBusy = this.randomBusyDelay() + BUSY_SECONDS;
-      this.busyLeft = BUSY_SECONDS;
+      this.busyLeft = between(BUSY_SECONDS);
+      this.nextBusy = this.randomBusyDelay() + this.busyLeft;
     }
   }
 
@@ -225,11 +240,8 @@ export class Character {
     }
     ctx.globalAlpha = this.alpha;
     if (!this.data.clipBottom) drawShadow(ctx, this.x, this.y, height);
-    // Atmen: minimal nach oben dehnen, die Füße bleiben stehen
-    let breath = this.walk ? 0 : (Math.sin((this.clock * Math.PI * 2) / BREATH_SECONDS) * 0.5 + 0.5) * BREATH_AMOUNT;
-    if (this.talking && !this.walk) breath += Math.max(0, Math.sin(this.clock * 9)) * TALK_NOD;
     ctx.translate(this.x, top + drawHeight);
-    ctx.scale(1, 1 + breath);
+    this.life.apply(ctx);
     ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
     ctx.restore();
   }

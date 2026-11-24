@@ -7,11 +7,17 @@
 // rechnet den passenden Wert aus).
 export const WALK_SPEED = 0.7;
 export const RUN_SPEED = 1.6;
+// Anlaufen und Abbremsen: niemand steht sofort in vollem Tempo und bleibt auf der Stelle stehen.
+const ACCELERATE = 0.22;    // Sekunden bis zum vollen Tempo
+const BRAKE_DISTANCE = 0.25; // ab so viel Rest-Strecke (in Körpergrößen) wird langsamer gegangen
+const MIN_FACTOR = 0.45;    // langsamer als das wird es dabei nicht (sonst schleicht er die letzten Zentimeter)
 
 export class PlayerMovement {
   constructor() {
     this.path = [];
     this.running = false;
+    this.factor = 0;        // 0 … 1, Anteil des vollen Tempos (wächst beim Anlaufen)
+    this.speed = 0;         // aktuelles Tempo in Körpergrößen pro Sekunde (für die Laufanimation)
   }
 
   get isMoving() {
@@ -25,16 +31,39 @@ export class PlayerMovement {
 
   stop() {
     this.path = [];
+    this.factor = 0;
+    this.speed = 0;
+  }
+
+  // Wie weit es noch bis zum Ziel ist (senkrecht wie unten gewichtet)
+  remaining(player, verticalSpeed) {
+    let total = 0;
+    let from = player;
+    for (const point of this.path) {
+      total += Math.hypot(point.x - from.x, (point.y - from.y) / verticalSpeed);
+      from = point;
+    }
+    return total;
   }
 
   // Bewegt Joseph für die Zeit dt weiter.
   // Gibt die neue Blickrichtung zurück ('left', 'right', 'front', 'back') oder null.
   update(dt, player, scene) {
-    if (!this.isMoving) return null;
+    if (!this.isMoving) {
+      this.factor = 0;
+      this.speed = 0;
+      return null;
+    }
 
     const { verticalSpeed } = scene.data.perspective;
-    const speed = this.running ? RUN_SPEED : WALK_SPEED;
-    let stepLeft = scene.characterHeightAt(player.y) * speed * dt; // so weit darf er in diesem Bild
+    const height = scene.characterHeightAt(player.y);
+    const full = this.running ? RUN_SPEED : WALK_SPEED;
+    // Anlaufen, und vor dem Ziel abbremsen (nur am Ende des ganzen Weges, nicht an jeder Ecke)
+    this.factor = Math.min(1, this.factor + dt / ACCELERATE);
+    const brake = Math.max(MIN_FACTOR, Math.min(1, this.remaining(player, verticalSpeed) / (height * BRAKE_DISTANCE * (full / WALK_SPEED))));
+    const factor = Math.max(MIN_FACTOR, Math.min(this.factor, brake));
+    this.speed = full * factor;
+    let stepLeft = height * this.speed * dt; // so weit darf er in diesem Bild
     let facing = null;
 
     while (stepLeft > 0 && this.path.length > 0) {
