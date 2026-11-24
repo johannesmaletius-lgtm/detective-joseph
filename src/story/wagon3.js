@@ -294,7 +294,7 @@ function currentGoal(story) {
         'I = 1, V = 5, X = 10. IV = 4, IX = 9, XIV = 14, XIX = 19, XXI = 21. Welche Fächer bleiben am Ende leer?',
       ] };
     }
-    return { id: 'cabinet', lines: ['Leer bleiben die Fächer I, IV, VI und IX – das ist der Code für den Schrank: 1469.'] };
+    return { id: 'cabinet', lines: ['Welche Fächer sind leer geblieben? Ihre Nummern könnten der Code sein.', 'Leer bleiben die Fächer I, IV, VI und IX – das ist der Code für den Schrank: 1469.'] };
   }
   if (!f.letterArrived) {
     return { id: 'tubes', lines: [

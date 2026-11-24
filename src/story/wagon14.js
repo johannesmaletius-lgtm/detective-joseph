@@ -271,9 +271,9 @@ function currentGoal(story) {
       'Richtig: WHISKY, ILSE, BITTERMANDEL, SCHAFFNER, ZAHNRAD, KLAVIER. Lösungswort WEICHE – für das Schloss am Archivschrank.',
     ] };
   }
-  if (!f.paperTaken) return { id: 'archive', lines: ['Im Archivschrank nachsehen.'] };
+  if (!f.paperTaken) return { id: 'archive', lines: ['Im Archivschrank nachsehen.', 'Den Archivschrank öffnen und die Zeitung darin nehmen.'] };
   if (!f.paperFixed) {
-    if (!f.snippetsTaken) return { id: 'basket', lines: ['Die herausgeschnittenen Wörter … im Papierkorb neben dem Lesetisch.'] };
+    if (!f.snippetsTaken) return { id: 'basket', lines: ['In der Zeitung fehlen Wörter. Jemand hat sie ausgeschnitten – aber wohin damit?', 'Die herausgeschnittenen Wörter … im Papierkorb neben dem Lesetisch.'] };
     return { id: 'fix', lines: [
       'Die Zeitung ansehen (Rechtsklick im Inventar) und die Schnipsel in die Löcher ziehen.',
       'Große Schrift in die Schlagzeile, kleine in den Text. Zwei Schnipsel gehören nicht dazu.',
@@ -281,8 +281,8 @@ function currentGoal(story) {
     ] };
   }
   if (!f.clockRead) {
-    if (!story.has('magnifier')) return { id: 'magnifier', lines: ['Auf dem Lesetisch liegt eine Lupe.'] };
-    return { id: 'clock', lines: ['Die Zeitung ansehen und auf die Bahnhofsuhr im Pressefoto klicken.'] };
+    if (!story.has('magnifier')) return { id: 'magnifier', lines: ['Das Pressefoto ist winzig. Ich bräuchte etwas zum Vergrößern.', 'Auf dem Lesetisch liegt eine Lupe.'] };
+    return { id: 'clock', lines: ['Auf dem Pressefoto ist eine Uhr. Mit der Lupe kann ich sie lesen.', 'Die Zeitung ansehen und auf die Bahnhofsuhr im Pressefoto klicken.'] };
   }
-  return { id: 'door', lines: ['Die Bahnhofsuhr zeigt 23:47. Die Tür will vier Ziffern: 2 – 3 – 4 – 7.'] };
+  return { id: 'door', lines: ['Die Uhrzeit auf dem Pressefoto – vielleicht ist das der Code.', 'Die Bahnhofsuhr zeigt 23:47. Die Tür will vier Ziffern: 2 – 3 – 4 – 7.'] };
 }

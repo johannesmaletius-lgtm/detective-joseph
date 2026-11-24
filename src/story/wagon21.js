@@ -267,13 +267,13 @@ function currentGoal(story) {
       'Gelb viermal (−20), Blau einmal (+3).',
     ] };
   }
-  if (!f.waterAsked) return { id: 'talk', lines: ['Jetzt mit dem Heizer reden.'] };
+  if (!f.waterAsked) return { id: 'talk', lines: ['Jetzt mit dem Heizer reden.', 'Den Heizer anklicken und mit ihm sprechen.'] };
   if (!f.watered) {
     return { id: 'water', lines: [
       'Die Pumpe zieht nur bergab. Wenn die Kohlen nach vorne rutschen, sofort die Speisepumpe benutzen.',
       'Neben der Pumpe stehen bleiben und warten. Bergab geht es im letzten Drittel der Runde, eine Weile vor dem Tunnel.',
     ] };
   }
-  if (!f.lockerOpen) return { id: 'talk2', lines: ['Noch einmal mit dem Heizer reden.'] };
-  return { id: 'door', lines: ['Die Dienstnummer am Ärmel auf dem Foto: 317.'] };
+  if (!f.lockerOpen) return { id: 'talk2', lines: ['Noch einmal mit dem Heizer reden.', 'Den Heizer anklicken und mit ihm sprechen.'] };
+  return { id: 'door', lines: ['Auf dem Foto aus dem Spind – am Ärmel steht eine Nummer.', 'Die Dienstnummer am Ärmel auf dem Foto: 317.'] };
 }

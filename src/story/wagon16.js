@@ -333,10 +333,10 @@ function currentGoal(story) {
     ] };
   }
   if (!f.messageHeard) {
-    if (!story.has('headphones')) return { id: 'headphones', lines: ['Der Lautsprecher des Funkgeräts ist kaputt. Auf dem Tisch liegen Kopfhörer.'] };
-    return { id: 'listen', lines: ['Das Funkgerät benutzen – mit den Kopfhörern.'] };
+    if (!story.has('headphones')) return { id: 'headphones', lines: ['Der Lautsprecher des Funkgeräts ist kaputt. Auf dem Tisch liegen Kopfhörer.', 'Die Kopfhörer vom Tisch nehmen.'] };
+    return { id: 'listen', lines: ['Mit Kopfhörern könnte ich das Funkgerät jetzt hören.', 'Das Funkgerät benutzen – mit den Kopfhörern.'] };
   }
-  if (!f.boardRead) return { id: 'board', lines: ['Die vier Morsezeichen am Ende … an der Wand hängt eine Morsetafel.'] };
+  if (!f.boardRead) return { id: 'board', lines: ['Die vier Morsezeichen am Ende … an der Wand hängt eine Morsetafel.', 'Die Morsetafel an der Wand ansehen und die vier Zeichen nachschlagen.'] };
   return { id: 'door', lines: [
     'Die vier Zeichen mit der Morsetafel übersetzen. Zwei Punkte und drei Striche ist eine 2.',
     '..--- ...-- ....- .---- = 2 – 3 – 4 – 1. Das ist der Türcode.',

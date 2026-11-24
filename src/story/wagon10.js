@@ -369,7 +369,7 @@ function currentGoal(story) {
       'Herr K. verschwand in Runde 108 – das stand am Filmrand im Bordkino.',
     ] };
   }
-  if (!f.recorder.loaded) return { id: 'load', lines: ['Das Tonband ins Tonbandgerät rechts einlegen: Band im Inventar anklicken, dann das Gerät.'] };
+  if (!f.recorder.loaded) return { id: 'load', lines: ['Ein Tonband allein nützt nichts. Ich brauche etwas, das es abspielt.', 'Das Tonband ins Tonbandgerät rechts einlegen: Band im Inventar anklicken, dann das Gerät.'] };
   if (!f.forwardHeard) {
     return { id: 'speed', lines: [
       'Das Band läuft zu langsam. Auf der Hülle stand, mit welcher Geschwindigkeit es aufgenommen wurde.',
@@ -382,6 +382,6 @@ function currentGoal(story) {
       'Mittlerer Regler auf „zurück“, Geschwindigkeit 19 lassen, abspielen.',
     ] };
   }
-  if (!f.cabinetOpen) return { id: 'cabinet', lines: ['„Elf ist der Nächste.“ Das Schloss am Schrank unter dem Mischpult hat zwei Rädchen: 1 – 1.'] };
-  return { id: 'door', lines: ['Der Schalter im Schrank öffnet die Tür. Dann hindurch.'] };
+  if (!f.cabinetOpen) return { id: 'cabinet', lines: ['Was hat die Stimme auf dem Band gesagt? Darin kam eine Zahl vor.', '„Elf ist der Nächste.“ Das Schloss am Schrank unter dem Mischpult hat zwei Rädchen: 1 – 1.'] };
+  return { id: 'door', lines: ['Der Schalter im Schrank öffnet die Tür. Dann hindurch.', 'Auf den Schalter im offenen Schrank klicken, dann zur Tür gehen.'] };
 }

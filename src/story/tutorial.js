@@ -57,7 +57,7 @@ export const TUTORIAL_WAGON1 = [
     done: (story) => story.happened('combined'),
   },
   {
-    text: 'Festgefahren? Taste H (oder „Tipp“ im Notizbuch): Joseph denkt laut nach. Je öfter du fragst, desto deutlicher wird er.',
+    text: 'Festgefahren? Taste H (oder „Tipp“ im Notizbuch): Joseph gibt dir zwei Tipps zum Rätsel, danach kannst du den ganzen Lösungsweg ansehen.',
     show: (story) => story.flags.backpackSearched && story.flags.letterRead,
     done: (story) => story.happened('askedHint'),
     duration: 12,

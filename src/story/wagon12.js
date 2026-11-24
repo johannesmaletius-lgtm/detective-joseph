@@ -463,7 +463,7 @@ function currentGoal(story) {
         !f.benchTaken ? 'Das Polster der Klavierbank lässt sich hochklappen.' : !f.carpetTaken ? 'Eine Teppichecke vorne am Gang steht hoch.' : 'Bei den Schallplatten: In einer Hülle steckt keine Platte.',
       ] };
     }
-    return { id: 'combine', lines: ['Die Stücke des Notenblatts zusammensetzen: ein Stück im Inventar anklicken, dann ein anderes.'] };
+    return { id: 'combine', lines: ['Ich habe mehrere Stücke eines Notenblatts. Zusammen ergeben sie vielleicht etwas.', 'Die Stücke des Notenblatts zusammensetzen: ein Stück im Inventar anklicken, dann ein anderes.'] };
   }
   if (!f.boxOpen) {
     return { id: 'box', lines: [
@@ -472,7 +472,7 @@ function currentGoal(story) {
       'Die Kreuze ergeben H – A – S – E. Das ist das Wort für die Spieldose auf dem Klavier.',
     ] };
   }
-  if (!f.pianoOpen) return { id: 'piano', lines: ['Den kleinen Schlüssel aus der Spieldose am Klavier benutzen.'] };
+  if (!f.pianoOpen) return { id: 'piano', lines: ['In der Spieldose lag ein kleiner Schlüssel. Wo gibt es hier ein kleines Schloss?', 'Den kleinen Schlüssel aus der Spieldose am Klavier benutzen.'] };
   if (!f.mollPlayed) {
     return { id: 'knock', lines: [
       'Herrn Moll bitten, das Lied zu spielen.',
@@ -486,5 +486,5 @@ function currentGoal(story) {
       'Am Klavier D – H – A – G spielen.',
     ] };
   }
-  return { id: 'door', lines: ['Die Tür ist offen.'] };
+  return { id: 'door', lines: ['Die Tür ist offen.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

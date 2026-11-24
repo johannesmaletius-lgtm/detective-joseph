@@ -21,7 +21,7 @@ export class Settings {
   // Zeilen des Menüs (Lösungsweg nur im Wagen)
   rows() {
     const rows = [];
-    if (!this.game.inCalendar) rows.push({ kind: 'hint', label: 'Lösungsweg zeigen (H)' });
+    if (!this.game.inCalendar) rows.push({ kind: 'hint', label: 'Tipp / Lösungsweg (H)' });
     rows.push(
       { kind: 'toggle', key: 'sound', label: 'Ton (M)' },
       { kind: 'toggle', key: 'music', label: 'Musik' },
@@ -233,7 +233,7 @@ export class Settings {
     ctx.fillStyle = possible ? '#2a1a0e' : 'rgba(243, 226, 191, 0.5)';
     ctx.font = `bold 18px ${SANS}`;
     ctx.textAlign = 'center';
-    ctx.fillText(possible ? row.label : 'Lösungsweg – gerade nicht möglich', x + w / 2, row.y + 1);
+    ctx.fillText(possible ? row.label : 'Tipp – gerade nicht möglich', x + w / 2, row.y + 1);
   }
 
   drawButton(ctx, row, hovered, label) {

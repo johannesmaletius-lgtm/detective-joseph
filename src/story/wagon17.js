@@ -302,7 +302,7 @@ function currentGoal(story) {
       'Ventil 1 und 2 auf, Ventil 3 zu.',
     ] };
   }
-  if (!f.planRead) return { id: 'glass', lines: ['Die Scheiben sind beschlagen. Auf einer steht etwas – Rechtsklick auf das Glas oben.'] };
+  if (!f.planRead) return { id: 'glass', lines: ['Die Scheiben im Dach sind beschlagen. Ob jemand etwas hineingeschrieben hat?', 'Die Scheiben sind beschlagen. Auf einer steht etwas – Rechtsklick auf das Glas oben.'] };
   if (!f.roseOpen) {
     return { id: 'cans', lines: [
       'Genau 4 Liter für die Rose, mit einer 3-Liter- und einer 5-Liter-Kanne.',
@@ -310,7 +310,7 @@ function currentGoal(story) {
       '5er füllen, in die 3er gießen, 3er ausleeren, 5er in die 3er (jetzt 2 drin), 5er füllen, in die 3er gießen bis voll → 4 Liter in der 5er. Rose gießen.',
     ] };
   }
-  if (!f.listRead) return { id: 'box', lines: ['Der winzige Schlüssel passt zur Kiste unter dem Pflanztisch.'] };
+  if (!f.listRead) return { id: 'box', lines: ['Ich habe einen winzigen Schlüssel. Hier muss irgendwo ein kleines Schloss sein.', 'Der winzige Schlüssel passt zur Kiste unter dem Pflanztisch.'] };
   return { id: 'door', lines: [
     'Zwei Ziffern. Auf der Liste stehen hinter den offenen Namen Wagennummern.',
     '5 + 11 + 12 + 15 + 1 = 44.',

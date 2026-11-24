@@ -532,7 +532,7 @@ async function tryDoor(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.metBruno) return { id: 'bruno', lines: ['Der Koch steht neben der Küche. Vielleicht weiß er etwas über die Gläser.'] };
+  if (!f.metBruno) return { id: 'bruno', lines: ['Der Koch steht neben der Küche. Vielleicht weiß er etwas über die Gläser.', 'Bruno anklicken und mit ihm reden.'] };
   if (!f.seatingDone) {
     if (f.cluesHeard < 6) {
       return { id: `clues${f.cluesHeard}`, lines: [
@@ -552,8 +552,8 @@ function currentGoal(story) {
       'Am Fenster kann ich auf den Tunnel warten.',
     ] };
   }
-  if (!f.sniffedPoison) return { id: 'sniff', lines: ['Im Tunnel war jemand am Tablett. Ich sollte noch einmal an den Gläsern riechen.'] };
-  if (!f.heardOrder) return { id: 'order', lines: ['Glas 3 ist vergiftet. Aber wer bekommt es? Bruno fragen, wie er den Wein serviert.'] };
+  if (!f.sniffedPoison) return { id: 'sniff', lines: ['Im Tunnel war jemand am Tablett. Ich sollte noch einmal an den Gläsern riechen.', 'Das Tablett ansehen und an den Gläsern riechen.'] };
+  if (!f.heardOrder) return { id: 'order', lines: ['Glas 3 ist vergiftet. Aber wer bekommt es? Bruno fragen, wie er den Wein serviert.', 'Bruno fragen, in welcher Reihenfolge er serviert.'] };
   if (!f.billTaken) {
     return { id: 'bill', lines: [
       'Unter dem Tablett liegt Brunos Rechnung. Aber Bruno passt auf.',
@@ -569,5 +569,5 @@ function currentGoal(story) {
       '7 × 14 = 98. Dazu 5 × Wein zu 4 = 20 und 2 × Kakao zu 2 = 4. Zusammen 122.',
     ] };
   }
-  return { id: 'door', lines: ['Die Kasse stimmt. Die Tür nach vorne ist offen.'] };
+  return { id: 'door', lines: ['Die Kasse stimmt. Die Tür nach vorne ist offen.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

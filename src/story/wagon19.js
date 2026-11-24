@@ -324,6 +324,6 @@ function currentGoal(story) {
     'Im Negativ sind die hellen Lampen dunkle Punkte. Je tiefer der Zug im Tunnel ist, desto weniger Lampen liegen noch vor ihm.',
     'Erst das Bild mit fünf Lampen vorn, dann vier, drei, zwei, eine – zuletzt keine (dort teilt sich das Gleis).',
   ] };
-  if (!f.enlarged) return { id: 'enlarge', lines: ['Das letzte Negativ in den Vergrößerer: den Vergrößerer links benutzen.'] };
-  return { id: 'door', lines: ['Der Kilometerstein auf dem Foto: 24,7 → 247.'] };
+  if (!f.enlarged) return { id: 'enlarge', lines: ['Von einem Negativ fehlt noch ein Bild. Wie wird hier aus einem Negativ ein Foto?', 'Das letzte Negativ in den Vergrößerer: den Vergrößerer links benutzen.'] };
+  return { id: 'door', lines: ['Auf dem vergrößerten Foto steht eine Zahl – am Kilometerstein.', 'Der Kilometerstein auf dem Foto: 24,7 → 247.'] };
 }

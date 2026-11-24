@@ -380,7 +380,7 @@ function currentGoal(story) {
         'Die Anhänger nach Uhrzeit sortieren, die früheste nach links. Dann die Anfangsbuchstaben lesen.',
       ] };
     }
-    return { id: 'green', lines: ['WEICHE SIEBEN – sechs Buchstaben für den grünen Koffer: WEICHE.'] };
+    return { id: 'green', lines: ['Die Anhänger ergeben zwei Wörter. Der grüne Koffer hat ein Schloss mit sechs Buchstaben.', 'WEICHE SIEBEN – sechs Buchstaben für den grünen Koffer: WEICHE.'] };
   }
   if (!f.caseFree) {
     return { id: 'stack', lines: [
@@ -390,7 +390,7 @@ function currentGoal(story) {
       'Ziel: Feld links. Kleinster nach rechts, zweiter nach links, kleinster nach links, dritter nach rechts, kleinster auf den Stapel, zweiter nach rechts, kleinster nach rechts, vierter nach links – dann kleinster nach links, zweiter auf den Stapel, kleinster auf den Stapel, dritter nach links, kleinster nach rechts, zweiter nach links, kleinster nach links.',
     ] };
   }
-  if (!f.weighed) return { id: 'weigh', lines: ['Den Koffer wiegen: Koffer im Inventar anklicken, dann die Gepäckwaage.'] };
-  if (!f.pagesRead) return { id: 'pages', lines: ['Was ist im Koffer? Rechtsklick auf den Koffer im Inventar.'] };
-  return { id: 'door', lines: ['17,3 kg, ohne Komma: 173 – das ist der Code für die Tür.'] };
+  if (!f.weighed) return { id: 'weigh', lines: ['Der unterste Koffer ist schwer. Wie schwer genau?', 'Den Koffer wiegen: Koffer im Inventar anklicken, dann die Gepäckwaage.'] };
+  if (!f.pagesRead) return { id: 'pages', lines: ['Der Koffer ist gewogen. Jetzt sollte ich hineinschauen.', 'Was ist im Koffer? Rechtsklick auf den Koffer im Inventar.'] };
+  return { id: 'door', lines: ['Das Gewicht des Koffers – vielleicht ist das der Code.', '17,3 kg, ohne Komma: 173 – das ist der Code für die Tür.'] };
 }

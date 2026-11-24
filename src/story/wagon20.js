@@ -315,7 +315,7 @@ async function tryDoor(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.metMira) return { id: 'mira', lines: ['Mit Mira reden.'] };
+  if (!f.metMira) return { id: 'mira', lines: ['Mit Mira reden.', 'Mira anklicken und mit ihr sprechen.'] };
   if (!f.parcelsSorted) {
     return { id: 'parcels', lines: [
       'Die Anhänger unter die passenden Pakete. Wer hat mir unterwegs was gezeigt? Uhren, Löffel, Wolle, Noten, ein Hut, Flaschen …',
@@ -323,7 +323,7 @@ function currentGoal(story) {
       'Aufziehloch = Herr Tick, Löffel = Bruno, Wolle = Ilse, Notenblatt = Moll, Hutschachtel = Herr K., Flasche = Barkeeper. Der Heizer bekommt hier nichts.',
     ] };
   }
-  if (!f.miraTold) return { id: 'mira2', lines: ['Mira noch einmal ansprechen.'] };
+  if (!f.miraTold) return { id: 'mira2', lines: ['Vielleicht hat Mira jetzt mehr zu erzählen.', 'Mira noch einmal ansprechen.'] };
   if (!f.listRead) {
     return { id: 'stencil', lines: [
       '„Mit Sternen gucken“: Die Rolle Geschenkpapier rechts hat ausgestanzte Sterne.',
@@ -338,6 +338,6 @@ function currentGoal(story) {
       'Die stehende Kiste ganz links oben nach oben, die liegende in der Mitte nach links, die stehende über der Luke-Kiste zweimal nach oben, dann die Kiste auf der Luke zweimal nach rechts.',
     ] };
   }
-  if (!f.opened) return { id: 'ribbons', lines: ['Miras Paket ansehen (Rechtsklick im Inventar). Nur das oberste Band geht ab: rot, dann gold, blau, weiß, grün.'] };
-  return { id: 'door', lines: ['Auf der Kelle steht der Code: 2512.'] };
+  if (!f.opened) return { id: 'ribbons', lines: ['Miras Paket ist mit Bändern verschnürt. Sie gehen nur in einer bestimmten Reihenfolge ab.', 'Miras Paket ansehen (Rechtsklick im Inventar). Nur das oberste Band geht ab: rot, dann gold, blau, weiß, grün.'] };
+  return { id: 'door', lines: ['Im Paket war eine Kelle. Steht darauf etwas?', 'Auf der Kelle steht der Code: 2512.'] };
 }

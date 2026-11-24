@@ -424,9 +424,9 @@ function currentGoal(story) {
           f.ticketLeftTaken ? 'Die andere Hälfte der Karte … wo stöbert man im Kino herum? In der Popcornmaschine!' : 'Auf einem Sessel links liegt eine abgerissene Kinokarte.',
         ] };
       }
-      return { id: 'combine', lines: ['Die beiden Hälften der Kinokarte zusammensetzen: eine Hälfte im Inventar anklicken, dann die andere.'] };
+      return { id: 'combine', lines: ['Ich habe zwei Hälften einer Kinokarte.', 'Die beiden Hälften der Kinokarte zusammensetzen: eine Hälfte im Inventar anklicken, dann die andere.'] };
     }
-    return { id: 'canister', lines: ['Auf der Kinokarte stehen Reihe 3 und Platz 12. Das Schloss der Filmdose hat drei Rädchen: 3 – 1 – 2.'] };
+    return { id: 'canister', lines: ['Auf der Kinokarte stehen Reihe und Platz. Die Filmdose hat ein Zahlenschloss.', 'Auf der Kinokarte stehen Reihe 3 und Platz 12. Das Schloss der Filmdose hat drei Rädchen: 3 – 1 – 2.'] };
   }
   if (!f.framesDone) {
     return { id: 'frames', lines: [
@@ -436,14 +436,14 @@ function currentGoal(story) {
     ] };
   }
   if (!f.filmShown) {
-    if (!f.reelLoaded) return { id: 'reel', lines: ['Die Filmrolle in den Projektor einlegen: Filmrolle im Inventar anklicken, dann den Projektor.'] };
+    if (!f.reelLoaded) return { id: 'reel', lines: ['Eine Filmrolle … und dort steht ein Projektor.', 'Die Filmrolle in den Projektor einlegen: Filmrolle im Inventar anklicken, dann den Projektor.'] };
     return { id: 'focus', lines: [
       'Der Projektor muss scharf gestellt werden. Das große Rad dreht das kleine mit.',
       `Das Bild wird scharf bei Objektiv ${FOCUS_TARGET.a} und Bildfenster ${FOCUS_TARGET.b}. Das Bildfenster allein springt immer zwei weiter.`,
       'Von 0/0 aus: dreimal das Objektiv (3/3), dann zweimal das Bildfenster (3/7).',
     ] };
   }
-  if (!f.edgeRead) return { id: 'edge', lines: ['Das letzte Bild auf der Leinwand genauer ansehen – vielleicht steht am Filmrand etwas.'] };
-  return { id: 'door', lines: [`Am Filmrand stand „Runde ${FILM_ROUND}“. Die Tür will vier Ziffern.`] };
+  if (!f.edgeRead) return { id: 'edge', lines: ['Das letzte Bild auf der Leinwand genauer ansehen – vielleicht steht am Filmrand etwas.', 'Auf das letzte Bild auf der Leinwand klicken und den Rand absuchen.'] };
+  return { id: 'door', lines: ['Am Filmrand stand eine Zahl.', `Am Filmrand stand „Runde ${FILM_ROUND}“. Die Tür will vier Ziffern.`] };
 }
 

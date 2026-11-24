@@ -271,7 +271,7 @@ function drawExit(ctx) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.headphonesOn) return { id: 'phones', lines: ['Die Stimme zieht auch an mir. Etwas, das die Ohren zuhält … die Kopfhörer aus dem Funkraum (Rechtsklick im Inventar).'] };
+  if (!f.headphonesOn) return { id: 'phones', lines: ['Die Stimme im Tunnel zieht an mir. Ich muss sie irgendwie ausblenden.', 'Die Stimme zieht auch an mir. Etwas, das die Ohren zuhält … die Kopfhörer aus dem Funkraum (Rechtsklick im Inventar).'] };
   if (f.junction < GATE) {
     return { id: 'maze', lines: [
       'An jeder Abzweigung ist ein Kreidezeichen an der linken Wand – die Zeichen vom Türschloss aus Wagen 1.',
@@ -279,5 +279,5 @@ function currentGoal(story) {
       'Der ganze Weg: links, geradeaus, rechts, geradeaus, links, rechts.',
     ] };
   }
-  return { id: 'gear', lines: ['Im Tor fehlt ein Zahnrad. Herrn Ticks Zahnrad im Inventar anklicken, dann die leere Achse.'] };
+  return { id: 'gear', lines: ['Das Gittertor hat einen Zahnradmechanismus. Fehlt da etwas?', 'Im Tor fehlt ein Zahnrad. Herrn Ticks Zahnrad im Inventar anklicken, dann die leere Achse.'] };
 }

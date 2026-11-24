@@ -261,7 +261,7 @@ async function ending(story) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.drawerOpen) {
-    if (!f.bookRead) return { id: 'book', lines: ['Die Schublade will einen Namen. Auf dem Schreibtisch liegt das Dienstbuch.'] };
+    if (!f.bookRead) return { id: 'book', lines: ['Die Schublade will einen Namen. Auf dem Schreibtisch liegt das Dienstbuch.', 'Das Dienstbuch lesen – die Tauschvermerke im Schichtplan führen zu einem Namen.'] };
     return { id: 'drawer', lines: [
       'Die Tauschvermerke der Reihe nach durchgehen: Wer hatte am Ende den 24.?',
       'J. gab den 24. an Moser. Moser gab den 24. an Kern. Der dritte Tausch betrifft den 25. – nicht den 24.',
@@ -280,5 +280,5 @@ function currentGoal(story) {
       'Weiche 1 nach oben, Weiche 2 nach rechts, Weiche 4 nach rechts, Weiche 6 nach rechts.',
     ] };
   }
-  return { id: 'door', lines: ['Die Tür ist entriegelt.'] };
+  return { id: 'door', lines: ['Die Tür ist entriegelt.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

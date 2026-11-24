@@ -358,7 +358,7 @@ async function leaveWagon(story) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.leversDone) {
-    if (!f.pullCount) return { id: 'pull', lines: ['An der Stirnwand sind zwei Hebel. Was passiert, wenn ich einen ziehe?'] };
+    if (!f.pullCount) return { id: 'pull', lines: ['An der Stirnwand sind zwei Hebel. Was passiert, wenn ich einen ziehe?', 'Einen der beiden Hebel an der Stirnwand ziehen und dann in den Spiegel schauen.'] };
     if (!f.scratchesRead) {
       return { id: 'scratches', lines: [
         'Rechts an der Wand sind Kratzer. Was steht da?',
@@ -383,5 +383,5 @@ function currentGoal(story) {
       'A und B wie „\\“, C und D wie „/“.',
     ] };
   }
-  return { id: 'door', lines: ['Die Tür ist offen. Hindurchgehen.'] };
+  return { id: 'door', lines: ['Die Tür ist offen. Hindurchgehen.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

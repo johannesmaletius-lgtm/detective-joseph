@@ -390,7 +390,7 @@ async function tryDoor(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.heardVoice && !f.flapOpen) return { id: 'bell', lines: ['Auf dem Tresen steht eine Glocke: „Bitte klingeln.“'] };
+  if (!f.heardVoice && !f.flapOpen) return { id: 'bell', lines: ['Auf dem Tresen steht eine Glocke: „Bitte klingeln.“', 'Auf die Glocke am Tresen klicken.'] };
   if (!f.flapOpen) {
     if (!f.indexDone) {
       return { id: 'index', lines: [
@@ -399,7 +399,7 @@ function currentGoal(story) {
         'Hut (Runde 109), Schal (110), Brille (112), Spazierstock (115). Die Lagernummern der Reihe nach sind der Code.',
       ] };
     }
-    return { id: 'padlock', lines: ['Die Lagernummern der Karten von Herrn K., der Reihe nach: 7, 2, 4, 9 – das Vorhängeschloss an der Klappe.'] };
+    return { id: 'padlock', lines: ['Die Karteikarten von Herrn K. haben Lagernummern. In der richtigen Reihenfolge …', 'Die Lagernummern der Karten von Herrn K., der Reihe nach: 7, 2, 4, 9 – das Vorhängeschloss an der Klappe.'] };
   }
   if (!f.slipDone) {
     return { id: 'shelf', lines: [
@@ -407,8 +407,8 @@ function currentGoal(story) {
       'Zum Gruß lüftet man den Hut. Rot um den Hals: der Schal. Rauch nach dem Essen: die Pfeife. Das Geschenk mit rotem Siegel ist ein Päckchen.',
     ] };
   }
-  if (!f.lockerOpen) return { id: 'give', lines: ['Der Fundschein ist ausgefüllt. Abgeben: an der Glocke klingeln.'] };
-  if (!f.watchTaken) return { id: 'locker', lines: ['Die Stimme sagte: Schließfach zwölf. Die Schließfächer sind rechts an der Wand.'] };
+  if (!f.lockerOpen) return { id: 'give', lines: ['Der Fundschein ist fertig. Aber wem gebe ich ihn?', 'Der Fundschein ist ausgefüllt. Abgeben: an der Glocke klingeln.'] };
+  if (!f.watchTaken) return { id: 'locker', lines: ['Die Stimme sagte: Schließfach zwölf. Die Schließfächer sind rechts an der Wand.', 'Rechts an der Wand das Schließfach zwölf öffnen.'] };
   if (!f.watchOpen) {
     if (!f.watchSet) {
       return { id: 'watch', lines: [
@@ -417,9 +417,9 @@ function currentGoal(story) {
         'Rechtsklick auf die Taschenuhr, dann an den Rädern drehen, bis sie genau 12 Uhr zeigt.',
       ] };
     }
-    return { id: 'wait', lines: ['Die Uhr steht auf der Tunnelzeit. Jetzt auf den Tunnel warten – am Fenster.'] };
+    return { id: 'wait', lines: ['Die Uhr steht jetzt richtig. Vielleicht passiert etwas im Tunnel.', 'Die Uhr steht auf der Tunnelzeit. Jetzt auf den Tunnel warten – am Fenster.'] };
   }
-  return { id: 'door', lines: [`Im Deckel der Uhr steht der Türcode: ${DOOR_CODE}. Die Tür ist hinter der offenen Klappe.`] };
+  return { id: 'door', lines: ['Die Taschenuhr hat sich geöffnet. Im Deckel steht etwas.', `Im Deckel der Uhr steht der Türcode: ${DOOR_CODE}. Die Tür ist hinter der offenen Klappe.`] };
 }
 
 function pick(list) {

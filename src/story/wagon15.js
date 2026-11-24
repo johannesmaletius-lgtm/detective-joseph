@@ -362,7 +362,7 @@ async function tryDoor(story) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.ispyDone) {
-    if (f.ispyRound === undefined) return { id: 'mira', lines: ['Mit Mira reden. Vielleicht will sie spielen.'] };
+    if (f.ispyRound === undefined) return { id: 'mira', lines: ['Mit Mira reden. Vielleicht will sie spielen.', 'Mira anklicken und mit ihr sprechen.'] };
     const round = ISPY[f.ispyRound];
     const answers = { drum: 'die Trommel im Regal', horse: 'das Schaukelpferd', window: 'ein Fenster – dahinter liegt irgendwo der echte Tunnel' };
     return { id: `ispy${f.ispyRound}`, lines: [`Mira sagt: ${round.clue} Auf das Gesuchte klicken.`, `Gemeint ist ${answers[round.answer]}.`] };
@@ -374,13 +374,13 @@ function currentGoal(story) {
       'Reihenfolge hinter der Lok: Bank, Koffer, Brief, Weinglas, Bett, Schirm, Whisky, Film, Spiegel, Trichter, Uhr, Note, Kreuz, Zeitung.',
     ] };
   }
-  if (!f.keyTaken) return { id: 'key', lines: ['Die Bahn steht im Spielzeugtunnel. Dort nachsehen.'] };
-  if (!f.houseOpen) return { id: 'house', lines: ['Der rote Schlüssel passt in den Puppenhaus-Bahnhof rechts.'] };
+  if (!f.keyTaken) return { id: 'key', lines: ['Die Bahn steht im Spielzeugtunnel. Dort nachsehen.', 'Den Spielzeugtunnel an der Modellbahn ansehen.'] };
+  if (!f.houseOpen) return { id: 'house', lines: ['Im Spielzeugtunnel lag ein roter Schlüssel. Was hier im Zimmer hat ein Schloss?', 'Der rote Schlüssel passt in den Puppenhaus-Bahnhof rechts.'] };
   if (!f.drawingFound) {
     return { id: 'figures', lines: [
       '„Stell sie so hin, wie es war. In der Nacht.“ Wie war es laut Zeitung vom 25. Dezember?',
       'Der Schaffner wartete auf dem Bahnsteig. Seine Frau und seine Tochter saßen im Zug. Koch und Hund gehören nicht dazu.',
     ] };
   }
-  return { id: 'door', lines: ['„Die Tür-Geheimzahl ist mein Geburtstag!“ – der 7. 11. Die Tür will vier Ziffern: 0 – 7 – 1 – 1.'] };
+  return { id: 'door', lines: ['Mira hat etwas über die Tür-Geheimzahl verraten. Was hat sie gesagt?', '„Die Tür-Geheimzahl ist mein Geburtstag!“ – der 7. 11. Die Tür will vier Ziffern: 0 – 7 – 1 – 1.'] };
 }

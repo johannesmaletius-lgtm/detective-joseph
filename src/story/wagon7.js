@@ -446,9 +446,9 @@ async function ending(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.metK) return { id: 'k', lines: ['Da hinten steht Herr K. Ich muss ihn warnen.'] };
+  if (!f.metK) return { id: 'k', lines: ['Da hinten steht Herr K. Ich muss ihn warnen.', 'Zum hinteren Tisch gehen und Herrn K. ansprechen.'] };
   if (!f.overheard) {
-    if (!f.askedK) return { id: 'askK', lines: ['Herr K. redet nicht mit mir. Vielleicht weiß der Barkeeper, wie man an ihn herankommt.'] };
+    if (!f.askedK) return { id: 'askK', lines: ['Herr K. redet nicht mit mir. Vielleicht weiß der Barkeeper, wie man an ihn herankommt.', 'Den Barkeeper anklicken und nach Herrn K. fragen.'] };
     const music = musicOn(story);
     if (!music && !story.has('coin')) {
       return { id: 'coin', lines: [
@@ -457,17 +457,17 @@ function currentGoal(story) {
         'Ist die Münze verbraucht? Nach dem nächsten Tunnel liegt sie wieder im Aschenbecher. Am Fenster kann ich warten.',
       ] };
     }
-    if (!music) return { id: 'jukebox', lines: ['Die Münze in die Musikbox: Münze im Inventar anklicken, dann die Musikbox.'] };
+    if (!music) return { id: 'jukebox', lines: ['Ich habe eine Münze. Und hier steht doch eine Musikbox.', 'Die Münze in die Musikbox: Münze im Inventar anklicken, dann die Musikbox.'] };
     if (!story.has('newspaper')) {
       return { id: 'hide', lines: [
         'Die Musik läuft. Aber wenn Herr K. merkt, dass ich zuhöre, schweigt er. Ich muss mich verstecken.',
         'Auf dem Tresen liegt eine Zeitung. Groß genug, um sich dahinter zu verstecken.',
       ] };
     }
-    return { id: 'listen', lines: ['Musik läuft, Zeitung habe ich: Zeitung im Inventar anklicken, dann den Tisch, an dem Herr K. steht.'] };
+    return { id: 'listen', lines: ['Hinter einer Zeitung fällt man nicht auf. Wo könnte ich mithören?', 'Musik läuft, Zeitung habe ich: Zeitung im Inventar anklicken, dann den Tisch, an dem Herr K. steht.'] };
   }
   if (!f.served) {
-    if (!f.askedUsual) return { id: 'usual', lines: ['Herr K. will „sein Übliches“. Den Barkeeper fragen, was das ist.'] };
+    if (!f.askedUsual) return { id: 'usual', lines: ['Herr K. will „sein Übliches“. Den Barkeeper fragen, was das ist.', 'Den Barkeeper anklicken und nach dem Üblichen fragen.'] };
     if (!story.has('drink')) {
       return { id: 'bottle', lines: [
         'Die drei leeren Gläser auf dem Tresen: Wie sieht der Rest aus, wie riecht er? Und welche Flasche passt dazu?',
@@ -475,9 +475,9 @@ function currentGoal(story) {
         'Der Whisky: „torfig · rauchig“, und es fehlen genau drei Gläser.',
       ] };
     }
-    return { id: 'serve', lines: ['Den Whisky Herrn K. geben: Glas im Inventar anklicken, dann Herrn K.'] };
+    return { id: 'serve', lines: ['Ich habe Herrn K.s Getränk. Jetzt muss es nur noch zu ihm.', 'Den Whisky Herrn K. geben: Glas im Inventar anklicken, dann Herrn K.'] };
   }
-  if (!f.coasterRead) return { id: 'coaster', lines: ['Herrn K.s Bierdeckel ansehen: Rechtsklick auf den Bierdeckel im Inventar.'] };
+  if (!f.coasterRead) return { id: 'coaster', lines: ['Herr K. hat mir seinen Bierdeckel gegeben. Steht etwas darauf?', 'Herrn K.s Bierdeckel ansehen: Rechtsklick auf den Bierdeckel im Inventar.'] };
   return { id: 'door', lines: [
     'Die Tür hat dieselben vier Zeichen wie der Bierdeckel – aber in anderer Reihenfolge.',
     'Auf der Tür: Turm, Laterne rechts, Tunnel, Laterne links. Auf dem Deckel: Turm 1, Laterne rechts 9, Tunnel 2, Laterne links 6.',

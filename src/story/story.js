@@ -202,20 +202,22 @@ export class Story {
     return this.script.itemName?.(this, id) ?? ITEMS[id].name;
   }
 
-  // Taste H: der komplette Lösungsweg des Wagens (src/story/solutions.js). Ohne Eintrag: Josephs Tipp.
+  // Taste H: erst zwei leichte Tipps zum aktuellen Rätsel (hint() im Drehbuch), danach der komplette
+  // Lösungsweg des Wagens (src/story/solutions.js) – mit Nachfrage.
   async hint() {
     if (this.isBusy) return;
     this.event('askedHint');
     this.game.voices.react('think');
+    const tip = this.script.hint?.(this);
     const steps = SOLUTIONS[this.door];
-    if (!steps) {
-      await this.respond(this.script.hint?.(this) ?? 'Ich sehe mich am besten noch einmal gründlich um.');
+    if (tip || !steps) {
+      await this.respond(tip ?? 'Ich sehe mich am besten noch einmal gründlich um.');
       return;
     }
     const pages = solutionPages(steps);
     this.busy++;
     try {
-      // Erst nachfragen – der Lösungsweg verrät alles
+      // Beide Tipps sind verbraucht – erst nachfragen, der Lösungsweg verrät alles
       const sure = await this.game.views.dialogue.open({
         options: ['Ja – den ganzen Lösungsweg zeigen.', 'Nein, ich knoble lieber weiter.'],
       });
@@ -227,7 +229,6 @@ export class Story {
       this.busy--;
     }
   }
-
 
   // Joseph läuft zu einem Punkt. Ergebnis: true = angekommen, false = unterwegs abgebrochen
   walkTo(x, y, facing) {

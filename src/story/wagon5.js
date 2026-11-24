@@ -466,7 +466,7 @@ async function tryDoor(story) {
 function currentGoal(story) {
   const f = story.flags;
   if (!f.room4Open) {
-    if (!f.keyholeSeen) return { id: 'door4', lines: ['Herr K. schläft in Abteil 4. Ich sollte mir die Tür ansehen.'] };
+    if (!f.keyholeSeen) return { id: 'door4', lines: ['Herr K. schläft in Abteil 4. Ich sollte mir die Tür ansehen.', 'Zur Tür von Abteil 4 gehen und das Schlüsselloch ansehen.'] };
     const missing = [];
     if (!story.has('page') && !f.pageUnder && !f.keyOnPage) missing.push('page');
     if (!f.needleTaken) missing.push('needle');
@@ -484,6 +484,7 @@ function currentGoal(story) {
       ] };
     }
     return { id: 'trick', lines: [
+      'Der Schlüssel steckt innen im Schloss. Fällt er heraus, müsste ich ihn irgendwie auffangen …',
       'Blatt und Stricknadel habe ich. Erst das Blatt unter die Tür von Abteil 4 schieben, dann mit der Nadel den Schlüssel herausstoßen, dann die Tür anklicken.',
     ] };
   }
@@ -505,7 +506,7 @@ function currentGoal(story) {
       'Unter das Tischchen am Fenster fällt nie Mondlicht.',
     ] };
   }
-  if (!f.suitcaseOpen) return { id: 'suitcase', lines: ['„Den Koffer unter Bett vier.“ In Abteil 4 den Bettkasten unter dem Bett ansehen.'] };
+  if (!f.suitcaseOpen) return { id: 'suitcase', lines: ['Was hat Ilse im Schlaf über den Koffer gesagt?', '„Den Koffer unter Bett vier.“ In Abteil 4 den Bettkasten unter dem Bett ansehen.'] };
   return { id: 'door', lines: [
     'Die Tür nach vorne will vier Ziffern. Auf dem Foto steht ein Datum.',
     'Rückseite des Fotos: 24. 12. – also 2412.',

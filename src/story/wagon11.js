@@ -407,7 +407,7 @@ function currentGoal(story) {
     ] };
   }
   if (!f.planned) return { id: 'talk', lines: ['Mit Herrn Tick reden: Wann kommt der Ruf? Hat er Angst?', 'Danach fragen, was wäre, wenn er den Ruf gar nicht hört.'] };
-  if (!f.noteFound) return { id: 'note', lines: ['Auf Herrn Ticks Werkbank liegt ein Zettel, wie seine Uhren gehen.'] };
+  if (!f.noteFound) return { id: 'note', lines: ['Auf Herrn Ticks Werkbank liegt ein Zettel, wie seine Uhren gehen.', 'Herrn Ticks Werkbank ansehen – der Zettel erklärt, wie die Uhren gehen.'] };
   if (!f.saved) {
     const correct = f.set.grandfather === TARGET.grandfather && f.set.cuckoo === TARGET.cuckoo;
     if (!correct) {
@@ -418,8 +418,8 @@ function currentGoal(story) {
       ] };
     }
     const armed = f.running?.grandfather === TARGET.grandfather && f.running?.cuckoo === TARGET.cuckoo;
-    if (!armed) return { id: 'tunnel', lines: ['Die Uhren stehen richtig, laufen aber erst nach dem nächsten Tunnel los. Auf den Tunnel warten (Fenster).'] };
-    return { id: 'wait', lines: ['Jetzt bis zum Ruf warten – am schnellsten auf dem Sofa.'] };
+    if (!armed) return { id: 'tunnel', lines: ['Die Uhren stehen jetzt richtig. Fehlt nur noch, dass sie loslaufen.', 'Die Uhren stehen richtig, laufen aber erst nach dem nächsten Tunnel los. Auf den Tunnel warten (Fenster).'] };
+    return { id: 'wait', lines: ['Alles ist bereit. Jetzt heißt es: Geduld.', 'Jetzt bis zum Ruf warten – am schnellsten auf dem Sofa.'] };
   }
-  return { id: 'door', lines: ['Herr Tick hat die Tür geöffnet.'] };
+  return { id: 'door', lines: ['Herr Tick hat die Tür geöffnet.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

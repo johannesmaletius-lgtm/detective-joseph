@@ -70,12 +70,15 @@ export async function waitForTunnel(story, line = 'Ich warte kurz auf den Tunnel
   });
 }
 
-// Tipps: erst ein Schubs, dann immer deutlicher. goal = { id, lines }
+// Tipps: zwei leichte Tipps je Rätsel, danach null (dann bietet Taste H den ganzen Lösungsweg an). goal = { id, lines }
+export const TIPS_PER_GOAL = 2;
 export function hintFor(story, goal) {
   const asked = (story.flags.hintsAsked ??= {});
-  const level = Math.min(asked[goal.id] ?? 0, goal.lines.length - 1);
+  const level = asked[goal.id] ?? 0;
+  const lines = goal.lines.filter(Boolean).slice(0, TIPS_PER_GOAL);
+  if (level >= lines.length) return null;
   asked[goal.id] = level + 1;
-  return goal.lines[level];
+  return lines[level];
 }
 
 // Das Ende eines Wagens: abblenden, Endkarte, dann zurück zur Wagenübersicht von Detective Joseph (der Spielstand wird gespeichert)

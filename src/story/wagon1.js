@@ -1,7 +1,7 @@
 import { TUTORIAL_WAGON1 } from './tutorial.js';
 import { CameraFeed } from '../puzzles/cameraFeed.js';
 import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui/cards.js';
-import { nextLine } from './wagonCommon.js';
+import { hintFor, nextLine } from './wagonCommon.js';
 
 // ============================================================================================
 //  WAGEN 1 – „Die Ringbahn“
@@ -889,15 +889,11 @@ async function afterTunnel(story) {
 }
 
 // ============================================================================================
-//  Tipps (Taste H oder „Tipp“ im Notizbuch): erst ein Schubs, dann immer deutlicher
+//  Tipps (Taste H oder „Tipp“ im Notizbuch): zwei leichte Tipps je Rätsel, danach der Lösungsweg
 // ============================================================================================
 
 function nextHint(story) {
-  const { id, lines } = currentGoal(story);
-  const asked = (story.flags.hintsAsked ??= {});
-  const level = Math.min(asked[id] ?? 0, lines.length - 1);
-  asked[id] = level + 1;
-  return lines[level];
+  return hintFor(story, currentGoal(story));
 }
 
 // Woran Joseph gerade arbeiten sollte – und was er dazu sagt, wenn man ihn mehrmals fragt
@@ -906,10 +902,10 @@ function currentGoal(story) {
   const left = story.motion.lanternCount('left'), right = story.motion.lanternCount('right');
 
   if (!story.has('letter') && !f.letterRead) {
-    return { id: 'letter', lines: ['Am Schaltpult rechts neben der Tür steckt ein Brief. Damit sollte ich anfangen.'] };
+    return { id: 'letter', lines: ['Am Schaltpult rechts neben der Tür steckt ein Brief. Damit sollte ich anfangen.', 'Auf das Schaltpult rechts neben der Tür klicken und den Brief nehmen.'] };
   }
-  if (!f.letterRead) return { id: 'read', lines: ['Den Brief sollte ich erst einmal lesen: Rechtsklick auf den Brief im Inventar.'] };
-  if (!f.backpackSearched) return { id: 'backpack', lines: ['Der Brief sagt: Fang beim Rucksack an. Er hängt links an der Wand.'] };
+  if (!f.letterRead) return { id: 'read', lines: ['Ich habe einen Brief – aber noch gar nicht gelesen.', 'Den Brief sollte ich erst einmal lesen: Rechtsklick auf den Brief im Inventar.'] };
+  if (!f.backpackSearched) return { id: 'backpack', lines: ['Was stand noch mal im Brief? Womit soll ich anfangen?', 'Der Brief sagt: Fang beim Rucksack an. Er hängt links an der Wand.'] };
   if (!f.toolboxOpen) {
     return { id: 'toolbox', lines: [
       'Im Rucksack war ein kleiner Schlüssel. Auf dem Anhänger steht „Werkzeug“.',
@@ -958,7 +954,7 @@ function currentGoal(story) {
     ] };
   }
   if (!story.has('flashlight')) {
-    if (story.has('battery')) return { id: 'combine', lines: ['Die Batterie gehört in die Taschenlampe: Batterie im Inventar anklicken, dann die Taschenlampe.'] };
+    if (story.has('battery')) return { id: 'combine', lines: ['Eine Batterie … und eine Taschenlampe, die nicht leuchtet.', 'Die Batterie gehört in die Taschenlampe: Batterie im Inventar anklicken, dann die Taschenlampe.'] };
     if (!f.batteries) {
       return { id: 'battery1', lines: [
         'Für den dunklen Tunnel brauche ich Licht. Die Taschenlampe braucht Batterien – am Schaltpult ist unten eine Klappe: „Notstrom“.',

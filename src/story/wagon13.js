@@ -378,8 +378,8 @@ function currentGoal(story) {
       `Reihenfolge: ${CANDLE_SYMBOLS.map((s) => ({ bench: 'Bank', suitcase: 'Koffer', letter: 'Brief', glass: 'Weinglas', bed: 'Bett', umbrella: 'Schirm', whisky: 'Whiskyglas', film: 'Filmrolle', mirror: 'Spiegel', horn: 'Trichter', clock: 'Uhr', note: 'Note' })[s]).join(', ')}.`,
     ] };
   }
-  if (!f.drawerOpen) return { id: 'altar', lines: ['Am Altar ist eine Schublade aufgesprungen.'] };
-  if (!f.rubbingDone) return { id: 'rub', lines: ['Papier und Bleistift „für die Tafel“: Papier und Bleistift an der verrußten Gedenktafel benutzen und über alle Zeilen reiben.'] };
+  if (!f.drawerOpen) return { id: 'altar', lines: ['Am Altar ist eine Schublade aufgesprungen.', 'Zum Altar gehen und die Schublade ansehen.'] };
+  if (!f.rubbingDone) return { id: 'rub', lines: ['Die Gedenktafel ist verrußt. Lesen kann man sie so nicht – aber vielleicht abpausen.', 'Papier und Bleistift „für die Tafel“: Papier und Bleistift an der verrußten Gedenktafel benutzen und über alle Zeilen reiben.'] };
   if (!f.wordFound) {
     if (!story.has('litLantern')) {
       return { id: 'lantern', lines: [
@@ -387,14 +387,14 @@ function currentGoal(story) {
         'Die Laterne nehmen und an den brennenden Kerzen des Kranzes anzünden (Laterne auf den Kranz).',
       ] };
     }
-    return { id: 'dots', lines: ['Die brennende Laterne an der Tafel benutzen – über dem Abrieb.'] };
+    return { id: 'dots', lines: ['Auf dem Abrieb fehlt noch etwas. Vielleicht sieht man es erst mit Licht.', 'Die brennende Laterne an der Tafel benutzen – über dem Abrieb.'] };
   }
-  if (!f.offeringOpen) return { id: 'offering', lines: ['Die roten Punkte ergaben HEIM. Der Opferstock hat ein Schloss mit vier Buchstaben.'] };
+  if (!f.offeringOpen) return { id: 'offering', lines: ['Die roten Punkte bilden ein Wort. Wo passt ein Wort mit vier Buchstaben?', 'Die roten Punkte ergaben HEIM. Der Opferstock hat ein Schloss mit vier Buchstaben.'] };
   if (!f.doorOpen) {
     return { id: 'bells', lines: [
       'Am Glockenbalken hängt ein Zettel: „Lasst sie klingen wie das Lied der Feier.“ Das Lied von Herrn Moll beginnt mit G – A – H.',
       'Die große Glocke ist die tiefste (G). Von den kleinen ist die rechte A, die linke H. Also: groß, rechts, links.',
     ] };
   }
-  return { id: 'door', lines: ['Die Tür ist offen.'] };
+  return { id: 'door', lines: ['Die Tür ist offen.', 'Einfach durch die Tür nach vorne gehen.'] };
 }

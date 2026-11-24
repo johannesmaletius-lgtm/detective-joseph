@@ -368,7 +368,7 @@ async function finale(story) {
 
 function currentGoal(story) {
   const f = story.flags;
-  if (!f.capOn) return { id: 'cap', lines: ['Die Mütze des Schaffners hängt an der Garderobe.'] };
+  if (!f.capOn) return { id: 'cap', lines: ['Die Mütze des Schaffners hängt an der Garderobe.', 'Die Mütze von der Garderobe nehmen und aufsetzen.'] };
   if (!f.announced) {
     return { id: 'announce', lines: [
       'An der Lautsprecheranlage (der Trichter oben links) nur die Wagen einschalten, in denen noch jemand sitzt.',
@@ -376,6 +376,6 @@ function currentGoal(story) {
       'Wagen 4, 5, 7, 12, 15 und 21.',
     ] };
   }
-  if (!f.sealCut) return { id: 'seal', lines: ['Die Plombe am roten Hebel: Die Lochzange liegt auf dem Schreibtisch. Lochzange nehmen, dann auf den Hebel anwenden.'] };
-  return { id: 'paddle', lines: ['Am roten Hebel oder am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben.'] };
+  if (!f.sealCut) return { id: 'seal', lines: ['Der rote Hebel ist verplombt. Ich brauche etwas, um die Plombe zu lösen.', 'Die Plombe am roten Hebel: Die Lochzange liegt auf dem Schreibtisch. Lochzange nehmen, dann auf den Hebel anwenden.'] };
+  return { id: 'paddle', lines: ['Bei Kilometer 24,7 liegt Weiche 7. Genau dort muss ich das Signal geben.', 'Am roten Hebel oder am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben.'] };
 }
