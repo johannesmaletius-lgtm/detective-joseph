@@ -16,7 +16,7 @@ Zwölf Kofferanhänger, eine Gepäckwaage, ein Stapel Koffer, der nach jedem Tun
 Ganz oben im Gepäckregal sitzt ein Stoffhase mit einem Schlappohr. Ein Kind ist hier aber nirgends zu sehen.
 
 ### Tür 3 – Der Postwagen
-In 24 Fächern liegen Briefe, sortiert nach Runden. Einige Fächer sind leer, ganze Runden fehlen. Hinter dem Schrank des Postmeisters wartet ein verschlüsselter Brief, adressiert an „J.“ und datiert auf **Runde 108**. Die Verschiebung der Buchstaben ist die Rundennummer. Entschlüsselt steht da, wieder in Josephs Handschrift:
+In 24 Fächern liegen Briefe, sortiert nach Runden. Einige Fächer sind leer, ganze Runden fehlen. Hinter dem Schrank des Postmeisters wartet ein verschlüsselter Brief, adressiert an „J.“, eingeworfen in Runde 107 und zuzustellen in **Runde 108** (so steht es in der Dienstanweisung des Postmeisters) – „morgen“ heißt also: in der Runde, in der Joseph ihn liest. Die Verschiebung der Buchstaben ist die Rundennummer. Entschlüsselt steht da, wieder in Josephs Handschrift:
 **„Morgen verschwindet jemand. Achte auf die Gläser.“**
 
 ### Tür 4 – Der Speisewagen
@@ -182,4 +182,4 @@ Wie aus dem Siebzehnjährigen am Ende der erwachsene Schaffner zu Hause wird, is
 - **Regeln:** Vergessen nimmt die Jahre, Hinausgehen gibt sie zurück; alle kommen um 23:47 am Bahnsteig an; die zwei Josephs werden am Ende eins (Tür 11, 22, 23, 24).
 - **Herr K. (5–7):** Tür 5 lässt offen, ob er schon fort ist („oder wartet er irgendwo im Zug?“), Tür 6 sagt „erst im nächsten Tunnel“ statt „erst morgen“, Tür 7 knüpft an (er ist aus seinem Abteil nach vorne in den Barwagen gegangen und wartet auf den Ruf).
 - **Warum das Entgleisen (23/24):** Brief am Tor – „Wer ruft, muss bleiben.“ Nur wenn der Zug selbst aus dem Ring fährt, kommen die beiden Josephs hinaus, und die Nacht holt niemanden mehr.
-
+- **Brief aus Runde 108 (3):** Eingeworfen in Runde 107, zuzustellen in Runde 108 – „Morgen verschwindet jemand“ meint damit Runde 108, in der Herr K. geht. Rätsel (Verschiebung 4) und gesprochene Sätze unverändert.

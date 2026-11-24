@@ -178,8 +178,8 @@ export function drawCipherLetter(ctx, { turn }) {
     color: '#ece2c8',
     shade: '#d5c49c',
     inner: (c) => {
-      text(c, 'An J.  –  Runde 108', 40, 48, { font: `bold 22px ${TYPEWRITER}` });
-      text(c, '(Verschiebung: wie die Runde)', 740, 48, { font: `italic 16px ${HAND}`, color: BLUE_INK, align: 'right' });
+      text(c, 'An J.  –  zuzustellen in Runde 108', 40, 48, { font: `bold 22px ${TYPEWRITER}` });
+      text(c, '(Verschiebung: wie die Runde)', 740, 76, { font: `italic 16px ${HAND}`, color: BLUE_INK, align: 'right' });
       CIPHER.forEach((row, i) => text(c, row, 40, 110 + i * 40, { font: `bold 26px ${TYPEWRITER}` }));
       c.strokeStyle = 'rgba(39, 64, 143, 0.4)';
       c.lineWidth = 1;
@@ -226,7 +226,8 @@ export function drawPostmasterNote(ctx) {
       text(c, 'Dienstanweisung', 260, 50, { font: `bold 28px ${SERIF}`, align: 'center' });
       text(c, 'Postwagen · Ringbahn', 260, 80, { font: `italic 18px ${SERIF}`, align: 'center' });
       const lines = [
-        'Brief an J. (Runde 108) steckt',
+        'Brief an J. – eingeworfen in Runde 107,',
+        'zuzustellen in Runde 108 – steckt',
         'noch in Leitung 3.',
         '',
         'Die Weichen klemmen. Dreht man eine,',

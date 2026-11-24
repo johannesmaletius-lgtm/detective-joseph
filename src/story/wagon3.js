@@ -163,7 +163,7 @@ async function readNote(story) {
   if (story.flags.noteRead) return;
   story.flags.noteRead = true;
   await story.say('Der Brief an J. steckt in der Rohrpost. Leitung 3. Das ist die Station rechts neben der Tür.');
-  story.note('Dienstanweisung: Der Brief an J. (Runde 108) steckt in Rohrpost-Leitung 3. Alle vier Weichen müssen gerade stehen – jede dreht ihre Nachbarn mit.');
+  story.note('Dienstanweisung: Der Brief an J. (eingeworfen in Runde 107, zuzustellen in Runde 108) steckt in Rohrpost-Leitung 3. Alle vier Weichen müssen gerade stehen – jede dreht ihre Nachbarn mit.');
 }
 
 async function openTubes(story) {
@@ -236,7 +236,7 @@ async function readLetter(story) {
         await story.say('„Morgen verschwindet jemand. Achte auf die Gläser.“');
         await story.say('„Das Wort für die Tür: W-X-I-V-R.“ Das letzte Wort muss ich selbst entziffern – Buchstabe für Buchstabe.');
         await story.say('Den Buchstaben aus dem Brief innen auf der roten Scheibe suchen, außen ablesen.');
-        story.note('Der Brief an J. (Runde 108, Scheibe auf 4): „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: WXIVR.“ Das letzte Wort muss ich selbst mit der Scheibe entziffern (innen suchen, außen ablesen).');
+        story.note('Der Brief an J. (eine Runde vorher eingeworfen, zuzustellen in Runde 108, Scheibe auf 4): „Morgen verschwindet jemand. Achte auf die Gläser. Das Wort für die Tür: WXIVR.“ Das letzte Wort muss ich selbst mit der Scheibe entziffern (innen suchen, außen ablesen).');
       }
     },
   });
