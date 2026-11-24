@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train } from './wagonKit.js';
+import { background, box, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 9: der Spiegelwagen. Nur DATEN – was passiert, steht in src/story/wagon9.js.
 // Keine Fenster: Alle Spiegel (sechs an den Wänden, vier auf Ständern) sind im Hintergrundbild
@@ -31,6 +31,11 @@ export const mirrorCar = {
   animations: [
     { id: 'mirrors', layer: 'behind', x: 0, y: 0, width: 1280, height: 720 },
     { id: 'levers', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
   ],
 
   hotspots: [

@@ -1,4 +1,4 @@
-import { background, outside, perspective, train } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 2 (Tür 2): der Gepäckwagen. Nur DATEN – was passiert, steht in src/story/wagon2.js.
 // Links das Brett mit den zwölf Kofferanhängern, hinten rechts der Kofferstapel mit den zwei
@@ -15,6 +15,11 @@ export const baggageCar = {
     { from: 1015, to: 1092, top: 138, bottom: 302 },
     { from: 1142, to: 1252, top: 102, bottom: 269 },
   ]),
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+  ],
+
   hotspots: [
     { id: 'tags', name: 'Brett mit Kofferanhängern', area: [[160, 120], [314, 120], [314, 400], [160, 400]], walkTo: [400, 540], facing: 'left' },
     { id: 'stack', name: 'Kofferstapel', area: [[748, 204], [904, 204], [904, 418], [748, 418]], walkTo: [760, 480], facing: 'right' },

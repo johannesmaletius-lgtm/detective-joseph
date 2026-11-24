@@ -1,4 +1,4 @@
-import { background, perspective, train } from './wagonKit.js';
+import { background, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 17 (Tür 17): das Gewächshaus – das Versteck des anderen Joseph. Nur DATEN – was passiert,
 // steht in src/story/wagon17.js. Das Glasdach ist im Hintergrundbild durchsichtig; dahinter malt
@@ -11,6 +11,11 @@ export const greenhouse = {
 
   animations: [
     { id: 'sky', layer: 'behind', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust({ dy: 12 }),
   ],
 
   hotspots: [

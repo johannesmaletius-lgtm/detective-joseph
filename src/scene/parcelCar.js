@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 20 (Tür 20): der Packwagen mit Mira. Nur DATEN – was passiert, steht in src/story/wagon20.js.
 // Links der Geschenkeberg mit dem Sessel, vorne lose Anhänger, rechts Kisten über der Bodenluke,
@@ -25,6 +25,11 @@ export const parcelCar = {
       x: 530, y: 490, pose: 'front', size: 0.66,
       walkTo: [620, 520], facing: 'left', color: '#ffc8d8', idle: ['blink', 'busy'],
     },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
   ],
 
   hotspots: [

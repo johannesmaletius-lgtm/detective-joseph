@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 14: der Zeitungswagen. Nur DATEN – was passiert, steht in src/story/wagon14.js.
 
@@ -18,6 +18,13 @@ export const newspaperCar = {
 
   animations: [
     { id: 'table', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 1020, y: 290, radius: 60, color: '230, 240, 160', strength: 0.14, flicker: 'lamp' },
+    { kind: 'dust', x: 960, y: 290, width: 120, height: 70, count: 6 },
   ],
 
   hotspots: [

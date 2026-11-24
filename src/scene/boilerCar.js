@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 21 (Tür 21): der Kesselwagen mit dem Heizer. Nur DATEN – was passiert, steht in src/story/wagon21.js.
 // Links Kessel mit Manometer, drei Ventilen, Wasserstandsglas, Speisepumpe und Feuertür,
@@ -23,6 +23,16 @@ export const boilerCar = {
       x: 820, y: 600, pose: 'left', size: 1.0,
       walkTo: [700, 600], facing: 'right', color: '#ffb08a',
     },
+  ],
+
+  // Glut hinter der Feuertür, Funken, Dampf aus den Rohren (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 222, y: 492, radius: 150, color: '255, 110, 40', strength: 0.18, flicker: 'fire' },
+    { kind: 'glow', x: 222, y: 492, radius: 70, color: '255, 150, 60', strength: 0.16, flicker: 'fire' },
+    { kind: 'sparks', x: 222, y: 600, width: 150, every: 0.45 },
+    { kind: 'steam', x: 348, y: 104, size: 18, drift: [12, -26], every: 0.45 },
+    { kind: 'steam', x: 838, y: 186, size: 16, drift: [6, -22], every: 0.7, strength: 0.8 },
   ],
 
   hotspots: [

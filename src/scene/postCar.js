@@ -1,4 +1,4 @@
-import { background, outside, perspective, train } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 3 (Tür 3): der Postwagen. Nur DATEN – was passiert, steht in src/story/wagon3.js.
 // Links die 24 Fächer und die Postsäcke, rechts neben der Tür die Rohrpost-Station,
@@ -14,6 +14,12 @@ export const postCar = {
     { from: 1024, to: 1098, top: 144, bottom: 295 },
     { from: 1143, to: 1248, top: 109, bottom: 239 },
   ]),
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 972, y: 318, radius: 60, color: '230, 240, 160', strength: 0.14, flicker: 'lamp' },
+  ],
 
   hotspots: [
     { id: 'holes', name: 'Fächer', area: [[168, 128], [490, 186], [490, 446], [168, 456]], walkTo: [470, 500], facing: 'left' },

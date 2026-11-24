@@ -6,6 +6,7 @@ import { WalkArea } from '../navigation/walkArea.js';
 import { pointInPolygon } from '../navigation/geometry.js';
 import { TrainMotion } from '../effects/trainMotion.js';
 import { Darkness } from '../effects/darkness.js';
+import { Ambience } from '../effects/ambience.js';
 import { paintCanvas } from '../core/paint.js';
 import { OutsideView } from './outsideView.js';
 import { Character } from './character.js';
@@ -52,6 +53,8 @@ export class Scene {
       ? new TrainMotion(data.train, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches })
       : null;
     this.darkness = new Darkness();
+    // kleine Effekte: Schnee hinter den Fenstern, Kerzen, Dampf, Staub … (siehe src/effects/ambience.js)
+    this.ambience = new Ambience(data.ambience, { windows: data.outside?.windows ?? [] });
     this.hotspots = (data.hotspots ?? []).map((hotspot) => ({ ...hotspot, area: hotspot.area.map(([x, y]) => ({ x, y })) }));
     this.props = [];      // kleine Bilder im Raum, z. B. der Brief im Schlitz
     this.foreground = []; // Möbel vorne im Bild, hinter denen Figuren vorbeilaufen (siehe oben)
@@ -196,6 +199,7 @@ export class Scene {
     this.outside?.update(dt, this.motion);
     for (const spot of this.animations) spot.player?.update(dt);
     for (const character of this.characters) character.update(dt);
+    this.ambience.update(dt, this);
 
     if (this.clickMarker) {
       this.clickMarker.age += dt;
@@ -207,6 +211,7 @@ export class Scene {
   draw(ctx, player) {
     // 1) alles, was nur durch die durchsichtigen Stellen des Hintergrunds zu sehen ist
     this.outside?.draw(ctx);
+    this.ambience.drawBehind(ctx, this);
     this.drawAnimations(ctx, 'behind');
 
     // 2) das Hintergrundbild
@@ -217,6 +222,7 @@ export class Scene {
     this.drawProps(ctx, (prop) => prop.depth === undefined);
     this.drawAnimations(ctx, 'front');
     this.drawGlows(ctx);
+    this.ambience.draw(ctx, this);
     this.drawClickMarker(ctx);
     this.drawInDepth(ctx, player);
 
