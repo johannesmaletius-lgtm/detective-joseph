@@ -27,9 +27,9 @@ export const chapelCar = {
   // Die beiden Wandlaternen flackern, Staub tanzt in ihrem Licht (src/effects/ambience.js).
   // Kranzkerzen und Standlaterne gehören zum Rätsel – die malt src/story/art/wagon13.js.
   ambience: [
-    { kind: 'glow', x: 272, y: 90, radius: 70, color: '255, 180, 90', strength: 0.2, flicker: 'candle' },
+    { kind: 'glow', x: 272, y: 90, radius: 70, color: '255, 180, 90', strength: 0.2, flicker: 'candle', burns: true },
     { kind: 'glow', x: 272, y: 92, radius: 20, color: '255, 225, 150', strength: 0.45, flicker: 'candle' },
-    { kind: 'glow', x: 1006, y: 90, radius: 70, color: '255, 180, 90', strength: 0.2, flicker: 'candle' },
+    { kind: 'glow', x: 1006, y: 90, radius: 70, color: '255, 180, 90', strength: 0.2, flicker: 'candle', burns: true },
     { kind: 'glow', x: 1006, y: 92, radius: 20, color: '255, 225, 150', strength: 0.45, flicker: 'candle' },
     { kind: 'dust', x: 222, y: 110, width: 100, height: 90, count: 8 },
     { kind: 'dust', x: 956, y: 110, width: 100, height: 90, count: 8 },

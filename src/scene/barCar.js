@@ -34,7 +34,7 @@ export const barCar = {
     lampDust(),
     { kind: 'glow', x: 990, y: 118, radius: 50, color: '255, 200, 120', strength: 0.16, flicker: 'lamp' },
     { kind: 'glow', x: 1120, y: 98, radius: 50, color: '255, 200, 120', strength: 0.16, flicker: 'lamp' },
-    { kind: 'glow', x: 130, y: 398, radius: 45, color: '255, 180, 90', strength: 0.22, flicker: 'candle' },
+    { kind: 'glow', x: 130, y: 398, radius: 45, color: '255, 180, 90', strength: 0.22, flicker: 'candle', burns: true },
   ],
 
   hotspots: [

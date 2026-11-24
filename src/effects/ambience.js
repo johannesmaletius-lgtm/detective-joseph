@@ -16,6 +16,8 @@
 //   { kind: 'hand', x, y, length, speed, color }   Sekundenzeiger einer Uhr (springt jede Sekunde;
 //                                                  speed −1 = läuft rückwärts)
 // Jeder Eintrag kann `when: 'merker'` haben (wie hotspots und props).
+// Kerzen brennen auch im Tunnel weiter, wenn das elektrische Licht aus ist: Flammen immer, ein Lichtschein
+// nur mit `burns: true` (z. B. eine Öllaterne). Sie sparen die Dunkelheit um sich herum aus (lights()).
 //
 // Alles ist auf Tempo gebaut (iPad): wenige Teilchen, Lichthöfe als einmal vorbereitete Bildchen,
 // keine Schatten oder Filter.
@@ -81,6 +83,18 @@ export class Ambience {
       ctx.fillRect(flake.x - s / 2, flake.y - s / 2, s, s);
     }
     ctx.restore();
+  }
+
+  // Was im Dunkeln weiterbrennt: Stellen, an denen die Dunkelheit ausgespart wird (siehe scene.glowingSpots)
+  lights(scene) {
+    const spots = [];
+    for (const effect of this.effects) {
+      if (!scene.isActive(effect)) continue;
+      const f = flicker(this.time, effect.seed, 'candle');
+      if (effect.kind === 'flame') spots.push({ x: effect.x, y: effect.y - effect.size * 0.45, radius: effect.size * 2.6 * f });
+      else if (effect.kind === 'glow' && effect.burns) spots.push({ x: effect.x, y: effect.y, radius: effect.radius * 0.9 * f });
+    }
+    return spots;
   }
 
   // Vor dem Hintergrund, unter den Figuren

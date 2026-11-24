@@ -394,6 +394,7 @@ export class Scene {
       const light = typeof prop.light === 'function' ? prop.light(this) : prop.light;
       if (light) spots.push(...[].concat(light));
     }
+    spots.push(...this.ambience.lights(this)); // Kerzen brennen weiter
     return spots;
   }
 
