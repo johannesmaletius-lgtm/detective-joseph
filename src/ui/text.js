@@ -1,5 +1,7 @@
 // Hilfsfunktionen für Text auf der Zeichenfläche: Schriften, Zeilenumbruch, Text mit Umriss.
 
+import { forTouch } from '../core/touch.js';
+
 // Schriften. Die erste Schrift in der Liste, die auf dem Rechner vorhanden ist, wird benutzt.
 const SANS = '"Trebuchet MS", "Avenir Next", "Segoe UI", system-ui, sans-serif';
 const HAND = '"Noteworthy", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive';
@@ -29,7 +31,7 @@ export const COLORS = {
 // Bricht Text so um, dass keine Zeile breiter als maxWidth ist. "\n" erzwingt eine neue Zeile.
 export function wrapText(ctx, text, maxWidth) {
   const lines = [];
-  for (const paragraph of String(text).split('\n')) {
+  for (const paragraph of String(forTouch(text)).split('\n')) {
     let line = '';
     for (const word of paragraph.split(' ')) {
       const test = line ? `${line} ${word}` : word;

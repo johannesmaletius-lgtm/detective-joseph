@@ -1,6 +1,11 @@
 // Einstiegspunkt: Spiel erzeugen, Wagenübersicht zeigen, loslegen.
 
 import { Game } from './core/game.js';
+import { installTouchText } from './core/touch.js';
+import { setupDevice } from './core/device.js';
+
+installTouchText(); // mit dem Finger: „tippen“ statt „klicken“ in allen Texten (src/core/touch.js)
+setupDevice();      // iPad: Ton, Bildschirm wach, Hinweis „Zum Home-Bildschirm“
 
 const status = document.getElementById('status');
 

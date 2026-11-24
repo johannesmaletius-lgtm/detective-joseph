@@ -2,7 +2,15 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- iPad: als App auf dem Home-Bildschirm (Vollbild, eigener Spielstand, der nicht nach 7 Tagen verschwindet) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Detective Joseph">
+  <meta name="theme-color" content="#140d09">
+  <link rel="apple-touch-icon" href="assets/ui/icons/icon-180.png">
   <title>Detective Joseph</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='26' cy='26' r='16' fill='%23213a3a' stroke='%23d9a441' stroke-width='7'/><path d='M38 38l16 16' stroke='%23d9a441' stroke-width='9' stroke-linecap='round'/></svg>">
   <link rel="stylesheet" href="style.css">
@@ -12,6 +20,11 @@
     <canvas id="game-canvas" width="1280" height="720" aria-label="Detective Joseph – Spielszene"></canvas>
     <p id="status" class="status">Lade Detective Joseph …</p>
   </main>
+  <p class="rotate-hint">Bitte das iPad quer halten.</p>
+  <div id="install-hint" class="install-hint" hidden>
+    <span>Tipp: In Safari auf <b>Teilen</b> → <b>Zum Home-Bildschirm</b> tippen und das Spiel immer von dort starten – dann läuft es im Vollbild und der Spielstand bleibt sicher.</span>
+    <button type="button" aria-label="Hinweis schließen">OK</button>
+  </div>
 
   <script>
     // Hilfe für den häufigsten Anfängerfehler: index.html per Doppelklick geöffnet.

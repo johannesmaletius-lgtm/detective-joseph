@@ -19,6 +19,7 @@ mkdirSync(out, { recursive: true });
 
 cpSync(join(root, 'src'), join(out, 'src'), { recursive: true });
 cpSync(join(root, 'style.css'), join(out, 'style.css'));
+cpSync(join(root, 'manifest.webmanifest'), join(out, 'manifest.webmanifest')); // iPad: „Zum Home-Bildschirm“
 cpSync(join(root, 'assets'), join(out, 'assets'), {
   recursive: true,
   filter: (src) => !src.includes(`${join('assets', 'reference')}`) && !src.includes(join('assets', 'voices')),
