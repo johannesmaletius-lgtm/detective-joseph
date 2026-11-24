@@ -3,7 +3,8 @@ import { FONTS, COLORS, outlinedText } from './text.js';
 import { touch } from '../core/touch.js';
 
 // Der Mauszeiger. Er zeigt, was ein Klick bewirkt:
-//   Zeigefinger = laufen   Auge = anschauen   Hand = benutzen/nehmen   Sprechblase = sprechen
+//   Zeigefinger = anklicken (benutzen/nehmen)   Auge = nur anschauen   Pfeil = weitergehen (Tür, Luke, Gang)
+//   Sprechblase = sprechen   kleiner Ring = auf den Boden klicken, Joseph läuft dorthin
 // Hält Joseph gerade einen Gegenstand "in der Hand", hängt dieser am Zeiger.
 // Daneben steht der Name dessen, was unter dem Zeiger liegt.
 //
@@ -12,11 +13,14 @@ import { touch } from '../core/touch.js';
 const SIZE = 46; // Höhe in Spielpixeln
 
 // hot = die Stelle im Bild, die genau auf der Mausposition liegt (Anteil von Breite/Höhe)
+// turn = Drehung des Bildes (Pfeil nach links/rechts)
 const KINDS = {
-  walk: { src: 'assets/ui/cursors/walk.png', hot: [0.46, 0.03] }, // Fingerspitze
+  interact: { src: 'assets/ui/cursors/walk.png', hot: [0.46, 0.03] }, // Fingerspitze
   look: { src: 'assets/ui/cursors/look.png', hot: [0.5, 0.5] },
-  interact: { src: 'assets/ui/cursors/interact.png', hot: [0.5, 0.45] },
   talk: { src: 'assets/ui/cursors/talk.png', hot: [0.5, 0.5] },
+  exit: { src: 'assets/ui/cursors/exit.png', hot: [0.5, 0.5] },
+  exitLeft: { src: 'assets/ui/cursors/exit.png', hot: [0.5, 0.5], turn: -Math.PI / 2 },
+  exitRight: { src: 'assets/ui/cursors/exit.png', hot: [0.5, 0.5], turn: Math.PI / 2 },
 };
 
 export class Cursor {
@@ -50,12 +54,18 @@ export class Cursor {
       ctx.globalAlpha = 0.92;
       ctx.drawImage(this.item, mouse.x - 26, mouse.y - 26, 52, 52);
       ctx.globalAlpha = 1;
+    } else if (this.kind === 'walk') {
+      drawWalkRing(ctx, mouse);
     } else {
-      const image = this.images[this.kind];
+      const { hot: [hx, hy], turn = 0 } = KINDS[this.kind] ?? KINDS.interact;
+      const image = this.images[this.kind] ?? this.images.interact;
       const height = SIZE;
       const width = (image.width / image.height) * height;
-      const [hx, hy] = KINDS[this.kind].hot;
-      ctx.drawImage(image, mouse.x - hx * width, mouse.y - hy * height, width, height);
+      ctx.save();
+      ctx.translate(mouse.x, mouse.y);
+      ctx.rotate(turn);
+      ctx.drawImage(image, -hx * width, -hy * height, width, height);
+      ctx.restore();
     }
     this.drawLabel(ctx, mouse);
     ctx.restore();
@@ -103,4 +113,16 @@ export class Cursor {
       outlinedText(ctx, this.label, x, y, COLORS.joseph, 4);
     }
   }
+}
+
+// Boden: ein kleiner Messing-Ring – „hierhin laufen“, ohne wie ein Klickziel auszusehen
+function drawWalkRing(ctx, mouse) {
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'rgba(20, 12, 7, 0.75)';
+  ctx.beginPath();
+  ctx.arc(mouse.x, mouse.y, 8, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = COLORS.brass;
+  ctx.stroke();
 }
