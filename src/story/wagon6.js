@@ -378,7 +378,7 @@ async function tryDoor(story) {
     await finishWagon(story, {
       number: 6,
       title: 'Ende von Wagen 6',
-      lines: ['Herr K. verschwindet erst morgen. Joseph kann ihn noch warnen.'],
+      lines: ['Herr K. verschwindet erst im nächsten Tunnel.', 'Bis dahin ist er noch irgendwo vorne im Zug – Joseph kann ihn noch warnen.'],
       nextTitle: 'im Barwagen',
     });
   });

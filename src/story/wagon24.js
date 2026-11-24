@@ -27,6 +27,7 @@ export const wagon24 = {
     'Der Tunnel ist kein Ende, er ist der Ausgang. Herr Tick ging hinaus in den Schnee und sagte: „Danke, Junge.“',
     'Ich habe niemanden gerettet. Ich habe sie festgehalten. Die anderen sitzen noch im Zug.',
     'Der andere Joseph ist der Schaffner – ich, nur älter. Weiche 7 lässt sich nur zu zweit stellen: in der Lok und hier am roten Hebel.',
+    'Sein Brief am Tor: „Wer ruft, muss bleiben.“ Wenn alle draußen sind, muss der Zug selbst aus dem Ring – Weiche 7, zu zweit, bei 24,7. Danach holt die Nacht niemanden mehr.',
     'Miras Kelle: „Damit du uns nach Hause bringst.“',
     'Der Tunnel: vierundzwanzig Ticks. Bei fünfundzwanzig wird es nicht mehr hell. Es ist so weit.',
   ],

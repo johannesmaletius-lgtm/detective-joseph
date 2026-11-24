@@ -238,6 +238,20 @@ async function insertGear(story) {
     await story.say('Der Tunnel ist wirklich der Ausgang. Ich habe niemanden gerettet. Ich habe sie festgehalten.');
     await story.say('Und die anderen sitzen noch im Zug.');
     story.note('Hinter dem Tor: Schnee und die Lichter eines Bahnhofs. Herr Tick ging hinaus, wurde mit jedem Schritt älter – er bekam seine Jahre zurück – und erinnerte sich: Seine Tochter wartet am Bahnsteig. Die Bahnhofsuhr zeigte 23:47. „Danke, Junge.“ Der Tunnel ist der Ausgang. Ich habe niemanden gerettet – ich habe sie festgehalten. Die anderen sitzen noch im Zug.');
+    // Am Tor steckt ein Brief des anderen Joseph: warum es am Ende Weiche 7 braucht
+    story.sound('paper');
+    await story.card({
+      kind: 'paper',
+      lines: [
+        'Joseph. Jetzt hast du es gesehen. Der Tunnel ist der Ausgang.',
+        'Aber nicht für jeden. Wer ruft, muss bleiben – die Nacht lässt den nicht gehen, der die anderen hinausschickt. Deshalb bin ich noch hier.',
+        'Wenn alle draußen sind, bleiben nur wir zwei. Dann muss der Zug selbst aus dem Ring: Weiche 7. Danach fährt hier nie wieder einer im Kreis, und die Nacht holt niemanden mehr.',
+        'Allein habe ich es hundertmal versucht. Sie springt nur um, wenn vorne und hinten gleichzeitig gezogen wird.',
+        'Morgen. Ruf sie hinaus. Dann der rote Hebel. Bei 24,7.',
+      ],
+      signature: '– J.',
+    });
+    story.note('Brief am Tor, in meiner Schrift: „Wer ruft, muss bleiben.“ Wenn alle draußen sind, bleiben nur er und ich. Dann muss der Zug selbst aus dem Ring – Weiche 7, vorne in der Lok und hinten am roten Hebel gleichzeitig. Danach holt die Nacht niemanden mehr. „Morgen. Ruf sie hinaus. Bei 24,7.“');
     await finishWagon(story, {
       number: 23,
       title: 'Ende von Wagen 23',

@@ -128,6 +128,7 @@ Der andere nimmt langsam die Mütze ab. Darunter ist ein älteres Gesicht mit gr
 Diesmal hört Herr Tick den Ruf. Joseph setzt die Kopfhörer aus dem Funkraum auf und folgt ihm durch den dunklen Gang. Er liest die Kreidezeichen an den Wänden, zählt die Lampen und setzt am Ende das Zahnrad von Herrn Tick in das Gittertor ein: „Das wirst du vorne brauchen.“
 Das Tor öffnet sich. Draußen schneit es, und in der Ferne leuchten die Lichter eines Bahnhofs. Herr Tick geht hinaus und wird mit jedem Schritt ein bisschen älter, er bekommt seine Jahre zurück. „Jetzt weiß ich es wieder. Meine Tochter. Sie wartet am Bahnsteig.“ Über dem Bahnhof leuchtet eine Uhr: 23:47. Er dreht sich noch einmal um und lächelt. „Danke, Junge.“
 Joseph steht im Schnee und versteht endlich: **Er hat niemanden gerettet. Er hat sie festgehalten.**
+Am Tor steckt ein Brief in seiner eigenen Schrift: **„Wer ruft, muss bleiben.“** Die Nacht lässt den nicht gehen, der die anderen hinausschickt – deshalb ist der Schaffner noch da. Wenn alle draußen sind, bleiben nur die beiden Josephs, und dann muss der Zug selbst aus dem Ring: Weiche 7, vorne und hinten gleichzeitig. Danach fährt nie wieder einer im Kreis, und die Nacht holt niemanden mehr. „Morgen. Ruf sie hinaus. Bei 24,7.“
 
 ### Tür 24 – Heiligabend
 Joseph geht zurück ins Schaffnerabteil, setzt die Mütze auf und nimmt das Mikrofon. Er schaltet jeden Wagen ein, in dem noch jemand sitzt: Bruno, Ilse, den Barkeeper, Herrn Moll, den Heizer und Mira. Dann spricht er den Ruf selbst. Einer nach dem anderen gehen sie ruhig zum Tunnel hinaus. Oma Ilse zupft ihm im Vorbeigehen den Schal zurecht: „Steht dir immer noch, Junge.“ Mira geht als Letzte und dreht sich in der Tür um: „Kommst du nach, Papa?“ Zum ersten Mal klingt das Wort für Joseph nicht falsch. „Ja, Mira. Ich komme nach. Versprochen.“
@@ -179,3 +180,6 @@ Wie aus dem Siebzehnjährigen am Ende der erwachsene Schaffner zu Hause wird, is
 - **Oma Ilse ist Miras Oma** und hat Josephs Schal gestrickt (Tür 5, 15, 20, 24, Schlussbild).
 - **Mira früh zeigen:** Hase im Gepäckwagen (2), Zettel im Mantel (4), Ilses Traum (5), Kakao an der Bar (7), Mädchen im Spiegel (9). Auflösung in Tür 15.
 - **Regeln:** Vergessen nimmt die Jahre, Hinausgehen gibt sie zurück; alle kommen um 23:47 am Bahnsteig an; die zwei Josephs werden am Ende eins (Tür 11, 22, 23, 24).
+- **Herr K. (5–7):** Tür 5 lässt offen, ob er schon fort ist („oder wartet er irgendwo im Zug?“), Tür 6 sagt „erst im nächsten Tunnel“ statt „erst morgen“, Tür 7 knüpft an (er ist aus seinem Abteil nach vorne in den Barwagen gegangen und wartet auf den Ruf).
+- **Warum das Entgleisen (23/24):** Brief am Tor – „Wer ruft, muss bleiben.“ Nur wenn der Zug selbst aus dem Ring fährt, kommen die beiden Josephs hinaus, und die Nacht holt niemanden mehr.
+
