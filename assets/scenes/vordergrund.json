@@ -1,0 +1,58 @@
+{
+ "assets/scenes/wagon-04/background.webp": [
+  {
+   "name": "tisch-lh",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lh.webp",
+   "x": 310,
+   "y": 402,
+   "width": 199,
+   "height": 189,
+   "depth": 452
+  },
+  {
+   "name": "tisch-lm",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lm.webp",
+   "x": 277,
+   "y": 465,
+   "width": 187,
+   "height": 321,
+   "depth": 614
+  },
+  {
+   "name": "tisch-lv",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lv.webp",
+   "x": 0,
+   "y": 523,
+   "width": 387,
+   "height": 501,
+   "depth": 800
+  },
+  {
+   "name": "tisch-rh",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rh.webp",
+   "x": 1020,
+   "y": 386,
+   "width": 222,
+   "height": 218,
+   "depth": 462
+  },
+  {
+   "name": "tisch-rm",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rm.webp",
+   "x": 1083,
+   "y": 452,
+   "width": 259,
+   "height": 309,
+   "depth": 593
+  },
+  {
+   "name": "tisch-rv",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rv.webp",
+   "x": 1154,
+   "y": 522,
+   "width": 382,
+   "height": 502,
+   "depth": 800
+  }
+ ]
+}
