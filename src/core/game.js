@@ -1,5 +1,7 @@
 import { Screen } from './screen.js';
 import { Input } from './input.js';
+import { touch } from './touch.js';
+import { INVENTORY_TAP_ZONE, drawCloseButton, insideCloseButton, keepAwake } from './device.js';
 import { Camera } from './camera.js';
 import { Scene } from '../scene/scene.js';
 import { Player } from '../player/player.js';
@@ -118,6 +120,16 @@ export class Game {
       this.view?.pointerUp(point);
     });
     this.input.on('key', (key) => this.handleKey(key));
+    // Ton erst nach einer echten Geste (iPad), Bildschirm soll beim Knobeln nicht ausgehen
+    this.input.on('gesture', () => {
+      this.sound.start();
+      this.effects.prepareSamples();
+      keepAwake();
+    });
+    // Finger: Ziehen zieht nur in Nahansichten und Einstellungen (Regler), sonst ist es Umsehen.
+    // Langes Drücken = anschauen – nur im Abteil (in Nahansichten schließt der Knopf ✕).
+    this.input.dragMode = () => !this.overlay.blocksInput && (Boolean(this.view) || this.settings.isOpen);
+    this.input.allowLongPress = () => !this.memory.isOpen && !this.inCalendar && !this.view && !this.settings.isOpen && !this.overlay.blocksInput && !this.notebook.isOpen && !this.story?.inCutscene;
   }
 
   // Die Nahansicht, die gerade offen ist (oder null)
@@ -252,6 +264,7 @@ export class Game {
   };
 
   update(dt) {
+    this.input.update();
     // Erinnerung an einen früheren Wagen: der jetzige Wagen (oder die Übersicht) steht so lange still
     if (this.memory.isOpen) {
       this.memory.update(dt, this.input.mouse);
@@ -303,7 +316,7 @@ export class Game {
     const ctx = this.screen.beginFrame();
     if (this.memory.isOpen) {
       this.memory.draw(ctx);
-      this.cursor.draw(ctx, this.input.mouse);
+      this.cursor.draw(ctx, this.input);
       return;
     }
     if (this.inCalendar) {
@@ -314,7 +327,7 @@ export class Game {
       }
       this.overlay.draw(ctx);
       if (this.calendar.isOpen) this.settings.draw(ctx);
-      this.cursor.draw(ctx, this.input.mouse);
+      this.cursor.draw(ctx, this.input);
       return;
     }
 
@@ -332,11 +345,12 @@ export class Game {
     this.inventory.draw(ctx);
     this.notebook.drawButton(ctx, this.notebook.buttonContains(this.input.mouse));
     this.view?.draw(ctx);
+    if (this.view && touch.active && !this.overlay.blocksInput) drawCloseButton(ctx, this.view.fadeIn);
     this.speech.draw(ctx); // über der Nahansicht: Joseph kommentiert, was er dort sieht
     this.notebook.drawPage(ctx);
     this.overlay.draw(ctx);
     if (this.overlay.fade < 0.5) this.settings.draw(ctx);
-    this.cursor.draw(ctx, this.input.mouse);
+    this.cursor.draw(ctx, this.input);
     this.debug.drawScreen(ctx, this);
   }
 
@@ -381,6 +395,7 @@ export class Game {
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.memory.isOpen) return this.memory.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
+    if (this.view && touch.active && insideCloseButton(click)) return this.view.close();
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {
       if (this.notebook.handleClick(click) === 'hint') {
@@ -391,6 +406,8 @@ export class Game {
     }
     if (this.story.isBusy) return this.speech.skip();
     if (this.notebook.buttonContains(click)) return this.story.openNotebook();
+    // Finger: Tippen an den unteren Rand holt erst die Inventarleiste heraus (statt dorthin zu laufen)
+    if (touch.active && !this.inventory.isOpen && click.y > 720 - INVENTORY_TAP_ZONE) return this.inventory.reveal(4);
     if (this.inventory.contains(click)) return this.clickInventory(click);
 
     const point = this.camera.screenToWorld(click);

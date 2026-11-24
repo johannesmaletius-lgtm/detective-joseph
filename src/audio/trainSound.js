@@ -24,7 +24,7 @@ export class TrainSound {
   start() {
     if (this.muted) return;
     if (this.context) {
-      if (this.context.state === 'suspended') this.context.resume();
+      if (this.context.state !== 'running') this.context.resume(); // iPad: nach dem Wegschalten „interrupted“
       return;
     }
     const AudioContext = window.AudioContext || window.webkitAudioContext;

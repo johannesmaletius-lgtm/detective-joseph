@@ -13,7 +13,7 @@ Die ganze Geschichte als Erzählung (mit Hintergrund und Korrekturliste): `docs/
 
 ## Entscheidungen
 
-- Sie spielt am **PC mit Maus** (nicht Handy).
+- Sie spielt am **PC mit Maus** (nicht Handy). Seit 24.11. geht auch das **iPad** (Finger, als App auf dem Home-Bildschirm).
 - Sie spielt **Joseph**. Sie selbst kommt im Spiel nicht vor.
 - Persönliches nur als **kleine Anspielungen** (z. B. ein Code mit einem Datum von euch). **Keine Fotos.**
 - **Kein echtes Geschenk** am Ende – das Spiel endet im Spiel.
@@ -118,6 +118,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 **Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen).
 
 ## Übergabe für die nächste Session
+
+**Stand (24.11.2026, iPad):** Das Spiel lässt sich mit dem Finger spielen. Tippen = Linksklick, lange drücken (Ring um den Finger) = anschauen, Finger ziehen = nur umsehen (Name erscheint über dem Finger, Taschenlampe folgt), doppelt tippen = rennen, Tippen an den unteren Rand holt das Inventar, ✕ oben links schließt Nahansichten. In Nahansichten und Einstellungen verhält sich der Finger wie die Maus (Ziehen zieht). Alle Texte im Bild werden für Finger umgeschrieben („Rechtsklick“ → „lange drücken“, „klicken“ → „tippen“, Tastenkürzel weg) – zentral in `src/core/touch.js` (leitet fillText/measureText um), Eingabe in `src/core/input.js`, ✕-Knopf, Bildschirm-wach, Ton trotz Stumm-Schalter und Hinweis „Zum Home-Bildschirm“ in `src/core/device.js`. Homescreen-App: `manifest.webmanifest`, Icons `assets/ui/icons/`. Wichtig: Auf dem iPad immer über das Home-Bildschirm-Symbol starten – Safari löscht sonst den Spielstand nach 7 Tagen ohne Besuch, und Safari und App haben getrennte Spielstände. Mit Maus/Trackpad bleibt alles wie vorher.
 
 **Stand (24.11.2026, Tipps vor der Lösung):** Taste H (und „Tipp“ im Notizbuch/Einstellungen) gibt jetzt zu jedem Rätsel erst zwei leichte Tipps von Joseph (die ersten zwei Zeilen aus `currentGoal` im jeweiligen Wagen, `hintFor` in `src/story/wagonCommon.js`); erst danach fragt H nach dem ganzen Lösungsweg. Neues Rätsel = wieder zwei Tipps. Rätsel mit nur einem Tipp haben einen zweiten bekommen (meist ein sanfterer davor, wenn der alte schon den Code verriet). Tipps sind nur Text, nicht vertont.
 
