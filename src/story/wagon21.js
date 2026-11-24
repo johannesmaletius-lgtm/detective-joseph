@@ -248,7 +248,7 @@ async function tryDoor(story) {
     await finishWagon(story, {
       number: 21,
       title: 'Ende von Wagen 21',
-      lines: ['Der Heizer: „Herr Schaffner, Sie kommen doch jede Runde um halb zwölf hier vorbei, mit dem Lok-Schlüssel um den Hals.“', 'Joseph weiß jetzt, wo er den anderen Joseph findet.'],
+      lines: ['Der Heizer: „Herr Schaffner, Sie kommen doch jede Runde um halb zwölf hier vorbei.“', 'Joseph weiß jetzt, wo er den anderen Joseph findet.'],
       nextTitle: 'in der Lok',
     });
   });

@@ -453,7 +453,7 @@ async function tryDoor(story) {
     await finishWagon(story, {
       number: 5,
       title: 'Ende von Wagen 5',
-      lines: ['Ein Foto: Herr K. und der Schaffner – Freunde.', 'Herr K. ist wie im Schlaf nach vorne gegangen. Aber ist er schon fort – oder wartet er irgendwo im Zug?'],
+      lines: ['Ein Foto: Herr K. und der Schaffner – Freunde.', 'Herr K. ist wie im Schlaf nach vorne gegangen. Ist er schon fort – oder noch im Zug?'],
       nextTitle: 'im Fundbüro',
     });
   });

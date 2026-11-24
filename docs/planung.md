@@ -202,3 +202,5 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Schaffnerabteil (18): Schlüsselbrett hat 8 Umrisse → Rätsel mit 8 Schlüsseln.
 
 **Nächster Schritt:** Online stellen (GitHub Pages).
+
+**Stand (24.11.2026, Vorschau auf der Endkarte):** Jede Endkarte (Tür 1–23) zeigt unten einen dunklen, langsam auftauchenden Ausschnitt aus dem Hintergrund des nächsten Wagens und einen neugierig machenden Satz („Morgen: …“ bzw. „Als Nächstes: …“, wenn die Tür schon offen ist). Sätze und Ausschnitte stehen in `src/story/previews.js` (Tür 24 nutzt das Schaffnerabteil aus Wagen 18). Nach Tür 24 keine Vorschau. Die alte Zeile „Morgen geht es weiter – im …“ erscheint nur noch, falls ein Bild fehlt.
