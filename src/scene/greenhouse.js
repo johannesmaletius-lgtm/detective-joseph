@@ -1,13 +1,21 @@
-import { background, perspective, train, lampDust } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 17 (Tür 17): das Gewächshaus – das Versteck des anderen Joseph. Nur DATEN – was passiert,
-// steht in src/story/wagon17.js. Das Glasdach ist im Hintergrundbild durchsichtig; dahinter malt
-// das Drehbuch den Nachthimmel mit Schnee (animations: 'sky').
+// steht in src/story/wagon17.js. Glaswände und Glasdach sind im Hintergrundbild durchsichtig.
+// Durch die Seitenwände zieht die Landschaft wie hinter den Zugfenstern vorbei – perspektivisch zur
+// Tür hin (der Zug fährt nach hinten ins Bild). Darüber malt das Drehbuch den Himmel im Dach, Schnee,
+// beschlagene Scheiben und die Gestalt draußen (animations: 'sky').
+const GLASS = outside([
+  { from: 0, to: 500, top: 80, bottom: 330 },    // linke Glaswand
+  { from: 790, to: 1280, top: 80, bottom: 400 }, // rechte Glaswand
+]);
+GLASS.windowLight = null; // die Glaswände sind zu groß für den Lichtschein der Zugfenster
 
 export const greenhouse = {
   id: 'greenhouse',
   name: 'Gewächshaus',
   background: background('assets/scenes/wagon-17/background.webp'),
+  outside: GLASS,
 
   animations: [
     { id: 'sky', layer: 'behind', x: 0, y: 0, width: 1280, height: 720 },

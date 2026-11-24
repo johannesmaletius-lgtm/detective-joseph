@@ -13,51 +13,31 @@ const GHOST_FRAMES = Array.from({ length: 8 }, (_, i) => `assets/characters/ande
 GHOST_FRAMES.forEach((src) => picture(src));
 const FLAKES = Array.from({ length: 140 }, (_, i) => ({ x: (i * 977) % 1280, y: (i * 421) % 720, s: 1 + (i % 3), v: 20 + (i % 5) * 9 }));
 
-// Dieselbe gemalte Landschaft wie hinter den Zugfenstern der anderen Wagen (outside/*.png), nur flach
-// und größer, weil das Gewächshaus fast ganz aus Glas ist. Die Fenster reichen bis etwa y = 460.
-const OUT = 'assets/scenes/train-compartment/outside/';
-const SCALE = 1.4;
-const LAYERS = [
-  { src: `${OUT}sky.png`, y: 85, speed: 0.5 },
-  { src: `${OUT}clouds.png`, y: 88, speed: 6 },
-  { src: `${OUT}hills.png`, y: 150, speed: 14 },
-  { src: `${OUT}treeline.png`, y: 150, speed: 45 },
-  { src: `${OUT}forest.png`, y: 60, speed: 160 },
-];
-const NEAR = { src: `${OUT}near.png`, y: 85, speed: 1100 };
-[...LAYERS, NEAR].forEach((layer) => picture(layer.src));
-picture(`${OUT}moon.png`);
-const toY = (y) => (y - 85) * SCALE + 141; // Horizont auf etwa y = 320, Waldboden an der Fensterkante
-const STARS = Array.from({ length: 90 }, (_, i) => [(i * 619) % 1280, (i * 233) % 150, 0.35 + (i % 4) * 0.15]);
-
-function band(ctx, { src, y, speed }, distance) {
-  const image = picture(src);
-  if (!image.complete || !image.naturalWidth) return;
-  const w = image.naturalWidth * SCALE, h = image.naturalHeight * SCALE;
-  let x = -((distance * speed * SCALE) % w);
-  if (x > 0) x -= w;
-  for (; x < 1280; x += w) ctx.drawImage(image, x, toY(y), w, h);
-}
+// Die Landschaft selbst zeichnet die Außenwelt der Szene (src/scene/outsideView.js) perspektivisch in die
+// Glaswände, unter y = 80. Hier kommt nur dazu, was darüber liegt: der Himmel im Glasdach (dieselbe
+// Farbe wie oben im Himmelsbild der Außenwelt), Schnee, die Gestalt draußen, Tunnel und Beschlag.
+const ROOF = 80;
+const ROOF_FILL = 90; // etwas tiefer: Die Außenwelt beginnt mit leerem Himmel und federt mit dem Wagen auf und ab
+const STARS = Array.from({ length: 50 }, (_, i) => [(i * 619) % 1280, (i * 233) % ROOF, 0.35 + (i % 4) * 0.15]);
 
 // fog = 0 … 1 (beschlagene Scheiben), ghost = x-Position der Gestalt draußen (oder null),
-// distance = gefahrene Strecke des Zuges, tunnel = 0 … 1 (im Tunnel)
-export function paintSky(ctx, { time, dark, fog = 0, ghost = null, distance = time, tunnel = 0 }) {
+// tunnel = 0 … 1 (im Tunnel)
+export function paintSky(ctx, { time, dark, fog = 0, ghost = null, tunnel = 0 }) {
   if (dark) {
     ctx.fillStyle = '#020203';
     ctx.fillRect(0, 0, 1280, 720);
     return;
   }
   ctx.fillStyle = '#150f3d';
-  ctx.fillRect(0, 0, 1280, 720);
+  ctx.fillRect(0, 0, 1280, ROOF_FILL);
   for (const [x, y, a] of STARS) {
     ctx.fillStyle = `rgba(235, 235, 255, ${a})`;
     ctx.fillRect(x, y, 1.5, 1.5);
   }
-  band(ctx, LAYERS[0], distance);
-  drawPicture(ctx, `${OUT}moon.png`, 960, 40, 110, 110);
-  for (const layer of LAYERS.slice(1)) band(ctx, layer, distance);
-  ctx.fillStyle = '#2b2470';
-  ctx.fillRect(0, toY(60 + 250) - 2, 1280, 720);
+  if (tunnel > 0) {
+    ctx.fillStyle = `rgba(4, 3, 8, ${tunnel})`;
+    ctx.fillRect(0, 0, 1280, ROOF_FILL);
+  }
   if (ghost !== null) {
     // er rennt nach links davon: Laufbilder, ein Durchlauf (zwei Schritte) alle 150 Pixel
     const frame = Math.floor(((1300 - ghost) / 150) * GHOST_FRAMES.length) % GHOST_FRAMES.length;
@@ -67,15 +47,10 @@ export function paintSky(ctx, { time, dark, fog = 0, ghost = null, distance = ti
     drawPicture(ctx, GHOST_FRAMES[frame], ghost - 34, 150, 159, 300);
     ctx.restore();
   }
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillStyle = `rgba(255,255,255,${0.85 * (1 - tunnel)})`;
   for (const f of FLAKES) {
     const y = (f.y + time * f.v) % 720, x = (f.x + Math.sin(time + f.y) * 10) % 1280;
     ctx.fillRect(x, y, f.s, f.s);
-  }
-  band(ctx, NEAR, distance);
-  if (tunnel > 0) {
-    ctx.fillStyle = `rgba(4, 3, 8, ${tunnel})`;
-    ctx.fillRect(0, 0, 1280, 720);
   }
   if (fog > 0) {
     ctx.fillStyle = `rgba(210, 220, 225, ${0.75 * fog})`;
