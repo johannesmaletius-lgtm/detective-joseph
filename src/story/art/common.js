@@ -337,3 +337,62 @@ export function rivet(ctx, x, y, r = 4, metal = [150, 140, 120]) {
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fill();
 }
+
+// Messingschild mit Doppelrand und zwei Nieten (Text setzt der Aufrufer darauf)
+export function brassPlate(ctx, x, y, w, h) {
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  g.addColorStop(0, '#f2d98c');
+  g.addColorStop(0.5, '#c9a24a');
+  g.addColorStop(1, '#8a6a24');
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
+  ctx.fillStyle = g;
+  roundedRect(ctx, x, y, w, h, 4);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(70, 50, 14, 0.7)';
+  ctx.lineWidth = 1;
+  roundedRect(ctx, x + 2.5, y + 2.5, w - 5, h - 5, 3);
+  ctx.stroke();
+  rivet(ctx, x + 8, y + h / 2, 2.5, [150, 120, 50]);
+  rivet(ctx, x + w - 8, y + h / 2, 2.5, [150, 120, 50]);
+}
+
+// Holzrahmen (Gehrung, Lichtkante, Schatten nach außen) um eine Fläche; innen bleibt frei
+export function woodFrame(ctx, x, y, w, h, { border = 30, tone = [126, 80, 42], seed = 1 } = {}) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = '#3a2412';
+  ctx.fillRect(x, y, w, border);
+  ctx.fillRect(x, y + h - border, w, border);
+  ctx.fillRect(x, y, border, h);
+  ctx.fillRect(x + w - border, y, border, h);
+  ctx.restore();
+  const [r, g, b] = tone;
+  plank(ctx, x, y, w, border, { tone: [r + 6, g + 4, b + 2], seed });
+  plank(ctx, x, y + h - border, w, border, { tone: [r - 6, g - 4, b - 2], seed: seed + 1 });
+  plank(ctx, x, y, border, h, { tone, seed: seed + 2, vertical: true });
+  plank(ctx, x + w - border, y, border, h, { tone, seed: seed + 3, vertical: true });
+  ctx.strokeStyle = 'rgba(20, 10, 4, 0.6)';
+  ctx.lineWidth = 1.5;
+  for (const [x0, y0, x1, y1] of [[x, y, x + border, y + border], [x + w, y, x + w - border, y + border], [x, y + h, x + border, y + h - border], [x + w, y + h, x + w - border, y + h - border]]) line(ctx, x0, y0, x1, y1);
+  ctx.strokeStyle = 'rgba(255, 220, 160, 0.3)';
+  line(ctx, x + 1, y + 1, x + w - 1, y + 1);
+  line(ctx, x + 1, y + 1, x + 1, y + h - 1);
+  // Schatten des Rahmens auf die Innenfläche
+  const ix = x + border, iy = y + border, iw = w - border * 2, ih = h - border * 2;
+  const top = ctx.createLinearGradient(0, iy, 0, iy + 22);
+  top.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
+  top.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = top;
+  ctx.fillRect(ix, iy, iw, 22);
+  const left = ctx.createLinearGradient(ix, 0, ix + 18, 0);
+  left.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+  left.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = left;
+  ctx.fillRect(ix, iy, 18, ih);
+}

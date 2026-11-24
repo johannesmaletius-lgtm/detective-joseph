@@ -1,6 +1,6 @@
 import { MORSE_DIGITS } from '../../effects/morse.js';
 import {
-  BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, cached, drawPicture, glow, fineGrain, line, plank, rivet, roundedRect, screw, seeded, sheet, smudge, text, vignette, wood,
+  BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, cached, cachedLayer, drawPicture, glow, fineGrain, line, plank, rivet, roundedRect, screw, seeded, sheet, smudge, text, vignette, wood,
 } from './common.js';
 
 // Gezeichnetes für Wagen 16 (Funkraum): Antennenkurbel mit Empfangsanzeige, Logbuch,
@@ -492,28 +492,81 @@ export function drawRadioLight(ctx, on, time) {
 }
 
 // ---------------------------------------------------------------- Morsetafel (Ziffern)
+// Emailleschild an der Wand des Funkraums
+function paintMorseBoard(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [62, 40, 24], seed: 161, vertical: true, knots: 0 });
+  for (let x = 20; x < 1280; x += 130) {
+    c.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    c.fillRect(x, 0, 3, 720);
+  }
+  glow(c, 640, 200, 600, '255, 214, 150', 0.14);
+  vignette(c, 0, 0, 1280, 720, 0.65);
+  // Blechschild mit gebördeltem Rand und Emaille
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  c.shadowBlur = 30;
+  c.shadowOffsetY = 14;
+  c.fillStyle = '#1c2a52';
+  roundedRect(c, 290, 80, 700, 560, 22);
+  c.fill();
+  c.restore();
+  const enamel = c.createLinearGradient(0, 96, 0, 624);
+  enamel.addColorStop(0, '#f6eed8');
+  enamel.addColorStop(1, '#ddd0ae');
+  c.fillStyle = enamel;
+  roundedRect(c, 304, 94, 672, 532, 16);
+  c.fill();
+  c.strokeStyle = '#1c2a52';
+  c.lineWidth = 3;
+  roundedRect(c, 318, 108, 644, 504, 10);
+  c.stroke();
+  fineGrain(c, 304, 94, 672, 532, { seed: 162, count: 0.002, dark: 0.08, light: 0.08 });
+  // Abgeplatzte Emaille an Rand und Löchern
+  for (const [x, y, r] of [[310, 400, 9], [972, 180, 7], [700, 622, 8], [330, 104, 6]]) {
+    c.fillStyle = '#2a2a2c';
+    c.beginPath();
+    c.ellipse(x, y, r, r * 0.7, 0.4, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = 'rgba(120, 60, 20, 0.5)';
+    c.beginPath();
+    c.ellipse(x + 1, y + 1, r * 0.6, r * 0.4, 0.4, 0, Math.PI * 2);
+    c.fill();
+  }
+  // Glanz
+  const sheen = c.createLinearGradient(304, 94, 700, 400);
+  sheen.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+  sheen.addColorStop(0.4, 'rgba(255, 255, 255, 0)');
+  c.fillStyle = sheen;
+  roundedRect(c, 304, 94, 672, 532, 16);
+  c.fill();
+  for (const [x, y] of [[330, 124], [950, 124], [330, 596], [950, 596]]) screw(c, x, y, 7, x * 0.02);
+}
+
 export function drawMorseBoard(ctx) {
-  sheet(ctx, 300, 90, 680, 540, {
-    color: '#efe3c2',
-    inner: (c) => {
-      text(c, 'Morsezeichen – Ziffern', 340, 54, { font: `bold 28px ${SERIF}`, align: 'center' });
-      Object.entries(MORSE_DIGITS).forEach(([digit, code], i) => {
-        const col = i < 5 ? 0 : 1;
-        const row = i % 5;
-        const x = 70 + col * 320, y = 120 + row * 76;
-        text(c, digit, x, y + 18, { font: `bold 36px ${SERIF}` });
-        [...code].forEach((mark, k) => {
-          c.fillStyle = INK;
-          if (mark === '.') {
-            c.beginPath();
-            c.arc(x + 70 + k * 36, y + 6, 7, 0, Math.PI * 2);
-            c.fill();
-          } else c.fillRect(x + 56 + k * 36, y + 1, 28, 10);
-        });
-      });
-      text(c, '· kurz     — lang', 340, 510, { font: `18px ${PRINT}`, align: 'center' });
-    },
+  ctx.drawImage(cachedLayer('w16-morse', paintMorseBoard), 0, 0, 1280, 720);
+  const ox = 300, oy = 90;
+  text(ctx, 'Morsezeichen – Ziffern', ox + 340, oy + 56, { font: `bold 28px ${SERIF}`, color: '#1c2a52', align: 'center' });
+  ctx.strokeStyle = 'rgba(28, 42, 82, 0.5)';
+  ctx.lineWidth = 1.5;
+  line(ctx, ox + 120, oy + 72, ox + 560, oy + 72);
+  Object.entries(MORSE_DIGITS).forEach(([digit, code], i) => {
+    const col = i < 5 ? 0 : 1;
+    const row = i % 5;
+    const x = ox + 70 + col * 320, y = oy + 120 + row * 76;
+    text(ctx, digit, x, y + 18, { font: `bold 36px ${SERIF}`, color: '#1c2a52' });
+    [...code].forEach((mark, k) => {
+      ctx.fillStyle = '#1a1a1c';
+      if (mark === '.') {
+        ctx.beginPath();
+        ctx.arc(x + 70 + k * 36, y + 6, 7, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        roundedRect(ctx, x + 56 + k * 36, y + 1, 28, 10, 3);
+        ctx.fill();
+      }
+    });
   });
+  text(ctx, '· kurz     — lang', ox + 340, oy + 510, { font: `18px ${PRINT}`, color: '#1c2a52', align: 'center' });
 }
 
 export function morseText(digits) {

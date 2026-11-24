@@ -1,4 +1,7 @@
-import { HAND, INK, PRINT, RED, TYPEWRITER, drawFilePage, drawPicture, glow, line, text, wood } from './common.js';
+import {
+  HAND, INK, PRINT, RED, TYPEWRITER, brassPlate, cachedLayer, drawFilePage, drawPicture, fineGrain, glow, grain, line, plank, rivet, roundedRect,
+  screw, text, vignette, woodFrame,
+} from './common.js';
 
 // Gezeichnetes für Wagen 2 (Gepäckwagen): Kofferanhänger, Kofferstapel mit Kreidefeldern, Gepäckwaage, Aktenseiten.
 
@@ -30,42 +33,126 @@ export function tagTokens() {
 }
 export const TAG_SLOTS = Array.from({ length: 12 }, (_, i) => ({ x: 120 + i * 88, y: 474, w: 82, h: 120, label: String(i + 1) }));
 
-export function drawTagBoard(ctx) {
-  wood(ctx, 90, 70, 1100, 580, [104, 64, 30]);
-  text(ctx, 'Kofferanhänger – in der Reihenfolge der Abfahrt aufhängen', 640, 456, { font: `bold 20px ${PRINT}`, color: '#f1e0b8', align: 'center' });
-  for (const slot of TAG_SLOTS) {
-    ctx.fillStyle = '#c9a24a';
-    ctx.beginPath();
-    ctx.arc(slot.x + slot.w / 2, slot.y + 6, 7, 0, Math.PI * 2);
-    ctx.fill();
+// Brett im Gepäckwagen: oben hängen die Anhänger durcheinander, unten die Hakenleiste mit 1–12
+function paintTagBoard(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [60, 38, 22], seed: 21, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.6);
+  woodFrame(c, 80, 60, 1120, 600, { border: 28, tone: [120, 76, 40], seed: 22 });
+  // Bretter der Rückwand (waagerecht, mit Fugen)
+  for (let k = 0; k < 6; k++) plank(c, 108, 88 + k * 91, 1064, 91, { tone: [150, 104, 60], seed: 30 + k, knots: 1 });
+  for (let k = 1; k < 6; k++) {
+    c.fillStyle = 'rgba(30, 14, 4, 0.55)';
+    c.fillRect(108, 88 + k * 91, 1064, 2);
+    c.fillStyle = 'rgba(255, 226, 170, 0.18)';
+    c.fillRect(108, 90 + k * 91, 1064, 1);
   }
+  fineGrain(c, 108, 88, 1064, 544, { seed: 23, count: 0.003 });
+  glow(c, 420, 160, 560, '255, 220, 160', 0.14);
+  // Haken für die losen Anhänger (zwei Reihen à sechs)
+  for (let i = 0; i < 12; i++) hook(c, 250 + (i % 6) * 156, 170 + Math.floor(i / 6) * 150 - 66);
+  // Kreidestrich und Hakenleiste unten
+  c.fillStyle = 'rgba(30, 18, 8, 0.5)';
+  c.fillRect(108, 440, 1064, 2);
+  const rail = c.createLinearGradient(0, 466, 0, 482);
+  rail.addColorStop(0, '#f2d98c');
+  rail.addColorStop(0.5, '#b08a3a');
+  rail.addColorStop(1, '#5a3e12');
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  c.shadowBlur = 8;
+  c.shadowOffsetY = 4;
+  c.fillStyle = rail;
+  roundedRect(c, 112, 466, 1056, 14, 5);
+  c.fill();
+  c.restore();
+  for (const x of [130, 640, 1150]) screw(c, x, 473, 5, x * 0.02);
+  for (const slot of TAG_SLOTS) hook(c, slot.x + slot.w / 2, slot.y + 2);
+  brassPlate(c, 360, 422, 560, 30);
+  text(c, 'Kofferanhänger – in der Reihenfolge der Abfahrt aufhängen', 640, 443, { font: `bold 15px ${PRINT}`, color: '#3a2a10', align: 'center' });
+}
+
+// Messinghaken (Öse für den Anhänger bei y + 12)
+function hook(c, x, y) {
+  rivet(c, x, y, 5.5, [176, 140, 64]);
+  c.strokeStyle = '#7a5a20';
+  c.lineWidth = 3.5;
+  c.lineCap = 'round';
+  c.beginPath();
+  c.moveTo(x, y);
+  c.lineTo(x, y + 10);
+  c.arc(x + 5, y + 10, 5, Math.PI, 0, true);
+  c.stroke();
+  c.strokeStyle = 'rgba(255, 236, 170, 0.6)';
+  c.lineWidth = 1;
+  line(c, x - 1, y + 1, x - 1, y + 9);
+}
+
+export function drawTagBoard(ctx) {
+  ctx.drawImage(cachedLayer('w2-tagboard', paintTagBoard), 0, 0, 1280, 720);
 }
 
 export function drawTag(ctx, token, x, y) {
   const { w, h, tag } = token;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#e9d39b';
-  ctx.strokeStyle = '#8c6a2a';
-  ctx.lineWidth = 2;
+  // Schnur zur Öse
+  ctx.strokeStyle = '#d8cfb4';
+  ctx.lineWidth = 1.6;
   ctx.beginPath();
-  ctx.moveTo(-w / 2 + 16, -h / 2);
-  ctx.lineTo(w / 2 - 16, -h / 2);
-  ctx.lineTo(w / 2, -h / 2 + 16);
-  ctx.lineTo(w / 2, h / 2);
-  ctx.lineTo(-w / 2, h / 2);
-  ctx.lineTo(-w / 2, -h / 2 + 16);
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(-4, -h / 2 + 14);
+  ctx.lineTo(0, -h / 2 - 6);
+  ctx.lineTo(4, -h / 2 + 14);
   ctx.stroke();
-  ctx.fillStyle = '#5c4320';
+  const shape = () => {
+    ctx.beginPath();
+    ctx.moveTo(-w / 2 + 16, -h / 2);
+    ctx.lineTo(w / 2 - 16, -h / 2);
+    ctx.lineTo(w / 2, -h / 2 + 16);
+    ctx.lineTo(w / 2, h / 2);
+    ctx.lineTo(-w / 2, h / 2);
+    ctx.lineTo(-w / 2, -h / 2 + 16);
+    ctx.closePath();
+  };
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 5;
+  const card = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+  card.addColorStop(0, '#f2dfaa');
+  card.addColorStop(1, '#d4b878');
+  ctx.fillStyle = card;
+  shape();
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  shape();
+  ctx.clip();
+  grain(ctx, -w / 2, -h / 2, w, h, { seed: tag.time.charCodeAt(1) * 7 + tag.city.length, count: 70, alpha: 0.12 });
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(120, 88, 34, 0.8)';
+  ctx.lineWidth = 1.5;
+  shape();
+  ctx.stroke();
+  // Messingöse
+  ctx.strokeStyle = '#a8822e';
+  ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.arc(0, -h / 2 + 14, 6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#3a2810';
+  ctx.beginPath();
+  ctx.arc(0, -h / 2 + 14, 4, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = RED;
   ctx.fillRect(-w / 2, -h / 2 + 28, w, 16);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.fillRect(-w / 2, -h / 2 + 28, w, 2);
   text(ctx, 'RINGBAHN', 0, -h / 2 + 41, { font: `bold 12px ${PRINT}`, color: '#fff3d6', align: 'center' });
   text(ctx, tag.city, 0, 4, { font: `bold ${tag.city.length > 8 ? 15 : 18}px ${TYPEWRITER}`, align: 'center' });
+  ctx.strokeStyle = 'rgba(80, 60, 30, 0.35)';
+  ctx.lineWidth = 1;
+  line(ctx, -w / 2 + 10, 12, w / 2 - 10, 12);
   text(ctx, 'Abfahrt', 0, 28, { font: `12px ${PRINT}`, align: 'center' });
   text(ctx, tag.time, 0, 50, { font: `bold 20px ${HAND}`, color: '#27408f', align: 'center' });
   ctx.restore();
@@ -354,14 +441,61 @@ export function drawPages23(ctx) {
   });
 }
 
+function paintSign(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [70, 46, 28], seed: 24, vertical: true, knots: 1 });
+  for (let x = 50; x < 1280; x += 120) {
+    c.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    c.fillRect(x, 0, 3, 720);
+  }
+  glow(c, 640, 240, 500, '255, 214, 150', 0.16);
+  vignette(c, 0, 0, 1280, 720, 0.65);
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  c.shadowBlur = 28;
+  c.shadowOffsetY = 12;
+  c.fillStyle = '#2b2118';
+  roundedRect(c, 432, 152, 416, 416, 16);
+  c.fill();
+  c.restore();
+  const enamel = c.createLinearGradient(0, 160, 0, 560);
+  enamel.addColorStop(0, '#ece4cc');
+  enamel.addColorStop(1, '#cfc4a6');
+  c.fillStyle = enamel;
+  roundedRect(c, 440, 160, 400, 400, 12);
+  c.fill();
+  fineGrain(c, 440, 160, 400, 400, { seed: 25, count: 0.003, dark: 0.1, light: 0.08 });
+  c.strokeStyle = INK;
+  c.lineWidth = 4;
+  roundedRect(c, 456, 176, 368, 368, 6);
+  c.stroke();
+  // Rost an den Schraubenlöchern, Glanz oben links
+  for (const [x, y] of [[462, 182], [818, 182], [462, 538], [818, 538]]) {
+    smudgeRust(c, x, y);
+    screw(c, x, y, 7, x * 0.02);
+  }
+  const sheen = c.createLinearGradient(440, 160, 700, 420);
+  sheen.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+  sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+  c.fillStyle = sheen;
+  roundedRect(c, 440, 160, 400, 400, 12);
+  c.fill();
+}
+
+function smudgeRust(c, x, y) {
+  const g = c.createRadialGradient(x + 2, y + 6, 1, x + 2, y + 8, 20);
+  g.addColorStop(0, 'rgba(120, 60, 20, 0.5)');
+  g.addColorStop(1, 'rgba(120, 60, 20, 0)');
+  c.fillStyle = g;
+  c.fillRect(x - 20, y - 14, 44, 44);
+}
+
 export function drawSign(ctx) {
-  ctx.fillStyle = '#d8cfb8';
-  ctx.fillRect(440, 160, 400, 400);
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(456, 176, 368, 368);
+  ctx.drawImage(cachedLayer('w2-sign', paintSign), 0, 0, 1280, 720);
   text(ctx, 'GEPÄCKWAGEN', 640, 240, { font: `bold 34px ${PRINT}`, align: 'center' });
   text(ctx, 'Abfertigung', 640, 280, { font: `22px ${PRINT}`, align: 'center' });
+  ctx.strokeStyle = 'rgba(43, 33, 24, 0.6)';
+  ctx.lineWidth = 1.5;
+  line(ctx, 520, 304, 760, 304);
   text(ctx, 'Anhänger nach Abfahrt', 640, 360, { font: `20px ${PRINT}`, align: 'center' });
   text(ctx, 'aufhängen – frühe zuerst.', 640, 390, { font: `20px ${PRINT}`, align: 'center' });
   text(ctx, 'Zerbrechliches nach oben!', 640, 460, { font: `bold 20px ${PRINT}`, color: RED, align: 'center' });

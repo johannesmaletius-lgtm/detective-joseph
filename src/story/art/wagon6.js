@@ -1,6 +1,6 @@
 import { loadImage } from '../../core/assets.js';
 import {
-  HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, drawPicture, glow, fineGrain, line, plank, rivet, roundedRect, seeded, sheet, text, vignette,
+  HAND, INK, PRINT, RED, SERIF, TYPEWRITER, brassPlate, cached, cachedLayer, drawPicture, grain, glow, fineGrain, line, plank, rivet, roundedRect, seeded, sheet, text, vignette,
 } from './common.js';
 
 // Gezeichnetes für Wagen 6 (Fundbüro): Karteikarten, Regal-Suchbild, Schließfächer, Taschenuhr.
@@ -387,27 +387,100 @@ export const LOCKER_SPOTS = Array.from({ length: 12 }, (_, i) => ({
   label: `Schließfach ${i + 1}`,
 }));
 
+function paintLockerWall(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [58, 36, 22], seed: 61, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.6);
+  // Blechschrank mit gekanteter Umrandung
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  c.shadowBlur = 34;
+  c.shadowOffsetY = 14;
+  c.fillStyle = '#3a3e40';
+  c.fillRect(356, 46, 568, 628);
+  c.restore();
+  const body = c.createLinearGradient(356, 0, 924, 0);
+  body.addColorStop(0, '#2c3032');
+  body.addColorStop(0.5, '#4a5054');
+  body.addColorStop(1, '#262a2c');
+  c.fillStyle = body;
+  c.fillRect(356, 46, 568, 628);
+  fineGrain(c, 356, 46, 568, 628, { seed: 62, count: 0.004, dark: 0.2, light: 0.06 });
+  c.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  c.fillRect(356, 46, 568, 2);
+  for (let i = 0; i <= 8; i++) for (const y of [56, 664]) rivet(c, 366 + i * 68.5, y, 3, [130, 134, 136]);
+  // Nischen hinter den Türen (sichtbar, wenn offen)
+  for (const spot of LOCKER_SPOTS) {
+    c.fillStyle = '#0e0d0c';
+    c.fillRect(spot.x, spot.y, spot.w, spot.h);
+    const inner = c.createLinearGradient(0, spot.y, 0, spot.y + spot.h);
+    inner.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+    inner.addColorStop(1, 'rgba(60, 60, 60, 0.25)');
+    c.fillStyle = inner;
+    c.fillRect(spot.x, spot.y, spot.w, spot.h);
+  }
+  glow(c, 640, 80, 480, '255, 230, 190', 0.1);
+}
+
+// Eine geschlossene Blechtür mit Lüftungsschlitzen, Nummernschild und Schlüsselloch
+function lockerDoor(c, spot, n) {
+  const { x, y, w, h } = spot;
+  const g = c.createLinearGradient(x, y, x + w, y + h);
+  g.addColorStop(0, '#a4aaae');
+  g.addColorStop(0.5, '#80878b');
+  g.addColorStop(1, '#565c60');
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  c.shadowBlur = 6;
+  c.shadowOffsetY = 3;
+  c.fillStyle = g;
+  c.fillRect(x, y, w, h);
+  c.restore();
+  c.fillStyle = 'rgba(255, 255, 255, 0.25)';
+  c.fillRect(x, y, w, 2);
+  c.fillRect(x, y, 2, h);
+  c.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  c.fillRect(x, y + h - 2, w, 2);
+  c.fillRect(x + w - 2, y, 2, h);
+  // Lüftungsschlitze (eingeprägt)
+  for (let k = 0; k < 4; k++) {
+    const ly = y + 62 + k * 13;
+    c.fillStyle = 'rgba(20, 22, 24, 0.75)';
+    roundedRect(c, x + 60, ly, 76, 5, 2.5);
+    c.fill();
+    c.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    c.fillRect(x + 61, ly + 5, 74, 1);
+  }
+  // Messing-Nummernschild
+  brassPlate(c, x + 8, y + 12, 48, 30);
+  text(c, String(n), x + 32, y + 33, { font: `bold 16px ${PRINT}`, color: '#2a1e08', align: 'center' });
+  // Scharniere
+  for (const hy of [y + 20, y + h - 34]) {
+    c.fillStyle = '#3a3e40';
+    c.fillRect(x - 3, hy, 6, 14);
+  }
+  // Schloss
+  const lx = x + w - 22, ly = y + 30;
+  const lg = c.createRadialGradient(lx - 2, ly - 2, 1, lx, ly, 10);
+  lg.addColorStop(0, '#fbe6a4');
+  lg.addColorStop(1, '#6a4a14');
+  c.fillStyle = lg;
+  c.beginPath();
+  c.arc(lx, ly, 10, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#1a1208';
+  c.beginPath();
+  c.arc(lx, ly - 2, 2.6, 0, Math.PI * 2);
+  c.fill();
+  c.fillRect(lx - 1.2, ly - 1, 2.4, 6);
+  grain(c, x, y, w, h, { seed: n * 13, count: 40, alpha: 0.3 });
+}
+
 export function drawLockers(ctx, open = []) {
-  ctx.fillStyle = '#2b2a28';
-  ctx.fillRect(360, 50, 560, 620);
+  ctx.drawImage(cachedLayer('w6-lockers', paintLockerWall), 0, 0, 1280, 720);
   for (const spot of LOCKER_SPOTS) {
     const n = Number(spot.id.slice(6));
-    const isOpen = open.includes(n);
-    const gradient = ctx.createLinearGradient(spot.x, spot.y, spot.x + spot.w, spot.y + spot.h);
-    gradient.addColorStop(0, isOpen ? '#1a1916' : '#8d9296');
-    gradient.addColorStop(1, isOpen ? '#0d0c0b' : '#5e6367');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
-    ctx.strokeStyle = '#3a3d40';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(spot.x, spot.y, spot.w, spot.h);
-    if (isOpen) continue;
-    ctx.fillStyle = '#d6a645';
-    ctx.fillRect(spot.x + 14, spot.y + 14, 36, 30);
-    text(ctx, String(n), spot.x + 32, spot.y + 36, { font: `bold 20px ${PRINT}`, color: INK, align: 'center' });
-    ctx.strokeStyle = 'rgba(30, 30, 30, 0.6)';
-    ctx.lineWidth = 3;
-    for (let k = 0; k < 3; k++) line(ctx, spot.x + 60, spot.y + 70 + k * 12, spot.x + 130, spot.y + 70 + k * 12);
+    if (open.includes(n)) continue;
+    lockerDoor(ctx, spot, n);
   }
 }
 

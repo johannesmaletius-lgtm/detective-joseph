@@ -1,6 +1,6 @@
 import { loadImage } from '../../core/assets.js';
 import { STAND_MIRRORS, WALL_MIRRORS } from '../../scene/mirrorCar.js';
-import { HAND, PRINT, SERIF, cachedLayer, glow, grain, line, rrect, seeded, smudge, text, wood } from './common.js';
+import { HAND, PRINT, SERIF, cachedLayer, fineGrain, glow, grain, line, plank, rivet, rrect, seeded, smudge, text, vignette } from './common.js';
 
 // Gezeichnetes für Wagen 9 (Spiegelwagen): was in den Spiegeln zu sehen ist, die Hebel,
 // die Kratzer (Spiegelschrift) und der Lichtplan mit den vier Standspiegeln.
@@ -199,36 +199,79 @@ export function drawEyeGlow(ctx, strength, time) {
 
 // ---------------------------------------------------------------- Kratzer
 // mirrored = true: so wie sie in der Wand stehen (Spiegelschrift); false: im Spiegel gelesen
-export function drawScratches(ctx, mirrored) {
-  ctx.save();
-  const panel = ctx.createLinearGradient(330, 150, 950, 570);
-  panel.addColorStop(0, '#7a4a22');
-  panel.addColorStop(1, '#4c2c12');
-  ctx.fillStyle = panel;
-  ctx.fillRect(330, 150, 620, 420);
-  wood(ctx, 340, 160, 600, 400, [110, 64, 30]);
-  if (!mirrored) {
-    // Rahmen eines Spiegels
-    ctx.strokeStyle = '#c9a24c';
-    ctx.lineWidth = 16;
-    ctx.strokeRect(338, 158, 604, 404);
+function paintScratchWall(c, mirrored) {
+  plank(c, 0, 0, 1280, 720, { tone: [46, 28, 18], seed: 91, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.7);
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  c.shadowBlur = 30;
+  c.shadowOffsetY = 12;
+  c.fillStyle = '#3a2410';
+  c.fillRect(330, 150, 620, 420);
+  c.restore();
+  // Wandbretter (senkrecht), im Spiegel etwas kühler und dunkler
+  for (let k = 0; k < 5; k++) plank(c, 340 + k * 120, 160, 120, 400, { tone: [118, 70, 34], seed: 92 + k, vertical: true, knots: 1 });
+  for (let k = 1; k < 5; k++) {
+    c.fillStyle = 'rgba(30, 14, 4, 0.6)';
+    c.fillRect(340 + k * 120, 160, 2, 400);
   }
+  fineGrain(c, 340, 160, 600, 400, { seed: 97, count: 0.003 });
+  if (!mirrored) {
+    // Spiegelglas: leicht bläulich, mit Glanzstreifen und blinden Stellen
+    c.fillStyle = 'rgba(160, 190, 210, 0.12)';
+    c.fillRect(340, 160, 600, 400);
+    const sheen = c.createLinearGradient(340, 160, 700, 560);
+    sheen.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+    sheen.addColorStop(0.3, 'rgba(255, 255, 255, 0)');
+    sheen.addColorStop(0.6, 'rgba(255, 255, 255, 0.06)');
+    sheen.addColorStop(0.7, 'rgba(255, 255, 255, 0)');
+    c.fillStyle = sheen;
+    c.fillRect(340, 160, 600, 400);
+    for (const [x, y] of [[360, 540], [920, 180], [900, 540]]) glow(c, x, y, 50, '200, 200, 190', 0.25);
+    // Goldrahmen mit Profil
+    const fg = c.createLinearGradient(330, 150, 950, 570);
+    fg.addColorStop(0, '#f2d98c');
+    fg.addColorStop(0.5, '#a8822e');
+    fg.addColorStop(1, '#5a3e12');
+    c.strokeStyle = fg;
+    c.lineWidth = 18;
+    c.strokeRect(337, 157, 606, 406);
+    c.strokeStyle = 'rgba(60, 40, 8, 0.7)';
+    c.lineWidth = 2;
+    c.strokeRect(346, 166, 588, 388);
+    c.strokeStyle = 'rgba(255, 240, 190, 0.5)';
+    c.strokeRect(329, 149, 622, 422);
+    for (const [x, y] of [[337, 157], [943, 157], [337, 563], [943, 563]]) rivet(c, x, y, 6, [190, 150, 70]);
+  } else {
+    vignette(c, 340, 160, 600, 400, 0.35);
+  }
+}
+
+export function drawScratches(ctx, mirrored) {
+  ctx.drawImage(cachedLayer(`w9-scratch-${mirrored ? 'wall' : 'mirror'}`, (c) => paintScratchWall(c, mirrored)), 0, 0, 1280, 720);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(340, 160, 600, 400);
+  ctx.clip();
   ctx.translate(640, 0);
   if (mirrored) ctx.scale(-1, 1);
-  ctx.strokeStyle = 'rgba(245, 220, 170, 0.85)';
-  ctx.lineWidth = 3;
   ctx.font = `bold 62px ${HAND}`;
   ctx.textAlign = 'center';
-  SCRATCH_TEXT.forEach((row, i) => {
-    ctx.save();
-    ctx.translate(0, 270 + i * 92);
-    ctx.rotate(-0.04 + i * 0.03);
-    ctx.strokeText(row, 0, 0);
-    ctx.restore();
-  });
-  // ein paar wilde Striche dazwischen
-  ctx.strokeStyle = 'rgba(245, 220, 170, 0.4)';
-  for (let i = 0; i < 9; i++) line(ctx, -260 + i * 60, 190 + (i % 3) * 120, -210 + i * 58, 230 + (i % 3) * 120);
+  const carve = (dx, dy, color, width) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    SCRATCH_TEXT.forEach((row, i) => {
+      ctx.save();
+      ctx.translate(dx, 270 + i * 92 + dy);
+      ctx.rotate(-0.04 + i * 0.03);
+      ctx.strokeText(row, 0, 0);
+      ctx.restore();
+    });
+    for (let i = 0; i < 9; i++) line(ctx, -260 + i * 60 + dx, 190 + (i % 3) * 120 + dy, -210 + i * 58 + dx, 230 + (i % 3) * 120 + dy);
+  };
+  // Kerbe: dunkle Tiefe, helles frisches Holz an der Kante
+  carve(1.5, 2, 'rgba(20, 8, 2, 0.75)', 5);
+  carve(0, 0, 'rgba(245, 220, 170, 0.85)', 2.5);
   ctx.restore();
   text(ctx, mirrored ? 'Tief in die Holzwand geritzt.' : 'Im Spiegel gegenüber: die Kratzer, richtig herum.', 640, 610, { font: `18px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
