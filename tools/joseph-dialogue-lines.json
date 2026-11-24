@@ -2125,11 +2125,6 @@
   "kind": "moment"
  },
  {
-  "text": "Er kommt gerade herein – und sieht mich, bevor er am Pult ist. Er dreht sich um und rennt.",
-  "file": "wagon22.js",
-  "kind": "moment"
- },
- {
   "text": "Zu spät! Er hat den Schlüssel schon wieder abgezogen und ist fort.",
   "file": "wagon22.js",
   "kind": "moment"
@@ -6330,16 +6325,6 @@
   "kind": "rest"
  },
  {
-  "text": "Der Vorhang ist zu. Kein Licht kommt herein.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
-  "text": "Ein schwerer Vorhang. Er ist offen.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
   "text": "Das Rotlicht leuchtet.",
   "file": "wagon19.js",
   "kind": "rest"
@@ -6380,17 +6365,12 @@
   "kind": "rest"
  },
  {
-  "text": "Durch den offenen Vorhang fällt Licht auf den Film. Verdorben!",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
   "text": "Ohne Rotlicht? Ich sehe nichts … Der Film rutscht mir weg. Verdorben.",
   "file": "wagon19.js",
   "kind": "rest"
  },
  {
-  "text": "Vorhang zu, Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.",
+  "text": "Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.",
   "file": "wagon19.js",
   "kind": "rest"
  },
@@ -6426,6 +6406,11 @@
  },
  {
   "text": "Ich sehe nichts.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein schwerer Vorhang. Er ist offen.",
   "file": "wagon19.js",
   "kind": "rest"
  },
@@ -6480,16 +6465,6 @@
   "kind": "rest"
  },
  {
-  "text": "Vorhang zu.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
-  "text": "Vorhang auf.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
   "text": "Rotlicht an.",
   "file": "wagon19.js",
   "kind": "rest"
@@ -6536,6 +6511,11 @@
  },
  {
   "text": "Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …",
+  "file": "wagon20.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Buchstabensalat. Daraus werde ich nicht schlau.",
   "file": "wagon20.js",
   "kind": "rest"
  },
