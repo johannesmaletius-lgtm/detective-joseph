@@ -11,6 +11,7 @@ import { morseSignal } from '../effects/morse.js';
 //
 // Sie besteht aus Ebenen (von hinten nach vorne). Jede Ebene ist eines von fünf Dingen:
 // - ein durchlaufendes Bild   { image, y, speed }      z. B. Wald – zieht mit Perspektive vorbei
+//                             mit ground: true  reicht die unterste Zeile (Boden) bis unten ins Fenster
 // - ein stehendes Bild        { image, x, y }          z. B. der Turm in der Mitte des Kreises
 //                             mit blink: { x, y, color, every }  blinkt gleichmäßig,
 //                             mit blink: { x, y, color, morse: '3', unit }  blinkt eine Ziffer im Morsecode
@@ -26,7 +27,7 @@ import { morseSignal } from '../effects/morse.js';
 //
 // Die linke Wagenseite wird so berechnet, die rechte ist dieselbe Rechnung gespiegelt.
 
-const BAND = { top: 80, height: 240 }; // nur in diesem waagerechten Band liegen Fenster
+const BAND = { top: 80, height: 380 }; // nur in diesem waagerechten Band liegen Fenster (bis y 460, auch die unteren Fenster)
 const SLICE_DISTANCE = 260;   // in diesem Abstand vom Fluchtpunkt gelten die feinsten Streifen (siehe sliceWidth)
 const TUNNEL_SLICE = 2;        // Breite der Streifen, in denen der Tunnel geprüft und gezeichnet wird
 const RIGHT_SIDE_SHIFT = 0.37; // die rechte Seite zeigt einen anderen Teil der Landschaft (Anteil der Bildbreite)
@@ -181,6 +182,11 @@ export class OutsideView {
       const scale = (vx - (x + right) / 2) / ref;
       const top = vy + (y - vy) * scale; // um den Horizont herum vergrößert bzw. verkleinert
       drawWrapped(ctx, picture, sourceFrom, sourceTo - sourceFrom, x, top, right - x, picture.height * scale);
+      // Boden (ground: true): die unterste Bildzeile reicht bis unten ins Fenster – für tief liegende Fenster
+      const bottom = top + picture.height * scale;
+      if (layer.ground && bottom < window.bottom) {
+        drawWrapped(ctx, picture, sourceFrom, sourceTo - sourceFrom, x, bottom - 1, right - x, window.bottom - bottom + 2, picture.height - 1);
+      }
     }
   }
 
@@ -365,13 +371,15 @@ function sliceWidth(speed, windowWidth) {
 
 // Zeichnet einen Ausschnitt eines endlos wiederholten Bildes. Läuft der Ausschnitt über den
 // rechten Bildrand hinaus, wird der Rest vom linken Bildrand genommen.
-function drawWrapped(ctx, picture, sourceX, sourceWidth, x, y, width, height) {
+// sourceY: nur ab dieser Bildzeile (z. B. die unterste Zeile, um den Boden zu verlängern)
+function drawWrapped(ctx, picture, sourceX, sourceWidth, x, y, width, height, sourceY = 0) {
   const start = mod(sourceX, picture.width);
   const first = Math.min(sourceWidth, picture.width - start);
   const firstWidth = (width * first) / sourceWidth;
-  ctx.drawImage(picture, start, 0, first, picture.height, x, y, firstWidth, height);
+  const rows = picture.height - sourceY;
+  ctx.drawImage(picture, start, sourceY, first, rows, x, y, firstWidth, height);
   if (first < sourceWidth) {
-    ctx.drawImage(picture, 0, 0, sourceWidth - first, picture.height, x + firstWidth, y, width - firstWidth, height);
+    ctx.drawImage(picture, 0, sourceY, sourceWidth - first, rows, x + firstWidth, y, width - firstWidth, height);
   }
 }
 

@@ -53,7 +53,7 @@ export const trainCompartment = {
         blink: { x: 16, y: 6, color: [255, 70, 60], morse: '3', unit: 0.34 },
       },
       { image: 'assets/scenes/train-compartment/outside/treeline.png', y: 150, speed: 45 },
-      { image: 'assets/scenes/train-compartment/outside/forest.png', y: 60, speed: 160 },
+      { image: 'assets/scenes/train-compartment/outside/forest.png', y: 60, speed: 160, ground: true },
       { image: 'assets/scenes/train-compartment/outside/near.png', y: 85, speed: 1100 },
     ],
     // Kaltes Licht, das durch die Fenster auf Wände und Sitze fällt (flackert, wenn draußen Stämme vorbeirauschen)
