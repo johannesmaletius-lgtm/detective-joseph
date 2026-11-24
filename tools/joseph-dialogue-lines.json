@@ -855,7 +855,7 @@
   "kind": "intro"
  },
  {
-  "text": "Er dreht sich zum Herd und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …",
+  "text": "Er kneift die Augen zu und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …",
   "file": "wagon4.js",
   "kind": "say"
  },
@@ -5836,6 +5836,11 @@
  },
  {
   "text": "Das Familienfoto: der junge Schaffner, seine Frau, die kleine Tochter mit dem Stoffhasen.",
+  "file": "wagon15.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.",
   "file": "wagon15.js",
   "kind": "rest"
  },

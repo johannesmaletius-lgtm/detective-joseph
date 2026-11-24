@@ -22,7 +22,14 @@ export const diningCar = {
     {
       id: 'bruno', name: 'Koch Bruno', poses: 'assets/characters/bruno',
       x: 548, y: 434, pose: 'front', size: 1.02,
-      walkTo: [636, 452], facing: 'left', color: '#ffd29a', idle: ['blink', 'busy'],
+      walkTo: [636, 452], facing: 'left', color: '#ffd29a', idle: ['blink'],
+      // Ab und zu rührt er im Topf; wenn die Räder quietschen, hält er sich die Ohren zu
+      // (Arme hoch – Ohren zu, zitternd – Arme runter)
+      busyAction: 'stir',
+      actions: {
+        stir: { loop: ['stir-1', 'stir-2', 'stir-3', 'stir-2'], loopFrame: 0.22 },
+        ears: { intro: ['ears-1'], loop: ['ears-2', 'ears-3'], outro: ['ears-1'], frame: 0.16, loopFrame: 0.32, shake: 1.2, whileTalking: true },
+      },
     },
   ],
 

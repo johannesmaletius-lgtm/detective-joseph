@@ -157,16 +157,12 @@ export const wagon4 = {
 
   onSqueal(story) {
     if (story.flags.registerOpen) return;
-    const bruno = story.character('bruno');
-    bruno.pose = 'left';
-    story.wait(Math.max(0.5, story.squealUntil - story.motion.time)).then(() => {
-      bruno.pose = 'front';
-    });
+    story.character('bruno').act('ears', Math.max(0.5, story.squealUntil - story.motion.time));
     if (!story.flags.squealSeen && story.flags.trayGuarded && !story.isBusy) {
       story.flags.squealSeen = true;
       story.respond(async () => {
         await story.speakAs('bruno', 'Aaah, dieses Quietschen! Meine armen Ohren!');
-        await story.say('Er dreht sich zum Herd und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …');
+        await story.say('Er kneift die Augen zu und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …');
       });
     }
   },
