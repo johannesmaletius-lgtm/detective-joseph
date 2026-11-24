@@ -16,6 +16,7 @@
 
 import fs from 'node:fs';
 import { Picture, fillPolygon, warpTriangle } from './lib/raster.mjs';
+import { prepareArm, armSwing, deformArm } from './lib/arm.mjs';
 
 const DIR = 'assets/characters/joseph';
 const FRAMES = 8;
@@ -41,6 +42,12 @@ const RIGS = {
     nearLeg: [[44, 392], [152, 392], [150, 420], [141, 446], [127, 468], [118, 490], [116, 520], [115, 545], [111, 558], [104, 572], [101, 580], [101, 615], [90, 617], [89, 650], [100, 672], [118, 680], [138, 684], [147, 690], [151, 697], [148, 709], [100, 718], [30, 717], [16, 709], [14, 690], [20, 662], [20, 620], [12, 612], [11, 580], [15, 558], [22, 542], [30, 522], [37, 500], [41, 470], [44, 440]],
     // Hand, die vor dem Oberschenkel hängt (gehört zum Oberkörper)
     hands: [[[16, 360], [124, 360], [124, 406], [114, 418], [100, 428], [82, 434], [64, 432], [50, 424], [38, 412], [18, 404]]],
+    // Armschwung (tools/lib/arm.mjs)
+    arm: {
+      shoulder: [45, 192], elbow: [44, 288], amp: 10,
+      shape: [[8, 182], [84, 182], [85, 292], [77, 314], [77, 341], [100, 347], [103, 400], [97, 420], [87, 433], [60, 435], [42, 425], [22, 411], [10, 381], [9, 340], [5, 300], [5, 250]],
+      behind: [[24, 178], [150, 178], [150, 445], [48, 445], [38, 400], [32, 340], [27, 280], [23, 220]],
+    },
   },
   left: {
     type: 'side',
@@ -51,6 +58,11 @@ const RIGS = {
     waistY: 392,
     nearLeg: [[50, 392], [170, 392], [171, 440], [175, 470], [179, 490], [186, 520], [195, 548], [201, 568], [206, 580], [206, 612], [203, 616], [204, 660], [206, 690], [206, 706], [200, 717], [120, 718], [82, 713], [77, 700], [80, 688], [90, 681], [105, 671], [122, 659], [133, 648], [133, 620], [120, 618], [120, 584], [114, 576], [104, 560], [99, 545], [100, 500], [97, 484], [80, 468], [62, 447], [53, 420]],
     hands: [[[94, 360], [152, 360], [153, 408], [146, 424], [132, 434], [112, 433], [101, 422], [96, 405]]],
+    arm: {
+      shoulder: [150, 190], elbow: [152, 286], amp: 10, forward: -1,
+      shape: [[110, 180], [196, 180], [198, 250], [197, 292], [193, 312], [180, 320], [178, 345], [180, 380], [174, 420], [161, 436], [124, 437], [99, 426], [95, 400], [99, 370], [109, 345], [124, 338], [127, 315], [117, 292], [111, 250]],
+      behind: [[60, 178], [181, 178], [183, 290], [179, 340], [173, 380], [171, 446], [60, 446]],
+    },
   },
   front: {
     type: 'frontal',
@@ -70,6 +82,7 @@ const RIGS = {
 
 for (const [name, rig] of Object.entries(RIGS)) {
   const source = Picture.load(`${DIR}/${name}.png`);
+  if (rig.arm) rig.prepared = prepareArm(source, rig.arm);
   const out = `${DIR}/walk-${name}`;
   fs.mkdirSync(out, { recursive: true });
   for (let f = 0; f < FRAMES; f++) {
@@ -87,8 +100,9 @@ function sideFrame(source, rig, phase) {
   const frame = new Picture(source.width + 2 * rig.pad, source.height);
   const shift = [rig.pad, 0];
 
-  const legImage = masked(source, [rig.nearLeg], true);
-  const bodyImage = masked(source, [[[0, 0], [source.width, 0], [source.width, rig.waistY], [0, rig.waistY]], ...rig.hands], true);
+  const base = rig.prepared?.body ?? source; // ohne den vorderen Arm (der kommt einzeln obendrauf)
+  const legImage = masked(base, [rig.nearLeg], true);
+  const bodyImage = masked(base, [[[0, 0], [source.width, 0], [source.width, rig.waistY], [0, rig.waistY]], ...rig.hands], true);
 
   // Fußziele beider Beine (hinteres Bein eine halbe Periode versetzt), dann Beckenhöhe so wählen,
   // dass kein Bein überstreckt wird: tiefster Punkt beim Aufsetzen, höchster in der Mitte.
@@ -104,9 +118,16 @@ function sideFrame(source, rig, phase) {
 
   // hinteres Bein: dunklere Kopie, leicht nach vorne und oben versetzt (weiter weg)
   warp(frame, legImage, bounds(rig.nearLeg, 6), (x, y) => skinLeg(x, y, rig, legPose(rig, far, hipDrop), rig.farOffset), shift, [0.7, 0.68, 0.74]);
+  const swing = armSwing(phase);
+  const armAt = (s) => (x, y) => {
+    const [ax, ay] = deformArm(x, y, rig.arm, rig.forward, s);
+    return [ax, ay + hipDrop];
+  };
   warp(frame, legImage, bounds(rig.nearLeg, 6), (x, y) => skinLeg(x, y, rig, legPose(rig, near, hipDrop), [0, 0]), shift);
   // Oberkörper wippt mit dem Becken
   warp(frame, bodyImage, [0, 0, source.width, rig.waistY + 60], (x, y) => [x, y + hipDrop], shift);
+  // vorderer Arm schwingt gegen das vordere Bein
+  if (rig.arm) warp(frame, rig.prepared.arm, rig.prepared.bounds, armAt(swing), shift);
   return frame;
 }
 

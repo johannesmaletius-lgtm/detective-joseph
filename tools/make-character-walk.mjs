@@ -19,6 +19,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { Picture, fillPolygon, warpTriangle } from './lib/raster.mjs';
+import { prepareArm, armSwing, deformArm } from './lib/arm.mjs';
 
 const FRAMES = 8;
 const FAR_TINT = [0.66, 0.64, 0.7];
@@ -44,17 +45,31 @@ const FIGURES = {
     left: { hip: [138, 520], knee: [138, 690], ankle: [140, 790], cut: 696, legX: [64, 200], stride: 140, lift: 20, toe: 70, sway: 5, skirtTop: 520,
       cane: { x: [41, 59], top: 560 } },
   },
+  // arm: Armschwung (tools/lib/arm.mjs) – Schulter, Ellbogen, Schwungwinkel, Umriss des Arms, Rumpf dahinter.
+  // Mira (Teddy), Herr Tick (Taschenuhr) und Herr K. (Stock) haben die Hände voll und schwingen nicht.
   moll: {
     right: { hip: [64, 480], knee: [62, 620], ankle: [64, 745], cut: 500, stride: 190, lift: 30, toe: 70, sway: 5, skirtTop: 480,
-      keep: [[[0, 470], [34, 470], [34, 590], [0, 590]], [[44, 380], [104, 380], [104, 478], [44, 478]]] },
+      keep: [[[0, 470], [34, 470], [34, 590], [0, 590]], [[44, 380], [104, 380], [104, 478], [44, 478]]],
+      arm: { shoulder: [55, 190], elbow: [62, 300], amp: 8,
+        shape: [[26, 175], [80, 175], [84, 240], [90, 300], [94, 360], [98, 395], [104, 430], [102, 468], [90, 481], [68, 481], [60, 455], [54, 415], [46, 398], [39, 360], [33, 300], [27, 250]],
+        behind: [[30, 170], [130, 170], [130, 486], [50, 486], [44, 400], [36, 300], [30, 240]] } },
     left: { hip: [96, 480], knee: [98, 620], ankle: [96, 745], cut: 500, stride: 190, lift: 30, toe: 70, sway: 5, skirtTop: 480,
-      keep: [[[126, 470], [159, 470], [159, 590], [126, 590]], [[56, 380], [116, 380], [116, 478], [56, 478]]] },
+      keep: [[[126, 470], [159, 470], [159, 590], [126, 590]], [[56, 380], [116, 380], [116, 478], [56, 478]]],
+      arm: { shoulder: [105, 190], elbow: [98, 300], amp: 8,
+        shape: [[80, 175], [134, 175], [131, 250], [125, 300], [119, 360], [113, 398], [105, 415], [101, 470], [91, 481], [65, 481], [55, 468], [55, 430], [63, 398], [67, 360], [71, 300], [75, 240]],
+        behind: [[30, 170], [128, 170], [124, 300], [114, 400], [108, 486], [30, 486]] } },
   },
   schaffner: {
     right: { hip: [75, 440], knee: [80, 610], ankle: [70, 800], cut: 445, stride: 200, lift: 32, toe: 80,
-      keep: [[[40, 405], [118, 405], [118, 508], [40, 508]]] },
+      keep: [[[40, 405], [118, 405], [118, 508], [40, 508]]],
+      arm: { shoulder: [45, 205], elbow: [45, 305], amp: 10,
+        shape: [[6, 192], [86, 192], [88, 335], [86, 375], [78, 398], [96, 410], [104, 425], [104, 480], [100, 506], [88, 519], [52, 519], [44, 495], [36, 445], [30, 412], [24, 388], [8, 378], [4, 330], [4, 250]],
+        behind: [[18, 190], [170, 190], [170, 525], [46, 525], [38, 450], [30, 420], [20, 380], [16, 300]] } },
     left: { hip: [105, 440], knee: [100, 610], ankle: [110, 800], cut: 445, stride: 200, lift: 32, toe: 80,
-      keep: [[[62, 405], [140, 405], [140, 508], [62, 508]]] },
+      keep: [[[62, 405], [140, 405], [140, 508], [62, 508]]],
+      arm: { shoulder: [135, 205], elbow: [135, 305], amp: 10,
+        shape: [[98, 192], [176, 192], [176, 250], [173, 335], [173, 380], [151, 390], [147, 410], [142, 425], [142, 480], [137, 506], [125, 519], [86, 519], [75, 500], [73, 440], [77, 415], [97, 405], [91, 380], [89, 335], [95, 250]],
+        behind: [[20, 190], [165, 190], [167, 300], [166, 380], [160, 420], [146, 445], [140, 525], [20, 525]] } },
   },
 
 
@@ -74,13 +89,14 @@ for (const [name, views] of Object.entries(FIGURES)) {
   const meta = { frames: FRAMES };
   for (const [view, rig] of Object.entries(views)) {
     const source = loadWebp(`${dir}/${view}.webp`);
+    const prepared = rig.arm && prepareArm(source, { ...rig.arm, forward: view === 'left' ? -1 : 1 });
     const out = `${dir}/walk-${view}`;
     fs.rmSync(out, { recursive: true, force: true });
     fs.mkdirSync(out, { recursive: true });
     const pngs = [];
     for (let f = 0; f < FRAMES; f++) {
       const phase = f / FRAMES;
-      const frame = view === 'front' ? frontalFrame(source, rig, phase) : sideFrame(source, rig, view === 'right' ? 1 : -1, phase);
+      const frame = view === 'front' ? frontalFrame(source, rig, phase) : sideFrame(source, rig, view === 'right' ? 1 : -1, phase, prepared);
       const png = path.join(tmp, `${name}-${view}-${f}.png`);
       frame.save(png);
       pngs.push([png, `${out}/frame_${String(f + 1).padStart(3, '0')}.webp`]);
@@ -114,7 +130,8 @@ function python(code) {
 
 // ------------------------------------------------------------------ Seitenansicht
 
-function sideFrame(source, rig, forward, phase) {
+function sideFrame(original, rig, forward, phase, prepared) {
+  const source = prepared?.body ?? original; // ohne den vorderen Arm (der kommt einzeln obendrauf)
   const pad = rig.pad ?? PAD;
   const frame = new Picture(source.width + 2 * pad, source.height);
   const shift = [pad, 0];
@@ -174,6 +191,14 @@ function sideFrame(source, rig, forward, phase) {
     const k = inside(bodyKeep, x, y) ? 0 : 1;
     return [x + swing * smoothstep(skirtTop, rig.cut, y) * k, y + hipDrop];
   }, shift);
+  // vorderer Arm schwingt gegen das vordere Bein
+  if (prepared) {
+    const s = armSwing(phase);
+    warp(frame, prepared.arm, prepared.bounds, (x, y) => {
+      const [ax, ay] = deformArm(x, y, rig.arm, forward, s);
+      return [ax, ay + hipDrop];
+    }, shift);
+  }
   return frame;
 }
 
