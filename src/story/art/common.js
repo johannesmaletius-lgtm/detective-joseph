@@ -221,3 +221,119 @@ export function contactShadow(ctx, cx, cy, rx, ry, alpha = 0.45) {
   ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
   ctx.restore();
 }
+
+// Aufwendige, unveränderliche Flächen nur einmal zeichnen und danach als Bild wiederverwenden.
+// draw(c) zeichnet mit (0, 0) = linke obere Ecke der Fläche.
+const CACHE = {};
+export function cached(key, w, h, draw) {
+  let entry = CACHE[key];
+  if (!entry) {
+    entry = document.createElement('canvas');
+    entry.width = Math.ceil(w);
+    entry.height = Math.ceil(h);
+    draw(entry.getContext('2d'));
+    CACHE[key] = entry;
+  }
+  return entry;
+}
+
+// Rechteck mit runden Ecken als Pfad
+export function roundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// Feines Rauschen (Anteil der Fläche) über einer Fläche (Papier, Kork, Holz): viele winzige helle und dunkle Punkte
+export function fineGrain(ctx, x, y, w, h, { seed = 3, count = 0.004, dark = 0.12, light = 0.08, size = 1.6 } = {}) {
+  const r = seeded(seed);
+  const n = Math.round(w * h * count);
+  for (let i = 0; i < n; i++) {
+    const on = r() < 0.5;
+    ctx.fillStyle = on ? `rgba(0, 0, 0, ${dark * r()})` : `rgba(255, 255, 255, ${light * r()})`;
+    const s = size * (0.5 + r());
+    ctx.fillRect(x + r() * w, y + r() * h, s, s);
+  }
+}
+
+// Vignette: Ränder einer Fläche abdunkeln
+export function vignette(ctx, x, y, w, h, strength = 0.55) {
+  const g = ctx.createRadialGradient(x + w / 2, y + h / 2, Math.min(w, h) * 0.3, x + w / 2, y + h / 2, Math.hypot(w, h) * 0.6);
+  g.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  g.addColorStop(1, `rgba(0, 0, 0, ${strength})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y, w, h);
+}
+
+// Holzbrett mit Maserung, Astlöchern und Lichtkante (aufwendiger als wood(), am besten mit cached())
+export function plank(ctx, x, y, w, h, { tone = [120, 74, 38], seed = 5, vertical = false, knots = 1 } = {}) {
+  const [r0, g0, b0] = tone;
+  const r = seeded(seed);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  const shift = (r() - 0.5) * 24;
+  const base = vertical ? ctx.createLinearGradient(x, y, x + w, y) : ctx.createLinearGradient(x, y, x, y + h);
+  base.addColorStop(0, `rgb(${r0 + 18 + shift}, ${g0 + 12 + shift * 0.7}, ${b0 + 6 + shift * 0.4})`);
+  base.addColorStop(0.5, `rgb(${r0 + shift}, ${g0 + shift * 0.7}, ${b0 + shift * 0.4})`);
+  base.addColorStop(1, `rgb(${r0 - 16 + shift}, ${g0 - 12 + shift * 0.7}, ${b0 - 8 + shift * 0.4})`);
+  ctx.fillStyle = base;
+  ctx.fillRect(x, y, w, h);
+  // Maserung: lange, leicht wellige Linien
+  const along = vertical ? h : w, across = vertical ? w : h;
+  const lines = Math.max(4, Math.round(across / 4));
+  for (let i = 0; i < lines; i++) {
+    const offset = (i + r() * 0.8) * (across / lines);
+    const amp = 1 + r() * 3, freq = 0.004 + r() * 0.01, phase = r() * 6;
+    ctx.strokeStyle = r() < 0.5 ? `rgba(40, 20, 6, ${0.08 + r() * 0.16})` : `rgba(255, 220, 170, ${0.03 + r() * 0.06})`;
+    ctx.lineWidth = 0.6 + r() * 1.4;
+    ctx.beginPath();
+    for (let t = -10; t <= along + 10; t += 12) {
+      const o = offset + Math.sin(t * freq + phase) * amp;
+      if (vertical) ctx.lineTo(x + o, y + t); else ctx.lineTo(x + t, y + o);
+    }
+    ctx.stroke();
+  }
+  // Astlöcher mit Ringen
+  for (let k = 0; k < knots; k++) {
+    if (r() < 0.35) continue;
+    const kx = vertical ? x + across * (0.3 + r() * 0.4) : x + along * (0.15 + r() * 0.7);
+    const ky = vertical ? y + along * (0.15 + r() * 0.7) : y + across * (0.3 + r() * 0.4);
+    const kr = 3 + r() * Math.min(7, across * 0.12);
+    for (let ring = 3; ring >= 0; ring--) {
+      ctx.strokeStyle = `rgba(50, 24, 8, ${0.12 + (3 - ring) * 0.08})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      if (vertical) ctx.ellipse(kx, ky, kr + ring * 2.2, (kr + ring * 2.2) * 2.4, 0, 0, Math.PI * 2);
+      else ctx.ellipse(kx, ky, (kr + ring * 2.2) * 2.4, kr + ring * 2.2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(45, 22, 8, 0.55)';
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, vertical ? kr * 0.6 : kr * 1.3, vertical ? kr * 1.3 : kr * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Ein Nagel- oder Nietkopf
+export function rivet(ctx, x, y, r = 4, metal = [150, 140, 120]) {
+  const [mr, mg, mb] = metal;
+  const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.1, x, y, r);
+  g.addColorStop(0, `rgb(${Math.min(255, mr + 80)}, ${Math.min(255, mg + 80)}, ${Math.min(255, mb + 80)})`);
+  g.addColorStop(0.6, `rgb(${mr}, ${mg}, ${mb})`);
+  g.addColorStop(1, `rgb(${mr - 70}, ${mg - 70}, ${mb - 70})`);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.beginPath();
+  ctx.arc(x + r * 0.3, y + r * 0.4, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}

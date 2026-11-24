@@ -1,5 +1,7 @@
 import { loadImage } from '../../core/assets.js';
-import { HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import {
+  HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, drawPicture, glow, fineGrain, line, plank, rivet, roundedRect, seeded, sheet, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 6 (Fundbüro): Karteikarten, Regal-Suchbild, Schließfächer, Taschenuhr.
 
@@ -22,33 +24,283 @@ export const CARD_HOMES = [
 ];
 
 export function drawCardBoard(ctx) {
-  wood(ctx, 90, 70, 1100, 600, [92, 58, 30]);
-  ctx.fillStyle = 'rgba(240, 225, 190, 0.12)';
-  ctx.fillRect(130, 100, 1020, 220);
-  text(ctx, 'Fundsachen „Herr K.“ – der Reihe nach, wie sie gefunden werden', 640, 132, { font: `bold 20px ${PRINT}`, color: '#f1e3c0', align: 'center' });
+  ctx.drawImage(cached('w6-board', 1100, 600, paintCardBoard), 90, 70);
 }
 
+// Schreibtisch im Fundbüro mit Korkbrett, Karteikasten, Stempel und Stempelkissen (einmal gezeichnet)
+function paintCardBoard(c) {
+  // Tischplatte aus Brettern
+  for (let i = 0; i < 6; i++) plank(c, 0, 250 + i * 60, 1100, 60, { tone: [104, 64, 32], seed: 40 + i, knots: 2 });
+  c.fillStyle = 'rgba(20, 10, 4, 0.55)';
+  for (let i = 1; i < 6; i++) c.fillRect(0, 250 + i * 60 - 1, 1100, 2);
+  // Wand hinter dem Brett
+  const wall = c.createLinearGradient(0, 0, 0, 260);
+  wall.addColorStop(0, '#3a2c22');
+  wall.addColorStop(1, '#2a1f17');
+  c.fillStyle = wall;
+  c.fillRect(0, 0, 1100, 260);
+  // Korkbrett mit Holzrahmen
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 20;
+  c.shadowOffsetY = 8;
+  c.fillStyle = '#5a3a1e';
+  c.fillRect(20, 12, 1060, 244);
+  c.restore();
+  plank(c, 20, 12, 1060, 16, { tone: [110, 70, 36], seed: 3, knots: 0 });
+  plank(c, 20, 240, 1060, 16, { tone: [100, 62, 32], seed: 4, knots: 0 });
+  plank(c, 20, 12, 16, 244, { tone: [104, 66, 34], seed: 5, vertical: true, knots: 0 });
+  plank(c, 1064, 12, 16, 244, { tone: [104, 66, 34], seed: 6, vertical: true, knots: 0 });
+  c.strokeStyle = 'rgba(255, 220, 170, 0.25)';
+  c.lineWidth = 1;
+  c.strokeRect(20.5, 12.5, 1059, 243);
+  c.strokeStyle = 'rgba(20, 10, 4, 0.7)';
+  c.strokeRect(35.5, 27.5, 1029, 213);
+  // Kork
+  c.fillStyle = '#b48552';
+  c.fillRect(36, 28, 1028, 212);
+  const rnd = seeded(11);
+  for (let i = 0; i < 9000; i++) {
+    const tone = rnd();
+    c.fillStyle = tone < 0.45 ? `rgba(90, 52, 22, ${0.25 + rnd() * 0.35})` : tone < 0.8 ? `rgba(214, 170, 110, ${0.2 + rnd() * 0.3})` : `rgba(60, 34, 14, ${0.3 + rnd() * 0.3})`;
+    const s = 1 + rnd() * 2.4;
+    c.beginPath();
+    c.ellipse(36 + rnd() * 1028, 28 + rnd() * 212, s, s * (0.5 + rnd() * 0.6), rnd() * 3, 0, Math.PI * 2);
+    c.fill();
+  }
+  const light = c.createRadialGradient(550, 40, 40, 550, 120, 620);
+  light.addColorStop(0, 'rgba(255, 220, 150, 0.18)');
+  light.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+  c.fillStyle = light;
+  c.fillRect(36, 28, 1028, 212);
+  // Messingschild oben
+  const plate = c.createLinearGradient(0, 30, 0, 70);
+  plate.addColorStop(0, '#e9c977');
+  plate.addColorStop(0.45, '#c79a43');
+  plate.addColorStop(1, '#8e6522');
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  c.shadowBlur = 6;
+  c.shadowOffsetY = 3;
+  roundedRect(c, 250, 31, 600, 42, 6);
+  c.fillStyle = plate;
+  c.fill();
+  c.restore();
+  c.strokeStyle = 'rgba(70, 45, 10, 0.8)';
+  c.lineWidth = 1.5;
+  roundedRect(c, 255, 35, 590, 34, 4);
+  c.stroke();
+  for (const x of [264, 836]) rivet(c, x, 52, 3.5, [170, 130, 60]);
+  text(c, 'Fundsachen „Herr K.“ – der Reihe nach, wie sie gefunden werden', 550, 58, { font: `bold 17px ${PRINT}`, color: '#3d2708', align: 'center' });
+  // Plätze für die Karten: hellere Abdrücke im Kork, Messingecken, Reißzwecke
+  CARD_SLOTS.forEach((slot, i) => {
+    const x = slot.x - 90, y = slot.y - 70;
+    c.fillStyle = 'rgba(232, 200, 150, 0.22)';
+    c.fillRect(x + 4, y + 4, slot.w - 8, slot.h - 8);
+    c.strokeStyle = 'rgba(70, 40, 15, 0.35)';
+    c.lineWidth = 1.5;
+    c.setLineDash([3, 4]);
+    c.strokeRect(x + 4.5, y + 4.5, slot.w - 9, slot.h - 9);
+    c.setLineDash([]);
+    for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + slot.w, y, -1, 1], [x, y + slot.h, 1, -1], [x + slot.w, y + slot.h, -1, -1]]) {
+      const g = c.createLinearGradient(cx, cy, cx + sx * 22, cy + sy * 22);
+      g.addColorStop(0, '#f0d488');
+      g.addColorStop(1, '#a07a2c');
+      c.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      c.beginPath();
+      c.moveTo(cx + 2, cy + 3);
+      c.lineTo(cx + sx * 24 + 2, cy + 3);
+      c.lineTo(cx + 2, cy + sy * 24 + 3);
+      c.fill();
+      c.fillStyle = g;
+      c.beginPath();
+      c.moveTo(cx, cy);
+      c.lineTo(cx + sx * 24, cy);
+      c.lineTo(cx, cy + sy * 24);
+      c.closePath();
+      c.fill();
+    }
+    // große Nummer im Kork, mit Kreide
+    text(c, String(i + 1), x + slot.w / 2, y + slot.h / 2 + 26, { font: `bold 72px ${SERIF}`, color: 'rgba(255, 245, 225, 0.16)', align: 'center' });
+  });
+  // ein paar lose Reißzwecken
+  const pins = seeded(21);
+  for (const [px, py] of [[52, 46], [1046, 220], [1040, 48], [56, 214], [302, 226], [810, 230]]) {
+    const hue = ['#b3261e', '#2f5a9a', '#d6a640', '#2f7a44'][Math.floor(pins() * 4)];
+    pushPin(c, px, py, hue);
+  }
+  // Karteikasten links (von vorn, Karten schauen oben heraus)
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 16;
+  c.shadowOffsetY = 8;
+  c.fillStyle = '#3a2210';
+  c.fillRect(12, 478, 118, 108);
+  c.restore();
+  for (let i = 0; i < 8; i++) {
+    const cy = 462 + i * 3;
+    c.fillStyle = i % 2 ? '#efe5cb' : '#f7f0dc';
+    c.fillRect(22, cy, 98, 30);
+    c.strokeStyle = 'rgba(90, 70, 40, 0.45)';
+    c.lineWidth = 1;
+    c.strokeRect(22.5, cy + 0.5, 97, 29);
+    if (i === 1 || i === 4 || i === 6) {
+      c.fillStyle = { 1: '#c0392b', 4: '#2f6aa0', 6: '#d6a640' }[i];
+      c.fillRect(28 + i * 11, cy - 6, 20, 7);
+    }
+  }
+  plank(c, 12, 490, 118, 96, { tone: [112, 68, 32], seed: 77, knots: 1 });
+  c.strokeStyle = 'rgba(25, 12, 4, 0.7)';
+  c.lineWidth = 2;
+  c.strokeRect(13, 491, 116, 94);
+  const handle = c.createLinearGradient(0, 524, 0, 540);
+  handle.addColorStop(0, '#e9c977');
+  handle.addColorStop(1, '#7a5418');
+  c.fillStyle = handle;
+  roundedRect(c, 48, 524, 46, 14, 4);
+  c.fill();
+  c.fillStyle = '#f3ead4';
+  c.fillRect(51, 548, 40, 20);
+  c.strokeStyle = '#a07a2c';
+  c.strokeRect(50.5, 547.5, 41, 21);
+  text(c, 'A – K', 71, 563, { font: `bold 12px ${TYPEWRITER}`, color: INK, align: 'center' });
+  // Stempelkissen und Stempel rechts
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  c.shadowBlur = 12;
+  c.shadowOffsetY = 6;
+  const tin = c.createLinearGradient(0, 510, 0, 580);
+  tin.addColorStop(0, '#5a6066');
+  tin.addColorStop(1, '#2c3034');
+  c.fillStyle = tin;
+  roundedRect(c, 975, 520, 110, 64, 8);
+  c.fill();
+  c.restore();
+  c.fillStyle = '#3b2a5c';
+  roundedRect(c, 984, 528, 92, 48, 5);
+  c.fill();
+  c.fillStyle = 'rgba(140, 110, 200, 0.25)';
+  c.fillRect(990, 532, 60, 10);
+  text(c, 'STEMPEL', 1030, 596, { font: `bold 10px ${PRINT}`, color: 'rgba(240, 225, 190, 0.5)', align: 'center' });
+  // Stempel (von oben): Gummiplatte und runder Holzgriff
+  c.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  c.beginPath();
+  c.ellipse(1040, 478, 34, 24, 0, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#2a2a2a';
+  roundedRect(c, 1004, 452, 64, 36, 4);
+  c.fill();
+  c.fillStyle = '#6f757a';
+  c.fillRect(1004, 452, 64, 6);
+  const knob = c.createRadialGradient(1028, 462, 2, 1034, 468, 22);
+  knob.addColorStop(0, '#c98a4c');
+  knob.addColorStop(0.6, '#7a4418');
+  knob.addColorStop(1, '#3a1d08');
+  c.fillStyle = knob;
+  c.beginPath();
+  c.arc(1036, 468, 20, 0, Math.PI * 2);
+  c.fill();
+  // Lampenschein von oben links, Rand abdunkeln
+  const lamp = c.createRadialGradient(560, 300, 60, 560, 380, 700);
+  lamp.addColorStop(0, 'rgba(255, 215, 150, 0.12)');
+  lamp.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+  c.fillStyle = lamp;
+  c.fillRect(0, 256, 1100, 344);
+  vignette(c, 0, 0, 1100, 600, 0.35);
+}
+
+function pushPin(c, x, y, color) {
+  c.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  c.beginPath();
+  c.ellipse(x + 4, y + 5, 7, 5, 0, 0, Math.PI * 2);
+  c.fill();
+  const g = c.createRadialGradient(x - 2, y - 3, 1, x, y, 8);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.25, color);
+  g.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+  c.fillStyle = color;
+  c.beginPath();
+  c.arc(x, y, 7, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = g;
+  c.globalAlpha = 0.7;
+  c.fill();
+  c.globalAlpha = 1;
+}
+
+// Eine Karteikarte (200 × 124), einmal je Karte gezeichnet und leicht schräg hingelegt
 export function drawIndexCard(ctx, token, x, y) {
   const card = INDEX_CARDS.find((c) => c.id === token.id);
+  const index = INDEX_CARDS.indexOf(card);
+  const image = cached(`w6-card-${card.id}`, 216, 140, (c) => paintIndexCard(c, card, index));
   ctx.save();
-  ctx.translate(x - 100, y - 62);
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(4, 5, 200, 124);
-  ctx.fillStyle = '#f6f0de';
-  ctx.fillRect(0, 0, 200, 124);
-  ctx.strokeStyle = 'rgba(179, 38, 30, 0.6)';
-  ctx.lineWidth = 2;
-  line(ctx, 0, 26, 200, 26);
-  ctx.strokeStyle = 'rgba(60, 90, 160, 0.25)';
-  ctx.lineWidth = 1;
-  for (let i = 1; i < 5; i++) line(ctx, 0, 26 + i * 22, 200, 26 + i * 22);
-  text(ctx, 'FUNDBÜRO', 8, 18, { font: `bold 12px ${PRINT}`, color: RED });
-  text(ctx, `Lager ${card.shelf}`, 192, 18, { font: `bold 15px ${TYPEWRITER}`, color: INK, align: 'right' });
-  text(ctx, card.thing, 10, 44, { font: `15px ${TYPEWRITER}` });
-  text(ctx, `Besitzer: ${card.owner}`, 10, 66, { font: `13px ${TYPEWRITER}` });
-  text(ctx, `Gefunden: Runde ${card.round}`, 10, 88, { font: `13px ${TYPEWRITER}` });
-  text(ctx, `im ${card.place}`, 10, 110, { font: `13px ${TYPEWRITER}` });
+  ctx.translate(x, y);
+  ctx.rotate([-0.018, 0.012, -0.008, 0.02, -0.014, 0.009][index] ?? 0);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.32)';
+  ctx.fillRect(-98, -58, 204, 128);
+  ctx.drawImage(image, -108, -70);
   ctx.restore();
+}
+
+function paintIndexCard(c, card, index) {
+  c.translate(8, 8);
+  const paper = c.createLinearGradient(0, 0, 200, 124);
+  paper.addColorStop(0, '#fbf5e4');
+  paper.addColorStop(1, '#eadfc2');
+  c.fillStyle = paper;
+  // Eselsohr unten rechts
+  c.beginPath();
+  c.moveTo(0, 0);
+  c.lineTo(200, 0);
+  c.lineTo(200, 110);
+  c.lineTo(186, 124);
+  c.lineTo(0, 124);
+  c.closePath();
+  c.fill();
+  c.fillStyle = '#d8caa4';
+  c.beginPath();
+  c.moveTo(200, 110);
+  c.lineTo(186, 110);
+  c.lineTo(186, 124);
+  c.closePath();
+  c.fill();
+  c.save();
+  c.clip();
+  fineGrain(c, 0, 0, 200, 124, { seed: 90 + index, count: 0.05, dark: 0.08, light: 0.15, size: 1 });
+  c.restore();
+  // Linien
+  c.strokeStyle = 'rgba(179, 38, 30, 0.65)';
+  c.lineWidth = 1.6;
+  line(c, 0, 27, 200, 27);
+  c.strokeStyle = 'rgba(60, 90, 160, 0.28)';
+  c.lineWidth = 1;
+  for (let i = 1; i < 5; i++) line(c, 0, 27 + i * 22, 196, 27 + i * 22);
+  // Kopf
+  text(c, 'FUNDBÜRO', 8, 18, { font: `bold 10px ${PRINT}`, color: RED });
+  // Lagerstempel (violett, schräg)
+  c.save();
+  c.translate(162, 14);
+  c.rotate(-0.08);
+  c.strokeStyle = 'rgba(88, 52, 140, 0.85)';
+  c.lineWidth = 1.8;
+  roundedRect(c, -34, -11, 68, 22, 3);
+  c.stroke();
+  text(c, `LAGER ${card.shelf}`, 0, 6, { font: `bold 14px ${TYPEWRITER}`, color: 'rgba(88, 52, 140, 0.92)', align: 'center' });
+  c.restore();
+  // Inhalt
+  text(c, card.thing, 10, 45, { font: `bold 15px ${TYPEWRITER}`, color: INK });
+  const field = (label, value, y) => {
+    text(c, label, 10, y, { font: `9px ${PRINT}`, color: 'rgba(60, 50, 40, 0.7)' });
+    text(c, value, 66, y, { font: `13px ${TYPEWRITER}`, color: INK });
+  };
+  field('BESITZER', card.owner, 67);
+  field('GEFUNDEN', `Runde ${card.round}`, 89);
+  field('ORT', card.place, 111);
+  // Lochung unten
+  c.fillStyle = 'rgba(40, 25, 12, 0.85)';
+  c.beginPath();
+  c.arc(100, 118, 4, 0, Math.PI * 2);
+  c.fill();
 }
 
 // ---------------------------------------------------------------- Regal als Suchbild
