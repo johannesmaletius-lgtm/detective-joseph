@@ -45,7 +45,7 @@ export const wagon19 = {
     f.roomLight = true;
     f.redLight = false;
     f.curtainClosed = false;
-    story.scene.paintSpot('tint', (ctx) => paintTint(ctx, { roomLight: f.roomLight || story.isDark, redLight: f.redLight }));
+    story.scene.paintSpot('tint', (ctx) => paintTint(ctx, { roomLight: f.roomLight, redLight: f.redLight, tunnel: story.isDark }));
   },
 
   hotspots: {

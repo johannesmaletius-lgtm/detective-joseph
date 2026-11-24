@@ -19,12 +19,12 @@ export const photoLab = {
   outside: outside(WINDOWS),
 
   animations: [
-    { id: 'tint', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+    { id: 'tint', layer: 'over', x: 0, y: 0, width: 1280, height: 720 },
   ],
 
   // kleine Effekte (src/effects/ambience.js)
   ambience: [
-    lampDust(),
+    { ...lampDust(), when: 'roomLight' }, // Staub nur im Licht der Deckenlampe
   ],
 
   hotspots: [
