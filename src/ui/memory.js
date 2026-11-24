@@ -53,15 +53,22 @@ export class Memory {
     return this.picking || this.loading || Boolean(this.visit);
   }
 
-  // Welche Wagen darf man ansehen? Alle geschafften vor dem jetzigen (im Test: alle davor)
+  // Wagen, der gerade gespielt wird (null in der Wagenübersicht)
+  get current() {
+    return this.game.inCalendar ? null : this.game.door;
+  }
+
+  // Welche Wagen darf man ansehen? Immer alle schon gespielten (im Test: alle), außer dem jetzigen
   doors() {
-    const current = this.game.door ?? 0;
-    return DOORS.filter(({ door, load }) => load && door < current && (TEST_MODE || this.game.save.isDone(door)));
+    return DOORS.filter(({ door, load }) => load && door !== this.current && (TEST_MODE || this.game.save.isDone(door)));
+  }
+
+  get backLabel() {
+    return this.current ? `Zurück zu Wagen ${this.current}` : 'Zurück zur Wagenübersicht';
   }
 
   get possible() {
-    const game = this.game;
-    return this.doors().length > 0 && !game.story?.inCutscene && !game.story?.isBusy && !game.overlay.blocksInput;
+    return this.doors().length > 0 && !this.game.overlay.blocksInput;
   }
 
   openPicker() {
@@ -219,7 +226,7 @@ export class Memory {
     outlinedText(ctx, `Erinnerung – Wagen ${door}: ${name}`, 24, 37, COLORS.brass);
     ctx.font = `16px ${SANS}`;
     outlinedText(ctx, 'So sah es am Anfang aus. Klick: anschauen · Rechtsklick oder Esc: zurück', 24, 68, '#f3e2bf', 4);
-    this.drawButton(ctx, BACK, `Zurück zu Wagen ${this.game.door}`);
+    this.drawButton(ctx, BACK, this.backLabel);
 
     if (this.caption) this.drawCaption(ctx);
   }
@@ -266,10 +273,10 @@ export class Memory {
     ctx.fillText('Frühere Wagen ansehen', 640, PICKER.y + 36);
     ctx.fillStyle = 'rgba(243, 226, 191, 0.8)';
     ctx.font = `16px ${SANS}`;
-    ctx.fillText(`Nur kurz nachsehen – Wagen ${this.game.door} wartet so lange und geht danach genau hier weiter.`, 640, PICKER.y + 66);
+    ctx.fillText(this.current ? `Nur kurz nachsehen – Wagen ${this.current} wartet so lange und geht danach genau hier weiter.` : 'Alle Wagen, die du schon gespielt hast.', 640, PICKER.y + 66);
 
     for (const cell of this.cells()) this.drawButton(ctx, cell, `${cell.door} · ${cell.wagon}`, true, 17);
-    this.drawButton(ctx, this.backFromPicker(), `Zurück zu Wagen ${this.game.door}`);
+    this.drawButton(ctx, this.backFromPicker(), this.backLabel);
     ctx.restore();
   }
 

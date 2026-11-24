@@ -252,6 +252,14 @@ export class Game {
   };
 
   update(dt) {
+    // Erinnerung an einen früheren Wagen: der jetzige Wagen (oder die Übersicht) steht so lange still
+    if (this.memory.isOpen) {
+      this.memory.update(dt, this.input.mouse);
+      this.music.update(dt, this);
+      this.overlay.update(dt);
+      this.cursor.set({ kind: this.memory.label() ? 'look' : 'interact', label: this.memory.label() });
+      return;
+    }
     if (this.inCalendar) {
       this.calendar.update(dt, this.input.mouse);
       this.overlay.update(dt);
@@ -260,14 +268,6 @@ export class Game {
       const onSettings = this.calendar.isOpen && this.settings.contains(this.input.mouse);
       const label = onSettings ? this.settings.labelAt(this.input.mouse) : this.calendar.isOpen ? this.calendar.label : '';
       this.cursor.set({ kind: 'interact', label, visible: this.calendar.isOpen || this.overlay.blocksInput });
-      return;
-    }
-    // Erinnerung an einen früheren Wagen: der jetzige Wagen steht so lange still
-    if (this.memory.isOpen) {
-      this.memory.update(dt, this.input.mouse);
-      this.music.update(dt, this);
-      this.overlay.update(dt);
-      this.cursor.set({ kind: this.memory.label() ? 'look' : 'interact', label: this.memory.label() });
       return;
     }
     this.scene.update(dt);
@@ -301,6 +301,11 @@ export class Game {
 
   draw() {
     const ctx = this.screen.beginFrame();
+    if (this.memory.isOpen) {
+      this.memory.draw(ctx);
+      this.cursor.draw(ctx, this.input.mouse);
+      return;
+    }
     if (this.inCalendar) {
       if (this.calendar.isOpen) this.calendar.draw(ctx, this.input.mouse);
       else {
@@ -309,12 +314,6 @@ export class Game {
       }
       this.overlay.draw(ctx);
       if (this.calendar.isOpen) this.settings.draw(ctx);
-      this.cursor.draw(ctx, this.input.mouse);
-      return;
-    }
-
-    if (this.memory.isOpen) {
-      this.memory.draw(ctx);
       this.cursor.draw(ctx, this.input.mouse);
       return;
     }
@@ -376,12 +375,12 @@ export class Game {
     this.idleTime = 0;
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     this.effects.prepareSamples();
-    const settingsVisible = this.inCalendar ? this.calendar.isOpen : this.overlay.fade < 0.5 && !this.memory.isOpen;
+    const settingsVisible = !this.memory.isOpen && (this.inCalendar ? this.calendar.isOpen : this.overlay.fade < 0.5);
     if (settingsVisible && !click.right && this.settings.handleClick(click)) return;
     if (settingsVisible && this.settings.isOpen) return;
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
-    if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.memory.isOpen) return this.memory.handleClick(click);
+    if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {
       if (this.notebook.handleClick(click) === 'hint') {
@@ -441,12 +440,12 @@ export class Game {
     this.sound.start();
     this.effects.prepareSamples();
     if (key === KEYS.close && this.settings.isOpen) return this.settings.close();
-    if (this.inCalendar) {
+    if (this.memory.isOpen) {
+      if (key === KEYS.close) this.memory.handleKey();
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
     }
-    if (this.memory.isOpen) {
-      if (key === KEYS.close) this.memory.handleKey();
+    if (this.inCalendar) {
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
     }

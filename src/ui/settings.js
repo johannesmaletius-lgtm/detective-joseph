@@ -29,7 +29,7 @@ export class Settings {
       { kind: 'slider', key: 'musicVolume', label: 'Musik' },
       { kind: 'slider', key: 'effects', label: 'Effekte' },
     );
-    if (!this.game.inCalendar && this.game.memory.doors().length) rows.push({ kind: 'memory', label: 'Frühere Wagen ansehen' });
+    if (this.game.memory.doors().length) rows.push({ kind: 'memory', label: 'Frühere Wagen ansehen' });
     if (!this.game.inCalendar) rows.push({ kind: 'leave', label: 'Zur Wagenübersicht' });
     let y = PANEL.y + 64;
     for (const row of rows) {
