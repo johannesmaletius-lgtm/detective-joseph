@@ -48,6 +48,7 @@ export const wagon17 = {
     story.flags.skyTime = 0;
     story.scene.paintSpot('sky', (ctx) => paintSky(ctx, {
       time: story.flags.skyTime, dark: story.isDark, fog: story.flags.fog, ghost: story.flags.ghost ?? null,
+      distance: story.motion?.distance ?? story.flags.skyTime, tunnel: story.motion?.tunnel ?? 0,
     }));
   },
 
