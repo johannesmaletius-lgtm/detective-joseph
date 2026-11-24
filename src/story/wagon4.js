@@ -162,7 +162,7 @@ export const wagon4 = {
       story.flags.squealSeen = true;
       story.respond(async () => {
         await story.speakAs('bruno', 'Aaah, dieses Quietschen! Meine armen Ohren!');
-        await story.say('Er dreht sich zum Herd und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …');
+        await story.say('Er kneift die Augen zu und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …');
       });
     }
   },
