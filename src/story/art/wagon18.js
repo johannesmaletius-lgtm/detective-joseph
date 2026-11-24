@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, rivet, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 18 (Schaffnerabteil): Dienstbuch mit Schichtplan, Telegramm, Schlüsselbrett,
 // Stellwerk mit Gleisplan.
@@ -77,9 +77,17 @@ export function checkKeys(placement) {
 }
 
 export function drawKeyBoard(ctx, view) {
-  wood(ctx, 160, 70, 960, 480, [60, 70, 50]);
-  ctx.fillStyle = '#2f3a2a';
+  wood(ctx, 160, 70, 960, 480, [60, 44, 26]);
+  // grüner Filz mit leichtem Lichtschein
+  const felt = ctx.createRadialGradient(640, 260, 60, 640, 310, 560);
+  felt.addColorStop(0, '#3e4c36');
+  felt.addColorStop(1, '#1f281b');
+  ctx.fillStyle = felt;
   ctx.fillRect(180, 90, 920, 440);
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(180, 90, 920, 440);
+  for (const [rx, ry] of [[170, 80], [1110, 80], [170, 540], [1110, 540]]) rivet(ctx, rx, ry, 5, { slot: true, tone: '#c9a24c' });
   const done = view?.solved;
   for (const slot of KEY_SLOTS) {
     ctx.save();
@@ -88,25 +96,60 @@ export function drawKeyBoard(ctx, view) {
     ctx.setLineDash([6, 4]);
     keyShape(ctx, slot.x + slot.w / 2, slot.y + 20, slot.shape, false);
     ctx.restore();
-    ctx.fillStyle = '#c9a24a';
+    // Messinghaken
+    rivet(ctx, slot.x + slot.w / 2, slot.y + 8, 7, { tone: '#c9a24c' });
+    ctx.strokeStyle = '#a07a2a';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(slot.x + slot.w / 2, slot.y + 8, 6, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.arc(slot.x + slot.w / 2 + 6, slot.y + 8, 6, Math.PI, Math.PI * 0.2, true);
+    ctx.stroke();
     if (slot.shape === 'loco' && done) text(ctx, 'LOK', slot.x + slot.w / 2, slot.y + slot.h + 4, { font: `bold 22px ${PRINT}`, color: '#ffd36b', align: 'center' });
   }
-  text(ctx, 'Alle Schlüssel an ihren Haken – sonst bleibt das Stellwerk gesperrt.', 640, 560, { font: `italic 16px ${SERIF}`, color: '#e8d8b0', align: 'center' });
+  text(ctx, 'Alle Schlüssel an ihren Haken – sonst bleibt das Stellwerk gesperrt.', 640, 545, { font: `italic 14px ${SERIF}`, color: '#f0e2bc', align: 'center' });
 }
 
 export function drawKeyToken(ctx, token, x, y) {
   ctx.save();
-  ctx.fillStyle = '#d6a645';
-  ctx.strokeStyle = '#6e4e18';
-  ctx.lineWidth = 3;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 4;
+  const brass = ctx.createLinearGradient(x - 30, y - 60, x + 30, y + 60);
+  brass.addColorStop(0, '#f6d98a');
+  brass.addColorStop(0.5, '#c9932f');
+  brass.addColorStop(1, '#7a5418');
+  ctx.fillStyle = brass;
+  ctx.strokeStyle = '#5e4010';
+  ctx.lineWidth = 2;
   keyShape(ctx, x, y - 60, token.shape, true);
   ctx.restore();
+  // Loch im Griff und Glanz am Schaft
+  ctx.fillStyle = 'rgba(30, 20, 6, 0.85)';
+  ctx.beginPath();
+  ctx.arc(x, y - 34, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255, 245, 210, 0.55)';
+  ctx.fillRect(x - 3, y - 6, 2, 80);
+  // Anhänger an einer Schnur
+  ctx.strokeStyle = 'rgba(230, 220, 190, 0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x, y - 34);
+  ctx.quadraticCurveTo(x - 30, y - 10, x - 22, y + 50);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(x - 4, y + 60);
+  ctx.rotate(-0.08);
   ctx.fillStyle = '#efe3c2';
-  ctx.fillRect(x - 40, y + 50, 80, 20);
-  text(ctx, KEY_LABELS[token.shape], x, y + 65, { font: `bold 12px ${PRINT}`, align: 'center' });
+  ctx.beginPath();
+  ctx.moveTo(-46, -10); ctx.lineTo(36, -10); ctx.lineTo(46, 0); ctx.lineTo(36, 10); ctx.lineTo(-46, 10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(110, 80, 30, 0.6)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  text(ctx, KEY_LABELS[token.shape], -4, 5, { font: `bold 11px ${PRINT}`, align: 'center' });
+  ctx.restore();
 }
 
 // Schlüssel: Griff (Form), Schaft nach unten, Bart
@@ -176,19 +219,32 @@ export function switchSpots() {
 }
 
 export function drawInterlocking(ctx, { settings }) {
-  ctx.fillStyle = '#e7dcc0';
-  ctx.fillRect(140, 70, 1000, 580);
-  ctx.strokeStyle = '#6a5a3a';
-  ctx.lineWidth = 8;
-  ctx.strokeRect(140, 70, 1000, 580);
+  // Stelltafel: Emailleblech im Holzrahmen
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 26;
+  ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#4a3420';
+  ctx.fillRect(126, 56, 1028, 608);
+  ctx.restore();
+  wood(ctx, 126, 56, 1028, 608, [80, 52, 28]);
+  const enamel = ctx.createLinearGradient(0, 70, 0, 650);
+  enamel.addColorStop(0, '#efe6cc');
+  enamel.addColorStop(1, '#d9ccaa');
+  ctx.fillStyle = enamel;
+  ctx.fillRect(146, 76, 988, 568);
+  ctx.strokeStyle = 'rgba(80, 60, 30, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(156, 86, 968, 548);
+  for (const [rx, ry] of [[160, 90], [1120, 90], [160, 630], [1120, 630]]) rivet(ctx, rx, ry, 6, { slot: true, tone: '#b8a070' });
   text(ctx, 'STELLWERK · Fahrstraße aus dem Ring', 380, 108, { font: `bold 22px ${SERIF}`, align: 'center' });
   // alle Gleise blass
   ctx.strokeStyle = 'rgba(60, 50, 40, 0.35)';
   ctx.lineWidth = 6;
   line(ctx, NODES.S.x, NODES.S.y, NODES.W1.x, NODES.W1.y);
   for (const [from, outs] of Object.entries(SWITCHES)) for (const to of outs) line(ctx, NODES[from].x, NODES[from].y, NODES[to].x, NODES[to].y);
-  line(ctx, NODES.W7.x, NODES.W7.y, 1110, 300);
-  text(ctx, 'Bahnhof', 1110, 286, { font: `bold 16px ${PRINT}`, align: 'center' });
+  line(ctx, NODES.W7.x, NODES.W7.y, 1090, 300);
+  text(ctx, 'Bahnhof', 1074, 284, { font: `bold 16px ${PRINT}`, align: 'center' });
   // gestellter Weg
   const { path, end } = routeFrom(settings);
   ctx.strokeStyle = end === 'W7' ? '#2a8a3a' : '#c0392b';
@@ -198,10 +254,23 @@ export function drawInterlocking(ctx, { settings }) {
   ctx.stroke();
   for (const [id, node] of Object.entries(NODES)) {
     if (SWITCHES[id]) {
-      ctx.fillStyle = '#4a3a22';
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 3;
+      const knob = ctx.createRadialGradient(node.x - 8, node.y - 8, 2, node.x, node.y, 26);
+      knob.addColorStop(0, '#6a5434');
+      knob.addColorStop(1, '#2e2212');
+      ctx.fillStyle = knob;
       ctx.beginPath();
       ctx.arc(node.x, node.y, 26, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = '#c9a24c';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 24, 0, Math.PI * 2);
+      ctx.stroke();
       text(ctx, String(SWITCH_NAMES.indexOf(id) + 1), node.x, node.y + 8, { font: `bold 22px ${PRINT}`, color: '#ffe7a0', align: 'center' });
       // Zunge der Weiche zeigt zum gestellten Ausgang
       const to = NODES[SWITCHES[id][settings[id]]];
@@ -217,6 +286,10 @@ export function drawInterlocking(ctx, { settings }) {
       text(ctx, node.label, node.x, node.y + (node.y > 400 ? 40 : -26), { font: `bold 15px ${PRINT}`, align: 'center' });
     }
   }
+  ctx.fillStyle = 'rgba(239, 230, 204, 0.88)';
+  ctx.beginPath();
+  ctx.roundRect(420, 128, 440, 32, 8);
+  ctx.fill();
   text(ctx, end === 'W7' ? 'Fahrstraße bis Weiche 7 frei.' : end === 'loop' || end.startsWith('R') ? 'Die Fahrstraße führt zurück in den Ring.' : 'Die Fahrstraße endet am Prellbock.', 640, 150, {
     font: `bold 20px ${PRINT}`, color: end === 'W7' ? '#2a6a2a' : RED, align: 'center',
   });

@@ -154,3 +154,143 @@ export function drawFilePage(ctx, { x = 330, y = 40, w = 620, h = 640, angle = 0
     },
   });
 }
+
+// ---------------------------------------------------------------- Metall, Schrauben, Zeiger
+
+// Kleine Niete/Schraube mit Glanzpunkt (slot = Schlitz einzeichnen)
+export function rivet(ctx, x, y, r = 5, { tone = '#8a8f93', slot = false } = {}) {
+  ctx.save();
+  const gradient = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
+  gradient.addColorStop(0, '#f4f1ea');
+  gradient.addColorStop(0.35, tone);
+  gradient.addColorStop(1, 'rgba(20, 16, 12, 0.9)');
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  if (slot) {
+    ctx.strokeStyle = 'rgba(20, 14, 8, 0.7)';
+    ctx.lineWidth = Math.max(1, r * 0.25);
+    line(ctx, x - r * 0.6, y + r * 0.2, x + r * 0.6, y - r * 0.2);
+  }
+  ctx.restore();
+}
+
+// Gebürstete Metallfläche mit hellem Rand oben links und dunklem unten rechts
+export function metalPanel(ctx, x, y, w, h, { top = '#9aa0a4', bottom = '#5d6367', radius = 6, bevel = 3 } = {}) {
+  ctx.save();
+  const gradient = ctx.createLinearGradient(x, y, x + w * 0.3, y + h);
+  gradient.addColorStop(0, top);
+  gradient.addColorStop(1, bottom);
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, radius);
+  ctx.fill();
+  ctx.lineWidth = bevel;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y + bevel / 2);
+  ctx.lineTo(x + w - radius, y + bevel / 2);
+  ctx.moveTo(x + bevel / 2, y + radius);
+  ctx.lineTo(x + bevel / 2, y + h - radius);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y + h - bevel / 2);
+  ctx.lineTo(x + w - radius, y + h - bevel / 2);
+  ctx.moveTo(x + w - bevel / 2, y + radius);
+  ctx.lineTo(x + w - bevel / 2, y + h - radius);
+  ctx.stroke();
+  // feine Schleifspuren
+  ctx.globalAlpha = 0.07;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  for (let i = 4; i < h - 4; i += 3) line(ctx, x + 4, y + i, x + w - 4, y + i + ((i * 7) % 3) - 1);
+  ctx.restore();
+}
+
+// Gerändeltes Messing-Stellrad (Draufsicht)
+export function brassKnob(ctx, cx, cy, r, { angle = 0, label = '', labelColor = '#3b2608', teeth = 28 } = {}) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 5;
+  ctx.fillStyle = '#6e4c16';
+  ctx.beginPath();
+  for (let i = 0; i < teeth * 2; i++) {
+    const a = (i / (teeth * 2)) * Math.PI * 2 + angle;
+    const rr = i % 2 ? r : r - 5;
+    ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  const face = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r * 0.92);
+  face.addColorStop(0, '#fbe3a0');
+  face.addColorStop(0.45, '#c9993f');
+  face.addColorStop(1, '#7a5418');
+  ctx.fillStyle = face;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(60, 38, 8, 0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 13, 0, Math.PI * 2);
+  ctx.stroke();
+  // Markierung, die mitdreht
+  ctx.fillStyle = '#3b2608';
+  ctx.beginPath();
+  ctx.arc(cx + Math.cos(angle - Math.PI / 2) * (r - 19), cy + Math.sin(angle - Math.PI / 2) * (r - 19), 4, 0, Math.PI * 2);
+  ctx.fill();
+  if (label) text(ctx, label, cx, cy + 7, { font: `bold ${Math.round(r * 0.32)}px ${PRINT}`, color: labelColor, align: 'center' });
+  ctx.restore();
+}
+
+// Spitz zulaufender Uhrzeiger mit kurzem Gegengewicht. angle: 0 = 12 Uhr, im Uhrzeigersinn (Bogenmaß)
+export function clockHand(ctx, cx, cy, angle, length, width, color = INK) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 3;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(-width * 0.35, length * 0.18);
+  ctx.lineTo(-width / 2, 0);
+  ctx.lineTo(-width * 0.18, -length * 0.82);
+  ctx.lineTo(0, -length);
+  ctx.lineTo(width * 0.18, -length * 0.82);
+  ctx.lineTo(width / 2, 0);
+  ctx.lineTo(width * 0.35, length * 0.18);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// Mittelkappe für Zeiger
+export function handCap(ctx, cx, cy, r = 9, color = INK) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255, 230, 170, 0.6)';
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.3, cy - r * 0.3, r * 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// Vignette: Ränder einer Nahansicht abdunkeln
+export function vignette(ctx, x, y, w, h, strength = 0.55) {
+  ctx.save();
+  const gradient = ctx.createRadialGradient(x + w / 2, y + h / 2, Math.min(w, h) * 0.35, x + w / 2, y + h / 2, Math.max(w, h) * 0.75);
+  gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  gradient.addColorStop(1, `rgba(0, 0, 0, ${strength})`);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+}

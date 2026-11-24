@@ -1,5 +1,5 @@
 import { loadImage } from '../../core/assets.js';
-import { HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, RED, SERIF, TYPEWRITER, brassKnob, clockHand, drawPicture, glow, handCap, line, metalPanel, rivet, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 6 (Fundbüro): Karteikarten, Regal-Suchbild, Schließfächer, Taschenuhr.
 
@@ -118,7 +118,9 @@ export function drawFoundSlip(ctx, found = []) {
         c.lineWidth = 1.5;
         c.strokeRect(30, y - 18, 20, 20);
         if (found.includes(id)) text(c, '✓', 33, y, { font: `bold 22px ${PRINT}`, color: '#1f6b34' });
-        text(c, description, 64, y, { font: `21px ${HAND}`, color: '#27408f' });
+        c.font = `21px ${HAND}`;
+        const size = c.measureText(description).width > 530 ? 18 : 21; // langer Satz passt sonst nicht aufs Blatt
+        text(c, description, 64, y, { font: `${size}px ${HAND}`, color: '#27408f' });
       });
       text(c, 'Bitte am Regal ankreuzen und an der Glocke abgeben.', 310, 580, { font: `italic 15px ${SERIF}`, align: 'center' });
     },
@@ -136,27 +138,88 @@ export const LOCKER_SPOTS = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 export function drawLockers(ctx, open = []) {
-  ctx.fillStyle = '#2b2a28';
-  ctx.fillRect(360, 50, 560, 620);
+  // Schrankkorpus aus dunklem Stahl, oben eine Leiste mit Schild
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  metalPanel(ctx, 356, 30, 568, 652, { top: '#3d4245', bottom: '#1f2224', radius: 8, bevel: 4 });
+  ctx.restore();
+  ctx.fillStyle = '#c9b48a';
+  ctx.fillRect(560, 40, 160, 22);
+  ctx.strokeStyle = '#6b5a38';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(560, 40, 160, 22);
+  text(ctx, 'GEPÄCK · SCHLIESSFÄCHER', 640, 56, { font: `bold 11px ${PRINT}`, color: '#3b2f1a', align: 'center' });
+  for (const [rx, ry] of [[372, 46], [908, 46], [372, 666], [908, 666]]) rivet(ctx, rx, ry, 5, { slot: true });
+
   for (const spot of LOCKER_SPOTS) {
     const n = Number(spot.id.slice(6));
     const isOpen = open.includes(n);
-    const gradient = ctx.createLinearGradient(spot.x, spot.y, spot.x + spot.w, spot.y + spot.h);
-    gradient.addColorStop(0, isOpen ? '#1a1916' : '#8d9296');
-    gradient.addColorStop(1, isOpen ? '#0d0c0b' : '#5e6367');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
-    ctx.strokeStyle = '#3a3d40';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(spot.x, spot.y, spot.w, spot.h);
-    if (isOpen) continue;
-    ctx.fillStyle = '#d6a645';
-    ctx.fillRect(spot.x + 14, spot.y + 14, 36, 30);
-    text(ctx, String(n), spot.x + 32, spot.y + 36, { font: `bold 20px ${PRINT}`, color: INK, align: 'center' });
-    ctx.strokeStyle = 'rgba(30, 30, 30, 0.6)';
-    ctx.lineWidth = 3;
-    for (let k = 0; k < 3; k++) line(ctx, spot.x + 60, spot.y + 70 + k * 12, spot.x + 130, spot.y + 70 + k * 12);
+    // Vertiefung im Korpus
+    ctx.fillStyle = '#121416';
+    ctx.fillRect(spot.x - 3, spot.y - 3, spot.w + 6, spot.h + 6);
+    if (isOpen) {
+      // offenes Fach: Tiefe, Rückwand, aufgeklappte Tür als schmale Kante links
+      const depth = ctx.createLinearGradient(spot.x, spot.y, spot.x, spot.y + spot.h);
+      depth.addColorStop(0, '#050505');
+      depth.addColorStop(1, '#1d1b18');
+      ctx.fillStyle = depth;
+      ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.beginPath();
+      ctx.moveTo(spot.x, spot.y + spot.h);
+      ctx.lineTo(spot.x + 22, spot.y + spot.h - 18);
+      ctx.lineTo(spot.x + spot.w - 22, spot.y + spot.h - 18);
+      ctx.lineTo(spot.x + spot.w, spot.y + spot.h);
+      ctx.fill();
+      metalPanel(ctx, spot.x - 14, spot.y - 6, 16, spot.h + 12, { top: '#8d9296', bottom: '#4c5154', radius: 2, bevel: 2 });
+      continue;
+    }
+    metalPanel(ctx, spot.x, spot.y, spot.w, spot.h, { top: '#9ba1a5', bottom: '#5b6165', radius: 4 });
+    // Lüftungsschlitze
+    for (let k = 0; k < 4; k++) {
+      const sy = spot.y + 62 + k * 13;
+      ctx.fillStyle = '#26292b';
+      ctx.beginPath();
+      ctx.roundRect(spot.x + 64, sy, 76, 6, 3);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      line(ctx, spot.x + 66, sy + 7.5, spot.x + 138, sy + 7.5);
+    }
+    // Messing-Nummernschild
+    const plate = ctx.createLinearGradient(spot.x + 14, spot.y + 14, spot.x + 50, spot.y + 44);
+    plate.addColorStop(0, '#f2d27e');
+    plate.addColorStop(1, '#a67a28');
+    ctx.fillStyle = plate;
+    ctx.beginPath();
+    ctx.roundRect(spot.x + 14, spot.y + 14, 38, 30, 4);
+    ctx.fill();
+    ctx.strokeStyle = '#6e4c16';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    text(ctx, String(n), spot.x + 33, spot.y + 36, { font: `bold 19px ${SERIF}`, color: '#2b1a06', align: 'center' });
+    // Schlüsselloch mit Messingrosette und Griff
+    const kx = spot.x + 32;
+    const ky = spot.y + 90;
+    ctx.fillStyle = '#b8892f';
+    ctx.beginPath();
+    ctx.arc(kx, ky, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a1208';
+    ctx.beginPath();
+    ctx.arc(kx, ky - 2, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(kx - 1.5, ky - 1, 3, 8);
+    ctx.fillStyle = '#2f3336';
+    ctx.beginPath();
+    ctx.roundRect(spot.x + 24, spot.y + 108, 18, 6, 3);
+    ctx.fill();
+    rivet(ctx, spot.x + spot.w - 10, spot.y + 10, 3);
+    rivet(ctx, spot.x + spot.w - 10, spot.y + spot.h - 10, 3);
   }
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------- Taschenuhr
@@ -181,28 +244,13 @@ export function drawWatch(ctx, { hours, minutes, open, code }) {
   // Zeiger
   const hourAngle = (((hours % 12) + minutes / 60) / 12) * Math.PI * 2 - Math.PI / 2;
   const minuteAngle = (minutes / 60) * Math.PI * 2 - Math.PI / 2;
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 9;
-  line(ctx, x, y, x + Math.cos(hourAngle) * r * 0.5, y + Math.sin(hourAngle) * r * 0.5);
-  ctx.lineWidth = 5;
-  line(ctx, x, y, x + Math.cos(minuteAngle) * r * 0.78, y + Math.sin(minuteAngle) * r * 0.78);
-  ctx.fillStyle = INK;
-  ctx.beginPath();
-  ctx.arc(x, y, 10, 0, Math.PI * 2);
-  ctx.fill();
-  // Stellräder
+  clockHand(ctx, x, y, hourAngle + Math.PI / 2, r * 0.52, 14, '#1c140c');
+  clockHand(ctx, x, y, minuteAngle + Math.PI / 2, r * 0.8, 9, '#1c140c');
+  handCap(ctx, x, y, 10, '#1c140c');
+  // Stellräder (drehen sichtbar mit)
   for (const spot of WATCH_SPOTS) {
-    ctx.fillStyle = '#b58a35';
-    ctx.beginPath();
-    ctx.arc(spot.cx, spot.cy, spot.r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#7a5418';
-    ctx.lineWidth = 4;
-    for (let i = 0; i < 16; i++) {
-      const a = (i / 16) * Math.PI * 2;
-      line(ctx, spot.cx + Math.cos(a) * (spot.r - 10), spot.cy + Math.sin(a) * (spot.r - 10), spot.cx + Math.cos(a) * spot.r, spot.cy + Math.sin(a) * spot.r);
-    }
-    text(ctx, spot.id === 'hours' ? 'Stunde' : 'Minute', spot.cx, spot.cy + 8, { font: `bold 18px ${PRINT}`, color: '#3b2608', align: 'center' });
+    const turn = spot.id === 'hours' ? (hours / 12) * Math.PI * 2 : (minutes / 60) * Math.PI * 2;
+    brassKnob(ctx, spot.cx, spot.cy, spot.r, { angle: turn, label: spot.id === 'hours' ? 'Stunde' : 'Minute' });
   }
   text(ctx, 'Klick: Rad weiterdrehen', 900, 560, { font: `15px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }

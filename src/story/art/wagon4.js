@@ -79,18 +79,45 @@ export function drawTray(ctx, { taken = false, bill = false, poured = 0 } = {}) 
   ctx.strokeStyle = 'rgba(30, 15, 5, 0.7)';
   ctx.lineWidth = 6;
   ctx.strokeRect(120, 150, 1040, 470);
-  // Tablett
+  // Tischtuch-Kante oben, Licht der Lampe
+  glow(ctx, 640, 300, 560, '255, 210, 140', 0.16);
+  // Silbertablett: Schatten, Rand, Spiegelung
   ctx.save();
-  const gradient = ctx.createLinearGradient(0, 360, 0, 520);
-  gradient.addColorStop(0, '#d9dde0');
-  gradient.addColorStop(1, '#8b9196');
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
   ctx.beginPath();
-  ctx.ellipse(640, 470, 330, 80, 0, 0, Math.PI * 2);
+  ctx.ellipse(648, 486, 340, 84, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = '#6f757a';
-  ctx.lineWidth = 4;
+  const rim = ctx.createLinearGradient(310, 0, 970, 0);
+  rim.addColorStop(0, '#7d8389');
+  rim.addColorStop(0.3, '#eef1f3');
+  rim.addColorStop(0.55, '#9aa0a5');
+  rim.addColorStop(0.8, '#e2e6e9');
+  rim.addColorStop(1, '#6c7277');
+  ctx.fillStyle = rim;
+  ctx.beginPath();
+  ctx.ellipse(640, 470, 334, 82, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const inner = ctx.createLinearGradient(0, 400, 0, 540);
+  inner.addColorStop(0, '#aeb4b9');
+  inner.addColorStop(0.5, '#d6dade');
+  inner.addColorStop(1, '#8a9095');
+  ctx.fillStyle = inner;
+  ctx.beginPath();
+  ctx.ellipse(640, 472, 312, 70, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(60, 64, 68, 0.55)';
+  ctx.lineWidth = 2;
   ctx.stroke();
+  // gravierte Zierlinie
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(640, 472, 292, 62, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+  ctx.beginPath();
+  ctx.ellipse(560, 452, 170, 18, -0.05, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
   // Rechnung unter dem dritten Glas
   if (bill) {
@@ -105,7 +132,15 @@ export function drawTray(ctx, { taken = false, bill = false, poured = 0 } = {}) 
     ctx.restore();
   }
   GLASS_X.forEach((x, i) => {
-    if (i === 2 && taken) return;
+    if (i === 2 && taken) {
+      // Abdruck, wo das Glas stand
+      ctx.strokeStyle = 'rgba(120, 16, 40, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(x, 466, 28, 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      return;
+    }
     drawWineGlass(ctx, x, 470, poured > i ? 0.9 : 0.9);
     text(ctx, String(i + 1), x, 560, { font: `bold 18px ${PRINT}`, align: 'center', color: 'rgba(255, 240, 210, 0.75)' });
   });
@@ -116,48 +151,125 @@ export function drawTray(ctx, { taken = false, bill = false, poured = 0 } = {}) 
 function drawWineGlass(ctx, x, y, fill) {
   ctx.save();
   ctx.translate(x, y);
-  // Wein
-  ctx.fillStyle = 'rgba(120, 16, 40, 0.92)';
+  // Schatten auf dem Tablett
+  ctx.fillStyle = 'rgba(40, 20, 20, 0.25)';
   ctx.beginPath();
-  ctx.moveTo(-34, -112 + (1 - fill) * 40);
-  ctx.quadraticCurveTo(0, -36, 34, -112 + (1 - fill) * 40);
-  ctx.closePath();
+  ctx.ellipse(10, -2, 34, 7, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Glas
-  ctx.strokeStyle = 'rgba(235, 245, 250, 0.9)';
-  ctx.lineWidth = 3;
+  const bowl = new Path2D();
+  bowl.moveTo(-40, -170);
+  bowl.bezierCurveTo(-48, -96, -30, -60, 0, -58);
+  bowl.bezierCurveTo(30, -60, 48, -96, 40, -170);
+  // Glas leicht getönt
+  ctx.fillStyle = 'rgba(220, 235, 245, 0.10)';
+  ctx.fill(bowl);
+  // Wein mit Oberfläche
+  ctx.save();
+  ctx.clip(bowl);
+  const level = -116 + (1 - fill) * 40;
+  const wine = ctx.createLinearGradient(-40, 0, 40, 0);
+  wine.addColorStop(0, 'rgba(70, 6, 22, 0.95)');
+  wine.addColorStop(0.4, 'rgba(140, 20, 46, 0.92)');
+  wine.addColorStop(1, 'rgba(60, 4, 18, 0.95)');
+  ctx.fillStyle = wine;
+  ctx.fillRect(-50, level, 100, 120);
+  ctx.fillStyle = 'rgba(190, 50, 80, 0.85)';
   ctx.beginPath();
-  ctx.moveTo(-40, -170);
-  ctx.quadraticCurveTo(-46, -64, 0, -58);
-  ctx.quadraticCurveTo(46, -64, 40, -170);
+  ctx.ellipse(0, level, 44, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  // Glaskante
+  ctx.strokeStyle = 'rgba(235, 245, 250, 0.85)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke(bowl);
+  ctx.strokeStyle = 'rgba(235, 245, 250, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, -170, 40, 6, 0, 0, Math.PI * 2);
   ctx.stroke();
-  line(ctx, 0, -58, 0, -6);
+  // Stiel und Fuß
+  const stem = ctx.createLinearGradient(-4, 0, 4, 0);
+  stem.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+  stem.addColorStop(1, 'rgba(180, 200, 210, 0.6)');
+  ctx.fillStyle = stem;
+  ctx.fillRect(-2.5, -58, 5, 54);
+  ctx.strokeStyle = 'rgba(235, 245, 250, 0.85)';
   ctx.beginPath();
   ctx.ellipse(0, -4, 30, 7, 0, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-  line(ctx, -28, -160, -30, -100);
+  ctx.fillStyle = 'rgba(235, 245, 250, 0.18)';
+  ctx.fill();
+  // Glanzlichter
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-30, -158);
+  ctx.quadraticCurveTo(-36, -110, -22, -80);
+  ctx.stroke();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+  line(ctx, 28, -150, 30, -120);
   ctx.restore();
 }
 
 function drawCocoa(ctx, x, y) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#f2ece0';
+  // Untertasse
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
   ctx.beginPath();
-  ctx.ellipse(0, 0, 44, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(6, 4, 52, 13, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#e9e2d2';
-  ctx.fillRect(-28, -64, 56, 60);
-  ctx.fillStyle = '#6b3d1f';
+  ctx.fillStyle = '#e8e1d2';
   ctx.beginPath();
-  ctx.ellipse(0, -64, 28, 7, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 0, 50, 12, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = '#e9e2d2';
+  ctx.strokeStyle = '#2f5d8a';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 44, 9.5, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  // Tasse, rundlich mit Schattierung
+  const body = ctx.createLinearGradient(-30, 0, 30, 0);
+  body.addColorStop(0, '#cfc6b3');
+  body.addColorStop(0.35, '#fbf7ee');
+  body.addColorStop(1, '#bdb39f');
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.moveTo(-30, -64);
+  ctx.lineTo(-27, -16);
+  ctx.quadraticCurveTo(-24, -4, 0, -4);
+  ctx.quadraticCurveTo(24, -4, 27, -16);
+  ctx.lineTo(30, -64);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#2f5d8a';
+  ctx.lineWidth = 2;
+  line(ctx, -29, -54, 29, -54);
+  // Henkel
+  ctx.strokeStyle = '#e6dfcf';
   ctx.lineWidth = 7;
   ctx.beginPath();
-  ctx.arc(34, -36, 13, -1.2, 1.2);
+  ctx.arc(33, -38, 13, -1.3, 1.3);
   ctx.stroke();
+  // Kakao mit Schaum
+  ctx.fillStyle = '#5a3218';
+  ctx.beginPath();
+  ctx.ellipse(0, -64, 30, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(214, 170, 120, 0.7)';
+  ctx.beginPath();
+  ctx.ellipse(-4, -65, 16, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Dampf
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.lineWidth = 3;
+  for (const dx of [-10, 8]) {
+    ctx.beginPath();
+    ctx.moveTo(dx, -74);
+    ctx.bezierCurveTo(dx - 10, -92, dx + 10, -104, dx, -124);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 

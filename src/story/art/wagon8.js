@@ -190,9 +190,15 @@ export function drawFocus(ctx, state, picture) {
     text(ctx, spot.id === 'a' ? 'Objektiv' : 'Bildfenster', spot.cx, spot.cy + spot.r + 30, { font: `bold 17px ${PRINT}`, color: '#e9d8b0', align: 'center' });
   }
   // Verbindung zwischen den Rädern
-  ctx.strokeStyle = '#7a6a4a';
-  ctx.lineWidth = 8;
-  line(ctx, 490, 560, 790, 560);
+  const shaft = ctx.createLinearGradient(0, 554, 0, 566);
+  shaft.addColorStop(0, '#d9c08a');
+  shaft.addColorStop(0.5, '#8a7448');
+  shaft.addColorStop(1, '#4a3c22');
+  ctx.fillStyle = shaft;
+  ctx.fillRect(490, 554, 300, 12);
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.lineWidth = 1;
+  for (let x = 500; x < 790; x += 14) line(ctx, x, 554, x + 6, 566);
   text(ctx, 'Achtung: Das Objektiv dreht das Bildfenster mit.', 640, 530, { font: `italic 15px ${SERIF}`, color: '#bdb5a4', align: 'center' });
 }
 
@@ -200,20 +206,52 @@ function drawGear(ctx, cx, cy, r, value) {
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate((value / 8) * Math.PI * 2);
-  ctx.fillStyle = '#9a8a62';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 4;
+  const teeth = 18;
+  const brass = ctx.createLinearGradient(-r, -r, r, r);
+  brass.addColorStop(0, '#f0d080');
+  brass.addColorStop(0.5, '#b08a3a');
+  brass.addColorStop(1, '#5e4214');
+  ctx.fillStyle = brass;
   ctx.beginPath();
-  for (let i = 0; i < 16; i++) {
-    const a0 = (i / 16) * Math.PI * 2, a1 = ((i + 0.5) / 16) * Math.PI * 2;
-    ctx.lineTo(Math.cos(a0) * r, Math.sin(a0) * r);
-    ctx.lineTo(Math.cos(a1) * (r - 10), Math.sin(a1) * (r - 10));
+  for (let i = 0; i < teeth; i++) {
+    const a = (i / teeth) * Math.PI * 2;
+    const t = Math.PI / teeth;
+    ctx.lineTo(Math.cos(a - t * 0.5) * (r - 10), Math.sin(a - t * 0.5) * (r - 10));
+    ctx.lineTo(Math.cos(a - t * 0.3) * r, Math.sin(a - t * 0.3) * r);
+    ctx.lineTo(Math.cos(a + t * 0.3) * r, Math.sin(a + t * 0.3) * r);
+    ctx.lineTo(Math.cos(a + t * 0.5) * (r - 10), Math.sin(a + t * 0.5) * (r - 10));
   }
+  ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#5d533b';
+  ctx.shadowColor = 'transparent';
+  // ausgesparte Speichen
+  ctx.fillStyle = '#16120f';
+  for (let k = 0; k < 5; k++) {
+    const a0 = (k / 5) * Math.PI * 2 + 0.22, a1 = ((k + 1) / 5) * Math.PI * 2 - 0.22;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.72, a0, a1);
+    ctx.arc(0, 0, r * 0.38, a1, a0, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(60, 40, 10, 0.6)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
+  ctx.arc(0, 0, r * 0.74, 0, Math.PI * 2);
+  ctx.stroke();
+  // Nabe
+  const hub = ctx.createRadialGradient(-6, -6, 2, 0, 0, r * 0.3);
+  hub.addColorStop(0, '#fbe3a0');
+  hub.addColorStop(1, '#6e4c16');
+  ctx.fillStyle = hub;
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
   ctx.fill();
   // Markierung
-  ctx.fillStyle = '#e9d8b0';
+  ctx.fillStyle = '#ffe9b0';
   ctx.beginPath();
   ctx.arc(0, -r + 18, 6, 0, Math.PI * 2);
   ctx.fill();
@@ -221,7 +259,7 @@ function drawGear(ctx, cx, cy, r, value) {
   // Skala 0–7 außen
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-    text(ctx, String(i), cx + Math.cos(a) * (r + 18), cy + Math.sin(a) * (r + 18) + 6, { font: `14px ${PRINT}`, color: i === value ? '#ffd36b' : '#8f8672', align: 'center' });
+    text(ctx, String(i), cx + Math.cos(a) * (r + 18), cy + Math.sin(a) * (r + 18) + 6, { font: `${i === value ? 'bold ' : ''}14px ${PRINT}`, color: i === value ? '#ffd36b' : '#8f8672', align: 'center' });
   }
 }
 

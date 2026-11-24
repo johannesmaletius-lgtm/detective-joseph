@@ -1,5 +1,5 @@
 import { loadImage } from '../../core/assets.js';
-import { BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, glow, line, rivet, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 14 (Zeitungswagen): das Kreuzworträtsel, die Zeitung vom 25. Dezember
 // mit herausgeschnittenen Wörtern, die Schnipsel und das Pressefoto mit der Bahnhofsuhr.
@@ -193,13 +193,80 @@ export function drawMagnified(ctx) {
 }
 
 export function drawArchive(ctx) {
-  wood(ctx, 300, 90, 680, 540, [96, 56, 28]);
+  // Archivschrank aus Eiche, vier Schubladen; die unterste ist aufgezogen
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = '#3a200e';
+  ctx.fillRect(300, 70, 680, 580);
+  ctx.restore();
+  wood(ctx, 300, 70, 680, 580, [110, 66, 32]);
+  ctx.fillStyle = '#2a1608';
+  ctx.fillRect(300, 70, 680, 24);
+  ctx.fillRect(300, 626, 680, 24);
+  text(ctx, 'ARCHIV · RINGBAHN-KURIER', 640, 88, { font: `bold 14px ${SERIF}`, color: '#c9a24c', align: 'center' });
+  const labels = ['A – F', 'G – M', 'N – S', '24. – 25. Dez.'];
   for (let i = 0; i < 4; i++) {
-    ctx.fillStyle = '#5a3418';
-    ctx.fillRect(340, 130 + i * 120, 600, 100);
-    ctx.fillStyle = '#c9a24c';
-    ctx.fillRect(610, 170 + i * 120, 60, 16);
-    const years = ['A – F', 'G – M', 'N – S', '24. – 25. Dez.'];
-    text(ctx, years[i], 640, 214 + i * 120, { font: `16px ${TYPEWRITER}`, color: '#f3e2b4', align: 'center' });
+    const open = i === 3;
+    const x = open ? 326 : 340;
+    const y = 110 + i * 124;
+    const w = open ? 628 : 600;
+    const h = 108;
+    // Schatten der Fuge
+    ctx.fillStyle = '#1a0d04';
+    ctx.fillRect(338, y - 2, 604, h + 4);
+    if (open) {
+      // Blick in die offene Lade: Zeitungen hochkant
+      ctx.fillStyle = '#120a04';
+      ctx.fillRect(330, y - 40, 620, 44);
+      for (let k = 0; k < 9; k++) {
+        ctx.fillStyle = k % 2 ? '#d9cfb4' : '#e6dcc0';
+        ctx.fillRect(350 + k * 64, y - 34 + (k % 3) * 3, 54, 38);
+        ctx.fillStyle = 'rgba(40, 30, 20, 0.35)';
+        ctx.fillRect(354 + k * 64, y - 28 + (k % 3) * 3, 30, 3);
+      }
+    }
+    const front = ctx.createLinearGradient(x, y, x, y + h);
+    front.addColorStop(0, open ? '#8a5428' : '#7a4a22');
+    front.addColorStop(1, '#4e2c12');
+    ctx.fillStyle = front;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = 'rgba(255, 220, 170, 0.18)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 10, y + 10, w - 20, h - 20);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.strokeRect(x + 12, y + 12, w - 20, h - 20);
+    const cx = x + w / 2;
+    // Messing-Kartenhalter mit Etikett
+    const brass = ctx.createLinearGradient(cx - 70, y + 22, cx + 70, y + 56);
+    brass.addColorStop(0, '#f2d27e');
+    brass.addColorStop(1, '#94681e');
+    ctx.fillStyle = brass;
+    ctx.beginPath();
+    ctx.roundRect(cx - 72, y + 20, 144, 40, 4);
+    ctx.fill();
+    ctx.fillStyle = '#f3ead2';
+    ctx.fillRect(cx - 62, y + 27, 124, 26);
+    text(ctx, labels[i], cx, y + 46, { font: `bold 16px ${TYPEWRITER}`, color: INK, align: 'center' });
+    rivet(ctx, cx - 66, y + 40, 3, { tone: '#c9a24c' });
+    rivet(ctx, cx + 66, y + 40, 3, { tone: '#c9a24c' });
+    // Bügelgriff
+    ctx.strokeStyle = '#c9a24c';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 36, y + 70);
+    ctx.quadraticCurveTo(cx, y + 96, cx + 36, y + 70);
+    ctx.stroke();
+    rivet(ctx, cx - 38, y + 70, 5, { tone: '#c9a24c' });
+    rivet(ctx, cx + 38, y + 70, 5, { tone: '#c9a24c' });
   }
+  // Schloss oben rechts (offen)
+  ctx.fillStyle = '#c9a24c';
+  ctx.beginPath();
+  ctx.arc(920, 84, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#1a0d04';
+  ctx.fillRect(919, 79, 2, 10);
+  glow(ctx, 640, 520, 260, '255, 220, 150', 0.12);
 }

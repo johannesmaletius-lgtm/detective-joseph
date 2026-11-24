@@ -1,4 +1,4 @@
-import { INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, photoCard, text } from './common.js';
+import { INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, metalPanel, photoCard, rivet, text } from './common.js';
 
 // Gezeichnetes für Wagen 22 (Lok): Fahrtenschreiber-Streifen der Unglücksnacht, der Blick aus dem
 // Kohlentender, die Beweise (Familienfoto, Pressefoto, Miras Karte).
@@ -16,9 +16,23 @@ export const STRIP_SPOTS = [
 ];
 
 export function drawStrip(ctx, { offset }) {
-  ctx.fillStyle = '#2a2a24';
-  ctx.fillRect(120, 90, 1040, 560);
-  text(ctx, 'FAHRTENSCHREIBER · 24. Dezember · Zug 24', 640, 130, { font: `bold 20px ${PRINT}`, color: '#e8e0c8', align: 'center' });
+  // Gerät: schwarzes Blechgehäuse, links und rechts die Papierrollen
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 26;
+  ctx.shadowOffsetY = 10;
+  metalPanel(ctx, 120, 90, 1040, 560, { top: '#3a3a34', bottom: '#1a1a16', radius: 14, bevel: 4 });
+  ctx.restore();
+  for (const [rx, ry] of [[140, 110], [1140, 110], [140, 630], [1140, 630]]) rivet(ctx, rx, ry, 6, { slot: true });
+  const plate = ctx.createLinearGradient(0, 108, 0, 142);
+  plate.addColorStop(0, '#e9d08a');
+  plate.addColorStop(1, '#9a7428');
+  ctx.fillStyle = plate;
+  ctx.beginPath();
+  ctx.roundRect(380, 108, 520, 34, 5);
+  ctx.fill();
+  text(ctx, 'FAHRTENSCHREIBER · 24. Dezember · Zug 24', 640, 132, { font: `bold 18px ${PRINT}`, color: '#2a1a06', align: 'center' });
+  // Papier mit feinem Raster und Transportlöchern
   ctx.fillStyle = '#f2ecdc';
   ctx.fillRect(160, 170, 960, 340);
   ctx.save();
@@ -26,6 +40,16 @@ export function drawStrip(ctx, { offset }) {
   ctx.rect(160, 170, 960, 340);
   ctx.clip();
   const step = 240;
+  const shift = (offset * step) % 24;
+  ctx.strokeStyle = 'rgba(179, 38, 30, 0.12)';
+  ctx.lineWidth = 1;
+  for (let gy = 190; gy < 500; gy += 20) line(ctx, 160, gy, 1120, gy);
+  for (let gx = 160 - shift; gx < 1120; gx += 24) line(ctx, gx, 186, gx, 494);
+  ctx.fillStyle = '#2a2a24';
+  for (let hx = 160 - shift; hx < 1130; hx += 24) {
+    ctx.beginPath(); ctx.roundRect(hx + 6, 174, 10, 7, 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(hx + 6, 499, 10, 7, 2); ctx.fill();
+  }
   // Geschwindigkeit (konstant hoch – niemand bremst)
   ctx.strokeStyle = RED;
   ctx.lineWidth = 3;
@@ -46,10 +70,34 @@ export function drawStrip(ctx, { offset }) {
     text(ctx, mark.time, x + 6, 470, { font: `bold 22px ${TYPEWRITER}` });
   });
   ctx.restore();
-  text(ctx, 'Ausweichgleis', 160, 540, { font: `italic 16px ${SERIF}`, color: '#b8b0a0' });
+  // Papierrollen links und rechts, Glasabdeckung mit Glanz
+  for (const rx of [148, 1132]) {
+    const roll = ctx.createLinearGradient(rx - 16, 0, rx + 16, 0);
+    roll.addColorStop(0, '#9a9382');
+    roll.addColorStop(0.5, '#f6f0e0');
+    roll.addColorStop(1, '#8a8372');
+    ctx.fillStyle = roll;
+    ctx.beginPath();
+    ctx.roundRect(rx - 16, 160, 32, 360, 12);
+    ctx.fill();
+  }
+  const shine = ctx.createLinearGradient(160, 170, 520, 510);
+  shine.addColorStop(0, 'rgba(255, 255, 255, 0.16)');
+  shine.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = shine;
+  ctx.fillRect(160, 170, 960, 340);
+  text(ctx, 'Ausweichgleis', 170, 540, { font: `italic 16px ${SERIF}`, color: '#b8b0a0' });
   for (const spot of STRIP_SPOTS) {
-    ctx.fillStyle = '#4a4a3e';
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
+    const btn = ctx.createLinearGradient(0, spot.y, 0, spot.y + spot.h);
+    btn.addColorStop(0, '#5a5a4c');
+    btn.addColorStop(1, '#2e2e26');
+    ctx.fillStyle = btn;
+    ctx.beginPath();
+    ctx.roundRect(spot.x, spot.y, spot.w, spot.h, 10);
+    ctx.fill();
+    ctx.strokeStyle = '#a5772c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
     text(ctx, spot.id === 'back' ? '◀◀' : '▶▶', spot.x + spot.w / 2, spot.y + 40, { font: `bold 24px ${PRINT}`, color: '#efe3c2', align: 'center' });
   }
 }

@@ -304,20 +304,95 @@ export function ribbonSpots(left) {
 export function drawGiftBox(ctx, { left }) {
   ctx.fillStyle = '#1a120c';
   ctx.fillRect(280, 90, 720, 560);
-  ctx.fillStyle = '#7a2a3a';
+  glow(ctx, 640, 300, 420, '255, 210, 150', 0.12);
+  // Paket in Geschenkpapier mit kleinen Sternen, Kanten leicht geknickt
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 26;
+  ctx.shadowOffsetY = 10;
+  const paper = ctx.createLinearGradient(340, 150, 940, 600);
+  paper.addColorStop(0, '#8e3446');
+  paper.addColorStop(1, '#5e1e2c');
+  ctx.fillStyle = paper;
   ctx.fillRect(340, 150, 600, 450);
-  text(ctx, 'Für Papa', 400, 128, { font: `bold 26px ${HAND}`, color: '#ffe7a0', align: 'center' });
-  // von unten nach oben zeichnen
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(340, 150, 600, 450);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(255, 220, 140, 0.35)';
+  for (let row = 0; row < 10; row++) {
+    for (let col = 0; col < 13; col++) {
+      const sx = 352 + col * 48 + (row % 2) * 24, sy = 166 + row * 46;
+      ctx.beginPath();
+      for (let k = 0; k < 10; k++) {
+        const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 3 : 7;
+        ctx.lineTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr);
+      }
+      ctx.fill();
+    }
+  }
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 3;
+  line(ctx, 340, 300, 940, 290);
+  line(ctx, 520, 150, 540, 600);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(340, 150, 600, 450);
+  // Bänder: von unten nach oben zeichnen, als Satin mit Glanz
   for (const id of [...LAYER].reverse()) {
     if (!left.includes(id)) continue;
-    const r = RIBBONS.find((q) => q.id === id);
-    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-    ctx.lineWidth = 34;
-    line(ctx, r.from[0] + 3, r.from[1] + 4, r.to[0] + 3, r.to[1] + 4);
-    ctx.strokeStyle = r.color;
-    ctx.lineWidth = 28;
-    line(ctx, r.from[0], r.from[1], r.to[0], r.to[1]);
+    satinRibbon(ctx, RIBBONS.find((q) => q.id === id));
   }
+  // Kinder-Anhänger (steckt oben unter den Bändern)
+  ctx.save();
+  ctx.translate(410, 122);
+  ctx.rotate(-0.06);
+  ctx.fillStyle = '#f3e8cc';
+  ctx.beginPath();
+  ctx.roundRect(-70, -22, 140, 40, 6);
+  ctx.fill();
+  text(ctx, 'Für Papa', 0, 8, { font: `bold 26px ${HAND}`, color: '#b3261e', align: 'center' });
+  ctx.restore();
+}
+
+function satinRibbon(ctx, r) {
+  const [x0, y0] = r.from, [x1, y1] = r.to;
+  const len = Math.hypot(x1 - x0, y1 - y0);
+  const angle = Math.atan2(y1 - y0, x1 - x0);
+  ctx.save();
+  ctx.translate(x0, y0);
+  ctx.rotate(angle);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 4;
+  ctx.fillStyle = r.color;
+  ctx.fillRect(-4, -14, len + 8, 28);
+  ctx.shadowColor = 'transparent';
+  const sheen = ctx.createLinearGradient(0, -14, 0, 14);
+  sheen.addColorStop(0, 'rgba(0, 0, 0, 0.25)');
+  sheen.addColorStop(0.3, 'rgba(255, 255, 255, 0.35)');
+  sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
+  sheen.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(-4, -14, len + 8, 28);
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+  ctx.lineWidth = 1;
+  line(ctx, -4, -11, len + 4, -11);
+  line(ctx, -4, 11, len + 4, 11);
+  // eingeschnittene Enden (Schwalbenschwanz)
+  ctx.fillStyle = '#1a120c';
+  for (const end of [-4, len + 4]) {
+    const dir = end < 0 ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(end, -15);
+    ctx.lineTo(end + dir * 12, 0);
+    ctx.lineTo(end, 15);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------- Kelle und Karte

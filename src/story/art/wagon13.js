@@ -213,28 +213,98 @@ export function rubSpots() {
   return PLAQUE_LINES.map((_, i) => ({ id: `band${i}`, band: i, x: 260, y: 170 + i * 66, w: 760, h: 66, label: 'Mit dem Bleistift reiben', quiet: true }));
 }
 
+// Bleistift-Schraffur für eine geriebene Zeile – einmal erzeugt, dann wiederverwendet
+let graphite = null;
+function graphiteBand() {
+  if (graphite) return graphite;
+  graphite = document.createElement('canvas');
+  graphite.width = 800;
+  graphite.height = 66;
+  const g = graphite.getContext('2d');
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  // ausgefranste Ränder: die Schraffur hört nicht gerade auf
+  g.beginPath();
+  g.moveTo(14, 8 + rnd() * 6);
+  for (let x = 14; x <= 786; x += 18) g.lineTo(x, 4 + rnd() * 7);
+  for (let x = 786; x >= 14; x -= 18) g.lineTo(x, 58 + rnd() * 7);
+  g.closePath();
+  g.clip();
+  g.fillStyle = 'rgba(52, 50, 58, 0.5)';
+  g.fillRect(0, 0, 800, 66);
+  g.lineCap = 'round';
+  for (let i = 0; i < 1600; i++) {
+    const x = 6 + rnd() * 788;
+    const y = rnd() * 66;
+    const len = 10 + rnd() * 22;
+    g.strokeStyle = `rgba(44, 42, 50, ${0.06 + rnd() * 0.12})`;
+    g.lineWidth = 1 + rnd() * 2.2;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x + len * 0.55, y - len * 0.83);
+    g.stroke();
+  }
+  return graphite;
+}
+
 export function drawRubbing(ctx, revealed, { dots = false, time = 0 } = {}) {
-  // Die Tafel unter dem Papier
-  ctx.fillStyle = '#3a2c1e';
-  ctx.fillRect(200, 110, 880, 500);
+  // Die verrußte Tafel unter dem Papier
+  ctx.save();
+  ctx.filter = 'brightness(0.55)';
+  drawPicture(ctx, 'assets/closeups/gedenktafel.webp', 0, 0, 1280, 720);
+  ctx.filter = 'none';
+  ctx.restore();
   sheet(ctx, 240, 140, 800, 440, {
-    color: '#efe7d2',
+    color: '#f1eadb',
     shade: '#ddd2b6',
     inner: (c) => {
+      // Klebestreifen an den Ecken
+      c.fillStyle = 'rgba(236, 226, 190, 0.75)';
+      for (const [tx, ty, a] of [[-10, -6, -0.6], [770, -6, 0.6], [-10, 418, 0.6], [770, 418, -0.6]]) {
+        c.save();
+        c.translate(tx + 20, ty + 14);
+        c.rotate(a);
+        c.fillRect(-28, -9, 56, 18);
+        c.restore();
+      }
       PLAQUE_LINES.forEach((row, i) => {
         const shown = revealed[i];
         const y = 30 + i * 66;
         if (shown) {
-          c.fillStyle = 'rgba(48, 46, 52, 0.55)';
-          c.fillRect(16, y + 4, 768, 58);
-          // ausgesparte Buchstaben: hell auf dunkel gerieben
-          text(c, row, 400, y + 46, { font: `bold 30px ${SERIF}`, color: '#efe7d2', align: 'center' });
+          c.drawImage(graphiteBand(), 0, y);
+          // ausgesparte Buchstaben: hell auf dunkel gerieben, an den Kanten der Gravur dunkler
+          c.font = `bold 30px ${SERIF}`;
+          c.textAlign = 'center';
+          c.lineJoin = 'round';
+          c.strokeStyle = 'rgba(30, 28, 34, 0.85)';
+          c.lineWidth = 3;
+          c.strokeText(row, 400, y + 46);
+          text(c, row, 400, y + 46, { font: `bold 30px ${SERIF}`, color: '#f1eadb', align: 'center' });
         } else {
+          // ungeriebene Zeile: man ahnt nur die Prägung
+          c.strokeStyle = 'rgba(120, 100, 70, 0.12)';
+          c.lineWidth = 1;
+          c.strokeRect(20, y + 8, 760, 52);
           text(c, '· · ·', 400, y + 44, { font: `20px ${SERIF}`, color: 'rgba(60, 50, 40, 0.25)', align: 'center' });
         }
       });
     },
   });
+  // ein Bleistiftstummel liegt auf dem Papier
+  ctx.save();
+  ctx.translate(1000, 590);
+  ctx.rotate(-0.35);
+  ctx.fillStyle = '#c99a2e';
+  ctx.fillRect(-60, -7, 100, 14);
+  ctx.fillStyle = '#e8c9a0';
+  ctx.beginPath();
+  ctx.moveTo(40, -7); ctx.lineTo(62, 0); ctx.lineTo(40, 7); ctx.fill();
+  ctx.fillStyle = '#2b2a2e';
+  ctx.beginPath();
+  ctx.moveTo(55, -2.5); ctx.lineTo(62, 0); ctx.lineTo(55, 2.5); ctx.fill();
+  ctx.fillStyle = '#d24b3a';
+  ctx.fillRect(-72, -7, 12, 14);
+  ctx.restore();
   if (dots) drawLanternDots(ctx, time);
 }
 

@@ -49,33 +49,40 @@ export const BOTTLE_SPOTS = BOTTLES.map((b, i) => ({ id: b.id, x: 330 + i * 240,
 export const DEVELOP_SPOT = { id: 'develop', x: 1060, y: 450, w: 160, h: 120, label: 'Film entwickeln' };
 
 export function drawChemistry(ctx, { trays, held, redLight }) {
-  ctx.fillStyle = redLight ? '#2a0606' : '#1a1410';
+  // Wand mit Kacheln, davor der Labortisch
+  ctx.fillStyle = redLight ? '#2a0808' : '#1c1814';
   ctx.fillRect(220, 60, 1020, 600);
+  ctx.strokeStyle = redLight ? 'rgba(255, 120, 100, 0.06)' : 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 2;
+  for (let y = 60; y < 420; y += 36) line(ctx, 220, y, 1240, y);
+  for (let x = 220; x < 1240; x += 36) line(ctx, x, 60, x, 420);
+  const bench = ctx.createLinearGradient(0, 400, 0, 660);
+  bench.addColorStop(0, redLight ? '#3a1410' : '#3a3530');
+  bench.addColorStop(1, redLight ? '#1a0606' : '#191613');
+  ctx.fillStyle = bench;
+  ctx.fillRect(220, 400, 1020, 260);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.fillRect(220, 400, 1020, 3);
   if (redLight) glow(ctx, 730, 60, 600, '255, 40, 30', 0.25);
   BOTTLES.forEach((b, i) => {
     if (held === b.id || trays.includes(b.id)) return;
-    const s = BOTTLE_SPOTS[i];
-    ctx.fillStyle = b.color;
-    ctx.fillRect(s.x + 30, s.y + 60, 80, 170);
-    ctx.fillRect(s.x + 55, s.y + 10, 30, 55);
-    ctx.fillStyle = '#eee4c8';
-    ctx.fillRect(s.x + 38, s.y + 120, 64, 40);
-    text(ctx, '?', s.x + 70, s.y + 150, { font: `bold 26px ${PRINT}`, align: 'center' });
+    drawBottle(ctx, BOTTLE_SPOTS[i], b);
   });
   TRAY_SPOTS.forEach((s, i) => {
-    ctx.fillStyle = ['#d8d0c0', '#a8a8a8', '#c0392b'][i];
-    ctx.fillRect(s.x, s.y + 40, s.w, 60);
-    const inside = BOTTLES.find((b) => b.id === trays[i]);
-    if (inside) {
-      ctx.fillStyle = inside.color;
-      ctx.globalAlpha = 0.7;
-      ctx.fillRect(s.x + 10, s.y + 50, s.w - 20, 40);
-      ctx.globalAlpha = 1;
-    }
+    drawTrayDish(ctx, s, ['#e2dccd', '#9a9a9a', '#b8352a'][i], BOTTLES.find((b) => b.id === trays[i]));
     text(ctx, `Schale ${i + 1}`, s.x + s.w / 2, s.y + 130, { font: `bold 18px ${PRINT}`, color: '#f1e0b8', align: 'center' });
   });
-  ctx.fillStyle = '#3d2a16';
-  ctx.fillRect(DEVELOP_SPOT.x, DEVELOP_SPOT.y, DEVELOP_SPOT.w, DEVELOP_SPOT.h);
+  // Laborzeituhr auf dem Knopf „Film entwickeln“
+  const plate = ctx.createLinearGradient(0, DEVELOP_SPOT.y, 0, DEVELOP_SPOT.y + DEVELOP_SPOT.h);
+  plate.addColorStop(0, '#4e3820');
+  plate.addColorStop(1, '#271a0c');
+  ctx.fillStyle = plate;
+  ctx.beginPath();
+  ctx.roundRect(DEVELOP_SPOT.x, DEVELOP_SPOT.y, DEVELOP_SPOT.w, DEVELOP_SPOT.h, 12);
+  ctx.fill();
+  ctx.strokeStyle = '#c9a24c';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   text(ctx, 'Film', DEVELOP_SPOT.x + 80, DEVELOP_SPOT.y + 52, { font: `bold 20px ${PRINT}`, color: '#f1e0b8', align: 'center' });
   text(ctx, 'entwickeln', DEVELOP_SPOT.x + 80, DEVELOP_SPOT.y + 80, { font: `bold 20px ${PRINT}`, color: '#f1e0b8', align: 'center' });
   // halb zerrissene Anleitung
@@ -94,6 +101,129 @@ export function drawChemistry(ctx, { trays, held, redLight }) {
     },
   });
   if (held) text(ctx, `${BOTTLES.find((b) => b.id === held).name} in der Hand – auf eine Schale klicken`, 730, 100, { font: `bold 18px ${PRINT}`, color: '#ffe7a0', align: 'center' });
+}
+
+// Glasflasche mit Schulter, Korken, Flüssigkeit, Etikett „?“
+function drawBottle(ctx, s, b) {
+  const cx = s.x + 70, base = s.y + 230;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  ctx.beginPath();
+  ctx.ellipse(cx + 8, base, 50, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const body = new Path2D();
+  body.moveTo(cx - 14, s.y + 20);
+  body.lineTo(cx - 14, s.y + 62);
+  body.bezierCurveTo(cx - 14, s.y + 80, cx - 44, s.y + 84, cx - 44, s.y + 110);
+  body.lineTo(cx - 44, base - 8);
+  body.quadraticCurveTo(cx - 44, base, cx - 36, base);
+  body.lineTo(cx + 36, base);
+  body.quadraticCurveTo(cx + 44, base, cx + 44, base - 8);
+  body.lineTo(cx + 44, s.y + 110);
+  body.bezierCurveTo(cx + 44, s.y + 84, cx + 14, s.y + 80, cx + 14, s.y + 62);
+  body.lineTo(cx + 14, s.y + 20);
+  body.closePath();
+  // Glas
+  const glass = ctx.createLinearGradient(cx - 44, 0, cx + 44, 0);
+  glass.addColorStop(0, b.color);
+  glass.addColorStop(0.35, 'rgba(255, 255, 255, 0.55)');
+  glass.addColorStop(0.5, b.color);
+  glass.addColorStop(1, 'rgba(0, 0, 0, 0.55)');
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = glass;
+  ctx.fill(body);
+  ctx.globalAlpha = 1;
+  // Flüssigkeit bis knapp unter die Schulter
+  ctx.save();
+  ctx.clip(body);
+  const liquid = ctx.createLinearGradient(cx - 44, 0, cx + 44, 0);
+  liquid.addColorStop(0, b.color);
+  liquid.addColorStop(0.4, b.color);
+  liquid.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+  ctx.fillStyle = liquid;
+  ctx.globalAlpha = 0.85;
+  ctx.fillRect(cx - 50, s.y + 120, 100, 120);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.fillRect(cx - 44, s.y + 120, 88, 2);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke(body);
+  // Glanzstreifen
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.beginPath();
+  ctx.roundRect(cx - 34, s.y + 112, 6, 100, 3);
+  ctx.fill();
+  // Korken
+  ctx.fillStyle = '#a9804a';
+  ctx.beginPath();
+  ctx.roundRect(cx - 12, s.y + 4, 24, 22, 3);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(60, 40, 20, 0.6)';
+  ctx.lineWidth = 1;
+  for (let k = 0; k < 3; k++) line(ctx, cx - 10, s.y + 9 + k * 6, cx + 10, s.y + 9 + k * 6);
+  // Etikett, leicht schief, abgegriffen
+  ctx.save();
+  ctx.translate(cx, s.y + 160);
+  ctx.rotate(-0.04);
+  ctx.fillStyle = '#ece2c4';
+  ctx.fillRect(-34, -22, 68, 44);
+  ctx.strokeStyle = 'rgba(80, 60, 30, 0.5)';
+  ctx.strokeRect(-30, -18, 60, 36);
+  ctx.fillStyle = 'rgba(120, 90, 50, 0.25)';
+  ctx.fillRect(-34, 10, 30, 12);
+  text(ctx, '?', 0, 10, { font: `bold 26px ${PRINT}`, align: 'center' });
+  ctx.restore();
+  ctx.restore();
+}
+
+// Entwicklerschale in leichter Aufsicht, mit Flüssigkeit
+function drawTrayDish(ctx, s, color, inside) {
+  const x = s.x, y = s.y + 30, w = s.w, h = 72;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.beginPath();
+  ctx.roundRect(x + 6, y + 10, w, h, 10);
+  ctx.fill();
+  // Außenwand
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 10);
+  ctx.fill();
+  // Boden innen (etwas dunkler) mit Rippen
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.beginPath();
+  ctx.roundRect(x + 10, y + 8, w - 20, h - 16, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+  ctx.lineWidth = 2;
+  for (let k = 1; k < 5; k++) line(ctx, x + 14 + k * (w - 28) / 5, y + 12, x + 14 + k * (w - 28) / 5, y + h - 12);
+  if (inside) {
+    ctx.globalAlpha = 0.75;
+    ctx.fillStyle = inside.color;
+    ctx.beginPath();
+    ctx.roundRect(x + 12, y + 10, w - 24, h - 20, 5);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.35, y + 20, w * 0.22, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Rand und Ausgießnase
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x + 1, y + 1, w - 2, h - 2, 10);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x + w - 2, y + 4);
+  ctx.lineTo(x + w + 10, y - 4);
+  ctx.lineTo(x + w - 2, y + 18);
+  ctx.fill();
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------- Kontaktbogen

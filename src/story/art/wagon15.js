@@ -1,5 +1,5 @@
 import { drawSymbol } from './wagon13.js';
-import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, clockHand, drawPicture, glow, handCap, line, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 15 (Spielzimmer): die vierzehn Modellbahn-Wagen, das Innere des
 // Puppenhaus-Bahnhofs mit den Figuren und Miras Zeichnung.
@@ -74,7 +74,7 @@ const HOUSE = { x: 190, y: 107, w: 900, h: 506 };
 export function drawDollhouseInside(ctx) {
   drawPicture(ctx, 'assets/closeups/puppenhaus.webp', HOUSE.x, HOUSE.y, HOUSE.w, HOUSE.h);
   // Bahnhofsuhr: 23:47
-  const cx = 352, cy = 287, r = 40;
+  const cx = 370, cy = 323, r = 44;
   ctx.strokeStyle = INK;
   ctx.lineCap = 'round';
   for (let i = 0; i < 12; i++) {
@@ -84,96 +84,205 @@ export function drawDollhouseInside(ctx) {
   }
   const minute = ((47 / 60) * Math.PI * 2) - Math.PI / 2;
   const hour = (((11 + 47 / 60) / 12) * Math.PI * 2) - Math.PI / 2;
-  ctx.lineWidth = 4;
-  line(ctx, cx, cy, cx + Math.cos(hour) * r * 0.5, cy + Math.sin(hour) * r * 0.5);
-  ctx.lineWidth = 3;
-  line(ctx, cx, cy, cx + Math.cos(minute) * r * 0.78, cy + Math.sin(minute) * r * 0.78);
   ctx.lineCap = 'butt';
+  clockHand(ctx, cx, cy, hour + Math.PI / 2, r * 0.52, 6);
+  clockHand(ctx, cx, cy, minute + Math.PI / 2, r * 0.8, 4);
+  handCap(ctx, cx, cy, 3.5);
   text(ctx, 'ZUG 24', 865, 332, { font: `bold 15px ${PRINT}`, color: '#f3e2b4', align: 'center' });
   text(ctx, 'Wo stand wer in jener Nacht?', 640, 650, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+}
+
+// Lackierte Holzfigur: gerundeter Körper mit Glanz
+function pegBody(ctx, color, bottom, flare) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(-17, -22);
+  ctx.quadraticCurveTo(-22, -16, -21, -6);
+  ctx.quadraticCurveTo(-flare + 4, 30, -flare, bottom);
+  ctx.quadraticCurveTo(0, bottom + 6, flare, bottom);
+  ctx.quadraticCurveTo(flare - 4, 30, 21, -6);
+  ctx.quadraticCurveTo(22, -16, 17, -22);
+  ctx.closePath();
+  ctx.fill();
+  const shine = ctx.createLinearGradient(-flare, 0, flare, 0);
+  shine.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+  shine.addColorStop(0.32, 'rgba(255, 255, 255, 0.3)');
+  shine.addColorStop(0.55, 'rgba(255, 255, 255, 0)');
+  shine.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+  ctx.fillStyle = shine;
+  ctx.fill();
+}
+
+function pegHead(ctx, y = -36, r = 16) {
+  const skin = ctx.createRadialGradient(-5, y - 6, 2, 0, y, r);
+  skin.addColorStop(0, '#fbe0c4');
+  skin.addColorStop(1, '#d9a888');
+  ctx.fillStyle = skin;
+  ctx.beginPath();
+  ctx.arc(0, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#2a1a10';
+  ctx.beginPath();
+  ctx.arc(-5, y - 2, 1.8, 0, Math.PI * 2);
+  ctx.arc(5, y - 2, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(220, 90, 80, 0.45)';
+  ctx.beginPath();
+  ctx.arc(-9, y + 4, 3, 0, Math.PI * 2);
+  ctx.arc(9, y + 4, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#7a2a1a';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, y + 4, 4, 0.2, Math.PI - 0.2);
+  ctx.stroke();
 }
 
 export function drawFigure(ctx, token, x, y) {
   const figure = FIGURES.find((f) => f.id === token.id);
   ctx.save();
   ctx.translate(x, y);
-  const body = { conductor: '#1f2a44', woman: '#7a3a3a', girl: '#3f5f34', cook: '#e8e2d2', dog: '#8a5a2a' }[figure.id];
-  // Sockel
-  ctx.fillStyle = '#5a3a1c';
+  // Sockel aus Holz
+  const base = ctx.createLinearGradient(-34, 0, 34, 0);
+  base.addColorStop(0, '#3e260f');
+  base.addColorStop(0.4, '#7a5028');
+  base.addColorStop(1, '#3a220c');
+  ctx.fillStyle = base;
   ctx.beginPath();
-  ctx.ellipse(0, 62, 34, 10, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 64, 34, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(-34, 58, 68, 6);
+  ctx.fillStyle = '#8a6034';
+  ctx.beginPath();
+  ctx.ellipse(0, 58, 34, 10, 0, 0, Math.PI * 2);
   ctx.fill();
   if (figure.id === 'dog') {
-    ctx.fillStyle = body;
-    ctx.fillRect(-26, 20, 52, 26);
+    ctx.fillStyle = '#8a5a2a';
     ctx.beginPath();
-    ctx.arc(30, 16, 14, 0, Math.PI * 2);
+    ctx.ellipse(-2, 30, 30, 15, 0, 0, Math.PI * 2); // Rumpf
     ctx.fill();
-    ctx.fillRect(-24, 44, 8, 16);
-    ctx.fillRect(16, 44, 8, 16);
+    for (const lx of [-22, -10, 10, 20]) ctx.fillRect(lx, 36, 7, 22);
+    ctx.beginPath();
+    ctx.ellipse(30, 14, 14, 12, 0, 0, Math.PI * 2); // Kopf
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(40, 18, 8, 6, 0, 0, Math.PI * 2); // Schnauze
+    ctx.fill();
+    ctx.fillStyle = '#5a3414';
+    ctx.beginPath();
+    ctx.ellipse(24, 14, 6, 11, 0.3, 0, Math.PI * 2); // Ohr
+    ctx.fill();
+    ctx.strokeStyle = '#8a5a2a';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-30, 24);
+    ctx.quadraticCurveTo(-42, 12, -38, 2); // Schwanz
+    ctx.stroke();
+    ctx.fillStyle = '#1a1008';
+    ctx.beginPath();
+    ctx.arc(46, 16, 2.5, 0, Math.PI * 2);
+    ctx.arc(32, 10, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#b3261e';
+    ctx.fillRect(16, 20, 18, 4); // Halsband
+    const shine = ctx.createLinearGradient(0, 14, 0, 46);
+    shine.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+    shine.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = shine;
+    ctx.beginPath();
+    ctx.ellipse(-2, 26, 26, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
   } else {
     const small = figure.id === 'girl';
     const s = small ? 0.72 : 1;
     ctx.scale(s, s);
     ctx.translate(0, small ? 30 : 0);
-    ctx.fillStyle = body;
-    ctx.beginPath();
-    ctx.moveTo(-20, -20);
-    ctx.lineTo(20, -20);
-    ctx.lineTo(figure.id === 'woman' || small ? 30 : 22, 60);
-    ctx.lineTo(figure.id === 'woman' || small ? -30 : -22, 60);
-    ctx.fill();
-    // Glanz auf dem lackierten Holz
-    const shine = ctx.createLinearGradient(-20, 0, 20, 0);
-    shine.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    shine.addColorStop(0.35, 'rgba(255, 255, 255, 0.28)');
-    shine.addColorStop(0.6, 'rgba(255, 255, 255, 0)');
-    ctx.fillStyle = shine;
-    ctx.fillRect(-22, -20, 44, 80);
-    ctx.fillStyle = '#f1cfae';
-    ctx.beginPath();
-    ctx.arc(0, -36, 16, 0, Math.PI * 2);
-    ctx.fill();
-    // gemaltes Gesicht
-    ctx.fillStyle = '#2a1a10';
-    ctx.beginPath();
-    ctx.arc(-5, -38, 1.8, 0, Math.PI * 2);
-    ctx.arc(5, -38, 1.8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(220, 90, 80, 0.45)';
-    ctx.beginPath();
-    ctx.arc(-9, -32, 3, 0, Math.PI * 2);
-    ctx.arc(9, -32, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#7a2a1a';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, -32, 4, 0.2, Math.PI - 0.2);
-    ctx.stroke();
+    const wide = figure.id === 'woman' || small;
+    const color = { conductor: '#1f2a44', woman: '#7a3a3a', girl: '#3f5f34', cook: '#ece6d6' }[figure.id];
+    pegBody(ctx, color, 60, wide ? 30 : 23);
+    if (figure.id === 'conductor') {
+      ctx.fillStyle = '#d9b25a';
+      for (let k = 0; k < 3; k++) {
+        ctx.beginPath();
+        ctx.arc(0, -8 + k * 16, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#121a2c';
+      ctx.fillRect(-21, 18, 42, 5); // Gürtel
+    }
+    if (figure.id === 'cook') {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(-14, -4, 28, 58, 4); // Schürze
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    if (figure.id === 'woman') {
+      ctx.fillStyle = '#c9a26a';
+      ctx.beginPath();
+      ctx.moveTo(-22, -16); ctx.quadraticCurveTo(0, 6, 22, -16); ctx.lineTo(18, -22); ctx.lineTo(-18, -22);
+      ctx.fill(); // Schultertuch
+    }
+    if (small) {
+      ctx.fillStyle = '#efe6d2';
+      ctx.fillRect(-28, 46, 56, 6); // Rocksaum
+    }
+    pegHead(ctx);
     if (figure.id === 'conductor') {
       ctx.fillStyle = '#121a2c';
-      ctx.fillRect(-18, -58, 36, 12);
+      ctx.beginPath();
+      ctx.roundRect(-17, -60, 34, 14, [4, 4, 0, 0]);
+      ctx.fill();
       ctx.fillRect(-22, -48, 44, 5);
       ctx.fillStyle = '#d9b25a';
-      ctx.fillRect(-4, -56, 8, 6);
+      ctx.fillRect(-4, -57, 8, 6);
+      // Schnurrbart
+      ctx.fillStyle = '#4a2a14';
+      ctx.beginPath();
+      ctx.ellipse(-4, -30, 5, 2, 0.2, 0, Math.PI * 2);
+      ctx.ellipse(4, -30, 5, 2, -0.2, 0, Math.PI * 2);
+      ctx.fill();
     }
     if (figure.id === 'cook') {
       ctx.fillStyle = '#fbf8ef';
-      ctx.fillRect(-14, -72, 28, 22);
+      ctx.fillRect(-12, -62, 24, 12);
+      for (const [hx, hy, hr] of [[-9, -66, 9], [0, -72, 11], [9, -66, 9]]) {
+        ctx.beginPath();
+        ctx.arc(hx, hy, hr, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     if (figure.id === 'woman') {
       ctx.fillStyle = '#4a2a1a';
       ctx.beginPath();
       ctx.arc(0, -44, 17, Math.PI, 0);
       ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -58, 7, 0, Math.PI * 2); // Dutt
+      ctx.fill();
     }
     if (small) {
+      ctx.fillStyle = '#5a3018';
+      ctx.beginPath();
+      ctx.arc(0, -44, 17, Math.PI, 0);
+      ctx.fill();
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.ellipse(side * 18, -30, 5, 11, side * 0.3, 0, Math.PI * 2); // Zöpfe
+        ctx.fill();
+      }
+      // Hase im Arm
       ctx.fillStyle = '#d8c3a0';
       ctx.beginPath();
       ctx.ellipse(16, 10, 9, 14, 0.3, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillRect(12, -10, 4, 10);
-      ctx.fillRect(18, -10, 4, 10);
+      ctx.beginPath();
+      ctx.ellipse(13, -8, 3, 9, -0.1, 0, Math.PI * 2);
+      ctx.ellipse(20, -7, 3, 9, 0.2, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
   ctx.restore();

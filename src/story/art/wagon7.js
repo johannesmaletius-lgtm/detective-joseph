@@ -220,24 +220,65 @@ export function drawCoaster(ctx) {
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
+  // Pappe: feine Körnung und gewellter Prägerand
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.clip();
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 1400; i++) {
+    ctx.fillStyle = i % 3 ? 'rgba(120, 90, 50, 0.09)' : 'rgba(255, 255, 255, 0.16)';
+    ctx.fillRect(cx - r + rnd() * r * 2, cy - r + rnd() * r * 2, 2, 2);
+  }
+  const edge = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, r);
+  edge.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  edge.addColorStop(1, 'rgba(90, 60, 30, 0.28)');
+  ctx.fillStyle = edge;
+  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(120, 90, 50, 0.35)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i <= 120; i++) {
+    const a = (i / 120) * Math.PI * 2;
+    const rr = r - 7 + Math.sin(i * 1.0) * 2;
+    ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  ctx.stroke();
   ctx.strokeStyle = '#8f2b1d';
   ctx.lineWidth = 8;
   ctx.beginPath();
-  ctx.arc(cx, cy, r - 18, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r - 22, 0, Math.PI * 2);
   ctx.stroke();
-  // Glasränder
-  ctx.strokeStyle = 'rgba(140, 90, 40, 0.3)';
-  ctx.lineWidth = 6;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(cx + 70, cy - 60, 90, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r - 32, 0, Math.PI * 2);
   ctx.stroke();
+  // Glasrand: nasser Ring, an einer Stelle dunkler
+  ctx.save();
+  ctx.strokeStyle = 'rgba(140, 90, 40, 0.22)';
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.arc(cx + 70, cy - 40, 92, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(120, 70, 30, 0.25)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(cx + 70, cy - 40, 95, 2.2, 4.4);
+  ctx.stroke();
+  ctx.restore();
   text(ctx, 'BARWAGEN · RINGBAHN', cx, cy - 190, { font: `bold 22px ${SERIF}`, color: '#8f2b1d', align: 'center' });
   COASTER_TALLY.forEach(({ symbol, count }, i) => {
     const y = cy - 110 + i * 78;
     drawSymbol(ctx, symbol, cx - 150, y, 52, INK);
     drawTally(ctx, cx - 100, y, count);
   });
-  text(ctx, 'K.', cx + 170, cy + 200, { font: `32px ${HAND}`, color: INK, align: 'center' });
+  ctx.save();
+  ctx.translate(cx + 140, cy + 168);
+  ctx.rotate(-0.12);
+  text(ctx, 'K.', 0, 0, { font: `34px ${HAND}`, color: INK, align: 'center' });
+  ctx.restore();
 }
 
 function drawTally(ctx, x, y, count) {

@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, rivet, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 3 (Postwagen): die 24 Fächer, die Rohrpost-Weichen, der verschlüsselte Brief.
 
@@ -89,32 +89,52 @@ export function switchSpots() {
 
 // open[i] = true: Weiche i lässt durch (gerades Rohr)
 export function drawTubes(ctx, { open, capsule }) {
-  ctx.fillStyle = '#20150c';
+  wood(ctx, 150, 110, 980, 500, [58, 36, 20]);
+  ctx.fillStyle = 'rgba(10, 6, 2, 0.45)';
   ctx.fillRect(150, 110, 980, 500);
-  glow(ctx, 640, 200, 520, '255, 210, 140', 0.12);
+  glow(ctx, 640, 200, 520, '255, 210, 140', 0.14);
+  for (const [rx, ry] of [[166, 126], [1114, 126], [166, 594], [1114, 594]]) rivet(ctx, rx, ry, 5, { slot: true, tone: '#c9a24c' });
   text(ctx, 'ROHRPOST · LEITUNG 3', 640, 160, { font: `bold 22px ${PRINT}`, color: '#e8c87a', align: 'center' });
   // Rohr
   const segments = [[220, SWITCH_X[0]], ...SWITCH_X.slice(0, -1).map((x, i) => [x, SWITCH_X[i + 1]]), [SWITCH_X[3], 1060]];
   for (const [a, b] of segments) pipe(ctx, a, PIPE_Y, b, PIPE_Y);
   // Einwurf und Ziel
   text(ctx, 'Einwurf', 220, PIPE_Y - 60, { font: `16px ${PRINT}`, color: '#e8d8b0', align: 'center' });
-  ctx.fillStyle = '#7a5a20';
-  ctx.fillRect(190, PIPE_Y - 40, 40, 80);
+  terminal(ctx, 210, PIPE_Y);
   text(ctx, 'Postmeister', 1060, PIPE_Y - 60, { font: `16px ${PRINT}`, color: '#e8d8b0', align: 'center' });
-  ctx.fillStyle = '#7a5a20';
-  ctx.fillRect(1050, PIPE_Y - 40, 40, 80);
+  terminal(ctx, 1070, PIPE_Y);
   SWITCH_X.forEach((x, i) => {
     // Sackgasse nach unten
     pipe(ctx, x, PIPE_Y, x, PIPE_Y + 150, 0.45);
     text(ctx, 'Fundsachen', x, PIPE_Y + 178, { font: `12px ${PRINT}`, color: 'rgba(232,216,176,0.6)', align: 'center' });
-    // Drehscheibe
-    ctx.fillStyle = '#9a7a3a';
+    // Drehscheibe aus Messing mit Rändel und Schrauben
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 5;
+    const disc = ctx.createRadialGradient(x - 18, PIPE_Y - 20, 6, x, PIPE_Y, 54);
+    disc.addColorStop(0, '#f4d68a');
+    disc.addColorStop(0.6, '#a5772c');
+    disc.addColorStop(1, '#5a3a10');
+    ctx.fillStyle = disc;
     ctx.beginPath();
     ctx.arc(x, PIPE_Y, 52, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#4a3410';
-    ctx.lineWidth = 4;
-    ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(60, 36, 6, 0.55)';
+    ctx.lineWidth = 1.5;
+    for (let k = 0; k < 48; k++) {
+      const a = (k / 48) * Math.PI * 2;
+      line(ctx, x + Math.cos(a) * 46, PIPE_Y + Math.sin(a) * 46, x + Math.cos(a) * 52, PIPE_Y + Math.sin(a) * 52);
+    }
+    for (let k = 0; k < 4; k++) {
+      const a = Math.PI / 4 + (k * Math.PI) / 2;
+      rivet(ctx, x + Math.cos(a) * 38, PIPE_Y + Math.sin(a) * 38, 4, { slot: true, tone: '#c9a24c' });
+    }
+    ctx.fillStyle = '#2a1a08';
+    ctx.beginPath();
+    ctx.arc(x, PIPE_Y, 30, 0, Math.PI * 2);
+    ctx.fill();
     ctx.strokeStyle = open[i] ? '#d9d2c2' : '#c47a5a';
     ctx.lineWidth = 18;
     ctx.lineCap = 'round';
@@ -132,22 +152,71 @@ export function drawTubes(ctx, { open, capsule }) {
   });
   text(ctx, 'Achtung: Weichen 1–4 hängen aneinander. Wer eine dreht, dreht die Nachbarn mit.', 640, 580, { font: `italic 16px ${SERIF}`, color: '#d8c8a0', align: 'center' });
   if (capsule !== null && capsule !== undefined) {
-    ctx.fillStyle = '#c9a24a';
-    ctx.fillRect(capsule - 26, PIPE_Y - 12, 52, 24);
-    ctx.fillStyle = '#7a5a20';
-    ctx.fillRect(capsule - 30, PIPE_Y - 12, 8, 24);
+    const body = ctx.createLinearGradient(0, PIPE_Y - 12, 0, PIPE_Y + 12);
+    body.addColorStop(0, '#8a6020');
+    body.addColorStop(0.35, '#f6dc90');
+    body.addColorStop(1, '#6e4c16');
+    ctx.fillStyle = body;
+    ctx.beginPath();
+    ctx.roundRect(capsule - 26, PIPE_Y - 12, 52, 24, 10);
+    ctx.fill();
+    ctx.fillStyle = '#5a2e14';
+    ctx.beginPath();
+    ctx.roundRect(capsule - 32, PIPE_Y - 13, 10, 26, 4);
+    ctx.roundRect(capsule + 22, PIPE_Y - 13, 10, 26, 4);
+    ctx.fill();
   }
 }
 
+// Einwurf / Empfänger: Messingkasten mit Klappe
+function terminal(ctx, x, y) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 4;
+  const box = ctx.createLinearGradient(x - 26, 0, x + 26, 0);
+  box.addColorStop(0, '#5e4416');
+  box.addColorStop(0.4, '#e0bc6a');
+  box.addColorStop(1, '#4a3410');
+  ctx.fillStyle = box;
+  ctx.beginPath();
+  ctx.roundRect(x - 26, y - 44, 52, 88, 8);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#1a1006';
+  ctx.beginPath();
+  ctx.arc(x, y, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#8a6020';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  rivet(ctx, x, y - 34, 3.5, { tone: '#c9a24c' });
+  rivet(ctx, x, y + 34, 3.5, { tone: '#c9a24c' });
+}
+
+// Messingrohr (waagrecht oder senkrecht) mit runder Schattierung und Flanschen an den Enden
 function pipe(ctx, x0, y0, x1, y1, alpha = 1) {
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.strokeStyle = '#6e5424';
-  ctx.lineWidth = 34;
-  line(ctx, x0, y0, x1, y1);
-  ctx.strokeStyle = '#b8924a';
-  ctx.lineWidth = 24;
-  line(ctx, x0, y0, x1, y1);
+  const vertical = x0 === x1;
+  const r = 16;
+  const shade = vertical ? ctx.createLinearGradient(x0 - r, 0, x0 + r, 0) : ctx.createLinearGradient(0, y0 - r, 0, y0 + r);
+  shade.addColorStop(0, '#5e4416');
+  shade.addColorStop(0.3, '#f0cf7e');
+  shade.addColorStop(0.55, '#b8924a');
+  shade.addColorStop(1, '#4a3410');
+  ctx.fillStyle = shade;
+  if (vertical) ctx.fillRect(x0 - r, Math.min(y0, y1), r * 2, Math.abs(y1 - y0));
+  else ctx.fillRect(Math.min(x0, x1), y0 - r, Math.abs(x1 - x0), r * 2);
+  // Flansch in der Mitte des Stücks
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  ctx.fillStyle = shade;
+  if (vertical) ctx.fillRect(mx - r - 4, my - 5, r * 2 + 8, 10);
+  else ctx.fillRect(mx - 5, my - r - 4, 10, r * 2 + 8);
+  ctx.strokeStyle = 'rgba(40, 26, 6, 0.5)';
+  ctx.lineWidth = 1;
+  if (vertical) ctx.strokeRect(mx - r - 4, my - 5, r * 2 + 8, 10);
+  else ctx.strokeRect(mx - 5, my - r - 4, 10, r * 2 + 8);
   ctx.restore();
 }
 
