@@ -144,7 +144,7 @@ async function sortParcels(story) {
     drawBackground: drawParcels,
     drawToken: drawNameTag,
     check: checkNames,
-    help: 'Anhänger mit gedrückter Maustaste unter die Pakete ziehen  ·  Rechtsklick: zurück',
+    help: 'Anhänger unter die Pakete ziehen (oder anklicken, dann Platz anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   f.parcelsSorted = true;
@@ -187,7 +187,7 @@ async function readList(story, withStencil) {
     },
   });
   if (!withStencil && !f.listRead) {
-    await story.say('Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …');
+    await story.say(f.miraTold ? 'Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …' : 'Buchstabensalat. Daraus werde ich nicht schlau.');
   }
 }
 

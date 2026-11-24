@@ -32,7 +32,7 @@ export class ModelRailwayView extends View {
 
   onOpen(options) {
     this.options = options;
-    this.help = options.help ?? 'Wagen mit gedrückter Maustaste auf einen anderen Platz ziehen (sie tauschen)  ·  Rechtsklick: zurück';
+    this.help = options.help ?? 'Wagen ziehen oder anklicken, dann Zielplatz anklicken (sie tauschen)  ·  Rechtsklick: zurück';
     // bleibt beim Schließen erhalten; schon gelöst (Tür noch einmal gespielt) → wieder durcheinander
     if (!this.order || options.check(this.order)) this.order = [...options.start];
     this.time = 0;
@@ -113,6 +113,13 @@ export class ModelRailwayView extends View {
       this.fast = true; // Klick während der Fahrt: schneller
       return;
     }
+    // Angetippter Wagen in der Hand: der nächste Klick setzt ihn ab
+    if (this.drag?.carried) {
+      // dort ablegen, wo getippt wurde (auf dem iPad springt der Finger direkt dorthin)
+      this.drag.groundX = point.x + this.drag.dx;
+      this.drag.groundY = point.y + this.drag.dy;
+      return this.drop();
+    }
     const slot = this.wagonAt(point);
     if (slot < 0) {
       if (this.locoAt(point)) this.sound('click');
@@ -126,12 +133,28 @@ export class ModelRailwayView extends View {
       dx: ground.x - point.x, dy: ground.y - point.y,
       groundX: ground.x, groundY: ground.y,
       tilt: 0, lift: 0,
+      start: { ...point }, carried: false,
     };
     this.sound('click');
   }
 
-  pointerUp() {
-    if (!this.drag) return;
+  pointerUp(point) {
+    if (!this.drag || this.drag.carried) return;
+    // Nur angetippt, nicht gezogen: Wagen in die Hand nehmen – er folgt der Maus
+    if (point && Math.hypot(point.x - this.drag.start.x, point.y - this.drag.start.y) < 8) {
+      this.drag.carried = true;
+      return;
+    }
+    this.drop();
+  }
+
+  // Wird die Ansicht geschlossen, während ein Wagen in der Hand ist: er bleibt auf seinem Platz
+  close(result) {
+    this.drag = null;
+    super.close(result);
+  }
+
+  drop() {
     const { wagon, from } = this.drag;
     const target = this.targetSlot();
     const here = unproject(this.drag.groundX, this.drag.groundY);

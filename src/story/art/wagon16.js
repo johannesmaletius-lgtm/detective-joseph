@@ -1,6 +1,6 @@
 import { MORSE_DIGITS } from '../../effects/morse.js';
 import {
-  BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, cached, drawPicture, glow, fineGrain, line, plank, roundedRect, sheet, smudge, text, vignette, wood,
+  BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, cached, drawPicture, glow, fineGrain, line, plank, rivet, roundedRect, screw, seeded, sheet, smudge, text, vignette, wood,
 } from './common.js';
 
 // Gezeichnetes für Wagen 16 (Funkraum): Antennenkurbel mit Empfangsanzeige, Logbuch,
@@ -18,65 +18,270 @@ export function signalStrength(direction) {
 export const CRANK_SPOTS = [{ id: 'crank', cx: 520, cy: 380, r: 190, label: 'Kurbel drehen' }];
 
 export function drawCrank(ctx, direction, time) {
-  wood(ctx, 240, 80, 800, 580, [60, 52, 40]);
-  // Zifferblatt mit Himmelsrichtungen des Zuges
-  ctx.fillStyle = '#e9dfc2';
-  ctx.beginPath();
-  ctx.arc(520, 380, 180, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#3a2a18';
-  ctx.lineWidth = 8;
-  ctx.stroke();
-  DIRECTIONS.forEach((name, i) => {
-    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 3;
-    line(ctx, 520 + Math.cos(a) * 150, 380 + Math.sin(a) * 150, 520 + Math.cos(a) * 172, 380 + Math.sin(a) * 172);
-    text(ctx, name, 520 + Math.cos(a) * 116, 380 + Math.sin(a) * 116 + 6, { font: `bold 15px ${PRINT}`, color: INK, align: 'center' });
-  });
-  // kleiner Zug in der Mitte (Fahrtrichtung nach oben)
-  ctx.fillStyle = '#5a4a3a';
-  ctx.fillRect(506, 340, 28, 80);
-  ctx.beginPath();
-  ctx.moveTo(506, 340);
-  ctx.lineTo(520, 318);
-  ctx.lineTo(534, 340);
-  ctx.fill();
-  // Zeiger = Antenne
+  // Ruhende Teile (Blechtafel, Zifferblatt, Gehäuse der Anzeige) nur einmal malen
+  ctx.drawImage(cached('w16-crank', 1280, 720, paintCrankPanel), 0, 0);
+
+  // Zeiger = Antenne: rote Marke außen am Ring und ein kurzer Strich innen – Schrift und Zug bleiben frei
   const a = (direction / 8) * Math.PI * 2 - Math.PI / 2;
-  ctx.strokeStyle = '#b3261e';
-  ctx.lineWidth = 7;
-  ctx.lineCap = 'round';
-  line(ctx, 520, 380, 520 + Math.cos(a) * 150, 380 + Math.sin(a) * 150);
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 4;
   ctx.fillStyle = '#b3261e';
   ctx.beginPath();
-  ctx.arc(520, 380, 12, 0, Math.PI * 2);
+  ctx.moveTo(520 + cos * 176, 380 + sin * 176);
+  ctx.lineTo(520 + cos * 150 - sin * 13, 380 + sin * 150 + cos * 13);
+  ctx.lineTo(520 + cos * 150 + sin * 13, 380 + sin * 150 - cos * 13);
+  ctx.closePath();
   ctx.fill();
+  // dünner Zeiger vom Rand des Zuges bis zur Schrift – der Zug in der Mitte bleibt sichtbar
+  ctx.strokeStyle = '#b3261e';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  line(ctx, 520 + cos * 46, 380 + sin * 46, 520 + cos * 92, 380 + sin * 92);
+  ctx.restore();
+
   // Empfangsanzeige
-  drawMeter(ctx, 850, 300, signalStrength(direction), time);
-  text(ctx, 'Empfang', 850, 420, { font: `bold 18px ${PRINT}`, color: '#f3e2b4', align: 'center' });
-  text(ctx, 'Antenne: wohin zeigt sie, vom Zug aus?', 640, 630, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  const value = signalStrength(direction);
+  drawMeter(ctx, 850, 330, value, time);
+  // Lämpchen: leuchtet grün, wenn die Antenne genau richtig steht
+  const on = value >= 1;
+  ctx.fillStyle = on ? '#7dff8a' : '#24361f';
+  ctx.beginPath();
+  ctx.arc(850, 440, 11, 0, Math.PI * 2);
+  ctx.fill();
+  if (on) glow(ctx, 850, 440, 50, '120, 255, 140', 0.35 + Math.sin(time * 4) * 0.08);
+  ctx.strokeStyle = '#2a2016';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function paintCrankPanel(ctx) {
+  // Blechtafel mit Nieten
+  const x = 240, y = 70, w = 800, h = 600;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 10;
+  roundedRect(ctx, x, y, w, h, 18);
+  const plate = ctx.createLinearGradient(x, y, x + w, y + h);
+  plate.addColorStop(0, '#4c5547');
+  plate.addColorStop(0.5, '#3c443a');
+  plate.addColorStop(1, '#2b3129');
+  ctx.fillStyle = plate;
+  ctx.fill();
+  ctx.restore();
+  fineGrain(ctx, x, y, w, h, { seed: 16, count: 0.01, dark: 0.18, light: 0.05 });
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, x + 14, y + 14, w - 28, h - 28, 10);
+  ctx.stroke();
+  for (let i = 0; i <= 10; i++) {
+    for (const ry of [y + 26, y + h - 26]) rivet(ctx, x + 30 + (i * (w - 60)) / 10, ry, 5, [120, 128, 112]);
+  }
+  for (let i = 1; i < 7; i++) {
+    for (const rx of [x + 26, x + w - 26]) rivet(ctx, rx, y + 26 + (i * (h - 52)) / 7, 5, [120, 128, 112]);
+  }
+  // Rostflecken
+  const r = seeded(61);
+  for (let i = 0; i < 14; i++) {
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    g.addColorStop(0, 'rgba(120, 66, 30, 0.35)');
+    g.addColorStop(1, 'rgba(120, 66, 30, 0)');
+    ctx.save();
+    ctx.translate(x + 40 + r() * (w - 80), y + 40 + r() * (h - 80));
+    ctx.scale(10 + r() * 30, 6 + r() * 18);
+    ctx.fillStyle = g;
+    ctx.fillRect(-1, -1, 2, 2);
+    ctx.restore();
+  }
+
+  // Messingschild oben
+  brassPlate(ctx, 640, 112, 360, 40);
+  text(ctx, 'ANTENNE  ·  RICHTUNG', 640, 120, { font: `bold 18px ${PRINT}`, color: '#3a2a10', align: 'center' });
+
+  // Zifferblatt: Messingring, cremefarbene Scheibe, Windrose
+  const cx = 520, cy = 380;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 8;
+  const ring = ctx.createLinearGradient(cx - 200, cy - 200, cx + 200, cy + 200);
+  ring.addColorStop(0, '#f2d68c');
+  ring.addColorStop(0.45, '#a67c2e');
+  ring.addColorStop(1, '#5c3e12');
+  ctx.fillStyle = ring;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 200, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#2a2116';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 184, 0, Math.PI * 2);
+  ctx.fill();
+  const face = ctx.createRadialGradient(cx - 40, cy - 50, 20, cx, cy, 182);
+  face.addColorStop(0, '#f6ecd0');
+  face.addColorStop(1, '#d9c69a');
+  ctx.fillStyle = face;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 180, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 180, 0, Math.PI * 2);
+  ctx.clip();
+  fineGrain(ctx, cx - 180, cy - 180, 360, 360, { seed: 9, count: 0.012, dark: 0.08, light: 0.12 });
+  ctx.restore();
+  // feine Windrose
+  ctx.fillStyle = 'rgba(120, 90, 40, 0.16)';
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+    const long = i % 2 === 0 ? 150 : 95;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * long, cy + Math.sin(a) * long);
+    ctx.lineTo(cx + Math.cos(a + 0.4) * 30, cy + Math.sin(a + 0.4) * 30);
+    ctx.lineTo(cx + Math.cos(a - 0.4) * 30, cy + Math.sin(a - 0.4) * 30);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Teilstriche
+  for (let i = 0; i < 32; i++) {
+    const a = (i / 32) * Math.PI * 2 - Math.PI / 2;
+    const major = i % 4 === 0;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = major ? 3 : 1.5;
+    const r0 = major ? 156 : 166;
+    line(ctx, cx + Math.cos(a) * r0, cy + Math.sin(a) * r0, cx + Math.cos(a) * 176, cy + Math.sin(a) * 176);
+  }
+  // Richtungen (der Zeiger ist kurz, die Marke sitzt außen – die Schrift bleibt immer lesbar)
+  DIRECTIONS.forEach((name, i) => {
+    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+    const r1 = i % 2 === 0 ? 126 : 118;
+    const words = name.split(' ');
+    const x = cx + Math.cos(a) * r1;
+    const y = cy + Math.sin(a) * r1;
+    if (words.length === 1) text(ctx, name, x, y + 6, { font: `bold 17px ${PRINT}`, color: INK, align: 'center' });
+    else {
+      text(ctx, words[0], x, y - 3, { font: `bold 14px ${PRINT}`, color: INK, align: 'center' });
+      text(ctx, words[1], x, y + 13, { font: `bold 14px ${PRINT}`, color: INK, align: 'center' });
+    }
+  });
+  // kleiner Zug von oben in der Mitte (fährt nach „vorn“)
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 2;
+  for (const [ty, th] of [[332, 22], [358, 22], [384, 22]]) {
+    roundedRect(ctx, 507, ty, 26, th, 4);
+    ctx.fillStyle = '#6a4a2a';
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.moveTo(507, 330);
+  ctx.lineTo(520, 304);
+  ctx.lineTo(533, 330);
+  ctx.closePath();
+  ctx.fillStyle = '#3e2c1a';
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = 'rgba(255, 230, 170, 0.6)';
+  for (const ty of [338, 364, 390]) ctx.fillRect(512, ty, 16, 4);
+  // Kurbelgriff unten rechts am Ring
+  ctx.strokeStyle = '#5a4018';
+  ctx.lineWidth = 12;
+  ctx.lineCap = 'round';
+  line(ctx, cx + 140, cy + 140, cx + 186, cy + 186);
+  const knob = ctx.createRadialGradient(cx + 188, cy + 184, 3, cx + 192, cy + 190, 22);
+  knob.addColorStop(0, '#d65a40');
+  knob.addColorStop(1, '#5a160c');
+  ctx.fillStyle = knob;
+  ctx.beginPath();
+  ctx.arc(cx + 192, cy + 190, 20, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Gehäuse der Empfangsanzeige
+  const mx = 850, my = 330;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 6;
+  roundedRect(ctx, mx - 125, my - 125, 250, 165, 16);
+  const box = ctx.createLinearGradient(mx, my - 125, mx, my + 40);
+  box.addColorStop(0, '#5a3a1e');
+  box.addColorStop(1, '#2e1c0e');
+  ctx.fillStyle = box;
+  ctx.fill();
+  ctx.restore();
+  for (const [sx, sy] of [[-108, -108], [108, -108], [-108, 24], [108, 24]]) screw(ctx, mx + sx, my + sy, 5);
+  ctx.fillStyle = '#f3e8c8';
+  ctx.beginPath();
+  ctx.arc(mx, my, 98, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(60, 160, 70, 0.55)';
+  ctx.beginPath();
+  ctx.arc(mx, my, 92, Math.PI * 1.8, Math.PI * 2);
+  ctx.arc(mx, my, 70, Math.PI * 2, Math.PI * 1.8, true);
+  ctx.closePath();
+  ctx.fill();
+  for (let i = 0; i <= 10; i++) {
+    const a = Math.PI + (i / 10) * Math.PI;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = i % 5 === 0 ? 2.5 : 1.2;
+    const r0 = i % 5 === 0 ? 74 : 82;
+    line(ctx, mx + Math.cos(a) * r0, my + Math.sin(a) * r0, mx + Math.cos(a) * 92, my + Math.sin(a) * 92);
+  }
+  text(ctx, 'EMPFANG', mx, my + 28, { font: `bold 15px ${PRINT}`, color: '#e8d6a8', align: 'center' });
+  brassPlate(ctx, mx, 482, 190, 34);
+  text(ctx, 'Signal', mx, 489, { font: `bold 16px ${PRINT}`, color: '#3a2a10', align: 'center' });
+
+  // Frage unten auf einem Zettel
+  ctx.save();
+  ctx.translate(640, 628);
+  ctx.rotate(-0.012);
+  ctx.fillStyle = '#efe2bf';
+  ctx.fillRect(-230, -20, 460, 38);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+  ctx.fillRect(-230, 16, 460, 3);
+  text(ctx, 'Antenne: wohin zeigt sie, vom Zug aus?', 0, 6, { font: `20px ${HAND}`, color: INK, align: 'center' });
+  ctx.restore();
+  vignette(ctx, x, y, w, h, 0.35);
+}
+
+function brassPlate(ctx, cx, cy, w, h) {
+  roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 6);
+  const g = ctx.createLinearGradient(cx, cy - h / 2, cx, cy + h / 2);
+  g.addColorStop(0, '#f0d488');
+  g.addColorStop(0.5, '#c49a46');
+  g.addColorStop(1, '#8a6424');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = '#5a3e14';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  screw(ctx, cx - w / 2 + 12, cy, 4);
+  screw(ctx, cx + w / 2 - 12, cy, 4);
 }
 
 function drawMeter(ctx, cx, cy, value, time) {
-  ctx.fillStyle = '#efe3c0';
-  ctx.beginPath();
-  ctx.arc(cx, cy, 90, Math.PI, 0);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle = '#3a2a18';
-  ctx.lineWidth = 5;
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(60, 160, 70, 0.6)';
-  ctx.beginPath();
-  ctx.arc(cx, cy, 84, Math.PI * 1.8, Math.PI * 2);
-  ctx.lineTo(cx, cy);
-  ctx.fill();
   const wobble = Math.sin(time * 13) * 0.04 * (1 - value);
   const a = Math.PI + (value * 0.95 + wobble) * Math.PI;
-  ctx.strokeStyle = INK;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 3;
+  ctx.shadowOffsetY = 2;
+  ctx.strokeStyle = '#1e1810';
   ctx.lineWidth = 3;
-  line(ctx, cx, cy, cx + Math.cos(a) * 80, cy + Math.sin(a) * 80);
+  ctx.lineCap = 'round';
+  line(ctx, cx, cy, cx + Math.cos(a) * 88, cy + Math.sin(a) * 88);
+  ctx.restore();
+  ctx.fillStyle = '#3a2a18';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 // ---------------------------------------------------------------- Logbuch

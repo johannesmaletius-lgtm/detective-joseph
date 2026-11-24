@@ -10,6 +10,7 @@ import { View } from './view.js';
 //                                                    // (spots darf auch eine Funktion sein, die die Liste liefert)
 //     onClick: async (spot, view) => { … },          // Linksklick auf eine Stelle; view.close(ergebnis) schließt
 //     onMiss: async (point, view) => { … },          // (optional) Linksklick daneben, aber auf dem Bild
+//     onRelease: (spot, view, point) => { … },       // (optional) Maustaste losgelassen (Ziehen und Ablegen)
 //     area: { x, y, w, h },                          // (optional) das Bild – ein Klick daneben schließt
 //     update: (dt, view) => { … },                   // (optional) in jedem Bild
 //     help: 'Klicken: …',
@@ -75,6 +76,17 @@ export class PictureView extends View {
     } finally {
       this.running = false;
     }
+  }
+
+  // Maustaste losgelassen (z. B. Ziehen und Ablegen): options.onRelease(spot, view)
+  pointerUp(point) {
+    if (this.running || !this.isOpen) return;
+    const action = this.options.onRelease?.(this.spotAt(point), this, point);
+    if (!action) return;
+    this.running = true;
+    Promise.resolve(action).finally(() => {
+      this.running = false;
+    });
   }
 
   update(dt, mouse) {

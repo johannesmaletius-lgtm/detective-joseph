@@ -29,6 +29,7 @@ import { ArrangeView } from '../puzzles/arrange.js';
 import { ModelRailwayView } from '../puzzles/modelRailway.js';
 import { DialogueView } from '../ui/dialogue.js';
 import { Story } from '../story/story.js';
+import { COLORS, FONTS, outlinedText } from '../ui/text.js';
 import { ITEMS } from '../story/items.js';
 import { Calendar } from '../advent/calendar.js';
 import { SaveGame } from '../advent/save.js';
@@ -347,6 +348,7 @@ export class Game {
     this.inventory.draw(ctx);
     this.notebook.drawButton(ctx, this.notebook.buttonContains(this.input.mouse));
     this.view?.draw(ctx);
+    this.drawTunnelWarning(ctx);
     if (this.view && touch.active && !this.overlay.blocksInput) drawCloseButton(ctx, this.view.fadeIn);
     this.speech.draw(ctx); // über der Nahansicht: Joseph kommentiert, was er dort sieht
     this.notebook.drawPage(ctx);
@@ -354,6 +356,29 @@ export class Game {
     if (this.overlay.fade < 0.5) this.settings.draw(ctx);
     this.cursor.draw(ctx, this.input);
     this.debug.drawScreen(ctx, this);
+  }
+
+  // Nahansicht offen und gleich kommt der Tunnel (der sie schließt): das Licht flackert, oben ein Hinweis.
+  // Nicht in Wagen 1 (dort ist der erste Tunnel eine Überraschung) und nicht in 23/24 (andere Regeln).
+  drawTunnelWarning(ctx) {
+    const view = this.view;
+    const motion = this.scene?.motion;
+    if (!view || !motion || motion.inTunnel || !(this.door >= 2 && this.door <= 22)) return;
+    if (view.staysInDark || view === this.views.dialogue || (view === this.views.lock && this.inventory.has('flashlight'))) return;
+    const seconds = motion.tunnelAhead / Math.max(motion.speed ?? 1, 0.01);
+    if (seconds > 8) return;
+    const t = motion.time;
+    const near = 1 - seconds / 8;
+    const flicker = Math.max(0, Math.sin(t * 23) * Math.sin(t * 7.3)) * near * 0.35;
+    ctx.save();
+    ctx.fillStyle = `rgba(0, 0, 0, ${near * 0.18 + flicker})`;
+    ctx.fillRect(0, 0, 1280, 720);
+    ctx.globalAlpha = Math.min(1, near * 3) * view.fadeIn;
+    ctx.font = FONTS.small;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    outlinedText(ctx, 'Die Lampen flackern – gleich kommt der Tunnel …', 640, 30, COLORS.joseph, 4);
+    ctx.restore();
   }
 
   // Welcher Mauszeiger, welcher Name daneben?

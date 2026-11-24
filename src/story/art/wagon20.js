@@ -1,6 +1,6 @@
 import {
   BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, cachedLayer, contactShadow, drawPicture, glow, grain, line, plank, rivet, seeded,
-  sheet, text, wood,
+  roundedRect, sheet, text, wood,
 } from './common.js';
 
 // Gezeichnetes für Wagen 20 (Packwagen): Pakete und Anhänger, Frachtliste mit Sternen-Schablone,
@@ -627,8 +627,8 @@ const G = { x: 300, y: 150, cell: 48 };
 export const STENCIL_SPOTS = [
   { id: 'left', x: 180, y: 300, w: 70, h: 80, label: 'Schablone nach links' },
   { id: 'right', x: 1030, y: 300, w: 70, h: 80, label: 'Schablone nach rechts' },
-  { id: 'up', x: 600, y: 80, w: 80, h: 50, label: 'Schablone nach oben' },
-  { id: 'down', x: 600, y: 560, w: 80, h: 50, label: 'Schablone nach unten' },
+  { id: 'up', x: 600, y: 50, w: 80, h: 48, label: 'Schablone nach oben' },
+  { id: 'down', x: 600, y: 584, w: 80, h: 48, label: 'Schablone nach unten' },
 ];
 
 export function stencilAligned({ dx, dy }) {
@@ -655,9 +655,24 @@ export function drawStencil(ctx, { dx, dy, laid }) {
     ctx.fill('evenodd');
     ctx.restore();
   }
+  // Pfeile nur, wenn die Schablone liegt (vorher lässt sich nichts verschieben); außerhalb des Blatts
+  if (!laid) return;
   for (const spot of STENCIL_SPOTS) {
-    ctx.fillStyle = '#3d2a16';
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    roundedRect(ctx, spot.x, spot.y, spot.w, spot.h, 10);
+    const g = ctx.createLinearGradient(0, spot.y, 0, spot.y + spot.h);
+    g.addColorStop(0, '#5a3d20');
+    g.addColorStop(1, '#2e1e0e');
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = '#c49a46';
+    ctx.lineWidth = 2;
+    roundedRect(ctx, spot.x + 1, spot.y + 1, spot.w - 2, spot.h - 2, 9);
+    ctx.stroke();
     text(ctx, { left: '◀', right: '▶', up: '▲', down: '▼' }[spot.id], spot.x + spot.w / 2, spot.y + spot.h / 2 + 9, { font: `bold 24px ${PRINT}`, color: '#ffe7a0', align: 'center' });
   }
 }

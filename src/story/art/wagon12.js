@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, SERIF, cached, glow, line, plank, roundedRect, sheet, smudge, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, cached, contactShadow, fineGrain, glow, line, plank, roundedRect, seeded, sheet, smudge, text, vignette, wood } from './common.js';
 
 // Gezeichnetes für Wagen 12 (Musiksalon): das Notenblatt (mit Bleistiftkreuzen), die Schallplatten,
 // das Klopfen im Takt und die Klaviertasten.
@@ -128,66 +128,351 @@ export function sleeveSpots() {
 }
 
 export function drawRecords(ctx, taken) {
-  wood(ctx, 160, 140, 960, 420, [92, 34, 28]);
-  for (const spot of sleeveSpots()) {
-    ctx.fillStyle = spot.color;
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.drawImage(cached(`w12-records-${taken ? 1 : 0}`, 1280, 720, (c) => paintRecords(c, taken)), 0, 0);
+}
+
+function paintRecords(ctx, taken) {
+  // Plattenkiste aus Mahagoni
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#2a0e0a';
+  ctx.fillRect(160, 120, 960, 460);
+  ctx.restore();
+  for (let i = 0; i < 6; i++) plank(ctx, 160, 120 + i * 77, 960, 77, { tone: [96, 38, 28], seed: 120 + i, knots: 1 });
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.fillRect(160, 120, 960, 460);
+  for (const spot of sleeveSpots()) drawSleeve(ctx, spot, taken && spot.id === 'xmas');
+  // vordere Kante der Kiste
+  plank(ctx, 160, 470, 960, 110, { tone: [110, 44, 30], seed: 131, knots: 2 });
+  ctx.fillStyle = 'rgba(255, 220, 170, 0.12)';
+  ctx.fillRect(160, 470, 960, 4);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  ctx.fillRect(160, 474, 960, 10);
+  // Messingschildchen
+  roundedRect(ctx, 480, 506, 320, 38, 5);
+  const brass = ctx.createLinearGradient(0, 506, 0, 544);
+  brass.addColorStop(0, '#f0d488');
+  brass.addColorStop(1, '#8a6424');
+  ctx.fillStyle = brass;
+  ctx.fill();
+  text(ctx, 'Herrn Molls Schallplatten', 640, 531, { font: `bold italic 18px ${SERIF}`, color: '#3a2a10', align: 'center' });
+  vignette(ctx, 160, 120, 960, 460, 0.4);
+}
+
+// Eine Plattenhülle mit kleinem Bild, oben schaut die Platte heraus
+function drawSleeve(ctx, spot, empty) {
+  const { x, y, w } = spot;
+  const h = 262;
+  const cx = x + w / 2;
+  if (!empty) {
+    // Schallplatte
+    const disc = ctx.createRadialGradient(cx, y + 24, 8, cx, y + 24, 76);
+    disc.addColorStop(0, '#2a2a2a');
+    disc.addColorStop(1, '#0c0c0c');
+    ctx.fillStyle = disc;
     ctx.beginPath();
-    ctx.arc(spot.x + spot.w / 2, spot.y + 100, 60, 0, Math.PI * 2);
+    ctx.arc(cx, y + 24, 76, Math.PI, 0);
     ctx.fill();
-    ctx.fillStyle = '#e9d8b0';
-    ctx.beginPath();
-    ctx.arc(spot.x + spot.w / 2, spot.y + 100, 16, 0, Math.PI * 2);
-    ctx.fill();
-    const words = spot.title.split(' ');
-    const lines = [];
-    let current = '';
-    for (const word of words) {
-      if ((current + ' ' + word).trim().length > 15) {
-        lines.push(current);
-        current = word;
-      } else current = `${current} ${word}`.trim();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+    ctx.lineWidth = 1;
+    for (let r = 34; r < 76; r += 4) {
+      ctx.beginPath();
+      ctx.arc(cx, y + 24, r, Math.PI, 0);
+      ctx.stroke();
     }
-    lines.push(current);
-    lines.forEach((row, i) => text(ctx, row, spot.x + spot.w / 2, spot.y + 196 + i * 22, { font: `bold 16px ${SERIF}`, color: '#f3e8cc', align: 'center' }));
-    if (spot.id === 'xmas' && taken) text(ctx, '(leer)', spot.x + spot.w / 2, spot.y + 240, { font: `14px ${PRINT}`, color: '#f3e8cc', align: 'center' });
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, y + 24, 60, Math.PI * 1.15, Math.PI * 1.35);
+    ctx.stroke();
+    ctx.fillStyle = spot.color;
+    ctx.beginPath();
+    ctx.arc(cx, y + 24, 26, Math.PI, 0);
+    ctx.fill();
   }
-  text(ctx, 'Herrn Molls Schallplatten', 640, 186, { font: `20px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+  // Hülle aus Karton
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 4;
+  ctx.fillStyle = spot.color;
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+  const shade = ctx.createLinearGradient(x, y, x + w, y + h);
+  shade.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+  ctx.fillStyle = shade;
+  ctx.fillRect(x, y, w, h);
+  fineGrain(ctx, x, y, w, h, { seed: x, count: 0.02, dark: 0.15, light: 0.1 });
+  // Ringabrieb der Platte auf dem Karton
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.arc(cx, y + 104, 64, 0, Math.PI * 2);
+  ctx.stroke();
+  // Bildchen
+  ctx.save();
+  roundedRect(ctx, x + 18, y + 22, w - 36, 132, 6);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(245, 232, 200, 0.92)';
+  ctx.fillRect(x + 18, y + 22, w - 36, 132);
+  drawSleeveArt(ctx, spot.id, x + 18, y + 22, w - 36, 132, spot.color);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(40, 20, 10, 0.5)';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, x + 18, y + 22, w - 36, 132, 6);
+  ctx.stroke();
+  // Titel
+  const words = spot.title.split(' ');
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    if ((current + ' ' + word).trim().length > 15) {
+      lines.push(current);
+      current = word;
+    } else current = `${current} ${word}`.trim();
+  }
+  lines.push(current);
+  lines.forEach((row, i) => text(ctx, row, cx, y + 186 + i * 22, { font: `bold 16px ${SERIF}`, color: '#f6ecd2', align: 'center' }));
+  // abgestoßene Ecken
+  ctx.fillStyle = 'rgba(240, 225, 190, 0.35)';
+  ctx.beginPath();
+  ctx.moveTo(x + w, y + h);
+  ctx.lineTo(x + w - 14, y + h);
+  ctx.lineTo(x + w, y + h - 14);
+  ctx.fill();
+  if (empty) text(ctx, '(leer)', cx, y + 244, { font: `italic 15px ${SERIF}`, color: '#f3e8cc', align: 'center' });
+}
+
+function drawSleeveArt(ctx, id, x, y, w, h, color) {
+  const cx = x + w / 2;
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  if (id === 'dance') {
+    // Kerzen und ein tanzendes Paar als Schattenriss
+    for (const kx of [x + 22, x + w - 22]) {
+      ctx.fillRect(kx - 4, y + 60, 8, 50);
+      glow(ctx, kx, y + 54, 22, '255, 200, 90', 0.6);
+      ctx.fillStyle = '#e8a030';
+      ctx.beginPath();
+      ctx.ellipse(kx, y + 52, 4, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = color;
+    }
+    ctx.beginPath();
+    ctx.arc(cx - 10, y + 44, 9, 0, Math.PI * 2);
+    ctx.arc(cx + 12, y + 40, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx - 22, y + 118);
+    ctx.lineTo(cx - 10, y + 56);
+    ctx.lineTo(cx + 2, y + 118);
+    ctx.fill();
+    ctx.fillRect(cx + 6, y + 52, 12, 66);
+  } else if (id === 'xmas') {
+    // Tannenbaum und eine kleine Lok
+    ctx.beginPath();
+    ctx.moveTo(cx, y + 12);
+    ctx.lineTo(cx - 34, y + 76);
+    ctx.lineTo(cx + 34, y + 76);
+    ctx.fill();
+    ctx.fillRect(cx - 5, y + 76, 10, 10);
+    ctx.fillStyle = '#d8a020';
+    ctx.beginPath();
+    ctx.arc(cx, y + 12, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#b8302a';
+    for (const [bx, by] of [[-12, 46], [14, 58], [4, 32], [-20, 66]]) {
+      ctx.beginPath();
+      ctx.arc(cx + bx, y + by, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(x + 10, y + 100, w - 20, 3);
+    ctx.fillRect(cx - 40, y + 84, 50, 16);
+    ctx.fillRect(cx + 14, y + 78, 24, 22);
+    ctx.fillRect(cx - 34, y + 74, 8, 10);
+    text(ctx, '24', cx + 26, y + 95, { font: `bold 11px ${PRINT}`, color: '#f3e8cc', align: 'center' });
+  } else if (id === 'signal') {
+    // Signallaterne am Bahnübergang
+    ctx.fillRect(cx - 3, y + 30, 6, 90);
+    ctx.fillRect(cx - 22, y + 30, 44, 34);
+    ctx.fillStyle = '#e8c040';
+    ctx.beginPath();
+    ctx.arc(cx - 9, y + 47, 7, 0, Math.PI * 2);
+    ctx.fill();
+    glow(ctx, cx - 9, y + 47, 26, '255, 210, 90', 0.6);
+    ctx.fillStyle = '#c03028';
+    ctx.beginPath();
+    ctx.arc(cx + 9, y + 47, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = color;
+    line(ctx, x + 8, y + 118, x + w - 8, y + 118);
+  } else if (id === 'waltz') {
+    // Kreisgleis mit Note in der Mitte
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(cx, y + 66, 46, 40, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = 2;
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      line(ctx, cx + Math.cos(a) * 40, y + 66 + Math.sin(a) * 34, cx + Math.cos(a) * 52, y + 66 + Math.sin(a) * 46);
+    }
+    text(ctx, '♫', cx, y + 80, { font: `bold 38px ${SERIF}`, color, align: 'center' });
+  } else {
+    // Mond über einem Nachtzug
+    ctx.fillStyle = '#1e1a3a';
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#f0e4b0';
+    ctx.beginPath();
+    ctx.arc(cx + 24, y + 36, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1e1a3a';
+    ctx.beginPath();
+    ctx.arc(cx + 32, y + 30, 16, 0, Math.PI * 2);
+    ctx.fill();
+    const r = seeded(id.length * 7);
+    ctx.fillStyle = '#f6efd0';
+    for (let k = 0; k < 18; k++) ctx.fillRect(x + r() * w, y + r() * 70, 2, 2);
+    ctx.fillStyle = '#0c0a1a';
+    ctx.fillRect(x, y + 104, w, 28);
+    for (let k = 0; k < 4; k++) {
+      ctx.fillRect(x + 8 + k * 32, y + 86, 28, 18);
+      ctx.fillStyle = '#f0c860';
+      ctx.fillRect(x + 12 + k * 32, y + 90, 8, 6);
+      ctx.fillRect(x + 24 + k * 32, y + 90, 8, 6);
+      ctx.fillStyle = '#0c0a1a';
+    }
+  }
 }
 
 // ---------------------------------------------------------------- Im Takt klopfen
 export const KNOCK_SPOT = [{ id: 'knock', x: 380, y: 300, w: 520, h: 240, label: 'Klopfen' }];
 
 export function drawKnocking(ctx, { sinceJoint, hits, needed }) {
-  wood(ctx, 300, 140, 680, 470, [40, 26, 18]);
-  ctx.fillStyle = '#1f140d';
-  ctx.fillRect(380, 300, 520, 240);
-  text(ctx, 'Klavierdeckel', 640, 330, { font: `16px ${PRINT}`, color: '#c8b48a', align: 'center' });
+  ctx.drawImage(cached('w12-lid', 1280, 720, paintPianoLid), 0, 0);
   // Wasserglas, das bei jedem Schienenstoß zittert
   const ring = Math.max(0, 1 - sinceJoint * 3);
+  const jiggle = Math.sin(sinceJoint * 60) * ring * 2;
   ctx.save();
-  ctx.translate(640, 260);
-  ctx.fillStyle = 'rgba(200, 225, 235, 0.35)';
-  ctx.fillRect(-34, -70, 68, 90);
-  ctx.strokeStyle = 'rgba(230, 245, 250, 0.8)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(-34, -70, 68, 90);
-  ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 + ring * 0.7})`;
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 2; i++) {
+  ctx.translate(640 + jiggle, 300);
+  contactShadow(ctx, 6, 22, 52, 10, 0.5);
+  // Glaskörper
+  const glass = ctx.createLinearGradient(-38, 0, 38, 0);
+  glass.addColorStop(0, 'rgba(220, 240, 250, 0.45)');
+  glass.addColorStop(0.3, 'rgba(255, 255, 255, 0.15)');
+  glass.addColorStop(0.7, 'rgba(255, 255, 255, 0.08)');
+  glass.addColorStop(1, 'rgba(200, 225, 235, 0.4)');
+  ctx.fillStyle = glass;
+  ctx.beginPath();
+  ctx.moveTo(-38, -80);
+  ctx.lineTo(38, -80);
+  ctx.lineTo(32, 20);
+  ctx.lineTo(-32, 20);
+  ctx.closePath();
+  ctx.fill();
+  // Wasser
+  ctx.fillStyle = 'rgba(170, 210, 230, 0.35)';
+  ctx.beginPath();
+  ctx.moveTo(-36, -40);
+  ctx.lineTo(36, -40);
+  ctx.lineTo(32, 18);
+  ctx.lineTo(-32, 18);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(235, 248, 255, 0.85)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(0, -80, 38, 8, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(0, 20, 32, 6, 0, 0, Math.PI);
+  ctx.stroke();
+  line(ctx, -38, -80, -32, 20);
+  line(ctx, 38, -80, 32, 20);
+  // Ringe auf dem Wasser, wenn der Schienenstoß kommt
+  ctx.strokeStyle = `rgba(255, 255, 255, ${0.35 + ring * 0.65})`;
+  ctx.lineWidth = 1.6;
+  for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.ellipse(0, -38, 12 + i * 10 + ring * 8, 4 + i * 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, -40, 8 + i * 9 + ring * 10, 2.5 + i * 2 + ring * 1.5, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.fillRect(-28, -70, 5, 80);
   ctx.restore();
+  // Fortschritt: kleine Messingknöpfe
   for (let i = 0; i < needed; i++) {
-    ctx.fillStyle = i < hits ? '#f3c95a' : 'rgba(255, 255, 255, 0.15)';
+    const x = 640 - (needed - 1) * 26 + i * 52;
+    const on = i < hits;
+    if (on) glow(ctx, x, 580, 30, '255, 210, 110', 0.45);
+    const g = ctx.createRadialGradient(x - 4, 576, 1, x, 580, 13);
+    g.addColorStop(0, on ? '#fff2b0' : '#6a5a40');
+    g.addColorStop(1, on ? '#b88a20' : '#2a2016');
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.arc(640 - (needed - 1) * 22 + i * 44, 580, 12, 0, Math.PI * 2);
+    ctx.arc(x, 580, 12, 0, Math.PI * 2);
     ctx.fill();
   }
-  text(ctx, 'Im Takt der Schienenstöße auf den Deckel klopfen', 640, 470, { font: `20px ${HAND}`, color: '#e9d8b0', align: 'center' });
+}
+
+function paintPianoLid(ctx) {
+  // Holzrahmen
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 10;
+  roundedRect(ctx, 300, 140, 680, 470, 18);
+  ctx.fillStyle = '#1a0e08';
+  ctx.fill();
+  ctx.restore();
+  // schwarzer Klavierlack mit Spiegelungen
+  roundedRect(ctx, 320, 160, 640, 430, 12);
+  const lacquer = ctx.createLinearGradient(320, 160, 960, 590);
+  lacquer.addColorStop(0, '#2a1c16');
+  lacquer.addColorStop(0.5, '#0c0806');
+  lacquer.addColorStop(1, '#1e1410');
+  ctx.fillStyle = lacquer;
+  ctx.fill();
+  ctx.save();
+  roundedRect(ctx, 320, 160, 640, 430, 12);
+  ctx.clip();
+  // breiter Lichtstreifen vom Kronleuchter
+  ctx.fillStyle = 'rgba(255, 230, 190, 0.07)';
+  ctx.beginPath();
+  ctx.moveTo(470, 160);
+  ctx.lineTo(560, 160);
+  ctx.lineTo(380, 590);
+  ctx.lineTo(320, 590);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255, 230, 190, 0.04)';
+  ctx.beginPath();
+  ctx.moveTo(600, 160);
+  ctx.lineTo(630, 160);
+  ctx.lineTo(450, 590);
+  ctx.lineTo(430, 590);
+  ctx.closePath();
+  ctx.fill();
+  // Kronleuchter-Lichter als Spiegelpunkte
+  const r = seeded(12);
+  for (let i = 0; i < 14; i++) glow(ctx, 760 + r() * 140, 190 + r() * 60, 6 + r() * 8, '255, 230, 170', 0.5);
+  fineGrain(ctx, 320, 160, 640, 430, { seed: 121, count: 0.004, dark: 0.1, light: 0.05 });
+  ctx.restore();
+  // Goldfaden-Einlage am Rand
+  ctx.strokeStyle = 'rgba(200, 160, 70, 0.7)';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, 336, 176, 608, 398, 8);
+  ctx.stroke();
+  // Scharnier unten
+  ctx.fillStyle = '#b8903a';
+  for (const hx of [420, 860]) ctx.fillRect(hx - 30, 586, 60, 8);
+  text(ctx, 'Im Takt der Schienenstöße auf den Deckel klopfen', 640, 470, { font: `22px ${HAND}`, color: '#e9d8b0', align: 'center' });
+  text(ctx, '(das Wasser im Glas zittert bei jedem Stoß)', 640, 500, { font: `italic 15px ${SERIF}`, color: 'rgba(233, 216, 176, 0.6)', align: 'center' });
 }
 
 // ---------------------------------------------------------------- Klaviertasten

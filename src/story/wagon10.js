@@ -135,7 +135,7 @@ async function fuseBox(story) {
     drawBackground: drawFuseBox,
     drawToken: drawFuse,
     check: (placement) => placement.every((id, i) => id === FUSE_ORDER[i]),
-    help: 'Sicherungen mit gedrückter Maustaste in die Fassungen ziehen  ·  Rechtsklick: zurück',
+    help: 'Sicherungen in die Fassungen ziehen (oder anklicken, dann Fassung anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
     if (!f.fusesSeen && !inTunnel(story)) {

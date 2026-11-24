@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, fineGrain, glow, line, rivet, roundedRect, screw, sheet, text, vignette, wood } from './common.js';
 
 // Gezeichnetes für Wagen 3 (Postwagen): die 24 Fächer, die Rohrpost-Weichen, der verschlüsselte Brief.
 
@@ -89,65 +89,190 @@ export function switchSpots() {
 
 // open[i] = true: Weiche i lässt durch (gerades Rohr)
 export function drawTubes(ctx, { open, capsule }) {
-  ctx.fillStyle = '#20150c';
-  ctx.fillRect(150, 110, 980, 500);
-  glow(ctx, 640, 200, 520, '255, 210, 140', 0.12);
-  text(ctx, 'ROHRPOST · LEITUNG 3', 640, 160, { font: `bold 22px ${PRINT}`, color: '#e8c87a', align: 'center' });
-  // Rohr
-  const segments = [[220, SWITCH_X[0]], ...SWITCH_X.slice(0, -1).map((x, i) => [x, SWITCH_X[i + 1]]), [SWITCH_X[3], 1060]];
-  for (const [a, b] of segments) pipe(ctx, a, PIPE_Y, b, PIPE_Y);
-  // Einwurf und Ziel
-  text(ctx, 'Einwurf', 220, PIPE_Y - 60, { font: `16px ${PRINT}`, color: '#e8d8b0', align: 'center' });
-  ctx.fillStyle = '#7a5a20';
-  ctx.fillRect(190, PIPE_Y - 40, 40, 80);
-  text(ctx, 'Postmeister', 1060, PIPE_Y - 60, { font: `16px ${PRINT}`, color: '#e8d8b0', align: 'center' });
-  ctx.fillStyle = '#7a5a20';
-  ctx.fillRect(1050, PIPE_Y - 40, 40, 80);
-  SWITCH_X.forEach((x, i) => {
-    // Sackgasse nach unten
-    pipe(ctx, x, PIPE_Y, x, PIPE_Y + 150, 0.45);
-    text(ctx, 'Fundsachen', x, PIPE_Y + 178, { font: `12px ${PRINT}`, color: 'rgba(232,216,176,0.6)', align: 'center' });
-    // Drehscheibe
-    ctx.fillStyle = '#9a7a3a';
-    ctx.beginPath();
-    ctx.arc(x, PIPE_Y, 52, 0, Math.PI * 2);
+  ctx.drawImage(cached('w3-tubes', 1280, 720, paintTubeWall), 0, 0);
+  SWITCH_X.forEach((x, i) => drawSwitch(ctx, x, i, open[i]));
+  if (capsule !== null && capsule !== undefined) {
+    // Rohrpostbüchse aus Messing mit Lederband
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 6;
+    const g = ctx.createLinearGradient(0, PIPE_Y - 14, 0, PIPE_Y + 14);
+    g.addColorStop(0, '#f6dc92');
+    g.addColorStop(0.5, '#c49a46');
+    g.addColorStop(1, '#6a4a18');
+    ctx.fillStyle = g;
+    roundedRect(ctx, capsule - 30, PIPE_Y - 13, 60, 26, 12);
     ctx.fill();
-    ctx.strokeStyle = '#4a3410';
-    ctx.lineWidth = 4;
+    ctx.restore();
+    ctx.fillStyle = '#5a2e14';
+    ctx.fillRect(capsule - 6, PIPE_Y - 13, 12, 26);
+  }
+}
+
+function paintTubeWall(ctx) {
+  const x = 150, y = 110, w = 980, h = 500;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 10;
+  roundedRect(ctx, x, y, w, h, 16);
+  const g = ctx.createLinearGradient(x, y, x, y + h);
+  g.addColorStop(0, '#3a4234');
+  g.addColorStop(1, '#22281e');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.restore();
+  fineGrain(ctx, x, y, w, h, { seed: 33, count: 0.01, dark: 0.18, light: 0.05 });
+  // Blechstöße mit Nieten
+  for (const bx of [x + 245, x + 490, x + 735]) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.fillRect(bx - 1, y + 10, 3, h - 20);
+    for (let k = 0; k < 8; k++) rivet(ctx, bx + 8, y + 30 + k * 55, 3.5, [120, 126, 108]);
+  }
+  for (let k = 0; k < 16; k++) for (const ry of [y + 18, y + h - 18]) rivet(ctx, x + 30 + k * 61, ry, 4, [120, 126, 108]);
+  // Emailleschild
+  roundedRect(ctx, 470, 136, 340, 42, 8);
+  ctx.fillStyle = '#1c3a6a';
+  ctx.fill();
+  ctx.strokeStyle = '#e8e0c8';
+  ctx.lineWidth = 3;
+  roundedRect(ctx, 476, 142, 328, 30, 5);
+  ctx.stroke();
+  text(ctx, 'ROHRPOST · LEITUNG 3', 640, 164, { font: `bold 19px ${PRINT}`, color: '#f2ead2', align: 'center' });
+  // Hauptrohr
+  const segments = [[220, SWITCH_X[0]], ...SWITCH_X.slice(0, -1).map((sx, i) => [sx, SWITCH_X[i + 1]]), [SWITCH_X[3], 1060]];
+  for (const [a, b] of segments) pipe(ctx, a, PIPE_Y, b, PIPE_Y);
+  // Abzweige nach unten in die Fundsachen-Kästen
+  SWITCH_X.forEach((sx) => {
+    pipe(ctx, sx, PIPE_Y, sx, PIPE_Y + 140, 0.75);
+    roundedRect(ctx, sx - 46, PIPE_Y + 140, 92, 46, 6);
+    ctx.fillStyle = '#4a3a22';
+    ctx.fill();
+    ctx.strokeStyle = '#8a6a34';
+    ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.strokeStyle = open[i] ? '#d9d2c2' : '#c47a5a';
-    ctx.lineWidth = 18;
+    text(ctx, 'Fundsachen', sx, PIPE_Y + 169, { font: `12px ${PRINT}`, color: 'rgba(232, 216, 176, 0.75)', align: 'center' });
+  });
+  // Rohrschellen
+  for (const cx of [300, 460, 620, 780, 960]) {
+    ctx.fillStyle = '#2a2a24';
+    ctx.fillRect(cx - 5, PIPE_Y - 22, 10, 44);
+    screw(ctx, cx, PIPE_Y - 26, 3);
+    screw(ctx, cx, PIPE_Y + 26, 3);
+  }
+  // Einwurf links: Trichter
+  station(ctx, 214, 'Einwurf');
+  // Station des Postmeisters rechts, mit Anforderungshebel
+  station(ctx, 1070, 'Postmeister');
+  ctx.fillStyle = '#2a1a0c';
+  ctx.fillRect(1062, PIPE_Y + 44, 16, 60);
+  const knob = ctx.createRadialGradient(1066, PIPE_Y + 110, 2, 1070, PIPE_Y + 114, 16);
+  knob.addColorStop(0, '#e86a50');
+  knob.addColorStop(1, '#6a1408');
+  ctx.fillStyle = knob;
+  ctx.beginPath();
+  ctx.arc(1070, PIPE_Y + 114, 15, 0, Math.PI * 2);
+  ctx.fill();
+  text(ctx, 'anfordern', 1070, PIPE_Y + 150, { font: `bold 13px ${PRINT}`, color: '#e8d8b0', align: 'center' });
+  text(ctx, 'Achtung: Weichen 1–4 hängen aneinander. Wer eine dreht, dreht die Nachbarn mit.', 640, 584, { font: `italic 16px ${SERIF}`, color: '#d8c8a0', align: 'center' });
+  vignette(ctx, x, y, w, h, 0.35);
+}
+
+function station(ctx, cx, label) {
+  const g = ctx.createLinearGradient(cx - 30, 0, cx + 30, 0);
+  g.addColorStop(0, '#6a4a18');
+  g.addColorStop(0.4, '#e8c878');
+  g.addColorStop(1, '#5a3e12');
+  ctx.fillStyle = g;
+  roundedRect(ctx, cx - 30, PIPE_Y - 50, 60, 100, 10);
+  ctx.fill();
+  ctx.fillStyle = '#1a1208';
+  ctx.beginPath();
+  ctx.ellipse(cx, PIPE_Y, 16, 20, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#3a2a10';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, cx - 30, PIPE_Y - 50, 60, 100, 10);
+  ctx.stroke();
+  roundedRect(ctx, cx - 56, PIPE_Y - 84, 112, 26, 5);
+  ctx.fillStyle = '#e8dcb8';
+  ctx.fill();
+  text(ctx, label, cx, PIPE_Y - 65, { font: `bold 15px ${SERIF}`, color: INK, align: 'center' });
+}
+
+function drawSwitch(ctx, x, i, isOpen) {
+  // Drehscheibe aus Messing mit Rand und Schrauben
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 5;
+  const g = ctx.createRadialGradient(x - 16, PIPE_Y - 18, 6, x, PIPE_Y, 56);
+  g.addColorStop(0, '#f6dc92');
+  g.addColorStop(0.6, '#b08a3a');
+  g.addColorStop(1, '#5a3e12');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, PIPE_Y, 54, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = '#3a2a10';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(x, PIPE_Y, 54, 0, Math.PI * 2);
+  ctx.stroke();
+  for (let k = 0; k < 6; k++) {
+    const a = (k / 6) * Math.PI * 2 + 0.3;
+    screw(ctx, x + Math.cos(a) * 46, PIPE_Y + Math.sin(a) * 46, 3.2, a);
+  }
+  // Kanal in der Scheibe: gerade durch oder um die Ecke nach unten
+  const draw = (width, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    if (open[i]) {
-      ctx.moveTo(x - 40, PIPE_Y);
-      ctx.lineTo(x + 40, PIPE_Y);
+    if (isOpen) {
+      ctx.moveTo(x - 38, PIPE_Y);
+      ctx.lineTo(x + 38, PIPE_Y);
     } else {
-      ctx.moveTo(x - 40, PIPE_Y);
-      ctx.quadraticCurveTo(x, PIPE_Y, x, PIPE_Y + 40);
+      ctx.moveTo(x - 38, PIPE_Y);
+      ctx.quadraticCurveTo(x, PIPE_Y, x, PIPE_Y + 38);
     }
     ctx.stroke();
-    ctx.lineCap = 'butt';
-    text(ctx, String(i + 1), x, PIPE_Y - 70, { font: `bold 20px ${PRINT}`, color: '#e8c87a', align: 'center' });
-  });
-  text(ctx, 'Achtung: Weichen 1–4 hängen aneinander. Wer eine dreht, dreht die Nachbarn mit.', 640, 580, { font: `italic 16px ${SERIF}`, color: '#d8c8a0', align: 'center' });
-  if (capsule !== null && capsule !== undefined) {
-    ctx.fillStyle = '#c9a24a';
-    ctx.fillRect(capsule - 26, PIPE_Y - 12, 52, 24);
-    ctx.fillStyle = '#7a5a20';
-    ctx.fillRect(capsule - 30, PIPE_Y - 12, 8, 24);
-  }
+  };
+  draw(22, '#1e140a');
+  draw(14, isOpen ? '#5a8a4a' : '#9a4a2a');
+  draw(4, isOpen ? 'rgba(200, 255, 180, 0.5)' : 'rgba(255, 190, 150, 0.45)');
+  ctx.lineCap = 'butt';
+  // Nummernschild
+  roundedRect(ctx, x - 16, PIPE_Y - 92, 32, 28, 5);
+  ctx.fillStyle = '#e8dcb8';
+  ctx.fill();
+  ctx.strokeStyle = '#5a3e14';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  text(ctx, String(i + 1), x, PIPE_Y - 71, { font: `bold 19px ${SERIF}`, color: INK, align: 'center' });
 }
 
 function pipe(ctx, x0, y0, x1, y1, alpha = 1) {
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.strokeStyle = '#6e5424';
-  ctx.lineWidth = 34;
+  ctx.lineCap = 'butt';
+  ctx.strokeStyle = '#4a3410';
+  ctx.lineWidth = 36;
   line(ctx, x0, y0, x1, y1);
-  ctx.strokeStyle = '#b8924a';
-  ctx.lineWidth = 24;
+  ctx.strokeStyle = '#a07a34';
+  ctx.lineWidth = 28;
   line(ctx, x0, y0, x1, y1);
+  // Glanzlinie oben bzw. links
+  const vertical = x0 === x1;
+  ctx.strokeStyle = 'rgba(255, 236, 180, 0.55)';
+  ctx.lineWidth = 5;
+  if (vertical) line(ctx, x0 - 7, y0, x1 - 7, y1);
+  else line(ctx, x0, y0 - 7, x1, y1 - 7);
+  ctx.strokeStyle = 'rgba(40, 24, 6, 0.35)';
+  ctx.lineWidth = 4;
+  if (vertical) line(ctx, x0 + 9, y0, x1 + 9, y1);
+  else line(ctx, x0, y0 + 9, x1, y1 + 9);
   ctx.restore();
 }
 

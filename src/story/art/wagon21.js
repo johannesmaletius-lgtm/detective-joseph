@@ -4,7 +4,8 @@ import { PRINT, RED, SERIF, drawPicture, glow, line, photoCard, picture, text } 
 // das Spind-Foto (ChatGPT-Bild) mit der Dienstnummer am Ärmel.
 
 // ---------------------------------------------------------------- Kesseldruck
-// Jede Drehung: rot −7, gelb −3, blau +2 (bar). Ziel: genau 25 (grüner Strich).
+// Jede Drehung: rot −8, gelb −5, blau +3 (bar). Ziel: genau 25 (grüner Strich).
+// Die Werte stehen auch oben links im Bild und im Satz des Heizers (wagon21.js) – immer alle drei mitändern.
 export const VALVES = [
   { id: 'red', name: 'rotes Ventil', delta: -8, color: '#c0302a', cx: 337, cy: 565 },
   { id: 'yellow', name: 'gelbes Ventil', delta: -5, color: '#d6a020', cx: 635, cy: 565 },
@@ -69,13 +70,15 @@ export function drawBoiler(ctx, { pressure, turns }) {
       ctx.drawImage(image, (v.cx - rr) * k, (v.cy - rr) * k, rr * 2 * k, rr * 2 * k, -rr, -rr, rr * 2, rr * 2);
       ctx.restore();
     }
-    ctx.fillStyle = 'rgba(20, 10, 4, 0.75)';
-    ctx.fillRect(v.cx - 26, v.cy + 124, 52, 26);
-    text(ctx, `${t}×`, v.cx, v.cy + 143, { font: `bold 18px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+    // Zähler rechts unten neben dem Rad (ganz unten steht die Hilfezeile)
+    ctx.fillStyle = 'rgba(20, 10, 4, 0.78)';
+    ctx.fillRect(v.cx + 82, v.cy + 78, 52, 26);
+    text(ctx, `${t}×`, v.cx + 108, v.cy + 97, { font: `bold 18px ${PRINT}`, color: '#f1e0b8', align: 'center' });
   });
   ctx.fillStyle = 'rgba(20, 10, 4, 0.75)';
   ctx.fillRect(20, 20, 400, 34);
-  text(ctx, 'Rot: −7 · Gelb: −3 · Blau: +2 (je Drehung)', 220, 44, { font: `italic 18px ${SERIF}`, color: '#f1e0b8', align: 'center' });
+  const step = (v) => `${v.delta > 0 ? '+' : '−'}${Math.abs(v.delta)}`;
+  text(ctx, `Rot: ${step(VALVES[0])} · Gelb: ${step(VALVES[1])} · Blau: ${step(VALVES[2])} (je Drehung)`, 220, 44, { font: `italic 18px ${SERIF}`, color: '#f1e0b8', align: 'center' });
   ctx.fillStyle = '#4a3420';
   ctx.fillRect(1100, 640, 150, 46);
   text(ctx, 'zurückdrehen', 1175, 670, { font: `bold 16px ${PRINT}`, color: '#f1e0b8', align: 'center' });

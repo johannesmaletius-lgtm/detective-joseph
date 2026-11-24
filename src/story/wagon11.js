@@ -126,7 +126,7 @@ async function clockWall(story) {
     draw: (ctx, view) => drawClockWall(ctx, { progress: roundProgress(story), age: view.age }),
     spots: clockSpots(),
     area: { x: 220, y: 40, w: 840, h: 640 },
-    help: 'Uhr anklicken: genauer ansehen  ·  Rechtsklick: zurück',
+    help: 'Welche Uhr geht mit dem Mond?  ·  Uhr anklicken: genauer ansehen  ·  Rechtsklick: zurück',
     onClick: async (spot, view) => {
       if (spot.kind === 'moon') {
         view.close(true);

@@ -44,7 +44,7 @@ export const clockCar = {
   ],
 
   train: train(),
-  playerStart: { x: 640, y: 650, facing: 'back' },
+  playerStart: { x: 580, y: 650, facing: 'back' }, // links von Herrn Tick, nicht vor ihm
   perspective: perspective(),
 
   walkArea: {

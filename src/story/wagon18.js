@@ -174,7 +174,7 @@ async function hangKeys(story) {
     drawBackground: drawKeyBoard,
     drawToken: drawKeyToken,
     check: checkKeys,
-    help: 'Schlüssel mit gedrückter Maustaste auf den passenden Umriss ziehen  ·  Rechtsklick: zurück',
+    help: 'Schlüssel auf den passenden Umriss ziehen (oder anklicken, dann Umriss anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   f.keysHung = true;

@@ -223,7 +223,7 @@ async function railway(story) {
     title: 'Die Modellbahn',
     start: MINI_START,
     check: (order) => order.every((wagon, slot) => wagon === slot),
-    help: 'Wagen mit gedrückter Maustaste auf einen anderen Platz ziehen (sie tauschen)  ·  Rechtsklick: zurück',
+    help: 'Wagen ziehen oder anklicken, dann Zielplatz anklicken (sie tauschen)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
     if (!f.railwaySeen && !inTunnel(story)) {
