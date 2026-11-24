@@ -13,8 +13,10 @@ import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCom
 //      sitzt – Bruno (4), Ilse (5), Barkeeper (7), Moll (12), Mira (15), Heizer (21) – und dann selbst
 //      den Ruf sprechen. Alle gehen ruhig hinaus, Mira als Letzte: „Kommst du nach, Papa?“
 //   3. Die Plombe am roten Hebel mit der Lochzange vom Schreibtisch öffnen.
-//   4. Am Fenster die Kilometersteine zählen und genau bei 24,7 Miras Kelle heben. Vorne zieht der
-//      andere Joseph, hinten Joseph – Weiche 7 springt halb um, der Zug entgleist.
+//   4. Am Fenster die Kilometersteine zählen und genau bei 24,7 Miras Kelle heben und gleichzeitig ins
+//      Mikrofon der Lautsprecheranlage „Jetzt!“ rufen – der andere Joseph sieht vorne keinen Stein (die
+//      Stirnlampe der Lok ist im Tunnel aus), er hört den Ruf in der Lok. Vorne zieht er, hinten Joseph –
+//      Weiche 7 springt halb um, der Zug entgleist.
 //   5. Schluss: warme Stube, Joseph ist der Schaffner, Mira: „Papa, du bist ja wach! Frohe Weihnachten!“
 //      Er zündet die letzte Kerze am Baum an. Die Wanduhr zeigt 23:47.
 
@@ -210,8 +212,8 @@ async function cutSeal(story) {
   story.sound('snap');
   await story.say('Knips. Der Draht ist durch, das Bleisiegel fällt zu Boden.');
   story.sound('speaker');
-  await story.speak('Ich bin bereit. Wenn du die Kelle hebst, ziehe ich. Bei 24,7 – nicht früher, nicht später.', { at: SPEAKER, color: VOICE });
-  story.note('Plombe ab. Der andere Joseph zieht in der Lok, sobald ich die Kelle hebe – genau bei Kilometer 24,7.');
+  await story.speak('Ich bin bereit. Von hier vorne sehe ich keinen Stein – die Stirnlampe der Lok ist aus. Heb die Kelle und ruf „Jetzt!“ ins Mikrofon, dann ziehe ich. Bei 24,7 – nicht früher, nicht später.', { at: SPEAKER, color: VOICE });
+  story.note('Plombe ab. Vorne in der Lok sieht er keinen Stein – die Stirnlampe ist aus. Genau bei Kilometer 24,7 hebe ich die Kelle und rufe ins Mikrofon der Lautsprecheranlage „Jetzt!“. Dann zieht er.');
 }
 
 async function watchStones(story) {
@@ -231,7 +233,7 @@ async function watchStones(story) {
     backdrop: 1,
     draw: (ctx, view) => drawWindowRun(ctx, view.state),
     spots: () => (state.raised ? [] : [PADDLE_SPOT]),
-    help: 'Kilometersteine zählen – bei 24,7 die Kelle heben  ·  Rechtsklick: zurück',
+    help: 'Kilometersteine zählen – bei 24,7 die Kelle heben und „Jetzt!“ rufen  ·  Rechtsklick: zurück',
     update: (dt, view) => {
       const s = view.state;
       s.t += dt;
@@ -260,15 +262,16 @@ async function watchStones(story) {
         return;
       }
       s.derail = 0;
+      story.sound('speaker'); // „Jetzt!“ geht über das Mikrofon nach vorne in die Lok
       await story.say('Vierundzwanzig Komma sieben. Jetzt!');
-      if (view.isOpen) await story.say('Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.');
+      if (view.isOpen) await story.say('Vorne in der Lok hört er mich. Wir ziehen beide – Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.');
     },
   });
   // Ein Rechtsklick mitten im Entgleisen hält es nicht mehr auf
   if (state.derail !== null) return finale(story);
   if (result === false) return;
   story.sound('wrong');
-  await story.say(result === 'missed' ? 'Zu spät! Der Stein ist vorbei.' : `Bei ${result.slice(6)}? Falsch! Ich habe die Kelle zu ${Number(result.slice(6).replace(',', '.')) < 24.7 ? 'früh' : 'spät'} gehoben.`);
+  await story.say(result === 'missed' ? 'Zu spät! Der Stein ist vorbei.' : `Bei ${result.slice(6)}? Falsch! Ich habe zu ${Number(result.slice(6).replace(',', '.')) < 24.7 ? 'früh' : 'spät'} „Jetzt!“ gerufen.`);
   story.sound('speaker');
   await story.speak('Ruhig, Junge. Noch wird es hell. Noch eine Runde. Bei 24,7.', { at: SPEAKER, color: VOICE });
 }
@@ -377,5 +380,5 @@ function currentGoal(story) {
     ] };
   }
   if (!f.sealCut) return { id: 'seal', lines: ['Der rote Hebel ist verplombt. Ich brauche etwas, um die Plombe zu lösen.', 'Die Plombe am roten Hebel: Die Lochzange liegt auf dem Schreibtisch. Lochzange nehmen, dann auf den Hebel anwenden.'] };
-  return { id: 'paddle', lines: ['Bei Kilometer 24,7 liegt Weiche 7. Genau dort muss ich das Signal geben.', 'Am roten Hebel oder am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben.'] };
+  return { id: 'paddle', lines: ['Bei Kilometer 24,7 liegt Weiche 7. Vorne in der Lok sieht er die Steine nicht – die Stirnlampe ist aus. Ich muss ihm Bescheid geben.', 'Am roten Hebel oder am Fenster die Kilometersteine zählen, genau bei 24,7 die Kelle heben – dann hört er mein „Jetzt!“ über die Lautsprecheranlage.'] };
 }

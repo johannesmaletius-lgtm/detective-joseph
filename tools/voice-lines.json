@@ -451,7 +451,7 @@
  },
  {
   "speaker": "mira",
-  "text": "Falsch. Heiligabend … welcher Tag ist das?",
+  "text": "Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.",
   "file": "wagon15.js"
  },
  {
@@ -846,7 +846,7 @@
  },
  {
   "speaker": "conductor",
-  "text": "Ich bin bereit. Wenn du die Kelle hebst, ziehe ich. Bei 24,7 – nicht früher, nicht später.",
+  "text": "Ich bin bereit. Von hier vorne sehe ich keinen Stein – die Stirnlampe der Lok ist aus. Heb die Kelle und ruf „Jetzt!“ ins Mikrofon, dann ziehe ich. Bei 24,7 – nicht früher, nicht später.",
   "file": "wagon24.js"
  },
  {
