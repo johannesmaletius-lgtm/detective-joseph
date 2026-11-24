@@ -39,18 +39,18 @@ export function drawGuestBook(ctx) {
 }
 
 // ---------------------------------------------------------------- Abteil 4 als Suchbild
-// Spuren: id, Rechteck, Name. clue = zählt zu den sechs Spuren.
+// Spuren: id, Rechteck, Name. clue = zählt zu den sieben Spuren.
 export const COMPARTMENT_SPOTS = [
   { id: 'hatbox', x: 712, y: 510, w: 148, h: 128, label: 'Hutschachtel', clue: true },
   { id: 'glasses', x: 362, y: 352, w: 84, h: 40, label: 'Brille', clue: true },
   { id: 'shoes', x: 928, y: 490, w: 128, h: 82, label: 'Schuhe', clue: true },
-  { id: 'footprints', x: 744, y: 630, w: 350, h: 62, label: 'Fußspuren', clue: true },
+  { id: 'footprints', x: 760, y: 566, w: 190, h: 150, label: 'Fußspuren', clue: true },
   { id: 'button', x: 656, y: 646, w: 48, h: 40, label: 'Knopf', clue: true },
   { id: 'ticket', x: 438, y: 410, w: 86, h: 44, label: 'Fahrschein', clue: true },
   { id: 'coat', x: 384, y: 160, w: 116, h: 220, label: 'Mantel' },
   { id: 'cup', x: 894, y: 346, w: 52, h: 46, label: 'Tasse' },
   { id: 'bedDrawer', x: 350, y: 578, w: 268, h: 62, label: 'Bettkasten' },
-  { id: 'window', x: 640, y: 160, w: 280, h: 150, label: 'Fenster' },
+  { id: 'window', x: 640, y: 140, w: 290, h: 170, label: 'Fenster', clue: true },
 ];
 
 export function drawCompartment(ctx, found) {
@@ -93,21 +93,22 @@ export function drawCompartment(ctx, found) {
   ctx.stroke();
   glow(ctx, 677, 662, 10, '255, 240, 190', 0.5);
   ctx.restore();
-  // feuchte Fußspuren (Socken), vom Bett zur Tür
+  // feuchte Fußspuren (Socken), vom Bett bis unters Fenster
   ctx.save();
   ctx.fillStyle = 'rgba(30, 22, 18, 0.5)';
-  for (let i = 0; i < 6; i++) {
-    const x = 770 + i * 56, y = 676 - i * 7 + (i % 2 ? 12 : 0);
+  const steps = [[790, 700, -0.1], [840, 690, -0.3], [880, 668, -0.7], [898, 640, -1.1], [912, 612, -1.3], [922, 584, -1.4]];
+  for (const [x, y, a] of steps) {
     ctx.beginPath();
-    ctx.ellipse(x, y, 19, 9, -0.15, 0, Math.PI * 2);
+    ctx.ellipse(x, y, 17, 8, a, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = 'rgba(200, 220, 255, 0.12)'; // nass glänzend
     ctx.beginPath();
-    ctx.ellipse(x - 4, y - 3, 8, 3, -0.15, 0, Math.PI * 2);
+    ctx.ellipse(x - 3, y - 3, 7, 3, a, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = 'rgba(30, 22, 18, 0.5)';
   }
   ctx.restore();
+  drawOpenWindow(ctx);
   // Gefundenes markieren
   for (const spot of COMPARTMENT_SPOTS) {
     if (!found.includes(spot.id)) continue;
@@ -123,7 +124,60 @@ export function drawCompartment(ctx, found) {
   const count = COMPARTMENT_SPOTS.filter((spot) => spot.clue && found.includes(spot.id)).length;
   ctx.fillStyle = 'rgba(12, 7, 4, 0.75)';
   ctx.fillRect(20, 18, 250, 42);
-  text(ctx, `Spuren: ${count} von 6`, 145, 46, { font: `bold 20px ${PRINT}`, color: '#f6e7c1', align: 'center' });
+  text(ctx, `Spuren: ${count} von ${COMPARTMENT_SPOTS.filter((spot) => spot.clue).length}`, 145, 46, { font: `bold 20px ${PRINT}`, color: '#f6e7c1', align: 'center' });
+}
+
+// Das Fenster steht einen Spalt offen (oben ein schwarzer Spalt, die Scheibe ein Stück heruntergeschoben),
+// der Riegel oben am Rahmen ist nach außen verbogen.
+function drawOpenWindow(ctx) {
+  ctx.save();
+  // Spalt oben: Nachtluft
+  ctx.fillStyle = '#000000';
+  ctx.beginPath();
+  ctx.roundRect(650, 161, 270, 22, [14, 14, 0, 0]);
+  ctx.fill();
+  // die Scheibe darunter spiegelt etwas (damit man sieht: hier ist Glas, oben nicht)
+  ctx.fillStyle = 'rgba(190, 210, 240, 0.13)';
+  ctx.beginPath();
+  ctx.roundRect(650, 183, 270, 116, [0, 0, 14, 14]);
+  ctx.fill();
+  // Oberkante der heruntergeschobenen Scheibe
+  ctx.fillStyle = '#8a6a32';
+  ctx.fillRect(650, 182, 270, 7);
+  ctx.fillStyle = 'rgba(255, 230, 170, 0.6)';
+  ctx.fillRect(650, 182, 270, 2);
+  // kalter Luftzug
+  ctx.strokeStyle = 'rgba(210, 230, 255, 0.35)';
+  ctx.lineWidth = 2;
+  for (const [x, y] of [[700, 192], [770, 198], [850, 190]]) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x + 10, y + 10, x - 10, y + 20, x + 4, y + 32);
+    ctx.stroke();
+  }
+  // verbogener Riegel: Halter am Rahmen, Riegel nach außen (in den Spalt) geknickt
+  ctx.fillStyle = '#b8862e';
+  ctx.strokeStyle = '#5e3f12';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(770, 144, 30, 16, 3);
+  ctx.fill();
+  ctx.stroke();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#3a2508';
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.moveTo(785, 154);
+  ctx.lineTo(791, 170);
+  ctx.lineTo(806, 162);
+  ctx.lineTo(822, 174);
+  ctx.stroke();
+  ctx.strokeStyle = '#e8b850';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  glow(ctx, 812, 168, 10, '255, 240, 190', 0.5);
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------- Das Foto (Vorder- und Rückseite)
