@@ -19,6 +19,7 @@ export const photoLab = {
   outside: outside(WINDOWS),
 
   animations: [
+    { id: 'curtain', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
     { id: 'tint', layer: 'over', x: 0, y: 0, width: 1280, height: 720 },
   ],
 
@@ -30,6 +31,7 @@ export const photoLab = {
   hotspots: [
     { id: 'bag', name: 'Kameratasche', area: box(404, 174, 502, 366), walkTo: [500, 500], facing: 'left' },
     { id: 'switch', name: 'Lichtschalter', area: box(494, 204, 548, 248), walkTo: [540, 470], facing: 'back' },
+    { id: 'curtain', name: 'Vorhang', area: box(550, 96, 808, 472), when: 'curtainClosed', walkTo: [680, 480], facing: 'back' }, // zu: über der Tür
     { id: 'curtain', name: 'Vorhang', area: box(722, 96, 806, 472), walkTo: [740, 480], facing: 'right' },
     { id: 'redLight', name: 'Rotlicht', area: box(1018, 140, 1092, 248), walkTo: [860, 560], facing: 'right' },
     { id: 'timer', name: 'Laborzeituhr', area: box(928, 168, 1012, 248), walkTo: [860, 560], facing: 'right' },

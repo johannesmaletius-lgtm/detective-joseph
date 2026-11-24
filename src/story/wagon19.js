@@ -1,6 +1,6 @@
 import {
   BOTTLES, BOTTLE_SPOTS, DEVELOP_SPOT, NEG_SLOTS, TRAY_SPOTS, checkNegatives, drawChemistry, drawContactSheet, drawEnlargement,
-  drawExposureTable, drawNegative, negativeTokens, paintTint,
+  drawExposureTable, drawNegative, negativeTokens, paintCurtain, paintTint,
 } from './art/wagon19.js';
 import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
@@ -45,6 +45,14 @@ export const wagon19 = {
     f.roomLight = true;
     f.redLight = false;
     f.curtainClosed = false;
+    // Vorhang: gleitet in einer knappen halben Sekunde auf bzw. zu
+    let shown = f.curtainClosed ? 1 : 0, last = performance.now();
+    story.scene.paintSpot('curtain', (ctx) => {
+      const now = performance.now(), step = Math.min(0.1, (now - last) / 1000) / 0.45;
+      last = now;
+      shown = f.curtainClosed ? Math.min(1, shown + step) : Math.max(0, shown - step);
+      paintCurtain(ctx, shown);
+    });
     story.scene.paintSpot('tint', (ctx) => paintTint(ctx, { roomLight: f.roomLight, redLight: f.redLight, tunnel: story.isDark }));
   },
 

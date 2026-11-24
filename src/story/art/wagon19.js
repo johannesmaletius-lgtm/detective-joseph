@@ -70,6 +70,75 @@ function center(points) {
   return { x: points.reduce((a, [x]) => a + x, 0) / points.length };
 }
 
+// ---------------------------------------------------------------- Vorhang der Dunkelkammer
+// Im Hintergrundbild ist der Vorhang offen (rechts neben der Tür zusammengebunden). Zu: ein Vorhang
+// in Falten über der ganzen Tür. shown = 0 (offen) … 1 (zu); dazwischen wird er von rechts zugezogen.
+const CURTAIN = { left: 550, right: 808, top: 104, bottom: 473 };
+
+export function paintCurtain(ctx, shown) {
+  if (shown <= 0) return;
+  const { left, right, top, bottom } = CURTAIN;
+  const full = right - left;
+  const width = 120 + (full - 120) * shown; // ganz offen deckt er noch das gebundene Bündel ab
+  const image = cached('w19-curtain', full, bottom - top, drawCurtainCloth);
+  ctx.drawImage(image, right - width, top, width, bottom - top);
+}
+
+function drawCurtainCloth(c) {
+  const w = CURTAIN.right - CURTAIN.left, h = CURTAIN.bottom - CURTAIN.top;
+  const folds = 12, fw = w / folds;
+  const rnd = seeded(19);
+  // Falten: jede ein senkrechter Streifen, Mitte hell, Ränder dunkel; unten leicht gewellter Saum
+  for (let i = 0; i < folds; i++) {
+    const x0 = i * fw, x1 = x0 + fw;
+    const hem = h - 4 - (i % 2 ? 0 : 5) - rnd() * 3;
+    const g = c.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, '#1b130f');
+    g.addColorStop(0.35, '#55402f');
+    g.addColorStop(0.55, '#694f37');
+    g.addColorStop(1, '#221912');
+    c.fillStyle = g;
+    c.beginPath();
+    c.moveTo(x0, 6);
+    c.lineTo(x1, 6);
+    c.lineTo(x1 + (i % 2 ? -1 : 1), hem + (i % 2 ? 4 : -2));
+    c.quadraticCurveTo((x0 + x1) / 2, hem + 6, x0, hem + (i % 2 ? -2 : 4));
+    c.closePath();
+    c.fill();
+    // dunkle Faltenlinie (Comic-Strich)
+    c.strokeStyle = 'rgba(10, 6, 4, 0.85)';
+    c.lineWidth = 2;
+    line(c, x0 + 0.5, 6, x0 + (i % 2 ? 1 : -1), hem);
+  }
+  // Stoffstruktur: feine helle und dunkle Sprenkel
+  for (let n = 0; n < 900; n++) {
+    c.fillStyle = rnd() < 0.5 ? 'rgba(120, 96, 76, 0.18)' : 'rgba(0, 0, 0, 0.18)';
+    c.fillRect(rnd() * w, 6 + rnd() * (h - 20), 1.5, 1.5);
+  }
+  // oben Schatten unter der Stange, unten etwas dunkler
+  const shade = c.createLinearGradient(0, 0, 0, h);
+  shade.addColorStop(0, 'rgba(0, 0, 0, 0.45)');
+  shade.addColorStop(0.08, 'rgba(0, 0, 0, 0)');
+  shade.addColorStop(0.85, 'rgba(0, 0, 0, 0)');
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+  c.globalCompositeOperation = 'source-atop';
+  c.fillStyle = shade;
+  c.fillRect(0, 0, w, h);
+  c.globalCompositeOperation = 'source-over';
+  // Messingringe an der Stange
+  for (let i = 0; i < folds; i++) {
+    const x = i * fw + fw / 2;
+    c.strokeStyle = '#2a1a0c';
+    c.lineWidth = 4;
+    c.beginPath();
+    c.ellipse(x, 6, 4, 7, 0, 0, Math.PI * 2);
+    c.stroke();
+    c.strokeStyle = '#d29a48';
+    c.lineWidth = 2;
+    c.stroke();
+  }
+}
+
 // ---------------------------------------------------------------- Kameratasche
 export function drawExposureTable(ctx) {
   sheet(ctx, 300, 90, 680, 520, {
