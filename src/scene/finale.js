@@ -16,5 +16,10 @@ export const finale = {
       walkTo: [640, 520], facing: 'back', color: '#ffc8d8', idle: ['blink', 'busy'],
     },
   ],
+  // Sobald Joseph die Mütze aufhat, hängt sie nicht mehr am Haken (Ausschnitt aus dem Hintergrund, übermalt)
+  props: [
+    ...(conductorCar.props ?? []),
+    { id: 'noCap', image: 'assets/scenes/wagon-18/ohne-muetze.webp', x: 811.67, y: 123.33, width: 75, height: 103.33, when: 'capOn' },
+  ],
   hotspots: conductorCar.hotspots.filter((h) => KEEP.includes(h.id)),
 };
