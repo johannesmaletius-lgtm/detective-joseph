@@ -118,6 +118,7 @@ async function announce(story) {
   const state = { on: f.on };
   const result = await story.view('picture', {
     state,
+    opaque: true,
     draw: (ctx, view) => drawPanel(ctx, view.state),
     spots: panelSpots(),
     area: { x: 150, y: 70, w: 980, h: 600 },

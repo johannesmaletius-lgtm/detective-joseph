@@ -14,6 +14,7 @@ import { View } from './view.js';
 //     update: (dt, view) => { … },                   // (optional) in jedem Bild
 //     help: 'Klicken: …',
 //     staysInDark: false,
+//     opaque: false,                                 // (optional) true: das Bild deckt alles ab
 //   });
 //
 // Solange die Reaktion auf einen Klick läuft (z. B. Joseph spricht), überspringt ein weiterer Klick
@@ -34,6 +35,11 @@ export class PictureView extends View {
     this.state = options.state ?? {};
     this.staysInDark = Boolean(options.staysInDark);
     this.help = options.help ?? 'Klicken: untersuchen  ·  Rechtsklick: zurück';
+  }
+
+  // Verdeckt die Ansicht das Abteil ganz (Option opaque)? Dann muss es nicht mitgezeichnet werden.
+  get covers() {
+    return Boolean(this.options.opaque) && this.fadeIn >= 1;
   }
 
   get spots() {

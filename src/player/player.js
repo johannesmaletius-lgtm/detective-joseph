@@ -2,6 +2,7 @@ import { loadAnimations } from '../animation/animation.js';
 import { loadImage } from '../core/assets.js';
 import { AnimationPlayer } from '../animation/animationPlayer.js';
 import { BodyLife } from '../animation/bodyLife.js';
+import { drawConductorCap } from './conductorCap.js';
 import { PlayerMovement, RUN_SPEED, WALK_SPEED } from './playerMovement.js';
 
 // So groß (in Pixeln) ist Joseph in seinen Bilddateien – daraus wird der Maßstab berechnet.
@@ -163,6 +164,12 @@ export class Player {
     ctx.translate(this.x, this.y);
     this.life.apply(ctx);
     ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
+    // Wagen 24: Joseph trägt die Mütze des Schaffners
+    if (scene.flags?.capOn) {
+      ctx.translate(-width / 2, -drawHeight);
+      ctx.scale(scale, scale);
+      drawConductorCap(ctx, image, this.facing);
+    }
     ctx.restore();
   }
 

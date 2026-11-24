@@ -302,12 +302,14 @@ export class Game {
       return;
     }
 
-    // 1) Spielwelt – wird mit der Kamera verschoben
-    ctx.save();
-    this.camera.apply(ctx);
-    this.scene.draw(ctx, this.player);
-    this.debug.drawWorld(ctx, this);
-    ctx.restore();
+    // 1) Spielwelt – wird mit der Kamera verschoben (nicht nötig, wenn eine Nahansicht sie ganz verdeckt)
+    if (!this.view?.covers) {
+      ctx.save();
+      this.camera.apply(ctx);
+      this.scene.draw(ctx, this.player);
+      this.debug.drawWorld(ctx, this);
+      ctx.restore();
+    }
 
     // 2) Benutzeroberfläche – bleibt fest auf dem Bildschirm
     this.hints.draw(ctx);

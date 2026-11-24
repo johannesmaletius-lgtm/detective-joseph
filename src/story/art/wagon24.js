@@ -33,25 +33,43 @@ export function panelSpots() {
   ];
 }
 
+// Das Pult wird nur neu gemalt, wenn sich ein Schalter ändert: einmal in Bildschirmauflösung auf eine
+// eigene Fläche, danach in jedem Bild nur noch 1:1 kopiert. (Vorher wurde das große Foto in jedem Bild
+// neu herunterskaliert – das ruckelte.)
+let panelCache = { key: '', canvas: null };
 export function drawPanel(ctx, { on }) {
-  drawPicture(ctx, PANEL, 0, 0, 1280, 720);
   const image = picture(PANEL);
-  const ready = image.complete && image.naturalWidth;
+  if (!image.complete || !image.naturalWidth) return;
+  const scale = Math.max(1, ctx.getTransform().a);
+  const key = `${scale}|${[...on].sort((a, b) => a - b).join(',')}|${document.fonts?.status}`;
+  if (panelCache.key !== key) {
+    const canvas = panelCache.canvas ?? document.createElement('canvas');
+    canvas.width = Math.round(1280 * scale);
+    canvas.height = Math.round(720 * scale);
+    const c = canvas.getContext('2d');
+    c.setTransform(scale, 0, 0, scale, 0, 0);
+    c.imageSmoothingQuality = 'high';
+    paintPanel(c, image, on);
+    panelCache = { key, canvas };
+  }
+  ctx.drawImage(panelCache.canvas, 0, 0, 1280, 720);
+}
+
+function paintPanel(ctx, image, on) {
+  ctx.drawImage(image, 0, 0, 1280, 720);
   for (let n = 1; n <= 23; n++) {
     const s = switchAt(n);
     // Schildchen: Nummer und Wagen
     text(ctx, `${n} ${NAMES[n - 1]}`, s.x, s.plate + 4, { font: `bold 11px ${PRINT}`, color: '#3a2410', align: 'center' });
     if (!on.includes(n)) continue;
     // eingeschaltet: Schalter senkrecht gespiegelt, der Hebel zeigt nach oben
-    if (ready) {
-      const hw = 38, hh = 43;
-      const sx = image.naturalWidth / 1280;
-      ctx.save();
-      ctx.translate(s.x, s.y);
-      ctx.scale(1, -1);
-      ctx.drawImage(image, (s.x - hw) * sx, (s.y - hh) * sx, hw * 2 * sx, hh * 2 * sx, -hw, -hh, hw * 2, hh * 2);
-      ctx.restore();
-    }
+    const hw = 38, hh = 43;
+    const sx = image.naturalWidth / 1280;
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.scale(1, -1);
+    ctx.drawImage(image, (s.x - hw) * sx, (s.y - hh) * sx, hw * 2 * sx, hh * 2 * sx, -hw, -hh, hw * 2, hh * 2);
+    ctx.restore();
     glow(ctx, s.x + 30, s.y - 30, 18, '120, 255, 140', 0.8);
     ctx.fillStyle = '#7dff8a';
     ctx.beginPath();
