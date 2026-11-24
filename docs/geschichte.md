@@ -94,8 +94,9 @@ Auf der letzten Seite steht eine Tabelle, wie lange der Tunnel dauert, Runde fü
 Hinter der beschlagenen Scheibe rennt eine Gestalt mit Josephs Mütze davon.
 
 ### Tür 18 – Das Schaffnerabteil
-Im Dienstbuch steht der Schichtplan der Weihnachtswoche: Der Schaffner hatte am 24. getauscht, um zu Hause alles vorzubereiten. Seine Familie sollte mit dem Zug nachkommen. Am Ende fuhr den 24. **Kern**: „Gern. Meine letzte Weihnachtsfahrt vor der Rente.“ Kern ist **Herr K.**, der alte Freund und Lehrmeister des Schaffners. Er hatte Dienst und saß bei der Feier statt am Funk. Deshalb ist er freiwillig gegangen. Am Schlüsselbrett ist ein Haken leer, darauf steht „Lok“. Der Hebel für Weiche 7 ist verplombt.
-**„Nur von der Lok aus.“**
+Im Dienstbuch steht der Schichtplan der Weihnachtswoche: Der Schaffner hatte am 24. getauscht, um zu Hause alles vorzubereiten. Seine Familie sollte mit dem Zug nachkommen. Am Ende fuhr den 24. **Kern**: „Gern. Meine letzte Weihnachtsfahrt vor der Rente.“ Kern ist **Herr K.**, der alte Freund und Lehrmeister des Schaffners. Er hatte Dienst und saß bei der Feier statt am Funk. Deshalb ist er freiwillig gegangen. Am Schlüsselbrett ist ein Haken leer, darauf steht „Lok“. Der rote Hebel für Weiche 7 ist verplombt.
+**„Sicherung gegen Fehlbedienung. Nur gleichzeitig mit dem Hebel in der Lok.“**
+Weiche 7 braucht also zwei Hebel gleichzeitig: den roten im Schaffnerabteil und den in der Lok – und den in der Lok stellt nur, wer den Lok-Schlüssel hat.
 
 ### Tür 19 – Das Fotolabor
 Im Rotlicht entwickelt Joseph einen Film aus der Tasche des Bordfotografen. Das erste Bild ist aus jener Nacht: ein leerer Führerstand, weil auch der Lokführer gefeiert hat. Das letzte Bild stammt aus einer viel späteren Runde. Darin steht eine Gestalt mit Josephs Mütze allein am Hebel, mit dem Lok-Schlüssel im Schloss, und versucht, die Weiche zu stellen.
@@ -153,7 +154,7 @@ Joseph steht auf und zündet die letzte Kerze am Baum an.
 - **Der Tunnel wächst:** In Runde 1 dauerte er drei Ticks, in Runde 109 elf, danach jede Runde einen mehr. Bei fünfundzwanzig wird es nicht mehr hell, dann kommt keiner mehr heraus. Das ist die tickende Uhr ab Tür 11. An Heiligabend sind es vierundzwanzig.
 - **Zwei Josephs:** Der Schaffner ist am längsten in der Nacht. Ein Teil von ihm hat alles vergessen, bis zurück zum Siebzehnjährigen, der Detektiv werden wollte. Dieser Teil ist Joseph: der, der alle retten will und nicht loslassen kann. Der ältere Teil weiß, dass er sie gehen lassen muss. Die Geschichte handelt vom Loslassen. Nur wer durch das Gittertor im Wartungsgang hinausgeht, kommt aus der Nacht heraus, altert wieder und lebt weiter (siehe die Fundkarten aus der Zukunft in Tür 6).
 - **Runde für Runde** ruft er einen Fahrgast über den Lautsprecher und führt ihn hinaus. Den Ängstlichen gibt er einen Schlaftrunk, der nach Bittermandel riecht. Für die Fahrgäste sieht es aus, als würden sie verschwinden. Seine Frau geht als Erste. Mira will nicht ohne ihren Papa gehen.
-- **Zu Ende bringen** kann er es nur, wenn Weiche 7 von der Lok und vom Schaffnerabteil aus gleichzeitig gestellt wird. Dafür braucht er einen Zweiten: seinen jüngeren Teil. Wenn beide gleichzeitig ziehen, werden sie wieder eins.
+- **Zu Ende bringen** kann er es nur, wenn Weiche 7 mit beiden Hebeln gleichzeitig gestellt wird – dem in der Lok (mit Lok-Schlüssel) und dem verplombten roten im Schaffnerabteil („Sicherung gegen Fehlbedienung“). Dafür braucht er einen Zweiten: seinen jüngeren Teil. Wenn beide gleichzeitig ziehen, werden sie wieder eins.
 - **Er legt ihm eine Spur:** die Akte in seiner Handschrift, die Briefe, die Noten und die Kreidezeichen. Joseph soll alles selbst herausfinden, denn nur dann glaubt er es.
 - **Josephs „Rettungen“** halten die Fahrgäste in Wahrheit in der Schleife fest.
 - **Am 24.** bringen beide es gemeinsam zu Ende. Der Zug entgleist, niemand kann mehr einsteigen, und die Nacht ist vorbei.

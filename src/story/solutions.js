@@ -130,7 +130,7 @@ export const SOLUTIONS = {
     'Schublade: KERN → Telegramm und sieben Schlüssel.',
     'Die Schlüssel nach Griffform an die Umrisse am Brett hängen; der Haken „Lok“ bleibt leer.',
     'Stellwerk: Weiche 1 nach oben, Weichen 2, 4 und 6 nach rechts → Fahrstraße bis Weiche 7 → die Tür ist frei.',
-    'Der rote Hebel (Weiche 7) bleibt verplombt: „Nur von der Lok aus.“',
+    'Der rote Hebel (Weiche 7) bleibt verplombt: „Sicherung gegen Fehlbedienung“ – Weiche 7 braucht ihn und den Hebel in der Lok gleichzeitig, und der Lok-Schlüssel fehlt.',
   ],
   19: [
     'Kameratasche: „Tunnel, fast kein Licht“ → Blende 2, Zeit 1/15 → 215. Darin ein Film.',

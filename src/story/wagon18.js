@@ -16,10 +16,11 @@ import { LETTERS, finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, w
 //      Ein Umriss bleibt leer: „Lok“. Erst wenn alle Schlüssel hängen, ist das Stellwerk frei.
 //   3. Stellwerk: Weichen 1–6 so stellen, dass die Fahrstraße aus dem Ring bis Weiche 7 führt
 //      (z. B. 1 nach oben, 2 nach rechts, 4 nach rechts, 6 nach rechts). Dann ist die Tür entriegelt.
-//   4. Der rote Hebel für Weiche 7 ist verplombt: „Nur von der Lok aus.“ Der Lok-Schlüssel fehlt.
+//   4. Der rote Hebel für Weiche 7 ist verplombt („Sicherung gegen Fehlbedienung“). Weiche 7 braucht
+//      zwei Hebel gleichzeitig: diesen und den in der Lok (nur mit dem Lok-Schlüssel). Der fehlt.
 //
-// ERGEBNIS: Der Schaffner hatte getauscht, um zu Hause Weihnachten vorzubereiten. Für Weiche 7
-// braucht Joseph den Lok-Schlüssel – und der fehlt.
+// ERGEBNIS: Der Schaffner hatte getauscht, um zu Hause Weihnachten vorzubereiten. Weiche 7 braucht
+// zwei Hebel gleichzeitig – den roten hier und den in der Lok. Und der Lok-Schlüssel fehlt.
 
 const VOICE = '#a6f0b6';
 const SPEAKER = { x: 420, y: 120 };
@@ -226,10 +227,11 @@ async function tryRedLever(story) {
   const f = story.flags;
   story.sound('locked');
   await story.say('Ich ziehe – der Hebel rührt sich nicht. Die Plombe hält ihn fest.');
-  await story.say('Auf dem Siegel steht: „Weiche 7 – nur von der Lok aus.“');
+  await story.say('Auf dem Siegel steht: „Weiche 7 – Sicherung gegen Fehlbedienung. Nur gleichzeitig mit dem Hebel in der Lok.“');
+  await story.say('Zwei Hebel also: dieser hier und einer vorne in der Lok. Und den in der Lok stellt man nur mit dem Lok-Schlüssel.');
   if (!f.sealNoted) {
     f.sealNoted = true;
-    story.note('Der rote Hebel für Weiche 7 ist verplombt: „Nur von der Lok aus.“ Dafür braucht man den Lok-Schlüssel.');
+    story.note('Der rote Hebel für Weiche 7 ist verplombt: „Sicherung gegen Fehlbedienung.“ Weiche 7 braucht zwei Hebel gleichzeitig – diesen hier und den in der Lok. Für den in der Lok braucht man den Lok-Schlüssel.');
   }
 }
 
@@ -248,7 +250,7 @@ async function ending(story) {
     await finishWagon(story, {
       number: 18,
       title: 'Ende von Wagen 18',
-      lines: ['Der Schaffner hatte seinen Dienst getauscht – seine Familie sollte mit diesem Zug nachkommen.', 'Weiche 7 lässt sich nur von der Lok aus stellen. Der Lok-Schlüssel fehlt.'],
+      lines: ['Der Schaffner hatte seinen Dienst getauscht – seine Familie sollte mit diesem Zug nachkommen.', 'Weiche 7 braucht zwei Hebel gleichzeitig: den roten hier und den in der Lok. Der Lok-Schlüssel fehlt.'],
       nextTitle: 'im Fotolabor',
     });
   });

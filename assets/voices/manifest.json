@@ -1,5 +1,5 @@
 {
- "Falsch. Vier Ziffern …": "assets/voices/mira/f2ca61a714.mp3",
+ "Falsch. Vier Ziffern …": "assets/voices/joseph/83a477c8b7.mp3",
  "Aaah, dieses Quietschen! Meine armen Ohren!": "assets/voices/bruno/f662a9a7ba.mp3",
  "He! Wer ist da an meinem Tablett?!": "assets/voices/bruno/fff6df4bcc.mp3",
  "Licht! Na also. Wo war ich … ach ja, der Wein.": "assets/voices/bruno/d2e0914f0e.mp3",
@@ -662,7 +662,6 @@
  "Halb zwölf. Mit dem Lok-Schlüssel um den Hals. Dann warte ich dort auf ihn.": "assets/voices/joseph/6a032d75e5.mp3",
  "Ich klettere hinaus – zu früh! Die Tür geht auf, er sieht mich …": "assets/voices/joseph/acca08b28d.mp3",
  "… und weg ist er. Zurück in den Zug.": "assets/voices/joseph/cac280db44.mp3",
- "Er kommt gerade herein – und sieht mich, bevor er am Pult ist. Er dreht sich um und rennt.": "assets/voices/joseph/46b1d1053d.mp3",
  "Zu spät! Er hat den Schlüssel schon wieder abgezogen und ist fort.": "assets/voices/joseph/96a242101d.mp3",
  "Neue Runde. Gleiche Zeit. Noch einmal – genau um halb zwölf, wenn er am Pult steht.": "assets/voices/joseph/19816156aa.mp3",
  "Ich gehe ihm nach … die Stimme … so müde …": "assets/voices/joseph/6e11c50a67.mp3",
@@ -1022,8 +1021,6 @@
  "Zu. Der Riegel rührt sich nicht.": "assets/voices/joseph/304c271e9b.mp3",
  "Ein Kabel führt vom Riegel zur Registrierkasse. Seltsam.": "assets/voices/joseph/da969efdeb.mp3",
  "Die Tür ist offen. Aber erst will ich wissen, wem das Gift gilt.": "assets/voices/joseph/662cb0e3c7.mp3",
- "Bruno: „Meine Rechnung! Rechnen müssen Sie selbst, junger Mann – ich hab zu tun.“": "assets/voices/joseph/d5589601bc.mp3",
- "Bruno: „Die Karte kenne ich auswendig. Seit hundert Runden dieselbe.“": "assets/voices/joseph/edd9e1edf8.mp3",
  "Ich leuchte ihm nicht ins Gesicht. Er hat ein Messer in der Hand.": "assets/voices/joseph/451112c60b.mp3",
  "Lieber nicht. Bruno hat das größere Messer.": "assets/voices/joseph/e31549c954.mp3",
  "Die Kasse aufbrechen? Bruno steht direkt daneben.": "assets/voices/joseph/6f28fdb9d6.mp3",
@@ -1449,7 +1446,6 @@
  "Alle sieben hängen. Klack – irgendwo hinter dem Brett löst sich eine Sperre.": "assets/voices/joseph/0ea67fd497.mp3",
  "Nur ein Umriss ist leer. Darunter steht: „Lok“.": "assets/voices/joseph/4e5d915b5b.mp3",
  "Ich ziehe – der Hebel rührt sich nicht. Die Plombe hält ihn fest.": "assets/voices/joseph/8fc7e8a723.mp3",
- "Auf dem Siegel steht: „Weiche 7 – nur von der Lok aus.“": "assets/voices/joseph/515285eda5.mp3",
  "Das Dienstbuch des Zugpersonals. Aufgeschlagen bei der Weihnachtswoche.": "assets/voices/joseph/a0da625b8c.mp3",
  "Eine schwere Lochzange. Damit knipst der Schaffner Fahrkarten.": "assets/voices/joseph/a93b063219.mp3",
  "Klick. Ein Loch in die Luft.": "assets/voices/joseph/2601800510.mp3",
@@ -1737,7 +1733,6 @@
  "Nein! Rot und rund und BUMM!": "assets/voices/mira/79dfd99372.mp3",
  "Nein! Es reitet und reitet und kommt nie an. Wie wir.": "assets/voices/mira/bd05e2f3e8.mp3",
  "Nein. Dunkel. Alle gehen hinein. Keiner kommt heraus.": "assets/voices/mira/141bafb06c.mp3",
- "Falsch. Heiligabend … welcher Tag ist das?": "assets/voices/mira/47d7828ee7.mp3",
  "Du musst raten! Zeig drauf!": "assets/voices/mira/ccb01cf071.mp3",
  "Hallo. Ich bin Mira. Ich bin sieben.": "assets/voices/mira/12e5205be1.mp3",
  "Schon ganz lange.": "assets/voices/mira/b593a9cfb3.mp3",
@@ -1776,5 +1771,10 @@
  "Papa?": "assets/voices/mira/78c42ae513.mp3",
  "Dann geh ich schon mal vor. Mama wartet.": "assets/voices/mira/bbe2b4adb4.mp3",
  "Er kneift die Augen zu und hält sich die Ohren zu. Jetzt sieht er nicht zum Tablett …": "assets/voices/joseph/770ea82c62.mp3",
- "Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.": "assets/voices/joseph/304111a82e.mp3"
+ "Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.": "assets/voices/joseph/304111a82e.mp3",
+ "Auf dem Siegel steht: „Weiche 7 – Sicherung gegen Fehlbedienung. Nur gleichzeitig mit dem Hebel in der Lok.“": "assets/voices/joseph/21c94bcb9d.mp3",
+ "Zwei Hebel also: dieser hier und einer vorne in der Lok. Und den in der Lok stellt man nur mit dem Lok-Schlüssel.": "assets/voices/joseph/62bd0a0d9f.mp3",
+ "Buchstabensalat. Daraus werde ich nicht schlau.": "assets/voices/joseph/815f0f699e.mp3",
+ "Bruno: „Meine Rechnung! Rechnen müssen Sie selbst, junger Mann – ich hab zu tun.“": "assets/voices/joseph/d5589601bc.mp3",
+ "Bruno: „Die Karte kenne ich auswendig. Seit hundert Runden dieselbe.“": "assets/voices/joseph/edd9e1edf8.mp3"
 }

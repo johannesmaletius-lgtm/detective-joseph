@@ -12,7 +12,8 @@ import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCom
 //   2. Letzte Durchsage: an der Lautsprecheranlage nur die Wagen einschalten, in denen noch jemand
 //      sitzt – Bruno (4), Ilse (5), Barkeeper (7), Moll (12), Mira (15), Heizer (21) – und dann selbst
 //      den Ruf sprechen. Alle gehen ruhig hinaus, Mira als Letzte: „Kommst du nach, Papa?“
-//   3. Die Plombe am roten Hebel mit der Lochzange vom Schreibtisch öffnen.
+//   3. Die Plombe am roten Hebel („Sicherung gegen Fehlbedienung“) mit der Lochzange vom Schreibtisch öffnen.
+//      Weiche 7 braucht zwei Hebel gleichzeitig: diesen und den in der Lok (mit dem Lok-Schlüssel).
 //   4. Am Fenster die Kilometersteine zählen und genau bei 24,7 Miras Kelle heben. Vorne zieht der
 //      andere Joseph, hinten Joseph – Weiche 7 springt halb um, der Zug entgleist.
 //   5. Schluss: warme Stube, Joseph ist der Schaffner, Mira: „Papa, du bist ja wach! Frohe Weihnachten!“
@@ -27,7 +28,7 @@ export const wagon24 = {
   recap: [
     'Der Tunnel ist kein Ende, er ist der Ausgang. Herr Tick ging hinaus in den Schnee und sagte: „Danke, Junge.“',
     'Ich habe niemanden gerettet. Ich habe sie festgehalten. Die anderen sitzen noch im Zug.',
-    'Der andere Joseph ist der Schaffner – ich, nur älter. Weiche 7 lässt sich nur zu zweit stellen: in der Lok und hier am roten Hebel.',
+    'Der andere Joseph ist der Schaffner – ich, nur älter. Weiche 7 braucht zwei Hebel gleichzeitig: vorne in der Lok (mit dem Lok-Schlüssel) und hier den roten – „Sicherung gegen Fehlbedienung“.',
     'Sein Brief am Tor: „Wer ruft, muss bleiben.“ Wenn alle draußen sind, muss der Zug selbst aus dem Ring – Weiche 7, zu zweit, bei 24,7. Danach holt die Nacht niemanden mehr.',
     'Miras Kelle: „Damit du uns nach Hause bringst.“',
     'Der Tunnel: vierundzwanzig Ticks. Bei fünfundzwanzig wird es nicht mehr hell. Es ist so weit.',
@@ -376,6 +377,6 @@ function currentGoal(story) {
       'Wagen 4, 5, 7, 12, 15 und 21.',
     ] };
   }
-  if (!f.sealCut) return { id: 'seal', lines: ['Der rote Hebel ist verplombt. Ich brauche etwas, um die Plombe zu lösen.', 'Die Plombe am roten Hebel: Die Lochzange liegt auf dem Schreibtisch. Lochzange nehmen, dann auf den Hebel anwenden.'] };
+  if (!f.sealCut) return { id: 'seal', lines: ['Weiche 7 braucht zwei Hebel gleichzeitig – den in der Lok stellt der andere Joseph, den roten hier ich. Erst muss die Plombe ab.', 'Die Plombe am roten Hebel: Die Lochzange liegt auf dem Schreibtisch. Lochzange nehmen, dann auf den Hebel anwenden.'] };
   return { id: 'paddle', lines: ['Bei Kilometer 24,7 liegt Weiche 7. Genau dort muss ich das Signal geben.', 'Am roten Hebel oder am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben.'] };
 }

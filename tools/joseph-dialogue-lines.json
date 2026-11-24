@@ -2125,11 +2125,6 @@
   "kind": "moment"
  },
  {
-  "text": "Er kommt gerade herein – und sieht mich, bevor er am Pult ist. Er dreht sich um und rennt.",
-  "file": "wagon22.js",
-  "kind": "moment"
- },
- {
   "text": "Zu spät! Er hat den Schlüssel schon wieder abgezogen und ist fort.",
   "file": "wagon22.js",
   "kind": "moment"
@@ -6245,7 +6240,12 @@
   "kind": "rest"
  },
  {
-  "text": "Auf dem Siegel steht: „Weiche 7 – nur von der Lok aus.“",
+  "text": "Auf dem Siegel steht: „Weiche 7 – Sicherung gegen Fehlbedienung. Nur gleichzeitig mit dem Hebel in der Lok.“",
+  "file": "wagon18.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Zwei Hebel also: dieser hier und einer vorne in der Lok. Und den in der Lok stellt man nur mit dem Lok-Schlüssel.",
   "file": "wagon18.js",
   "kind": "rest"
  },
@@ -6536,6 +6536,11 @@
  },
  {
   "text": "Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …",
+  "file": "wagon20.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Buchstabensalat. Daraus werde ich nicht schlau.",
   "file": "wagon20.js",
   "kind": "rest"
  },
