@@ -1,5 +1,6 @@
 import { SCRATCH_TEXT, drawEyeGlow, drawScratches, drawLevers, drawMirrors, drawPlan, planSpots, traceBeam } from './art/wagon9.js';
 import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
+import { SPRITE_HEIGHT } from '../player/player.js';
 
 // ============================================================================================
 //  WAGEN 9 – Der Spiegelwagen (niemand da)
@@ -35,7 +36,12 @@ export const wagon9 = {
     f.turns ??= { A: '/', B: '/', C: '\\', D: '\\' };
     f.pulls ??= {};      // Runde → [{ side, t }]
     f.levers = { left: 0, right: 0 };
-    story.scene.paintSpot('mirrors', (ctx) => drawMirrors(ctx, { figures: reflections(story), time: story.motion.time }));
+    story.scene.paintSpot('mirrors', (ctx) => drawMirrors(ctx, {
+      figures: reflections(story),
+      time: story.motion.time,
+      room: story.scene.background,
+      live: liveReflection(story),
+    }));
     story.scene.paintSpot('levers', (ctx) => {
       drawLevers(ctx, f.levers);
       drawEyeGlow(ctx, f.eyeLit ? 1 : 0, story.motion.time);
@@ -121,6 +127,15 @@ function standMirror() {
 // ============================================================================================
 //  Spiegelbilder
 // ============================================================================================
+
+// Joseph, wie er gerade aussieht – für die Wandspiegel
+function liveReflection(story) {
+  const { player, scene } = story;
+  const image = player.currentImage?.();
+  if (!image) return null;
+  const height = scene.characterHeightAt(player.y) * (image.height / SPRITE_HEIGHT);
+  return { image, x: player.x, y: player.y, height };
+}
 
 function reflections(story) {
   const f = story.flags;

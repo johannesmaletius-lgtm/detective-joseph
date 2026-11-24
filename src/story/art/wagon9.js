@@ -11,35 +11,51 @@ loadImage('assets/characters/joseph/front.png').then((image) => { joseph = image
 export const SCRATCH_TEXT = ['ER IST', 'EINE RUNDE', 'ZU SPÄT'];
 
 // ---------------------------------------------------------------- Spiegel
-// figures: [{ mirror: 'wall0' | 'standA' …, alpha, dark, offset }] – Spiegelbilder von Joseph
-export function drawMirrors(ctx, { figures = [], time = 0 } = {}) {
+// Echte Spiegel: Jeder Spiegel zeigt den Raum seitenverkehrt (das Hintergrundbild, gespiegelt und
+// kleiner, weil weiter weg). In den Wandspiegeln läuft Joseph live mit – sein aktuelles Bild,
+// gespiegelt und an der Stelle, an die der gespiegelte Raum ihn setzt. Die Standspiegel zeigen nur
+// den Raum (sie gehören dem Lichtstrahl).
+// figures: [{ mirror: 'wall0' | 'standA' …, alpha, dark, offset }] – erzählte Spiegelbilder (Rätsel);
+//   wo eins steht, ersetzt es das Live-Bild.
+// room: das Hintergrundbild; live: { image, x, y, height } – Joseph, wie er gerade gezeichnet wird.
+const ROOM_SCALE = 0.62;   // so viel kleiner erscheint der gespiegelte Raum
+const STAND_SCALE = 0.5;
+
+export function drawMirrors(ctx, { figures = [], time = 0, room = null, live = null } = {}) {
   const all = [
-    ...WALL_MIRRORS.map((m, i) => ({ ...m, key: `wall${i}`, oval: true })),
-    ...STAND_MIRRORS.map((m) => ({ ...m, key: `stand${m.id}`, round: true })),
+    ...WALL_MIRRORS.map((m, i) => ({ ...m, key: `wall${i}`, wall: true })),
+    ...STAND_MIRRORS.map((m) => ({ ...m, key: `stand${m.id}` })),
   ];
+  const mirrored = room ? roomLayer(room) : null;
   for (const m of all) {
     const w = m.to - m.from, h = m.bottom - m.top;
     ctx.save();
     ctx.beginPath();
     ctx.rect(m.from - 2, m.top - 2, w + 4, h + 4);
     ctx.clip();
-    // dunkles, warmes Glas mit dem Widerschein der Kerzen
+    // dunkles, warmes Glas als Grund
     const glass = ctx.createLinearGradient(m.from, m.top, m.to, m.bottom);
     glass.addColorStop(0, '#3a2a1e');
     glass.addColorStop(0.5, '#5b4330');
     glass.addColorStop(1, '#231811');
     ctx.fillStyle = glass;
     ctx.fillRect(m.from - 2, m.top - 2, w + 4, h + 4);
-    // Spiegelung des Gangs: Teppich und Fluchtpunkt
-    ctx.fillStyle = 'rgba(120, 30, 24, 0.45)';
-    ctx.beginPath();
-    ctx.moveTo(m.from + w * 0.42, m.top + h * 0.55);
-    ctx.lineTo(m.from + w * 0.58, m.top + h * 0.55);
-    ctx.lineTo(m.from + w * 0.85, m.bottom + 2);
-    ctx.lineTo(m.from + w * 0.15, m.bottom + 2);
-    ctx.fill();
-    glow(ctx, m.from + w * 0.25, m.top + h * 0.3, Math.max(w, h) * 0.35, '255, 190, 110', 0.22 + 0.04 * Math.sin(time * 3 + m.from));
-    for (const figure of figures.filter((f) => f.mirror === m.key)) drawReflection(ctx, m, figure);
+
+    const view = mirrorView(m);
+    if (mirrored) {
+      ctx.save();
+      ctx.translate(view.x, view.y);
+      ctx.scale(view.s, view.s);
+      ctx.drawImage(mirrored, -view.ax, -view.ay, 1280, 720);
+      ctx.restore();
+    }
+    const told = figures.filter((f) => f.mirror === m.key);
+    if (m.wall && live?.image && !told.length) drawLive(ctx, view, live);
+    // Spiegelglas schluckt etwas Licht und färbt warm
+    ctx.fillStyle = 'rgba(28, 16, 8, 0.32)';
+    ctx.fillRect(m.from - 2, m.top - 2, w + 4, h + 4);
+    glow(ctx, m.from + w * 0.25, m.top + h * 0.3, Math.max(w, h) * 0.35, '255, 190, 110', 0.16 + 0.04 * Math.sin(time * 3 + m.from));
+    for (const figure of told) drawReflection(ctx, m, figure);
     // Glanzstreifen
     ctx.fillStyle = 'rgba(255, 245, 230, 0.10)';
     ctx.beginPath();
@@ -50,6 +66,48 @@ export function drawMirrors(ctx, { figures = [], time = 0 } = {}) {
     ctx.fill();
     ctx.restore();
   }
+}
+
+// Wie ein Spiegel den gespiegelten Raum zeigt: Der Punkt (ax, ay) des gespiegelten Raums liegt in
+// der Mitte des Spiegels (x, y), verkleinert um s. Ein Wandspiegel blickt schräg auf die
+// gegenüberliegende Wand, weiter hinten Richtung Tür – steht Joseph rechts, sieht man ihn links.
+// Standspiegel blicken schräg auf den Boden davor.
+function mirrorView(m) {
+  const cx = (m.from + m.to) / 2, cy = (m.top + m.bottom) / 2;
+  if (m.id) return { x: cx, y: cy, s: STAND_SCALE, ax: cx, ay: cy + 150 };
+  return { x: cx, y: cy, s: ROOM_SCALE, ax: cx + (640 - cx) * 0.4, ay: cy + 40 };
+}
+
+// Hintergrund seitenverkehrt, die durchsichtigen Spiegelflächen darin mit dunklem Glas gefüllt
+let roomCache = null;
+function roomLayer(room) {
+  if (roomCache?.room === room) return roomCache.canvas;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1280;
+  canvas.height = 720;
+  const c = canvas.getContext('2d');
+  c.fillStyle = '#2a1d14';
+  c.fillRect(0, 0, 1280, 720);
+  c.translate(1280, 0);
+  c.scale(-1, 1);
+  c.drawImage(room, 0, 0, 1280, 720);
+  roomCache = { room, canvas };
+  return canvas;
+}
+
+// Joseph live im Spiegel: dieselbe Abbildung wie der Raum, also gespiegelt und verkleinert
+function drawLive(ctx, view, { image, x, y, height }) {
+  const fx = 1280 - x;
+  const px = view.x + (fx - view.ax) * view.s;
+  const py = view.y + (y - view.ay) * view.s;
+  const dh = height * view.s;
+  const dw = (image.width / image.height) * dh;
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  ctx.translate(px, py);
+  ctx.scale(-1, 1);
+  ctx.drawImage(image, -dw / 2, -dh, dw, dh);
+  ctx.restore();
 }
 
 function drawReflection(ctx, m, { alpha = 0.8, dark = 0.45, offset = 0, scale = 1 }) {

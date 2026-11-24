@@ -7,7 +7,7 @@ import { PlayerMovement, RUN_SPEED, WALK_SPEED } from './playerMovement.js';
 // So groß (in Pixeln) ist Joseph in seinen Bilddateien – daraus wird der Maßstab berechnet.
 // Regeln für eigene PNGs (Stehen und Laufen): gleicher Maßstab in allen Bildern, die Füße
 // berühren den unteren Bildrand, die Figur steht waagerecht in der Mitte, Hintergrund transparent.
-const SPRITE_HEIGHT = 720;
+export const SPRITE_HEIGHT = 720;
 
 const DIRECTIONS = ['front', 'back', 'left', 'right'];
 
