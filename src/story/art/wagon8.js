@@ -194,44 +194,112 @@ function filmScrap(c, x, y, length) {
 // Ein Filmbild-Schnipsel: Filmstreifen mit Perforation, darin das Bild
 export function drawFrame(ctx, token, x, y) {
   const frame = FRAMES.find((f) => f.id === token.id);
+  const index = FRAMES.indexOf(frame);
   ctx.save();
   ctx.translate(x - 120, y - 75);
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-  ctx.fillRect(4, 6, 240, 150);
-  ctx.drawImage(cached('w8-strip', 240, 150, paintStrip), 0, 0);
-  drawFrameScene(ctx, 8, 16, 224, 118, frame.step);
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(8.5, 16.5, 223, 117);
+  ctx.drawImage(cached(`w8-strip-${index % 4}`, 264, 174, (c) => paintStrip(c, index % 4)), -12, -10);
+  drawFrameScene(ctx, IMAGE.x, IMAGE.y, IMAGE.w, IMAGE.h, frame.step);
+  ctx.drawImage(cached('w8-strip-gloss', 240, 150, paintStripGloss), 0, 0);
   ctx.restore();
 }
 
-function paintStrip(c) {
+const IMAGE = { x: 14, y: 22, w: 212, h: 106 }; // Bildfeld im Filmstreifen (240 × 150)
+
+// Ein Stück 35-mm-Film auf dem Leuchttisch: bernsteinfarbene Unterlage, durchleuchtete Perforation,
+// Randaufdruck, an den Enden mit der Schere abgeschnitten. Mit weichem Schatten (Rand 12/10 px).
+function paintStrip(c, variant) {
+  const r = seeded(40 + variant);
+  c.translate(12, 10);
+  // Schnittkanten links und rechts leicht schief
+  const cutL = [r() * 3, r() * 3], cutR = [240 - r() * 3, 240 - r() * 3];
+  const outline = () => {
+    c.beginPath();
+    c.moveTo(cutL[0], 0);
+    c.lineTo(cutR[0], 0);
+    c.lineTo(cutR[1], 150);
+    c.lineTo(cutL[1], 150);
+    c.closePath();
+  };
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  c.shadowBlur = 10;
+  c.shadowOffsetX = 3;
+  c.shadowOffsetY = 5;
+  outline();
+  c.fillStyle = '#2b1c10';
+  c.fill();
+  c.restore();
+  c.save();
+  outline();
+  c.clip();
+  // Unterlage: dunkles Bernstein, zur Mitte etwas heller (Licht von unten)
   const base = c.createLinearGradient(0, 0, 0, 150);
-  base.addColorStop(0, '#2a241d');
-  base.addColorStop(0.5, '#1a1612');
-  base.addColorStop(1, '#2a241d');
+  base.addColorStop(0, '#3a2512');
+  base.addColorStop(0.5, '#24170c');
+  base.addColorStop(1, '#3a2512');
   c.fillStyle = base;
   c.fillRect(0, 0, 240, 150);
-  // Perforation mit runden Ecken
-  for (let k = 6; k < 236; k += 18) {
-    for (const py of [3, 137]) {
-      c.fillStyle = '#d9d2c0';
-      roundedRect(c, k, py, 10, 9, 2);
+  grain(c, 0, 0, 240, 150, { seed: 70 + variant, count: 0.03, dark: 0.15, light: 0.05, size: 1 });
+  // Perforation: Licht vom Leuchttisch scheint durch
+  for (let k = 4; k < 240; k += 16) {
+    for (const py of [4, 136]) {
+      const hole = c.createLinearGradient(0, py, 0, py + 10);
+      hole.addColorStop(0, '#d8cfb8');
+      hole.addColorStop(0.3, '#f7f1e2');
+      hole.addColorStop(1, '#e8dfc8');
+      c.fillStyle = hole;
+      roundedRect(c, k, py, 9, 10, 2.2);
       c.fill();
-      c.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      c.strokeStyle = 'rgba(10, 5, 0, 0.6)';
       c.lineWidth = 1;
       c.stroke();
     }
   }
-  // Randaufdruck (verrät nichts über die Reihenfolge)
-  text(c, 'SICHERHEITSFILM ▸ RINGBAHN', 120, 148, { font: `bold 6px ${PRINT}`, color: 'rgba(230, 180, 90, 0.55)', align: 'center' });
-  // Glanzlicht
+  // Randaufdruck in Orange zwischen Perforation und Bild (verrät nichts über die Reihenfolge)
+  c.font = `bold 5.5px ${PRINT}`;
+  c.fillStyle = 'rgba(240, 150, 60, 0.8)';
+  c.textAlign = 'left';
+  c.textBaseline = 'alphabetic';
+  c.fillText('RINGBAHN  SICHERHEITSFILM', 16, 20);
+  c.fillText('▸ 24', 200, 20);
+  c.fillText('◂', 18, 135);
+  c.fillText('ZUG 24  ·  KAMERA AUSSEN', 120, 135);
+  // Bildfenster: dunkler Rahmen mit runden Ecken
+  c.fillStyle = '#0d0804';
+  roundedRect(c, IMAGE.x - 2, IMAGE.y - 2, IMAGE.w + 4, IMAGE.h + 4, 4);
+  c.fill();
+  // Kratzer auf der Unterlage
+  c.strokeStyle = 'rgba(255, 230, 190, 0.08)';
+  c.lineWidth = 0.7;
+  for (let i = 0; i < 3; i++) {
+    const sx = r() * 240;
+    line(c, sx, 0, sx + (r() - 0.5) * 10, 150);
+  }
+  c.restore();
+  // Schnittkanten etwas heller
+  c.strokeStyle = 'rgba(255, 210, 150, 0.25)';
+  c.lineWidth = 1;
+  line(c, cutL[0], 0, cutL[1], 150);
+  line(c, cutR[0], 0, cutR[1], 150);
+}
+
+// Glanz und Bildrand über dem Bild (der Film liegt glänzend auf dem Glas)
+function paintStripGloss(c) {
+  c.save();
+  roundedRect(c, IMAGE.x, IMAGE.y, IMAGE.w, IMAGE.h, 3);
+  c.clip();
+  c.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+  c.lineWidth = 3;
+  roundedRect(c, IMAGE.x, IMAGE.y, IMAGE.w, IMAGE.h, 3);
+  c.stroke();
+  c.restore();
   const shine = c.createLinearGradient(0, 0, 240, 150);
-  shine.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
-  shine.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+  shine.addColorStop(0, 'rgba(255, 255, 255, 0.0)');
+  shine.addColorStop(0.35, 'rgba(255, 255, 255, 0.0)');
+  shine.addColorStop(0.42, 'rgba(255, 255, 255, 0.10)');
+  shine.addColorStop(0.5, 'rgba(255, 255, 255, 0.0)');
   c.fillStyle = shine;
-  c.fillRect(0, 0, 240, 150);
+  c.fillRect(2, 0, 236, 150);
 }
 
 // Ein Filmbild: step 0 … 7 (Mond von links nach rechts, step 7: Tunnel). Wird je Größe und Bild
@@ -417,13 +485,19 @@ function paintFrameScene(c, step) {
 
 function drawTrain(c, x, rail, step) {
   const dark = '#0c0d12';
-  // Rauchfahne
-  for (let i = 0; i < 7; i++) {
-    const px = x + 120 - i * 14, py = rail - 34 - i * 2.4 - Math.sin(i + step) * 1.5, pr = 4 + i * 1.6;
-    c.fillStyle = `rgba(190, 195, 210, ${0.3 - i * 0.035})`;
-    c.beginPath();
-    c.arc(px, py, pr, 0, Math.PI * 2);
-    c.fill();
+  // Rauchfahne: weiche Wolken aus dem Schornstein, nach hinten verweht
+  const chimney = { x: x + 126, y: rail - 24 };
+  for (let i = 11; i >= 0; i--) {
+    const t = i / 11;
+    const px = chimney.x - t * 120 - Math.sin(i * 1.7 + step) * 2;
+    const py = chimney.y - 4 - Math.sqrt(t) * 16 - Math.sin(i * 2.3 + step * 0.7) * 2;
+    const pr = 3 + t * 13;
+    const puff = c.createRadialGradient(px - pr * 0.3, py - pr * 0.3, 0.5, px, py, pr);
+    puff.addColorStop(0, `rgba(215, 220, 232, ${0.5 - t * 0.38})`);
+    puff.addColorStop(0.6, `rgba(170, 178, 196, ${0.32 - t * 0.24})`);
+    puff.addColorStop(1, 'rgba(150, 160, 180, 0)');
+    c.fillStyle = puff;
+    c.fillRect(px - pr, py - pr, pr * 2, pr * 2);
   }
   // drei Wagen
   for (let k = 0; k < 3; k++) {

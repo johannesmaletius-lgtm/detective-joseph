@@ -277,43 +277,104 @@ function drawTable(c, cx, cy, index) {
   text(c, String(index + 1), cx - 78, cy - 30, { font: `bold ${BRUNO_FONT(18)}`, color: BRUNO, align: 'center' });
 }
 
-// Ein Namenskärtchen als kleiner Tischaufsteller mit Goldrand und Stechpalme
+// Ein Namenskärtchen als kleiner Tischaufsteller (120 × 44): oben die geknickte Rückseite,
+// vorn Goldrand mit Eckverzierung, Stechpalmenzweig und der Name in Schönschrift
 export function drawNameCard(ctx, token, x, y) {
+  const image = cached(`w4-name-${token.label}`, 150, 76, (c) => paintNameCard(c, token.label));
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(40, 25, 10, 0.35)';
-  ctx.fillRect(-57, -17, 120, 44);
-  const paper = ctx.createLinearGradient(0, -22, 0, 22);
-  paper.addColorStop(0, '#fffdf6');
-  paper.addColorStop(0.7, '#f4ecd8');
-  paper.addColorStop(1, '#ddd0b0');
-  ctx.fillStyle = paper;
-  ctx.fillRect(-60, -22, 120, 44);
-  // Knick (unten sieht man die Rückseite)
-  ctx.fillStyle = 'rgba(150, 120, 70, 0.25)';
-  ctx.fillRect(-60, 14, 120, 8);
-  ctx.strokeStyle = 'rgba(150, 120, 70, 0.6)';
-  ctx.lineWidth = 1;
-  line(ctx, -60, 14, 60, 14);
-  ctx.strokeStyle = '#c29a45';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(-56, -18, 112, 30);
-  ctx.lineWidth = 0.7;
-  ctx.strokeRect(-53, -15, 106, 24);
-  // Stechpalme in der Ecke
-  ctx.fillStyle = '#2f6a3a';
-  for (const a of [-0.6, 0.5]) {
-    ctx.beginPath();
-    ctx.ellipse(-48 + Math.cos(a) * 5, -12 + Math.sin(a) * 4, 6, 2.6, a, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.fillStyle = '#c0302a';
-  ctx.beginPath();
-  ctx.arc(-46, -11, 2.2, 0, Math.PI * 2);
-  ctx.fill();
-  const size = token.label.length > 12 ? 15 : 20;
-  text(ctx, token.label, 2, 4, { font: `${size}px ${HAND}`, color: '#2a1d10', align: 'center' });
+  ctx.rotate(((token.label.length * 37) % 7 - 3) * 0.004);
+  ctx.drawImage(image, -75, -36);
   ctx.restore();
+}
+
+function paintNameCard(c, label) {
+  c.translate(75, 36); // Mitte des Kärtchens
+  // weicher Schatten auf dem Tischtuch
+  c.save();
+  c.shadowColor = 'rgba(70, 45, 20, 0.45)';
+  c.shadowBlur = 9;
+  c.shadowOffsetX = 2;
+  c.shadowOffsetY = 6;
+  c.fillStyle = '#efe6d0';
+  c.fillRect(-60, -22, 120, 44);
+  c.restore();
+  // Rückseite (oben, hinter dem Knick) – etwas dunkler, schmaler Streifen
+  const back = c.createLinearGradient(0, -22, 0, -15);
+  back.addColorStop(0, '#d9ccab');
+  back.addColorStop(1, '#efe5cc');
+  c.fillStyle = back;
+  c.fillRect(-60, -22, 120, 7);
+  // Knickkante mit Lichtkante
+  c.fillStyle = 'rgba(255, 255, 255, 0.9)';
+  c.fillRect(-60, -15, 120, 1.2);
+  c.fillStyle = 'rgba(120, 95, 50, 0.35)';
+  c.fillRect(-60, -13.8, 120, 0.8);
+  // Vorderseite: Büttenpapier, unten leicht im Schatten
+  const front = c.createLinearGradient(0, -14, 0, 22);
+  front.addColorStop(0, '#fffcf3');
+  front.addColorStop(0.75, '#f7f0de');
+  front.addColorStop(1, '#e8dcbd');
+  c.fillStyle = front;
+  c.fillRect(-60, -13, 120, 35);
+  grain(c, -60, -13, 120, 35, { seed: label.length * 13, count: 0.08, dark: 0.05, light: 0.2, size: 0.9 });
+  // Goldrand, doppelt, mit Eckpunkten
+  const gold = c.createLinearGradient(-60, -13, 60, 22);
+  gold.addColorStop(0, '#e9cf86');
+  gold.addColorStop(0.5, '#b88d36');
+  gold.addColorStop(1, '#e3c174');
+  c.strokeStyle = gold;
+  c.lineWidth = 1.6;
+  c.strokeRect(-56, -10, 112, 28);
+  c.lineWidth = 0.6;
+  c.strokeRect(-53.5, -7.5, 107, 23);
+  c.fillStyle = gold;
+  for (const [cx, cy] of [[-56, -10], [56, -10], [-56, 18], [56, 18]]) {
+    c.beginPath();
+    c.moveTo(cx, cy - 3);
+    c.lineTo(cx + 3, cy);
+    c.lineTo(cx, cy + 3);
+    c.lineTo(cx - 3, cy);
+    c.closePath();
+    c.fill();
+  }
+  // Stechpalme: zwei gezackte Blätter und drei Beeren, links oben über dem Rand
+  const leaf = (lx, ly, angle) => {
+    c.save();
+    c.translate(lx, ly);
+    c.rotate(angle);
+    const g = c.createLinearGradient(0, -3, 0, 3);
+    g.addColorStop(0, '#4f8a4a');
+    g.addColorStop(1, '#24502a');
+    c.fillStyle = g;
+    c.beginPath();
+    c.moveTo(0, 0);
+    for (const [px, py] of [[2.5, -2.4], [4.5, -1.6], [6.5, -3], [8.5, -1.8], [10.5, -2.6], [12, 0], [10.5, 2.6], [8.5, 1.8], [6.5, 3], [4.5, 1.6], [2.5, 2.4]]) c.lineTo(px, py);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = 'rgba(200, 230, 180, 0.6)';
+    c.lineWidth = 0.5;
+    line(c, 1, 0, 11, 0);
+    c.restore();
+  };
+  leaf(-50, -9, -2.6);
+  leaf(-50, -9, 0.35);
+  for (const [bx, by] of [[-50, -9], [-47, -11], [-47.5, -7]]) {
+    const berry = c.createRadialGradient(bx - 0.6, by - 0.6, 0.2, bx, by, 2.2);
+    berry.addColorStop(0, '#ff8a7a');
+    berry.addColorStop(1, '#a3161a');
+    c.fillStyle = berry;
+    c.beginPath();
+    c.arc(bx, by, 2.1, 0, Math.PI * 2);
+    c.fill();
+  }
+  // Name, mit Tinte geschrieben (leicht gesetzt, damit er auf dem Papier „sitzt“)
+  const size = label.length > 12 ? 15 : 20;
+  c.font = `${size}px ${HAND}`;
+  let fit = size;
+  while (c.measureText(label).width > 92 && fit > 11) c.font = `${--fit}px ${HAND}`;
+  text(c, label, 3, 10, { font: `${fit}px ${HAND}`, color: 'rgba(255, 255, 255, 0.6)', align: 'center' });
+  text(c, label, 3, 9, { font: `${fit}px ${HAND}`, color: '#2a1a0c', align: 'center' });
 }
 
 // ---------------------------------------------------------------- Tablett mit Gläsern
