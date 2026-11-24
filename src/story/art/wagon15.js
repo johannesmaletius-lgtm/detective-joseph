@@ -23,9 +23,12 @@ export const MINI_TOKENS = START.map((wagon, slot) => ({ id: `mini${wagon}`, wag
 
 export function drawRailwayTable(ctx) {
   drawPicture(ctx, 'assets/closeups/modellbahn.webp', 0, 0, 1280, 720);
-  ctx.fillStyle = 'rgba(20, 12, 6, 0.7)';
-  ctx.fillRect(300, 692, 680, 26);
-  text(ctx, 'Hinter der Lok der erste Wagen. „Papa hat sie immer richtig hingestellt.“', 640, 711, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  // Hinweis in der freien Wiese zwischen den Gleisen (ganz unten steht die Hilfezeile der Ansicht)
+  ctx.fillStyle = 'rgba(20, 12, 6, 0.62)';
+  ctx.beginPath();
+  ctx.roundRect(330, 352, 620, 34, 8);
+  ctx.fill();
+  text(ctx, 'Hinter der Lok der erste Wagen. „Papa hat sie immer richtig hingestellt.“', 640, 375, { font: `17px ${PRINT}`, color: '#f0e2bc', align: 'center' });
 }
 
 export function drawMini(ctx, token, x, y) {

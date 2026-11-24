@@ -53,9 +53,7 @@ export function drawClockWall(ctx, { progress, age }) {
     }
     hands(ctx, cx, cy, r, hour, minute, second);
   }
-  ctx.fillStyle = 'rgba(20, 10, 4, 0.7)';
-  ctx.fillRect(420, 690, 440, 26);
-  text(ctx, 'Herrn Ticks Uhren. Welche geht mit dem Mond?', 640, 709, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+  // Die Frage („Welche geht mit dem Mond?“) steht in der Hilfezeile ganz unten – sonst lägen zwei Zeilen übereinander.
 }
 
 function ticks(ctx, cx, cy, r, color = INK) {

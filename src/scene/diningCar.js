@@ -56,7 +56,7 @@ export const diningCar = {
   ],
 
   train: train({ squealEvery: [12, 26] }),
-  playerStart: { x: 640, y: 640, facing: 'back' },
+  playerStart: { x: 740, y: 640, facing: 'back' }, // rechts neben Bruno, nicht vor ihm
   perspective: perspective(),
 
   walkArea: {

@@ -187,7 +187,7 @@ async function readList(story, withStencil) {
     },
   });
   if (!withStencil && !f.listRead) {
-    await story.say('Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …');
+    await story.say(f.miraTold ? 'Buchstabensalat. „Mit Sternen gucken“, hat Mira gesagt …' : 'Buchstabensalat. Daraus werde ich nicht schlau.');
   }
 }
 
