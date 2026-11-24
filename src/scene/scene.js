@@ -6,6 +6,7 @@ import { WalkArea } from '../navigation/walkArea.js';
 import { pointInPolygon } from '../navigation/geometry.js';
 import { TrainMotion } from '../effects/trainMotion.js';
 import { Darkness } from '../effects/darkness.js';
+import { Ambience } from '../effects/ambience.js';
 import { paintCanvas } from '../core/paint.js';
 import { OutsideView } from './outsideView.js';
 import { Character } from './character.js';
@@ -29,6 +30,20 @@ const CLICK_MARKER_DURATION = 0.45; // Sekunden
 // jedem Bild neu gemalt (z. B. eine schlafende Dame, die atmet). Weitere Angaben für props:
 // - depth: y        steht auf dem Boden bei y: Ist Joseph weiter hinten (kleineres y), wird es VOR ihm gezeichnet
 // - light: { x, y, radius } oder (scene) => …   leuchtet und bleibt im Dunkeln sichtbar
+//
+// Vordergrund: Möbel, die im Bild weiter vorne stehen (Sitze, Tische, Kisten …), sind als ausgeschnittene
+// Stücke des Hintergrundbilds in assets/scenes/vordergrund.json eingetragen (erzeugt von
+// tools/cut-foreground.py). Jedes Stück hat eine Bodenhöhe (depth, bei schräg stehenden Möbeln eine Linie):
+// Stehen die Füße einer Figur weiter hinten (kleineres y), wird das Stück über die Figur gelegt. Das Stück wird dabei nicht neu gemalt,
+// sondern Pixel für Pixel aus dem schon gezeichneten Bild kopiert (das ausgeschnittene Bild dient nur
+// als Schablone) – so gibt es keine Kanten, und was dort gerade liegt (Requisiten, Lichtschein), bleibt.
+const FOREGROUND = 'assets/scenes/vordergrund.json';
+let foregroundList = null;
+function loadForegroundList() {
+  foregroundList ??= fetch(FOREGROUND).then((response) => (response.ok ? response.json() : {})).catch(() => ({}));
+  return foregroundList;
+}
+
 export class Scene {
   constructor(data) {
     this.data = data;
@@ -38,8 +53,11 @@ export class Scene {
       ? new TrainMotion(data.train, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches })
       : null;
     this.darkness = new Darkness();
+    // kleine Effekte: Schnee hinter den Fenstern, Kerzen, Dampf, Staub … (siehe src/effects/ambience.js)
+    this.ambience = new Ambience(data.ambience, { windows: data.outside?.windows ?? [] });
     this.hotspots = (data.hotspots ?? []).map((hotspot) => ({ ...hotspot, area: hotspot.area.map(([x, y]) => ({ x, y })) }));
     this.props = [];      // kleine Bilder im Raum, z. B. der Brief im Schlitz
+    this.foreground = []; // Möbel vorne im Bild, hinter denen Figuren vorbeilaufen (siehe oben)
     this.animations = []; // animierte Stellen im Bild, z. B. der Bildschirm
     this.characters = (data.characters ?? []).map((character) => new Character(character)); // andere Figuren
     this.background = null;
@@ -52,15 +70,24 @@ export class Scene {
   async load() {
     const spots = this.data.animations ?? [];
     const { background: bg } = this.data;
-    const [background, players, props] = await Promise.all([
+    const [background, players, props, foreground] = await Promise.all([
       bg.paint ? paintCanvas(bg.width, bg.height, bg.paint) : loadImage(bg.src),
       Promise.all(spots.map(async (spot) => (spot.animation ? new AnimationPlayer(await loadAnimation(spot.animation)) : null))),
       Promise.all((this.data.props ?? []).map(async (prop) => ({ ...prop, picture: prop.image ? await loadImage(prop.image) : null }))),
+      bg.src ? loadForegroundList().then((list) => Promise.all((list[bg.src] ?? []).map(async (piece) => ({ ...piece, mask: await loadImage(piece.image) })))) : [],
       this.outside?.load(),
       ...this.characters.map((character) => character.load()),
     ]);
     this.background = background;
     this.props = props;
+    // Stücke in Spielkoordinaten umrechnen (im Bild: Pixel des Hintergrundbilds)
+    const zoomX = bg.width / background.width, zoomY = bg.height / background.height;
+    this.foreground = foreground.map((piece) => ({
+      ...piece,
+      x: bg.x + piece.x * zoomX, y: bg.y + piece.y * zoomY,
+      width: piece.width * zoomX, height: piece.height * zoomY,
+      canvas: document.createElement('canvas'),
+    }));
     this.animations = spots.map((spot, i) => ({ ...spot, player: players[i], off: false }));
   }
 
@@ -172,6 +199,7 @@ export class Scene {
     this.outside?.update(dt, this.motion);
     for (const spot of this.animations) spot.player?.update(dt);
     for (const character of this.characters) character.update(dt);
+    this.ambience.update(dt, this);
 
     if (this.clickMarker) {
       this.clickMarker.age += dt;
@@ -183,19 +211,20 @@ export class Scene {
   draw(ctx, player) {
     // 1) alles, was nur durch die durchsichtigen Stellen des Hintergrunds zu sehen ist
     this.outside?.draw(ctx);
+    this.ambience.drawBehind(ctx, this);
     this.drawAnimations(ctx, 'behind');
 
     // 2) das Hintergrundbild
     this.drawBackground(ctx);
 
-    // 3) Dinge davor: kleine Bilder, Animationen, Lichtschein, Klick-Markierung, Joseph –
-    //    und was vorne auf dem Boden steht, vor Joseph
-    this.drawProps(ctx, (prop) => !this.inFront(prop, player));
+    // 3) Dinge davor: kleine Bilder, Animationen, Lichtschein, Klick-Markierung, Joseph und die Figuren –
+    //    dazwischen, nach Bodenhöhe sortiert, was vorne auf dem Boden steht (Möbel, Bilder mit depth)
+    this.drawProps(ctx, (prop) => prop.depth === undefined);
     this.drawAnimations(ctx, 'front');
     this.drawGlows(ctx);
+    this.ambience.draw(ctx, this);
     this.drawClickMarker(ctx);
-    this.drawFigures(ctx, player);
-    this.drawProps(ctx, (prop) => this.inFront(prop, player));
+    this.drawInDepth(ctx, player);
 
     // 4) Licht und Flackern liegen über allem – auch über Joseph
     this.outside?.drawLight(ctx);
@@ -246,25 +275,80 @@ export class Scene {
 
   // Joseph und die anderen Figuren – wer weiter vorne steht (größeres y), wird später gezeichnet
   drawFigures(ctx, player) {
-    const figures = [player, ...this.characters.filter((character) => this.isActive(character))];
-    figures.sort((a, b) => a.y - b.y);
-    for (const figure of figures) figure.draw(ctx, this);
+    for (const figure of this.figures(player)) figure.draw(ctx, this);
   }
 
-  // Steht ein kleines Bild vor Joseph? (nur Dinge mit depth = Bodenhöhe)
-  inFront(prop, player) {
-    return prop.depth !== undefined && prop.depth > player.y;
+  figures(player) {
+    return [player, ...this.characters.filter((character) => this.isActive(character))].sort((a, b) => a.y - b.y);
+  }
+
+  // Figuren, Bilder mit Bodenhöhe (depth) und Vordergrund-Möbel, von hinten nach vorne.
+  // Bei gleicher Höhe steht die Figur vorne. Ein Möbelstück kommt direkt nach der vordersten Figur,
+  // die hinter ihm steht (bei schräg stehenden Möbeln hängt das davon ab, wo die Figur steht).
+  drawInDepth(ctx, player) {
+    const figures = this.figures(player);
+    const order = figures.map((figure) => ({ y: figure.y, rank: 1, draw: () => figure.draw(ctx, this) }));
+    for (const prop of this.props) {
+      if (prop.depth !== undefined && this.isActive(prop)) order.push({ y: prop.depth, rank: 0, draw: () => this.drawProp(ctx, prop) });
+    }
+    for (const piece of this.foreground) {
+      const behind = figures.filter((figure) => figure.y < Scene.depthAt(piece, figure.x));
+      if (!behind.length || !this.copyPiece(ctx, piece)) continue; // keine Figur dahinter: nichts zu tun
+      order.push({ y: Math.max(...behind.map((figure) => figure.y)), rank: 2, draw: () => this.pastePiece(ctx, piece) });
+    }
+    order.sort((a, b) => a.y - b.y || a.rank - b.rank);
+    for (const item of order) item.draw();
+  }
+
+  // Bodenhöhe eines Möbelstücks an der Stelle x: eine Zahl oder eine schräge Linie [[x1, y1], [x2, y2]]
+  static depthAt(piece, x) {
+    if (typeof piece.depth === 'number') return piece.depth;
+    const [[x1, y1], [x2, y2]] = piece.depth;
+    return y1 + ((x - x1) * (y2 - y1)) / (x2 - x1);
+  }
+
+  // Merkt sich, wie das Möbelstück gerade im Bild aussieht (genau die Pixel, ausgeschnitten mit der Schablone)
+  copyPiece(ctx, piece) {
+    const m = ctx.getTransform();
+    const { width: cw, height: ch } = ctx.canvas;
+    const x0 = Math.max(0, Math.floor(m.a * piece.x + m.e)), y0 = Math.max(0, Math.floor(m.d * piece.y + m.f));
+    const x1 = Math.min(cw, Math.ceil(m.a * (piece.x + piece.width) + m.e)), y1 = Math.min(ch, Math.ceil(m.d * (piece.y + piece.height) + m.f));
+    if (x1 <= x0 || y1 <= y0) return false;
+    const { canvas } = piece;
+    if (canvas.width !== x1 - x0 || canvas.height !== y1 - y0) {
+      canvas.width = x1 - x0;
+      canvas.height = y1 - y0;
+    }
+    const copy = canvas.getContext('2d');
+    copy.setTransform(1, 0, 0, 1, 0, 0);
+    copy.globalCompositeOperation = 'copy';
+    copy.drawImage(ctx.canvas, x0, y0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+    copy.globalCompositeOperation = 'destination-in';
+    copy.setTransform(m.a, m.b, m.c, m.d, m.e - x0, m.f - y0);
+    copy.drawImage(piece.mask, piece.x, piece.y, piece.width, piece.height);
+    piece.at = { x: x0, y: y0 };
+    return true;
+  }
+
+  pastePiece(ctx, piece) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(piece.canvas, piece.at.x, piece.at.y);
+    ctx.restore();
   }
 
   drawProps(ctx, filter = () => true) {
     for (const prop of this.props) {
-      if (!this.isActive(prop) || !filter(prop)) continue;
-      ctx.save();
-      if (prop.inDark) ctx.globalAlpha = this.darkLevel;
-      if (prop.paint) prop.paint(ctx, this);
-      else ctx.drawImage(prop.picture, prop.x, prop.y, prop.width, prop.height);
-      ctx.restore();
+      if (this.isActive(prop) && filter(prop)) this.drawProp(ctx, prop);
     }
+  }
+
+  drawProp(ctx, prop) {
+    ctx.save();
+    if (prop.inDark) ctx.globalAlpha = this.darkLevel;
+    if (prop.paint) prop.paint(ctx, this);
+    else ctx.drawImage(prop.picture, prop.x, prop.y, prop.width, prop.height);
+    ctx.restore();
   }
 
   drawAnimations(ctx, layer) {
@@ -310,6 +394,7 @@ export class Scene {
       const light = typeof prop.light === 'function' ? prop.light(this) : prop.light;
       if (light) spots.push(...[].concat(light));
     }
+    spots.push(...this.ambience.lights(this)); // Kerzen brennen weiter
     return spots;
   }
 

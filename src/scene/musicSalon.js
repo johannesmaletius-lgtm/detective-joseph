@@ -43,6 +43,20 @@ export const musicSalon = {
     ...windowSpots(WINDOWS),
   ],
 
+  // Kronleuchter (Kerzen, brennt auch im Tunnel weiter) und Tischlampe flackern leise, Staub schwebt im Licht (src/effects/ambience.js)
+  ambience: [
+    { kind: 'glow', x: 640, y: 52, radius: 120, color: '255, 205, 130', strength: 0.14, flicker: 'lamp', burns: true, lightRadius: 200 },
+    { kind: 'glow', x: 584, y: 38, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 595, y: 31, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 617, y: 25, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 663, y: 25, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 685, y: 31, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 696, y: 38, radius: 14, color: '255, 225, 160', strength: 0.5, flicker: 'candle', burns: true },
+    { kind: 'glow', x: 222, y: 232, radius: 70, color: '255, 200, 120', strength: 0.18, flicker: 'candle' },
+    { kind: 'dust', x: 560, y: 70, width: 160, height: 160, count: 16 },
+    { kind: 'dust', x: 180, y: 255, width: 90, height: 60, count: 6 },
+  ],
+
   train: train(),
   playerStart: { x: 640, y: 650, facing: 'back' },
   perspective: perspective(),

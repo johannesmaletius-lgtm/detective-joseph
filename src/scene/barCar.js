@@ -1,4 +1,4 @@
-import { background, outside, perspective, train } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 7: der Barwagen. Nur DATEN – was passiert, steht in src/story/wagon7.js.
 // Herr K. steht am hinteren Tisch, der Barkeeper hinter dem Tresen (unterhalb der Tresenkante
@@ -27,6 +27,14 @@ export const barCar = {
       x: 1050, y: 476, pose: 'front', size: 1.02, clipBottom: 324,
       walkTo: [780, 560], facing: 'right', color: '#f0c9a0', idle: ['blink', 'busy'],
     },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 990, y: 118, radius: 50, color: '255, 200, 120', strength: 0.16, flicker: 'lamp' },
+    { kind: 'glow', x: 1120, y: 98, radius: 50, color: '255, 200, 120', strength: 0.16, flicker: 'lamp' },
+    { kind: 'glow', x: 130, y: 398, radius: 45, color: '255, 180, 90', strength: 0.22, flicker: 'candle', burns: true },
   ],
 
   hotspots: [

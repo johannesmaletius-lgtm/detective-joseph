@@ -45,3 +45,9 @@ export function box(x0, y0, x1, y1) {
 export function windowSpots(windows, name = 'Fenster') {
   return windows.map((w) => ({ id: 'window', name, cursor: 'look', area: box(w.from, w.top, w.to, w.bottom) }));
 }
+
+// Staub, der im Licht der Deckenlampe über der Tür schwebt (src/effects/ambience.js) – alle Wagen
+// haben die Lampe an derselben Stelle. dy verschiebt den Lichtkegel nach unten.
+export function lampDust({ dy = 0, count = 12 } = {}) {
+  return { kind: 'dust', x: 578, y: 84 + dy, width: 124, height: 140, count };
+}

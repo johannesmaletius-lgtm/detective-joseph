@@ -55,6 +55,19 @@ export const diningCar = {
     { id: 'window', name: 'Fenster', cursor: 'look', area: [[1138, 106], [1240, 106], [1240, 304], [1138, 304]] },
   ],
 
+  // Kerzen auf den sechs Tischen, Dampf aus dem Topf in der Küche, Staub unter der Lampe (src/effects/ambience.js)
+  ambience: [
+    { kind: 'flame', x: 314, y: 301, size: 17 },
+    { kind: 'flame', x: 252, y: 355, size: 20 },
+    { kind: 'flame', x: 103, y: 436, size: 30 },
+    { kind: 'flame', x: 954, y: 302, size: 17 },
+    { kind: 'flame', x: 1024, y: 355, size: 20 },
+    { kind: 'flame', x: 1174, y: 436, size: 30 },
+    { kind: 'glow', x: 418, y: 186, radius: 46, color: '255, 190, 110', strength: 0.22, flicker: 'candle' },
+    { kind: 'steam', x: 402, y: 236, size: 12, drift: [4, -18], every: 0.6 },
+    { kind: 'dust', x: 585, y: 72, width: 110, height: 150, count: 14 },
+  ],
+
   train: train({ squealEvery: [12, 26] }),
   playerStart: { x: 740, y: 640, facing: 'back' }, // rechts neben Bruno, nicht vor ihm
   perspective: perspective(),

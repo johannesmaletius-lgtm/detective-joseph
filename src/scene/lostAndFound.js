@@ -1,4 +1,4 @@
-import { background, outside, perspective, train } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 6: das Fundbüro. Nur DATEN – was passiert, steht in src/story/wagon6.js.
 // Ein Tresen trennt den Raum: Die Tür nach vorne liegt dahinter, die Klappe im Tresen ist mit
@@ -15,6 +15,11 @@ export const lostAndFound = {
   ]),
 
   props: [],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+  ],
 
   hotspots: [
     { id: 'bell', name: 'Tischglocke', area: [[460, 322], [534, 322], [534, 388], [460, 388]], walkTo: [500, 560], facing: 'back' },

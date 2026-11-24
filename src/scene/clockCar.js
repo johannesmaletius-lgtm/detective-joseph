@@ -28,6 +28,19 @@ export const clockCar = {
     { id: 'pendulum', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
   ],
 
+  // Sekundenzeiger an einigen Wanduhren (eine läuft rückwärts), Staub im Licht der Werkbanklampe
+  // (src/effects/ambience.js). Standuhr und Kuckucksuhr gehören zum Rätsel und bekommen keine.
+  ambience: [
+    { kind: 'hand', x: 82, y: 51, length: 26 },
+    { kind: 'hand', x: 156, y: 73, length: 15 },
+    { kind: 'hand', x: 517, y: 101, length: 20, speed: -1 },
+    { kind: 'hand', x: 762, y: 120, length: 22 },
+    { kind: 'hand', x: 171, y: 356, length: 17 },
+    { kind: 'hand', x: 439, y: 96, length: 10 },
+    { kind: 'glow', x: 96, y: 392, radius: 60, color: '255, 210, 130', strength: 0.16, flicker: 'lamp' },
+    { kind: 'dust', x: 40, y: 395, width: 130, height: 90, count: 10 },
+  ],
+
   hotspots: [
     { id: 'grandfather', name: 'Standuhr', area: box(196, 10, 352, 440), walkTo: [420, 560], facing: 'left' },
     { id: 'cuckoo', name: 'Kuckucksuhr', area: box(986, 0, 1152, 300), walkTo: [860, 470], facing: 'right' },

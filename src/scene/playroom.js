@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 15: das Spielzimmer mit Mira. Nur DATEN – was passiert, steht in src/story/wagon15.js.
 
@@ -27,6 +27,11 @@ export const playroom = {
 
   animations: [
     { id: 'toys', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
   ],
 
   hotspots: [

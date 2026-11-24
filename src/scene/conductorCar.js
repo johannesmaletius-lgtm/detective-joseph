@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 18 (Tür 18): das Schaffnerabteil (der Schaffner nur als Stimme). Nur DATEN – was passiert,
 // steht in src/story/wagon18.js. Links Schreibtisch mit Dienstbuch und Schubladenschloss,
@@ -16,6 +16,11 @@ export const conductorCar = {
   name: 'Schaffnerabteil',
   background: background('assets/scenes/wagon-18/background.webp'),
   outside: outside(WINDOWS),
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+  ],
 
   hotspots: [
     { id: 'book', name: 'Dienstbuch', area: box(146, 356, 312, 434), walkTo: [420, 600], facing: 'left' },

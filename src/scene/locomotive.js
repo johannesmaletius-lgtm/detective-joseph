@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 22 (Tür 22): der Führerstand der Lok. Nur DATEN – was passiert, steht in src/story/wagon22.js.
 // Links der Fahrtenschreiber und die Luke zum Kohlentender (mit Zahlenschloss), in der Mitte der Kessel,
@@ -27,6 +27,16 @@ export const locomotive = {
       x: 820, y: 620, pose: 'front', size: 1.0, when: 'capOff', idle: ['blink'],
       walkTo: [640, 640], facing: 'right', color: '#e0c8a0',
     },
+  ],
+
+  // Glut in der Feuerbüchse, Funken, Dampf aus den Rohrverbindungen (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 640, y: 385, radius: 170, color: '255, 110, 40', strength: 0.17, flicker: 'fire' },
+    { kind: 'glow', x: 640, y: 385, radius: 85, color: '255, 150, 60', strength: 0.15, flicker: 'fire' },
+    { kind: 'sparks', x: 640, y: 492, width: 170, every: 0.4 },
+    { kind: 'steam', x: 470, y: 118, size: 14, drift: [-8, -22], every: 0.6 },
+    { kind: 'steam', x: 858, y: 100, size: 14, drift: [8, -20], every: 0.75 },
   ],
 
   hotspots: [

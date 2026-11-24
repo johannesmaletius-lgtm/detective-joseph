@@ -1,4 +1,4 @@
-import { background, outside, perspective, train } from './wagonKit.js';
+import { background, outside, perspective, train, lampDust } from './wagonKit.js';
 
 // Wagen 5: der Schlafwagen. Nur DATEN – was passiert, steht in src/story/wagon5.js.
 // Links die Abteile 1–4 (in Abteil 3 schläft Oma Ilse bei offener Tür), rechts die Fenster.
@@ -13,6 +13,13 @@ export const sleepingCar = {
     { from: 992, to: 1072, top: 146, bottom: 342 },
     { from: 1129, to: 1248, top: 108, bottom: 363 },
   ]),
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
+    { kind: 'glow', x: 1058, y: 300, radius: 60, color: '255, 205, 130', strength: 0.18, flicker: 'candle' },
+    { kind: 'dust', x: 1010, y: 290, width: 100, height: 70, count: 6 },
+  ],
 
   hotspots: [
     { id: 'drawer', name: 'Schublade unter Ilses Bett', area: [[330, 452], [426, 452], [426, 536], [330, 536]], walkTo: [452, 560], facing: 'left' },

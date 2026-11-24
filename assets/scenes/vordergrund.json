@@ -1,0 +1,180 @@
+{
+ "assets/scenes/wagon-04/background.webp": [
+  {
+   "name": "tisch-lh",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lh.webp",
+   "x": 310,
+   "y": 402,
+   "width": 199,
+   "height": 189,
+   "depth": 452
+  },
+  {
+   "name": "tisch-lm",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lm.webp",
+   "x": 277,
+   "y": 465,
+   "width": 187,
+   "height": 321,
+   "depth": 614
+  },
+  {
+   "name": "tisch-lv",
+   "image": "assets/scenes/wagon-04/vorne-tisch-lv.webp",
+   "x": 0,
+   "y": 523,
+   "width": 387,
+   "height": 501,
+   "depth": 800
+  },
+  {
+   "name": "tisch-rh",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rh.webp",
+   "x": 1020,
+   "y": 386,
+   "width": 222,
+   "height": 218,
+   "depth": 462
+  },
+  {
+   "name": "tisch-rm",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rm.webp",
+   "x": 1083,
+   "y": 452,
+   "width": 259,
+   "height": 309,
+   "depth": 593
+  },
+  {
+   "name": "tisch-rv",
+   "image": "assets/scenes/wagon-04/vorne-tisch-rv.webp",
+   "x": 1154,
+   "y": 522,
+   "width": 382,
+   "height": 502,
+   "depth": 800
+  }
+ ],
+ "assets/scenes/wagon-02/background.webp": [
+  {
+   "name": "koffer",
+   "image": "assets/scenes/wagon-02/vorne-koffer.webp",
+   "x": 893,
+   "y": 290,
+   "width": 193,
+   "height": 266,
+   "depth": 417
+  }
+ ],
+ "assets/scenes/wagon-03/background.webp": [
+  {
+   "name": "pult",
+   "image": "assets/scenes/wagon-03/vorne-pult.webp",
+   "x": 952,
+   "y": 389,
+   "width": 396,
+   "height": 469,
+   "depth": [
+    [
+     798,
+     533
+    ],
+    [
+     1033,
+     652
+    ]
+   ]
+  }
+ ],
+ "assets/scenes/wagon-05/background.webp": [
+  {
+   "name": "tischchen",
+   "image": "assets/scenes/wagon-05/vorne-tischchen.webp",
+   "x": 1115,
+   "y": 365,
+   "width": 237,
+   "height": 394,
+   "depth": 592
+  }
+ ],
+ "assets/scenes/wagon-07/background.webp": [
+  {
+   "name": "hocker-1",
+   "image": "assets/scenes/wagon-07/vorne-hocker-1.webp",
+   "x": 881,
+   "y": 458,
+   "width": 79,
+   "height": 171,
+   "depth": 477
+  },
+  {
+   "name": "hocker-2",
+   "image": "assets/scenes/wagon-07/vorne-hocker-2.webp",
+   "x": 929,
+   "y": 497,
+   "width": 95,
+   "height": 206,
+   "depth": 543
+  },
+  {
+   "name": "hocker-3",
+   "image": "assets/scenes/wagon-07/vorne-hocker-3.webp",
+   "x": 1000,
+   "y": 543,
+   "width": 122,
+   "height": 265,
+   "depth": 633
+  },
+  {
+   "name": "hocker-4",
+   "image": "assets/scenes/wagon-07/vorne-hocker-4.webp",
+   "x": 1100,
+   "y": 607,
+   "width": 153,
+   "height": 319,
+   "depth": 735
+  }
+ ],
+ "assets/scenes/wagon-10/background.webp": [
+  {
+   "name": "mikrofon",
+   "image": "assets/scenes/wagon-10/vorne-mikrofon.webp",
+   "x": 996,
+   "y": 426,
+   "width": 110,
+   "height": 362,
+   "depth": 600
+  }
+ ],
+ "assets/scenes/wagon-14/background.webp": [
+  {
+   "name": "lesetisch",
+   "image": "assets/scenes/wagon-14/vorne-lesetisch.webp",
+   "x": 1007,
+   "y": 371,
+   "width": 301,
+   "height": 452,
+   "depth": 577
+  },
+  {
+   "name": "sessel",
+   "image": "assets/scenes/wagon-14/vorne-sessel.webp",
+   "x": 1220,
+   "y": 554,
+   "width": 316,
+   "height": 470,
+   "depth": 800
+  }
+ ],
+ "assets/scenes/wagon-21/background.webp": [
+  {
+   "name": "pumpe",
+   "image": "assets/scenes/wagon-21/vorne-pumpe.webp",
+   "x": 471,
+   "y": 424,
+   "width": 183,
+   "height": 334,
+   "depth": 586
+  }
+ ]
+}

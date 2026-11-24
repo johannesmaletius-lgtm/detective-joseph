@@ -1,4 +1,4 @@
-import { background, box, outside, perspective, train, windowSpots } from './wagonKit.js';
+import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 10: der Lautsprecherwagen. Nur DATEN – was passiert, steht in src/story/wagon10.js.
 
@@ -19,6 +19,11 @@ export const speakerCar = {
 
   animations: [
     { id: 'lights', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+  ],
+
+  // kleine Effekte (src/effects/ambience.js)
+  ambience: [
+    lampDust(),
   ],
 
   hotspots: [
