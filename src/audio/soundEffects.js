@@ -435,6 +435,19 @@ const EFFECTS = {
     fx.noise(t + 0.12, { frequency: 4800, q: 3, gain: 0.12, duration: 0.05 });
   },
   // Spielzeugzug
+  // Pfeife der Spielzeuglok: zwei kurze, helle Töne
+  toyWhistle(fx, t) {
+    for (const [start, length] of [[0, 0.22], [0.3, 0.5]]) {
+      fx.tone(t + start, { frequency: 1245, to: 1262, type: 'triangle', gain: 0.045, attack: 0.03, duration: length });
+      fx.tone(t + start, { frequency: 1568, to: 1590, type: 'sine', gain: 0.03, attack: 0.03, duration: length });
+      fx.noise(t + start, { frequency: 3200, q: 1.5, gain: 0.025, attack: 0.03, duration: length });
+    }
+  },
+  // Blechräder über einen Schienenstoß: ta-tack
+  toyClack(fx, t) {
+    fx.noise(t, { frequency: 2400, q: 6, gain: 0.09, duration: 0.025 });
+    fx.noise(t + 0.07, { frequency: 1900, q: 6, gain: 0.07, duration: 0.025 });
+  },
   toyTrain(fx, t) {
     for (let i = 0; i < 10; i++) fx.noise(t + i * 0.12, { frequency: 1600, q: 4, gain: 0.07, duration: 0.03 });
     fx.tone(t + 1.2, { frequency: 1046, type: 'square', gain: 0.03, duration: 0.3 });

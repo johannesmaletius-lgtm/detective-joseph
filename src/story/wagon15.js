@@ -1,6 +1,5 @@
 import {
-  FIGURES, FIGURE_SLOTS, MINI, MINI_SLOTS, MINI_TOKENS, drawDollhouseInside, drawFigure, drawMini, drawMiraDrawing,
-  drawRailwayTable, drawToyGlow, figuresCorrect,
+  FIGURES, FIGURE_SLOTS, MINI, MINI_START, drawDollhouseInside, drawFigure, drawMiraDrawing, drawToyGlow, figuresCorrect,
 } from './art/wagon15.js';
 import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTunnel, wagonIntro } from './wagonCommon.js';
 
@@ -219,14 +218,11 @@ async function railway(story) {
   if (f.trainRan) return story.say('Die Bahn ist in den Tunnel gefahren und dort stehen geblieben.');
   if (!f.ispyDone) return story.speakAs('mira', 'Das ist meine Bahn! Erst spielen wir was.');
   if (inTunnel(story)) return story.say('Im Dunkeln sehe ich die kleinen Zeichen nicht.');
-  const solved = await story.view('arrange', {
-    id: 'railway',
+  // Eigene Nahansicht (src/puzzles/modelRailway.js): Wagen tauschen; richtig → Lichter an, eine Runde, Tunnel
+  const solved = await story.view('railway', {
     title: 'Die Modellbahn',
-    slots: MINI_SLOTS,
-    tokens: MINI_TOKENS.map((token) => ({ id: token.id, label: 'Wagen', w: 120, h: 84, slot: token.slot })),
-    drawBackground: drawRailwayTable,
-    drawToken: drawMini,
-    check: (placement) => placement.every((id, i) => id === `mini${i}`),
+    start: MINI_START,
+    check: (order) => order.every((wagon, slot) => wagon === slot),
     help: 'Wagen mit gedrückter Maustaste auf einen anderen Platz ziehen (sie tauschen)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
@@ -239,7 +235,6 @@ async function railway(story) {
   }
   f.trainRan = true;
   await story.cutscene(async () => {
-    story.sound('toyTrain');
     await story.say('Abteil, Gepäckwagen, Postwagen … Kapelle, Zeitungswagen. Genau mein Weg.');
     await story.speakAs('mira', 'Sie fährt! Sie fährt!');
     await story.wait(1.2);
