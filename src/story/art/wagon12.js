@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, SERIF, glow, line, sheet, smudge, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, cached, glow, line, plank, roundedRect, sheet, smudge, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 12 (Musiksalon): das Notenblatt (mit Bleistiftkreuzen), die Schallplatten,
 // das Klopfen im Takt und die Klaviertasten.
@@ -200,23 +200,186 @@ export function keySpots() {
 }
 
 export function drawKeyboard(ctx, { pressed = null, pressAge = 1, played = [] } = {}) {
-  wood(ctx, 110, 120, 1060, 520, [30, 20, 14]);
+  ctx.drawImage(cached('w12-piano', 1060, 520, paintPianoCase), 110, 120);
+  // Notenzettel auf dem Pult: was schon gespielt ist
+  text(ctx, played.length ? played.join(' – ') : 'Wie endet das Lied?', 640, 196, { font: `26px ${HAND}`, color: '#2b2118', align: 'center' });
+  // weiße Tasten
   WHITE.forEach((name, i) => {
     const x = KEY.x + i * KEY.w;
     const down = pressed === i && pressAge < 0.25;
-    ctx.fillStyle = down ? '#d8d0bc' : '#f6f1e4';
-    ctx.fillRect(x + 2, KEY.y, KEY.w - 4, KEY.h + (down ? 4 : 0));
-    ctx.strokeStyle = '#7d7564';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x + 2, KEY.y, KEY.w - 4, KEY.h);
-    text(ctx, name, x + KEY.w / 2, KEY.y + KEY.h - 18, { font: `bold 20px ${PRINT}`, color: '#6a604e', align: 'center' });
+    ctx.drawImage(cached(`w12-white-${down ? 'down' : 'up'}`, KEY.w, KEY.h + 14, (c) => paintWhiteKey(c, down)), x, KEY.y);
+    text(ctx, name, x + KEY.w / 2, KEY.y + KEY.h - 22 + (down ? 4 : 0), { font: `bold 19px ${SERIF}`, color: 'rgba(90, 78, 58, 0.85)', align: 'center' });
   });
   // schwarze Tasten (nur zur Zierde)
+  const black = cached('w12-black', 50, 200, paintBlackKey);
   WHITE.forEach((name, i) => {
     if (i === WHITE.length - 1 || name === 'E' || name === 'H') return;
-    ctx.fillStyle = '#16110c';
-    ctx.fillRect(KEY.x + (i + 1) * KEY.w - 22, KEY.y, 44, 190);
+    ctx.drawImage(black, KEY.x + (i + 1) * KEY.w - 25, KEY.y - 2);
   });
-  text(ctx, played.length ? played.join(' – ') : 'Wie endet das Lied?', 640, 190, { font: `24px ${HAND}`, color: '#f3e2b4', align: 'center' });
-  glow(ctx, 640, 200, 10, '255, 230, 160', 0);
+  // Schatten der Tastenklappe auf den Tasten
+  const shade = ctx.createLinearGradient(0, KEY.y, 0, KEY.y + 26);
+  shade.addColorStop(0, 'rgba(0, 0, 0, 0.55)');
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = shade;
+  ctx.fillRect(KEY.x, KEY.y, KEY.w * WHITE.length, 26);
+}
+
+// Gehäuse des Klaviers: poliertes Mahagoni, Notenpult mit Notenzettel, rote Filzleiste, Kerzenleuchter
+function paintPianoCase(c) {
+  // Korpus
+  const body = c.createLinearGradient(0, 0, 0, 520);
+  body.addColorStop(0, '#2a120a');
+  body.addColorStop(0.5, '#3d1a0c');
+  body.addColorStop(1, '#1c0b05');
+  c.fillStyle = body;
+  roundedRect(c, 0, 0, 1060, 520, 18);
+  c.fill();
+  plank(c, 14, 14, 1032, 96, { tone: [74, 30, 14], seed: 12, knots: 0 });
+  // Lack-Glanz
+  const gloss = c.createLinearGradient(0, 14, 0, 110);
+  gloss.addColorStop(0, 'rgba(255, 220, 180, 0.22)');
+  gloss.addColorStop(0.3, 'rgba(255, 220, 180, 0.04)');
+  gloss.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+  c.fillStyle = gloss;
+  c.fillRect(14, 14, 1032, 96);
+  // Intarsien-Linie
+  c.strokeStyle = 'rgba(214, 170, 90, 0.55)';
+  c.lineWidth = 1.5;
+  roundedRect(c, 24, 22, 1012, 80, 8);
+  c.stroke();
+  // Notenzettel auf dem Pult
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 10;
+  c.shadowOffsetY = 4;
+  const paper = c.createLinearGradient(0, 30, 0, 98);
+  paper.addColorStop(0, '#f6eed8');
+  paper.addColorStop(1, '#e1d2ac');
+  c.fillStyle = paper;
+  c.translate(530, 64);
+  c.rotate(-0.01);
+  c.fillRect(-230, -38, 460, 74);
+  c.restore();
+  c.strokeStyle = 'rgba(43, 33, 24, 0.22)';
+  c.lineWidth = 1;
+  for (let k = 0; k < 5; k++) line(c, 316, 34 + k * 4, 744, 34 + k * 4);
+  for (let k = 0; k < 5; k++) line(c, 316, 82 + k * 4, 744, 82 + k * 4);
+  // Messing-Leuchter links und rechts mit Kerzenschein
+  for (const x of [130, 930]) {
+    const g = c.createRadialGradient(x, 40, 2, x, 50, 110);
+    g.addColorStop(0, 'rgba(255, 210, 130, 0.5)');
+    g.addColorStop(1, 'rgba(255, 210, 130, 0)');
+    c.fillStyle = g;
+    c.fillRect(x - 110, 0, 220, 130);
+    const brass = c.createLinearGradient(x - 20, 0, x + 20, 0);
+    brass.addColorStop(0, '#7a5418');
+    brass.addColorStop(0.5, '#f0d488');
+    brass.addColorStop(1, '#7a5418');
+    c.fillStyle = brass;
+    c.beginPath();
+    c.ellipse(x, 92, 26, 7, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillRect(x - 4, 60, 8, 32);
+    c.fillStyle = '#f3ead4';
+    c.fillRect(x - 6, 28, 12, 34);
+    c.fillStyle = '#ffd36b';
+    c.beginPath();
+    c.ellipse(x, 20, 4, 9, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = '#fff6d0';
+    c.beginPath();
+    c.ellipse(x, 22, 2, 4, 0, 0, Math.PI * 2);
+    c.fill();
+  }
+  // Namensleiste (aufgeklappter Tastendeckel) und rote Filzleiste
+  const board = c.createLinearGradient(0, 110, 0, 130);
+  board.addColorStop(0, '#5a2410');
+  board.addColorStop(1, '#1e0c05');
+  c.fillStyle = board;
+  c.fillRect(40, 110, 980, 20);
+  text(c, 'Ringbahn  ·  Salonklavier', 530, 125, { font: `italic 13px ${SERIF}`, color: 'rgba(230, 190, 110, 0.85)', align: 'center' });
+  c.fillStyle = '#7a1616';
+  c.fillRect(48, 126, 964, 4);
+  // Wangen links und rechts der Tasten
+  for (const x of [8, 1012]) {
+    const cheek = c.createLinearGradient(x, 0, x + 40, 0);
+    cheek.addColorStop(0, '#1c0b05');
+    cheek.addColorStop(0.5, '#4a1e0c');
+    cheek.addColorStop(1, '#1c0b05');
+    c.fillStyle = cheek;
+    roundedRect(c, x, 110, 40, 360, 8);
+    c.fill();
+  }
+  // Vorderleiste unter den Tasten mit Spiegelung
+  const rail = c.createLinearGradient(0, 466, 0, 520);
+  rail.addColorStop(0, '#4a1e0c');
+  rail.addColorStop(0.2, '#2a1006');
+  rail.addColorStop(1, '#120603');
+  c.fillStyle = rail;
+  c.fillRect(8, 466, 1044, 54);
+  c.fillStyle = 'rgba(255, 220, 170, 0.12)';
+  c.fillRect(8, 468, 1044, 3);
+  // Schlüsselloch
+  c.fillStyle = '#d6a640';
+  c.beginPath();
+  c.arc(530, 490, 6, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#120603';
+  c.beginPath();
+  c.arc(530, 489, 2.2, 0, Math.PI * 2);
+  c.fill();
+  c.fillRect(529, 489, 2, 6);
+}
+
+// Eine weiße Taste (Elfenbein), gedrückt etwas dunkler und tiefer
+function paintWhiteKey(c, down) {
+  const w = KEY.w, h = KEY.h, top = down ? 4 : 0;
+  c.fillStyle = '#0c0603';
+  c.fillRect(0, 0, w, h + 14);
+  const ivory = c.createLinearGradient(0, top, 0, top + h);
+  ivory.addColorStop(0, down ? '#cfc6ae' : '#efe6cf');
+  ivory.addColorStop(0.75, down ? '#e0d7c0' : '#fbf6e8');
+  ivory.addColorStop(1, down ? '#d6ccb2' : '#f1e8d2');
+  c.fillStyle = ivory;
+  roundedRect(c, 2, top - 6, w - 4, h + 6, 5);
+  c.fill();
+  // feine Maserung im Elfenbein
+  c.strokeStyle = 'rgba(160, 140, 100, 0.08)';
+  c.lineWidth = 1;
+  for (let k = 8; k < w - 6; k += 7) line(c, k, top + 4, k + 2, top + h - 6);
+  // Seitenkanten und Lichtkante
+  c.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  c.fillRect(3, top, 2, h - 8);
+  c.fillStyle = 'rgba(80, 60, 30, 0.25)';
+  c.fillRect(w - 5, top, 2, h - 8);
+  // Stirnseite der Taste
+  const front = c.createLinearGradient(0, top + h - 4, 0, top + h + 10);
+  front.addColorStop(0, '#d8ceb4');
+  front.addColorStop(1, '#a39878');
+  c.fillStyle = front;
+  roundedRect(c, 2, top + h - 4, w - 4, down ? 10 : 14, 3);
+  c.fill();
+}
+
+// Eine schwarze Taste (Ebenholz) mit Glanz und Fase
+function paintBlackKey(c) {
+  c.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  roundedRect(c, 4, 4, 46, 196, 5);
+  c.fill();
+  const ebony = c.createLinearGradient(0, 0, 50, 0);
+  ebony.addColorStop(0, '#2a2420');
+  ebony.addColorStop(0.5, '#141110');
+  ebony.addColorStop(1, '#060505');
+  c.fillStyle = ebony;
+  roundedRect(c, 1, 0, 46, 194, 4);
+  c.fill();
+  const top = c.createLinearGradient(0, 0, 0, 190);
+  top.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
+  top.addColorStop(0.85, 'rgba(255, 255, 255, 0.16)');
+  top.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+  c.fillStyle = top;
+  roundedRect(c, 7, 2, 34, 172, 3);
+  c.fill();
+  c.fillStyle = 'rgba(255, 255, 255, 0.3)';
+  c.fillRect(9, 8, 2, 156);
 }

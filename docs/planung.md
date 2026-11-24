@@ -119,6 +119,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 
 ## Übergabe für die nächste Session
 
+**Stand (24.11.2026, schönere Nahansichten):** Sechs im Code gezeichnete Ansichten neu und deutlich detaillierter gezeichnet (Rätsel, Klickflächen und Lösungen unverändert): Karteikarten-Brett (6, Korkbrett mit Messingschild, Kartenhalter, Karteikasten, Stempel), Tischplan (4, Tischtücher, Gedecke, Kerzen, Brunos Handschrift und Randnotizen), Filmbilder (8, Sternenhimmel, Mond mit Hof, Wald, Dampflok mit Rauch, Laternen mit Lichtschein, Tunnel im Fels, auf Leuchttisch), Klavier (12, Mahagoni, Elfenbein/Ebenholz, Leuchter), Kisten auf der Bodenluke (20, Holzkisten mit Aufschriften, Riffelblech-Luke) und Logbuch (16, aufgeschlagenes Buch mit Tabelle, Stempel, Bleistift). Neue Zeichenhilfen in `src/story/art/common.js` (`cached`, `plank`, `grain`, `rivet`, `roundedRect`, `vignette`, `seeded`) – aufwendige Flächen werden nur einmal gezeichnet.
+
 **Stand (24.11.2026, Codes):** Tür 15 hat jetzt **0711** (Miras Geburtstag, Rückseite der Zeichnung) statt 2412 – so gibt es 2412 nur noch in Tür 5. Die Uhrzeit-Codes 2341 (16), 2343 (22), 2347 (14) bleiben bewusst, weil sie die Geschichte erzählen. Neuer Joseph-Satz ohne Stimme: falscher Code in Tür 15.
 
 **Stand (24.11.2026, Story-Lücken):** Herr K. in Tür 5–7 schlüssig (Endkarten 5 und 6, Notiz 7). Finale begründet: Brief des anderen Joseph am Tor in Tür 23 („Wer ruft, muss bleiben“ → Weiche 7 zu zweit), auch im Rückblick von Tür 24. Brief in Tür 3: „eingeworfen in Runde 107, zuzustellen in Runde 108“ (Dienstanweisung + Briefkopf), damit „Morgen verschwindet jemand“ zu Herrn K. in Runde 108 passt. Nur Endkarten, Notizen und Briefe geändert – keine gesprochenen Sätze, also keine neuen Aufnahmen nötig.

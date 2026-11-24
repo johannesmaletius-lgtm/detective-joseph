@@ -1,4 +1,4 @@
-import { HAND, INK, PRINT, RED, SERIF, glow, line, sheet, smudge, text, wood } from './common.js';
+import { HAND, INK, PRINT, RED, SERIF, cached, glow, grain, line, roundedRect, sheet, smudge, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 4 (Speisewagen): Tischplan, Namenskärtchen, Tablett mit Gläsern,
 // Speisekarte und Rechnung.
@@ -13,60 +13,306 @@ export const SEAT_SLOTS = TABLE_IDS.map((id, i) => {
 });
 
 export function drawSeatingPlan(ctx) {
-  sheet(ctx, 250, 70, 780, 610, {
-    angle: 0,
-    inner: (c) => {
-      // Wagen von oben: vorne (Tür) ist oben
-      c.strokeStyle = INK;
-      c.lineWidth = 3;
-      c.strokeRect(110, 70, 560, 510);
-      c.clearRect(330, 66, 120, 8);
-      text(c, 'Tür', 390, 58, { font: `18px ${PRINT}`, align: 'center' });
-      text(c, 'Küche', 160, 98, { font: `16px ${PRINT}`, align: 'center' });
-      text(c, 'Kasse', 620, 98, { font: `16px ${PRINT}`, align: 'center' });
-      c.fillStyle = 'rgba(43, 33, 24, 0.12)';
-      c.fillRect(112, 72, 100, 40);
-      c.fillRect(568, 72, 100, 40);
-      // Fenster an den Seiten
-      c.lineWidth = 6;
-      c.strokeStyle = 'rgba(80, 110, 160, 0.6)';
-      for (const y of [150, 300, 450]) {
-        line(c, 110, y, 110, y + 70);
-        line(c, 670, y, 670, y + 70);
-      }
-      text(c, 'Fenster', 96, 330, { font: `14px ${PRINT}`, align: 'right' });
-      // Tische
-      c.lineWidth = 2;
-      for (let i = 0; i < 6; i++) {
-        const cx = COLUMNS[i < 3 ? 0 : 1] - 250, cy = ROWS[i % 3] - 70;
-        c.fillStyle = '#efe8d8';
-        c.strokeStyle = 'rgba(43, 33, 24, 0.6)';
-        c.beginPath();
-        c.ellipse(cx, cy, 78, 46, 0, 0, Math.PI * 2);
-        c.fill();
-        c.stroke();
-      }
-      text(c, 'hinten', 96, 170, { font: `14px ${PRINT}`, align: 'right', color: 'rgba(43,33,24,0.6)' });
-      text(c, 'vorne', 96, 470, { font: `14px ${PRINT}`, align: 'right', color: 'rgba(43,33,24,0.6)' });
-      text(c, 'Gang', 390, 330, { font: `16px ${PRINT}`, align: 'center', color: 'rgba(43,33,24,0.5)' });
-      text(c, 'Brunos Tischplan – die Kärtchen sind vertauscht', 390, 604, { font: `18px ${HAND}`, align: 'center' });
-    },
-  });
+  ctx.drawImage(cached('w4-plan', 840, 670, paintSeatingPlan), 220, 40);
 }
 
+const BRUNO = '#3b2a1a';           // Brunos Bleistift/Tinte
+const BRUNO_FONT = (size) => `${size}px ${HAND}`;
+
+// Brunos Tischplan: der Speisewagen von oben, gedeckt für Heiligabend (einmal gezeichnet)
+function paintSeatingPlan(c) {
+  c.translate(30, 30);
+  // Blatt
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 24;
+  c.shadowOffsetY = 8;
+  const paper = c.createLinearGradient(0, 0, 780, 610);
+  paper.addColorStop(0, '#f6ecd2');
+  paper.addColorStop(1, '#e2cfa2');
+  c.fillStyle = paper;
+  c.fillRect(0, 0, 780, 610);
+  c.restore();
+  grain(c, 0, 0, 780, 610, { seed: 4, count: 0.03, dark: 0.06, light: 0.12, size: 1.2 });
+  // Flecken aus der Küche
+  smudge(c, 640, 8, 110, 90, 'rgba(150, 100, 50, 0.22)');
+  smudge(c, 20, 540, 80, 60, 'rgba(150, 100, 50, 0.18)');
+  c.strokeStyle = 'rgba(120, 70, 30, 0.35)';
+  c.lineWidth = 3;
+  c.beginPath();
+  c.arc(712, 52, 34, 0.3, Math.PI * 1.85);
+  c.stroke();
+  c.lineWidth = 1;
+  c.beginPath();
+  c.arc(712, 52, 29, 0.6, Math.PI * 1.6);
+  c.stroke();
+  // Überschrift in Brunos Schrift
+  text(c, 'Heiligabend – Tischplan', 390, 40, { font: `bold ${BRUNO_FONT(28)}`, color: BRUNO, align: 'center' });
+  c.strokeStyle = BRUNO;
+  c.lineWidth = 2;
+  c.beginPath();
+  for (let x = 240; x <= 540; x += 10) c.lineTo(x, 50 + Math.sin(x * 0.15) * 1.5);
+  c.stroke();
+
+  // Wagen: Wände, Fenster, Tür
+  const wall = (x, y, w, h) => {
+    c.fillStyle = '#8f7c62';
+    c.fillRect(x, y, w, h);
+    c.strokeStyle = 'rgba(43, 33, 24, 0.85)';
+    c.lineWidth = 1.5;
+    c.strokeRect(x, y, w, h);
+  };
+  // Boden mit Dielen
+  c.fillStyle = 'rgba(140, 100, 60, 0.12)';
+  c.fillRect(110, 70, 560, 510);
+  c.strokeStyle = 'rgba(110, 80, 50, 0.16)';
+  c.lineWidth = 1;
+  for (let y = 86; y < 580; y += 16) line(c, 112, y, 668, y);
+  // Teppich im Gang
+  c.fillStyle = 'rgba(150, 40, 35, 0.32)';
+  c.fillRect(352, 70, 76, 510);
+  c.strokeStyle = 'rgba(200, 150, 70, 0.5)';
+  c.lineWidth = 2;
+  c.strokeRect(358, 70, 64, 510);
+  for (let y = 100; y < 580; y += 36) {
+    c.fillStyle = 'rgba(200, 150, 70, 0.4)';
+    c.beginPath();
+    c.moveTo(390, y - 8);
+    c.lineTo(398, y);
+    c.lineTo(390, y + 8);
+    c.lineTo(382, y);
+    c.fill();
+  }
+  wall(102, 62, 228, 10);
+  wall(450, 62, 228, 10);
+  wall(102, 578, 576, 10);
+  wall(102, 62, 10, 526);
+  wall(668, 62, 10, 526);
+  // Fenster in den Seitenwänden
+  for (const y of [138, 288, 438]) {
+    for (const x of [102, 668]) {
+      const glass = c.createLinearGradient(x, y, x + 10, y + 84);
+      glass.addColorStop(0, '#b9d3e8');
+      glass.addColorStop(1, '#7fa3c4');
+      c.fillStyle = glass;
+      c.fillRect(x + 1, y, 8, 84);
+      c.strokeStyle = 'rgba(43, 33, 24, 0.8)';
+      c.lineWidth = 1.2;
+      c.strokeRect(x + 1, y, 8, 84);
+      line(c, x + 1, y + 42, x + 9, y + 42);
+    }
+  }
+  text(c, 'Fenster', 94, 334, { font: BRUNO_FONT(16), color: BRUNO, align: 'right' });
+  text(c, 'Fenster', 686, 334, { font: BRUNO_FONT(16), color: BRUNO });
+  // Tür oben mit Schwenkbogen
+  c.strokeStyle = 'rgba(43, 33, 24, 0.7)';
+  c.lineWidth = 1.5;
+  c.setLineDash([4, 4]);
+  c.beginPath();
+  c.arc(330, 72, 120, 0, Math.PI / 2);
+  c.stroke();
+  c.setLineDash([]);
+  c.lineWidth = 3;
+  line(c, 330, 72, 330, 192);
+  text(c, 'Tür', 390, 92, { font: `bold 15px ${PRINT}`, color: 'rgba(43, 33, 24, 0.75)', align: 'center' });
+  text(c, '↑ nach vorn', 390, 112, { font: BRUNO_FONT(15), color: BRUNO, align: 'center' });
+  // Küche mit Herd, Kasse mit Registrierkasse
+  c.fillStyle = 'rgba(120, 100, 80, 0.22)';
+  c.fillRect(112, 72, 92, 34);
+  c.fillRect(576, 72, 92, 34);
+  c.strokeStyle = 'rgba(43, 33, 24, 0.7)';
+  c.lineWidth = 1.2;
+  c.strokeRect(112, 72, 92, 34);
+  c.strokeRect(576, 72, 92, 34);
+  for (const x of [126, 148]) {
+    c.beginPath();
+    c.arc(x, 89, 8, 0, Math.PI * 2);
+    c.stroke();
+  }
+  text(c, 'Küche', 182, 94, { font: `bold 12px ${PRINT}`, color: INK, align: 'center' });
+  c.strokeRect(588, 80, 26, 18);
+  c.strokeRect(592, 76, 18, 6);
+  text(c, 'Kasse', 642, 94, { font: `bold 12px ${PRINT}`, color: INK, align: 'center' });
+  // Seiten-Hinweise in Brunos Schrift
+  text(c, 'hinten', 94, 172, { font: BRUNO_FONT(16), color: BRUNO, align: 'right' });
+  text(c, 'vorne', 94, 482, { font: BRUNO_FONT(16), color: BRUNO, align: 'right' });
+  c.save();
+  c.translate(390, 336);
+  c.rotate(-Math.PI / 2);
+  text(c, 'Gang', 0, 6, { font: `bold 15px ${PRINT}`, color: 'rgba(250, 235, 200, 0.75)', align: 'center' });
+  c.restore();
+
+  // Die sechs Tische
+  for (let i = 0; i < 6; i++) {
+    const cx = COLUMNS[i < 3 ? 0 : 1] - 250, cy = ROWS[i % 3] - 70;
+    drawTable(c, cx, cy, i);
+  }
+
+  // Brunos Randnotizen
+  c.save();
+  c.translate(724, 210);
+  c.rotate(0.06);
+  text(c, 'Tisch 6:', 0, 0, { font: BRUNO_FONT(17), color: BRUNO, align: 'center' });
+  text(c, 'zwei', 0, 22, { font: BRUNO_FONT(17), color: BRUNO, align: 'center' });
+  text(c, 'Gedecke!', 0, 44, { font: BRUNO_FONT(17), color: BRUNO, align: 'center' });
+  c.restore();
+  c.strokeStyle = BRUNO;
+  c.lineWidth = 1.6;
+  c.beginPath();
+  c.moveTo(724, 266);
+  c.quadraticCurveTo(735, 380, 700, 448);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(700, 448);
+  c.lineTo(698, 434);
+  c.moveTo(700, 448);
+  c.lineTo(712, 440);
+  c.stroke();
+  text(c, 'Kerzen', 724, 530, { font: BRUNO_FONT(16), color: BRUNO, align: 'center' });
+  text(c, 'um 22 Uhr', 724, 550, { font: BRUNO_FONT(16), color: BRUNO, align: 'center' });
+  text(c, 'Wer hat die Kärtchen vertauscht?!', 390, 604, { font: BRUNO_FONT(21), color: BRUNO, align: 'center' });
+  text(c, '– B.', 668, 604, { font: BRUNO_FONT(19), color: BRUNO, align: 'right' });
+}
+
+// Ein gedeckter Tisch mit Tischtuch, Stuhl, Gedeck, Kerze und Tannenzweig. Platz in der Mitte bleibt frei
+// für das Namenskärtchen, unten für die Beschriftung „Tisch N“.
+function drawTable(c, cx, cy, index) {
+  const guests = index === 5 ? [-46, 46] : [0];
+  // Stühle (nur die Lehne schaut hervor)
+  for (const gx of guests) {
+    c.fillStyle = '#6b4424';
+    roundedRect(c, cx + gx - 22, cy - 60, 44, 14, 5);
+    c.fill();
+    c.strokeStyle = 'rgba(30, 15, 5, 0.8)';
+    c.lineWidth = 1.2;
+    c.stroke();
+    c.fillStyle = '#9c2f2a';
+    roundedRect(c, cx + gx - 17, cy - 57, 34, 8, 3);
+    c.fill();
+  }
+  // Tischtuch mit Schatten
+  c.save();
+  c.shadowColor = 'rgba(60, 40, 20, 0.35)';
+  c.shadowBlur = 8;
+  c.shadowOffsetY = 3;
+  c.fillStyle = '#fbf8f0';
+  roundedRect(c, cx - 92, cy - 50, 184, 102, 8);
+  c.fill();
+  c.restore();
+  c.strokeStyle = 'rgba(160, 40, 35, 0.85)';
+  c.lineWidth = 3;
+  roundedRect(c, cx - 86, cy - 44, 172, 90, 5);
+  c.stroke();
+  c.strokeStyle = 'rgba(200, 160, 70, 0.7)';
+  c.lineWidth = 1;
+  roundedRect(c, cx - 82, cy - 40, 164, 82, 4);
+  c.stroke();
+  // Faltenwurf
+  c.strokeStyle = 'rgba(180, 170, 150, 0.35)';
+  line(c, cx - 30, cy - 50, cx - 30, cy + 52);
+  line(c, cx + 30, cy - 50, cx + 30, cy + 52);
+  // Gedeck(e) oben
+  for (const gx of guests) {
+    const px = cx + gx, py = cy - 30, small = index === 5 && gx > 0;
+    const r = small ? 10 : 12;
+    c.fillStyle = '#ffffff';
+    c.strokeStyle = 'rgba(120, 110, 95, 0.9)';
+    c.lineWidth = 1.2;
+    c.beginPath();
+    c.arc(px, py, r, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    c.strokeStyle = 'rgba(200, 160, 70, 0.9)';
+    c.beginPath();
+    c.arc(px, py, r - 3, 0, Math.PI * 2);
+    c.stroke();
+    // Gabel links, Messer rechts
+    c.strokeStyle = '#8a8f94';
+    c.lineWidth = 2;
+    line(c, px - r - 6, py - 9, px - r - 6, py + 10);
+    c.lineWidth = 1;
+    for (const d of [-2, 0, 2]) line(c, px - r - 6 + d, py - 12, px - r - 6 + d, py - 7);
+    c.lineWidth = 2.5;
+    line(c, px + r + 6, py - 11, px + r + 6, py + 10);
+    // Glas (Wein) bzw. Tasse (Kakao) – ohne zu verraten, wer was trinkt: nur ein Glas
+    c.strokeStyle = 'rgba(110, 140, 170, 0.9)';
+    c.lineWidth = 1.3;
+    c.fillStyle = 'rgba(200, 225, 240, 0.6)';
+    c.beginPath();
+    c.arc(px + r + 16, py - 10, 5, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+  }
+  // Kerze mit Schein (rechts unten) und Tannenzweig (links unten)
+  const kx = cx + 70, ky = cy + 30;
+  const flame = c.createRadialGradient(kx, ky, 0, kx, ky, 22);
+  flame.addColorStop(0, 'rgba(255, 210, 120, 0.6)');
+  flame.addColorStop(1, 'rgba(255, 210, 120, 0)');
+  c.fillStyle = flame;
+  c.fillRect(kx - 22, ky - 22, 44, 44);
+  c.fillStyle = '#c83a30';
+  c.beginPath();
+  c.arc(kx, ky, 5.5, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#ffe9a0';
+  c.beginPath();
+  c.arc(kx, ky, 2.2, 0, Math.PI * 2);
+  c.fill();
+  const tx = cx - 70, ty = cy + 30;
+  c.strokeStyle = '#3d6b3a';
+  c.lineWidth = 1.6;
+  line(c, tx - 12, ty + 6, tx + 12, ty - 6);
+  for (let k = -10; k <= 10; k += 4) {
+    const bx = tx + k, by = ty - k * 0.5;
+    line(c, bx, by, bx - 3, by - 6);
+    line(c, bx, by, bx + 3, by + 6);
+  }
+  c.fillStyle = '#c0302a';
+  for (const [dx, dy] of [[2, 2], [5, 0], [3, -3]]) {
+    c.beginPath();
+    c.arc(tx + dx, ty + dy, 2, 0, Math.PI * 2);
+    c.fill();
+  }
+  // Tischnummer in Brunos Schrift (in der Ecke)
+  text(c, String(index + 1), cx - 78, cy - 30, { font: `bold ${BRUNO_FONT(18)}`, color: BRUNO, align: 'center' });
+}
+
+// Ein Namenskärtchen als kleiner Tischaufsteller mit Goldrand und Stechpalme
 export function drawNameCard(ctx, token, x, y) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-58, -18, 120, 44);
-  ctx.fillStyle = '#fbf6ea';
+  ctx.fillStyle = 'rgba(40, 25, 10, 0.35)';
+  ctx.fillRect(-57, -17, 120, 44);
+  const paper = ctx.createLinearGradient(0, -22, 0, 22);
+  paper.addColorStop(0, '#fffdf6');
+  paper.addColorStop(0.7, '#f4ecd8');
+  paper.addColorStop(1, '#ddd0b0');
+  ctx.fillStyle = paper;
   ctx.fillRect(-60, -22, 120, 44);
-  ctx.fillStyle = '#e6dcc4';
-  ctx.fillRect(-60, 12, 120, 10);
-  ctx.strokeStyle = '#b89a5c';
+  // Knick (unten sieht man die Rückseite)
+  ctx.fillStyle = 'rgba(150, 120, 70, 0.25)';
+  ctx.fillRect(-60, 14, 120, 8);
+  ctx.strokeStyle = 'rgba(150, 120, 70, 0.6)';
+  ctx.lineWidth = 1;
+  line(ctx, -60, 14, 60, 14);
+  ctx.strokeStyle = '#c29a45';
   ctx.lineWidth = 1.5;
-  ctx.strokeRect(-56, -18, 112, 34);
-  text(ctx, token.label, 0, 6, { font: `${token.label.length > 12 ? 15 : 20}px ${HAND}`, align: 'center' });
+  ctx.strokeRect(-56, -18, 112, 30);
+  ctx.lineWidth = 0.7;
+  ctx.strokeRect(-53, -15, 106, 24);
+  // Stechpalme in der Ecke
+  ctx.fillStyle = '#2f6a3a';
+  for (const a of [-0.6, 0.5]) {
+    ctx.beginPath();
+    ctx.ellipse(-48 + Math.cos(a) * 5, -12 + Math.sin(a) * 4, 6, 2.6, a, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#c0302a';
+  ctx.beginPath();
+  ctx.arc(-46, -11, 2.2, 0, Math.PI * 2);
+  ctx.fill();
+  const size = token.label.length > 12 ? 15 : 20;
+  text(ctx, token.label, 2, 4, { font: `${size}px ${HAND}`, color: '#2a1d10', align: 'center' });
   ctx.restore();
 }
 

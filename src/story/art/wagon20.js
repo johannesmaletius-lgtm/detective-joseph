@@ -1,4 +1,4 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, drawPicture, glow, line, plank, rivet, sheet, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 20 (Packwagen): Pakete und Anhänger, Frachtliste mit Sternen-Schablone,
 // Kisten über der Bodenluke (Schiebepuzzle), Miras Paket mit fünf Bändern, Kelle und Karte.
@@ -255,30 +255,173 @@ export function hatchFree(crates) {
 
 export function drawCrates(ctx, { crates }) {
   const { x, y, cell, size } = BOARD;
-  wood(ctx, x - 30, y - 30, cell * size + 60, cell * size + 60, [110, 70, 36]);
-  ctx.strokeStyle = 'rgba(40, 20, 8, 0.4)';
-  ctx.lineWidth = 2;
-  for (let i = 0; i <= size; i++) {
-    line(ctx, x + i * cell, y, x + i * cell, y + size * cell);
-    line(ctx, x, y + i * cell, x + size * cell, y + i * cell);
-  }
-  // Luke
-  ctx.fillStyle = '#4a4a46';
-  ctx.fillRect(x + HATCH[0][0] * cell + 6, y + HATCH[0][1] * cell + 6, 2 * cell - 12, cell - 12);
-  text(ctx, 'LUKE', x + 2 * cell, y + 4.6 * cell, { font: `bold 22px ${PRINT}`, color: '#ddd', align: 'center' });
+  ctx.drawImage(cached('w20-floor', cell * size + 120, cell * size + 100, paintCrateFloor), x - 60, y - 50);
   for (const c of crates) {
-    const w = (c.dir === 'h' ? c.len : 1) * cell - 8, h = (c.dir === 'v' ? c.len : 1) * cell - 8;
+    const long = c.len * cell - 8, short = cell - 8;
     const cx = x + c.col * cell + 4, cy = y + c.row * cell + 4;
-    ctx.fillStyle = c.color;
-    ctx.fillRect(cx, cy, w, h);
-    ctx.strokeStyle = '#3a2210';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(cx, cy, w, h);
-    line(ctx, cx, cy, cx + w, cy + h);
-    line(ctx, cx + w, cy, cx, cy + h);
-    text(ctx, c.dir === 'h' ? '◀ ▶' : '▲▼', cx + w / 2, cy + h / 2 + 8, { font: `bold 18px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+    const image = cached(`w20-crate-${c.id}`, long + 12, short + 12, (g) => paintCrate(g, c, long, short));
+    const w = c.dir === 'h' ? long : short, h = c.dir === 'v' ? long : short;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillRect(cx + 6, cy + 8, w, h);
+    if (c.dir === 'h') ctx.drawImage(image, cx - 6, cy - 6);
+    else {
+      ctx.translate(cx + w, cy);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(image, -6, -6);
+    }
+    ctx.restore();
+    // Schieberichtung als aufgemalte Pfeile
+    ctx.save();
+    ctx.translate(cx + w / 2, cy + h / 2);
+    if (c.dir === 'v') ctx.rotate(Math.PI / 2);
+    ctx.fillStyle = 'rgba(250, 236, 200, 0.85)';
+    for (const sx of [-1, 1]) {
+      const ax = sx * (c.len * cell / 2 - 26);
+      ctx.beginPath();
+      ctx.moveTo(ax + sx * 12, 0);
+      ctx.lineTo(ax - sx * 4, -11);
+      ctx.lineTo(ax - sx * 4, 11);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
   }
   text(ctx, 'Klicken: Kiste in diese Richtung schieben (linke/rechte bzw. obere/untere Hälfte)', 640, y + size * cell + 60, { font: `16px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+}
+
+// Boden des Packwagens mit Bodenluke (einmal gezeichnet). (0, 0) = 60 px links und 50 px über dem Brett.
+function paintCrateFloor(c) {
+  const { cell, size } = BOARD;
+  const W = cell * size + 120, H = cell * size + 100, ox = 60, oy = 50;
+  for (let i = 0; i * 50 < W; i++) plank(c, i * 50, 0, 50, H, { tone: [104, 70, 40], seed: 500 + i, vertical: true, knots: 2 });
+  c.fillStyle = 'rgba(15, 8, 3, 0.65)';
+  for (let i = 1; i * 50 < W; i++) c.fillRect(i * 50 - 1, 0, 2, H);
+  // Nagelreihen über den Querbalken
+  for (let yy = 30; yy < H; yy += 150) for (let i = 0; i * 50 < W; i++) {
+    rivet(c, i * 50 + 12, yy, 2.4, [90, 85, 80]);
+    rivet(c, i * 50 + 38, yy, 2.4, [90, 85, 80]);
+  }
+  // Kreidelinien: das 5 × 5-Feld
+  c.strokeStyle = 'rgba(240, 230, 210, 0.18)';
+  c.lineWidth = 2;
+  c.setLineDash([10, 7]);
+  for (let i = 0; i <= size; i++) {
+    line(c, ox + i * cell, oy, ox + i * cell, oy + size * cell);
+    line(c, ox, oy + i * cell, ox + size * cell, oy + i * cell);
+  }
+  c.setLineDash([]);
+  // Bodenluke: Riffelblech mit Nieten, Scharnieren und Ring
+  const hx = ox + HATCH[0][0] * cell + 6, hy = oy + HATCH[0][1] * cell + 6, hw = 2 * cell - 12, hh = cell - 12;
+  c.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  c.fillRect(hx - 5, hy - 5, hw + 10, hh + 10);
+  const steel = c.createLinearGradient(hx, hy, hx + hw, hy + hh);
+  steel.addColorStop(0, '#7b7f82');
+  steel.addColorStop(1, '#45494c');
+  c.fillStyle = steel;
+  c.fillRect(hx, hy, hw, hh);
+  c.save();
+  c.beginPath();
+  c.rect(hx, hy, hw, hh);
+  c.clip();
+  c.strokeStyle = 'rgba(200, 205, 210, 0.35)';
+  c.lineWidth = 2;
+  for (let ty = hy + 6; ty < hy + hh; ty += 12) {
+    for (let tx = hx + ((ty - hy) % 24 ? 6 : 14); tx < hx + hw; tx += 16) line(c, tx, ty, tx + 6, ty - 5);
+  }
+  c.restore();
+  c.strokeStyle = 'rgba(20, 20, 20, 0.8)';
+  c.lineWidth = 2;
+  c.strokeRect(hx + 0.5, hy + 0.5, hw - 1, hh - 1);
+  for (const [rx, ry] of [[hx + 8, hy + 8], [hx + hw - 8, hy + 8], [hx + 8, hy + hh - 8], [hx + hw - 8, hy + hh - 8]]) rivet(c, rx, ry, 3.5, [150, 150, 150]);
+  for (const sx of [hx + 30, hx + hw - 60]) {
+    c.fillStyle = '#2c2f31';
+    c.fillRect(sx, hy - 4, 30, 12);
+    rivet(c, sx + 7, hy + 2, 2.5, [130, 130, 130]);
+    rivet(c, sx + 23, hy + 2, 2.5, [130, 130, 130]);
+  }
+  c.strokeStyle = '#a7a9aa';
+  c.lineWidth = 4;
+  c.beginPath();
+  c.ellipse(hx + hw / 2, hy + hh - 22, 14, 9, 0, 0, Math.PI * 2);
+  c.stroke();
+  c.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  c.fillRect(hx + hw / 2 - 18, hy + hh - 14, 36, 4);
+  text(c, 'LUKE', hx + hw / 2, hy + 38, { font: `bold 24px ${TYPEWRITER}`, color: 'rgba(245, 220, 120, 0.85)', align: 'center' });
+  // Lampenlicht von oben, Ränder dunkel
+  const light = c.createRadialGradient(W / 2, H * 0.4, 60, W / 2, H / 2, W * 0.75);
+  light.addColorStop(0, 'rgba(255, 220, 150, 0.12)');
+  light.addColorStop(1, 'rgba(0, 0, 0, 0.55)');
+  c.fillStyle = light;
+  c.fillRect(0, 0, W, H);
+}
+
+const CRATE_LABELS = {
+  A: ['ZERBRECHLICH', '#a12a1e'], B: ['RINGBAHN', '#2a2018'], C: ['POST', '#2a3a6a'], D: ['VORSICHT GLAS', '#a12a1e'],
+  E: ['OBEN', '#2a2018'], F: ['ZUG 24', '#2a2018'], G: ['WEIHNACHTEN', '#2f5a3a'],
+};
+
+// Eine Holzkiste, liegend gezeichnet (long × short); stehende Kisten werden gedreht
+function paintCrate(c, crate, long, short) {
+  c.translate(6, 6);
+  const tone = crate.color.match(/\w\w/g).map((h) => parseInt(h, 16));
+  const seed = crate.id.charCodeAt(0) * 7;
+  // Bretter quer
+  const boards = Math.max(2, Math.round(long / 48));
+  for (let i = 0; i < boards; i++) plank(c, (i * long) / boards, 0, long / boards, short, { tone, seed: seed + i, vertical: true, knots: 1 });
+  c.fillStyle = 'rgba(20, 10, 3, 0.55)';
+  for (let i = 1; i < boards; i++) c.fillRect((i * long) / boards - 1, 0, 2, short);
+  // Rahmen
+  const dark = tone.map((v) => Math.max(0, v - 34));
+  for (const [fx, fy, fw, fh] of [[0, 0, long, 12], [0, short - 12, long, 12], [0, 0, 12, short], [long - 12, 0, 12, short]]) {
+    plank(c, fx, fy, fw, fh, { tone: dark, seed: seed + fx + fy, vertical: fh > fw, knots: 0 });
+  }
+  c.strokeStyle = 'rgba(15, 8, 2, 0.8)';
+  c.lineWidth = 2;
+  c.strokeRect(1, 1, long - 2, short - 2);
+  c.strokeRect(12, 12, long - 24, short - 24);
+  // Diagonalstrebe
+  c.save();
+  c.beginPath();
+  c.rect(12, 12, long - 24, short - 24);
+  c.clip();
+  c.translate(long / 2, short / 2);
+  c.rotate(Math.atan2(short - 24, long - 24));
+  plank(c, -long, -6, long * 2, 12, { tone: dark, seed: seed + 99, knots: 0 });
+  c.strokeStyle = 'rgba(15, 8, 2, 0.7)';
+  c.lineWidth = 1.5;
+  c.strokeRect(-long, -6, long * 2, 12);
+  c.restore();
+  // Nägel und Eckbeschläge
+  for (const [nx, ny] of [[6, 6], [long - 6, 6], [6, short - 6], [long - 6, short - 6]]) {
+    c.fillStyle = '#3a3a38';
+    c.fillRect(nx - 6, ny - 6, 12, 12);
+    rivet(c, nx, ny, 2.6, [160, 155, 145]);
+  }
+  // Stempelaufdruck
+  const [label, ink] = CRATE_LABELS[crate.id] ?? ['', INK];
+  c.save();
+  c.translate(long / 2, short / 2);
+  c.rotate(-0.04);
+  const size = long > 150 ? 15 : 12;
+  c.font = `bold ${size}px ${TYPEWRITER}`;
+  const tw = c.measureText(label).width + 16;
+  c.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  c.fillRect(-tw / 2 + 2, -13, tw, 24);
+  c.fillStyle = '#efe3c4';
+  c.fillRect(-tw / 2, -15, tw, 24);
+  c.strokeStyle = 'rgba(120, 90, 50, 0.6)';
+  c.lineWidth = 1;
+  c.strokeRect(-tw / 2 + 2.5, -12.5, tw - 5, 19);
+  text(c, label, 0, 2, { font: `bold ${size}px ${TYPEWRITER}`, color: ink, align: 'center' });
+  c.restore();
+  // Lichtkante oben, Schatten unten
+  const shade = c.createLinearGradient(0, 0, 0, short);
+  shade.addColorStop(0, 'rgba(255, 230, 190, 0.18)');
+  shade.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+  c.fillStyle = shade;
+  c.fillRect(0, 0, long, short);
 }
 
 // ---------------------------------------------------------------- Miras Paket: fünf Bänder
