@@ -17,7 +17,7 @@
 //                                                  speed −1 = läuft rückwärts)
 // Jeder Eintrag kann `when: 'merker'` haben (wie hotspots und props).
 // Kerzen brennen auch im Tunnel weiter, wenn das elektrische Licht aus ist: Flammen immer, ein Lichtschein
-// nur mit `burns: true` (z. B. eine Öllaterne). Sie sparen die Dunkelheit um sich herum aus (lights()).
+// nur mit `burns: true` (z. B. eine Öllaterne; `lightRadius` = wie weit es im Dunkeln leuchtet). Sie sparen die Dunkelheit um sich herum aus (lights()).
 //
 // Alles ist auf Tempo gebaut (iPad): wenige Teilchen, Lichthöfe als einmal vorbereitete Bildchen,
 // keine Schatten oder Filter.
@@ -92,7 +92,7 @@ export class Ambience {
       if (!scene.isActive(effect)) continue;
       const f = flicker(this.time, effect.seed, 'candle');
       if (effect.kind === 'flame') spots.push({ x: effect.x, y: effect.y - effect.size * 0.45, radius: effect.size * 2.6 * f });
-      else if (effect.kind === 'glow' && effect.burns) spots.push({ x: effect.x, y: effect.y, radius: effect.radius * 0.9 * f });
+      else if (effect.kind === 'glow' && effect.burns) spots.push({ x: effect.x, y: effect.y, radius: (effect.lightRadius ?? effect.radius * 0.9) * f });
     }
     return spots;
   }
