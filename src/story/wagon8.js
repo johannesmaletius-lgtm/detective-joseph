@@ -251,7 +251,7 @@ async function arrangeFrames(story) {
     drawBackground: drawFilmTable,
     drawToken: drawFrame,
     check: (placement) => placement.every((id, i) => FRAMES.find((f) => f.id === id).step === i),
-    help: 'Bilder mit gedrückter Maustaste auf einen anderen Platz ziehen (sie tauschen)  ·  Rechtsklick: zurück',
+    help: 'Bilder auf einen anderen Platz ziehen oder anklicken, dann Platz anklicken (sie tauschen)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
     if (!story.flags.framesSeen && !inTunnel(story)) {

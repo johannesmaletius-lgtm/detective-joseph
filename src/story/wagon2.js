@@ -142,7 +142,7 @@ async function sortTags(story) {
     drawBackground: drawTagBoard,
     drawToken: drawTag,
     check: (placement) => placement.every((id, i) => id === TAG_ORDER[i]),
-    help: 'Anhänger mit gedrückter Maustaste auf die Haken ziehen  ·  Rechtsklick: zurück',
+    help: 'Anhänger auf die Haken ziehen (oder anklicken, dann Haken anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   story.flags.tagsSorted = true;
@@ -227,44 +227,57 @@ async function restack(story) {
   const state = { piles: f.piles, held: null, moves: f.moves };
   await story.view('picture', {
     state,
-    draw: (ctx, view) => drawStack(ctx, view.state),
+    draw: (ctx, view) => drawStack(ctx, { ...view.state, mouse: view.mouse }),
     spots: pileSpots(),
     area: { x: 80, y: 80, w: 1120, h: 580 },
-    help: 'Klicken: obersten Koffer nehmen, dann auf einen anderen Platz klicken  ·  Rechtsklick: zurück',
+    help: 'Obersten Koffer anklicken (oder ziehen), dann auf einen anderen Platz klicken  ·  Rechtsklick: zurück',
     onClick: async (spot, view) => {
       const s = view.state;
       const i = Number(spot.id.slice(4));
       if (!s.held) {
         if (!s.piles[i].length) return;
-        s.held = { from: i, size: s.piles[i].pop() };
+        s.held = { from: i, size: s.piles[i].pop(), at: performance.now() };
         story.sound('pickup');
         return;
       }
-      const top = s.piles[i].at(-1);
-      if (top !== undefined && top < s.held.size) {
-        s.piles[s.held.from].push(s.held.size);
-        s.held = null;
-        story.sound('wrong');
-        await story.say('Nein! Der größere Koffer würde den kleinen zerdrücken. „Glas!“');
-        return;
-      }
-      s.piles[i].push(s.held.size);
-      if (i !== s.held.from) s.moves += 1;
-      s.held = null;
-      story.sound('thud');
-      f.moves = s.moves;
-      // Liegt auf dem untersten Koffer nichts mehr – und stehen die vier anderen ordentlich auf einem Feld?
-      if (bottomFree(s.piles)) {
-        if (stackedAway(s.piles)) {
-          await story.wait(0.4);
-          view.close(true);
-        } else if (!f.messNoted) {
-          f.messNoted = true;
-          await story.say('Der unterste ist frei … aber so ein Durcheinander? Die Akte sagt: die vier anderen ordentlich auf EIN Feld.');
-        }
-      }
+      await putDown(i, view);
+    },
+    // Ziehen und Ablegen: über einem anderen Platz losgelassen → dort hinlegen
+    onRelease: (spot, view) => {
+      const s = view.state;
+      if (!s.held || !spot) return;
+      const i = Number(spot.id.slice(4));
+      if (i === s.held.from) return;
+      return putDown(i, view);
     },
   });
+
+  async function putDown(i, view) {
+    const s = view.state;
+    const top = s.piles[i].at(-1);
+    if (top !== undefined && top < s.held.size) {
+      s.piles[s.held.from].push(s.held.size);
+      s.held = null;
+      story.sound('wrong');
+      await story.say('Nein! Der größere Koffer würde den kleinen zerdrücken. „Glas!“');
+      return;
+    }
+    s.piles[i].push(s.held.size);
+    if (i !== s.held.from) s.moves += 1;
+    s.held = null;
+    story.sound('thud');
+    f.moves = s.moves;
+    // Liegt auf dem untersten Koffer nichts mehr – und stehen die vier anderen ordentlich auf einem Feld?
+    if (bottomFree(s.piles)) {
+      if (stackedAway(s.piles)) {
+        await story.wait(0.4);
+        view.close(true);
+      } else if (!f.messNoted) {
+        f.messNoted = true;
+        await story.say('Der unterste ist frei … aber so ein Durcheinander? Die Akte sagt: die vier anderen ordentlich auf EIN Feld.');
+      }
+    }
+  }
   // Koffer, der noch in der Hand war, zurücklegen
   if (state.held) state.piles[state.held.from].push(state.held.size);
   if (bottomFree(state.piles) && stackedAway(state.piles) && !f.caseFree) {

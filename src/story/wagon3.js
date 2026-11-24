@@ -118,7 +118,7 @@ async function sortLetters(story) {
     drawBackground: drawHoles,
     drawToken: drawLetterToken,
     check: checkHoles,
-    help: 'Briefe mit gedrückter Maustaste in die Fächer ziehen  ·  Rechtsklick: zurück',
+    help: 'Briefe in die Fächer ziehen (oder anklicken, dann Fach anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   story.flags.holesSorted = true;

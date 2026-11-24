@@ -246,7 +246,7 @@ async function sortNegatives(story) {
     drawBackground: drawContactSheet,
     drawToken: drawNegative,
     check: checkNegatives,
-    help: 'Negative mit gedrückter Maustaste in die Reihe ziehen  ·  Rechtsklick: zurück',
+    help: 'Negative in die Reihe ziehen (oder anklicken, dann Platz anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   f.sorted = true;

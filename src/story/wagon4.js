@@ -353,7 +353,7 @@ async function openSeating(story) {
     drawBackground: drawSeatingPlan,
     drawToken: drawNameCard,
     check: (placement) => placement.every((id, i) => id === SOLUTION[i]),
-    help: 'Kärtchen mit gedrückter Maustaste auf einen anderen Tisch ziehen (sie tauschen die Plätze)  ·  Rechtsklick: zurück',
+    help: 'Kärtchen auf einen anderen Tisch ziehen oder anklicken, dann Tisch anklicken (sie tauschen)  ·  Rechtsklick: zurück',
   });
   if (!solved) return;
   story.flags.seatingDone = true;

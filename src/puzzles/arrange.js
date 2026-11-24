@@ -27,16 +27,18 @@ export class ArrangeView extends View {
     this.memory = {};   // id → { tokenId: { x, y, slot } }
     this.options = {};
     this.tokens = [];
-    this.drag = null;   // { token, dx, dy }
+    this.drag = null;   // { token, dx, dy, from, start } – wird gerade gezogen
+    this.carry = null;  // dasselbe, aber nur angetippt: folgt der Maus, der nächste Klick legt ab
     this.solved = 0;    // > 0: richtig – kurz zeigen, dann schließen
     this.mouse = { x: 0, y: 0 };
   }
 
   onOpen(options) {
     this.options = options;
-    this.help = options.help ?? 'Kärtchen mit gedrückter Maustaste auf die Plätze ziehen  ·  Rechtsklick: zurück';
+    this.help = options.help ?? 'Kärtchen auf die Plätze ziehen (oder antippen und Platz antippen)  ·  Rechtsklick: zurück';
     this.solved = 0;
     this.drag = null;
+    this.carry = null;
     const saved = (this.memory[options.id] ??= {});
     this.tokens = options.tokens.map((token) => {
       const slot = options.slots[token.slot];
@@ -71,27 +73,59 @@ export class ArrangeView extends View {
 
   pointerDown(point) {
     if (this.solved) return;
+    // Getragenes Kärtchen (angetippt statt gezogen): der nächste Klick legt es ab
+    if (this.carry) {
+      this.drag = this.carry;
+      this.carry = null;
+      this.drop(point);
+      return;
+    }
     const token = this.tokenAt(point);
     if (!token) return this.onSkip?.();
     // nach oben legen
     this.tokens = [...this.tokens.filter((t) => t !== token), token];
-    this.drag = { token, dx: token.place.x - point.x, dy: token.place.y - point.y, from: { ...token.place } };
+    this.drag = { token, dx: token.place.x - point.x, dy: token.place.y - point.y, from: { ...token.place }, start: { ...point } };
     this.sound('paper');
   }
 
   pointerUp(point) {
     if (!this.drag) return;
-    const { token, from } = this.drag;
-    this.drag = null;
-    const slots = this.options.slots;
+    // Nur angetippt, nicht gezogen: Kärtchen „in die Hand nehmen“ – der nächste Klick legt es ab
+    if (Math.hypot(point.x - this.drag.start.x, point.y - this.drag.start.y) < 8) {
+      this.carry = this.drag;
+      this.drag = null;
+      return;
+    }
+    this.drop(point);
+  }
+
+  // Der Platz, auf dem das bewegte Kärtchen landen würde (oder -1)
+  snapSlot(token) {
     let best = -1, bestDistance = SNAP;
-    slots.forEach((slot, i) => {
+    this.options.slots.forEach((slot, i) => {
       const d = Math.hypot(token.place.x - (slot.x + slot.w / 2), token.place.y - (slot.y + slot.h / 2));
       if (d < bestDistance) {
         best = i;
         bestDistance = d;
       }
     });
+    return best;
+  }
+
+  // Wird die Ansicht geschlossen, während ein Kärtchen unterwegs ist: zurück an seinen Platz
+  close(result) {
+    const moving = this.drag ?? this.carry;
+    if (moving) Object.assign(moving.token.place, moving.from);
+    this.drag = null;
+    this.carry = null;
+    super.close(result);
+  }
+
+  drop(point) {
+    const { token, from } = this.drag;
+    this.drag = null;
+    const slots = this.options.slots;
+    const best = this.snapSlot(token);
     if (best < 0) {
       // daneben: zurück an den eigenen Ablageplatz (oder liegen lassen, wenn auf dem Tisch Platz ist)
       if (from.slot !== null || !token.home) {
@@ -130,9 +164,10 @@ export class ArrangeView extends View {
     super.update(dt);
     if (!this.isOpen) return;
     if (mouse) this.mouse = mouse;
-    if (this.drag) {
-      this.drag.token.place.x = this.mouse.x + this.drag.dx;
-      this.drag.token.place.y = this.mouse.y + this.drag.dy;
+    const moving = this.drag ?? this.carry;
+    if (moving) {
+      moving.token.place.x = this.mouse.x + moving.dx;
+      moving.token.place.y = this.mouse.y + moving.dy;
     }
     if (this.solved) {
       this.solved += dt;
@@ -151,11 +186,21 @@ export class ArrangeView extends View {
       ctx.textBaseline = 'alphabetic';
       outlinedText(ctx, this.options.title, 640, 44, COLORS.brass, 5);
     }
-    for (const slot of this.options.slots) {
+    const moving = this.drag ?? this.carry;
+    const target = moving ? this.snapSlot(moving.token) : -1;
+    this.options.slots.forEach((slot, i) => {
       ctx.save();
-      ctx.strokeStyle = 'rgba(255, 230, 170, 0.35)';
-      ctx.setLineDash([7, 6]);
-      ctx.lineWidth = 2;
+      if (i === target) {
+        // hier würde das Kärtchen landen
+        ctx.fillStyle = 'rgba(255, 220, 130, 0.18)';
+        ctx.fillRect(slot.x, slot.y, slot.w, slot.h);
+        ctx.strokeStyle = 'rgba(255, 225, 150, 0.95)';
+        ctx.lineWidth = 3;
+      } else {
+        ctx.strokeStyle = 'rgba(255, 230, 170, 0.35)';
+        ctx.setLineDash([7, 6]);
+        ctx.lineWidth = 2;
+      }
       ctx.strokeRect(slot.x, slot.y, slot.w, slot.h);
       ctx.restore();
       if (slot.label) {
@@ -164,10 +209,10 @@ export class ArrangeView extends View {
         ctx.textBaseline = 'top';
         outlinedText(ctx, slot.label, slot.x + slot.w / 2, slot.y + slot.h + 6, '#e9d8b0', 4);
       }
-    }
+    });
     for (const token of this.tokens) {
       ctx.save();
-      if (this.drag?.token === token) {
+      if (moving?.token === token) {
         ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
         ctx.shadowBlur = 18;
         ctx.shadowOffsetY = 10;

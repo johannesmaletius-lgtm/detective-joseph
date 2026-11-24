@@ -19,7 +19,8 @@ import { SPRITE_HEIGHT } from '../player/player.js';
 //   3. Lichtstrahl über die vier Standspiegel ins Glasauge der Tür. Lösung: A \, B \, C /, D /.
 //   4. Die Tür geht auf. Im großen Spiegel steht für einen Augenblick jemand hinter Joseph.
 
-const HOLD = 3.5; // so lange hält Joseph (oder sein Spiegelbild) einen Hebel unten
+const HOLD = 3.5; // so lange hält Joseph einen Hebel unten
+const GHOST_HOLD = 7; // so lange hält das Spiegelbild – Zeit genug, um zum eigenen Hebel zu laufen
 const SOLUTION = { A: '\\', B: '\\', C: '/', D: '/' };
 
 export const wagon9 = {
@@ -170,7 +171,7 @@ function updateLevers(story) {
     for (const pull of f.pulls[story.lap - 1] ?? []) {
       if (pull.fired || lapTime < pull.t || lapTime > pull.t + 1) continue;
       pull.fired = true;
-      f.ghost = { side: pull.side === 'left' ? 'right' : 'left', until: t + HOLD };
+      f.ghost = { side: pull.side === 'left' ? 'right' : 'left', until: t + GHOST_HOLD };
       story.sound('lever');
       if (!f.ghostSeen) noticeGhost(story);
     }

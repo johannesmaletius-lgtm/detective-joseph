@@ -77,11 +77,17 @@ export const PILE_X = [330, 640, 950];
 const PILE_Y = 600;
 const CASE_COLORS = ['#a8432a', '#4f6b86', '#c9a24a', '#7b2f22', '#5a2e1c'];
 
+// Über welchem der drei Plätze steht die Maus (oder -1)?
+export function pileAt(x) {
+  const i = PILE_X.findIndex((px) => Math.abs(x - px) <= 150);
+  return i;
+}
+
 export function pileSpots() {
   return PILE_X.map((x, i) => ({ id: `pile${i}`, x: x - 150, y: 150, w: 300, h: 480, label: ['Stapel', 'Kreidefeld links', 'Kreidefeld rechts'][i] }));
 }
 
-export function drawStack(ctx, { piles, held, moves }) {
+export function drawStack(ctx, { piles, held, moves, mouse }) {
   // Hintergrund: der Gepäckwagen selbst, abgedunkelt – davor die Dielen mit den Kreidefeldern
   ctx.save();
   ctx.beginPath();
@@ -107,7 +113,20 @@ export function drawStack(ctx, { piles, held, moves }) {
   ctx.lineWidth = 6;
   ctx.strokeRect(80, 80, 1120, 580);
 
+  // Koffer in der Hand: über welchem Platz schwebt er, passt er dort hin?
+  const over = held && mouse ? pileAt(mouse.x) : -1;
+  const fits = over >= 0 && (!piles[over].length || piles[over].at(-1) > held.size);
   PILE_X.forEach((x, i) => {
+    if (held && i === over && over !== held.from) {
+      ctx.save();
+      ctx.fillStyle = fits ? 'rgba(120, 230, 130, 0.16)' : 'rgba(240, 90, 70, 0.18)';
+      ctx.fillRect(x - 150, 150, 300, PILE_Y + 40 - 150);
+      ctx.strokeStyle = fits ? 'rgba(150, 240, 150, 0.8)' : 'rgba(255, 120, 100, 0.8)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+      ctx.strokeRect(x - 150, 150, 300, PILE_Y + 40 - 150);
+      ctx.restore();
+    }
     if (i > 0) chalkRect(ctx, x - 140, PILE_Y - 8, 280, 38, i);
     else {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
@@ -119,7 +138,12 @@ export function drawStack(ctx, { piles, held, moves }) {
     let y = PILE_Y;
     for (const size of piles[i]) y -= drawCase(ctx, x, y, size);
   });
-  if (held) drawCase(ctx, PILE_X[held.from], 230, held.size, true);
+  if (held) {
+    // folgt der Maus (zwischen den Plätzen frei, über einem Platz mittig darüber)
+    const x = over >= 0 ? PILE_X[over] : Math.max(200, Math.min(1080, mouse?.x ?? PILE_X[held.from]));
+    drawCase(ctx, x, 230, held.size, true);
+    if (over >= 0 && over !== held.from && !fits) text(ctx, 'zu groß für den kleinen Koffer darunter', PILE_X[over], 140, { font: `bold 17px ${HAND}`, color: '#ffb0a0', align: 'center' });
+  }
   text(ctx, `Züge: ${moves}`, 1170, 120, { font: `bold 20px ${HAND}`, color: '#f1e0b8', align: 'right' });
 }
 

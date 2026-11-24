@@ -227,7 +227,7 @@ async function railway(story) {
     drawBackground: drawRailwayTable,
     drawToken: drawMini,
     check: (placement) => placement.every((id, i) => id === `mini${i}`),
-    help: 'Wagen mit gedrückter Maustaste auf einen anderen Platz ziehen (sie tauschen)  ·  Rechtsklick: zurück',
+    help: 'Wagen auf einen anderen Platz ziehen oder anklicken, dann Platz anklicken (sie tauschen)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
     if (!f.railwaySeen && !inTunnel(story)) {

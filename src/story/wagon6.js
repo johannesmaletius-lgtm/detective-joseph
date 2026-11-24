@@ -195,7 +195,7 @@ async function openIndex(story) {
     drawBackground: drawCardBoard,
     drawToken: drawIndexCard,
     check: (placement) => placement.every((id, i) => id === K_ORDER[i]),
-    help: 'Karten mit gedrückter Maustaste auf die Plätze oben ziehen  ·  Rechtsklick: zurück',
+    help: 'Karten auf die Plätze oben ziehen (oder anklicken, dann Platz anklicken)  ·  Rechtsklick: zurück',
   });
   if (!solved) {
     if (!story.flags.futureNoticed && !inTunnel(story)) {
