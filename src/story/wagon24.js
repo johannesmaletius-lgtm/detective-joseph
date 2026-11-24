@@ -1,5 +1,6 @@
 import { ENDING } from '../audio/music.js';
 import { CANDLE_SPOT, OCCUPIED, PADDLE_SPOT, drawFinal, drawPanel, drawSnow, drawWindowRun, panelSpots, stoneAt } from './art/wagon24.js';
+import { preloadConductorCap } from '../player/conductorCap.js';
 import { finishWagon, hintFor, skipIntro, tunnels, wagonIntro } from './wagonCommon.js';
 
 // ============================================================================================
@@ -100,6 +101,7 @@ export const wagon24 = {
 async function putOnCap(story) {
   const f = story.flags;
   if (f.capOn) return story.say('Die Mütze sitzt.');
+  preloadConductorCap();
   f.capOn = true;
   story.sound('pickup');
   await story.say('Ich setze die Mütze des Schaffners auf. Sie passt. Natürlich passt sie.');
