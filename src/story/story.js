@@ -215,6 +215,11 @@ export class Story {
     const pages = solutionPages(steps);
     this.busy++;
     try {
+      // Erst nachfragen – der Lösungsweg verrät alles
+      const sure = await this.game.views.dialogue.open({
+        options: ['Ja – den ganzen Lösungsweg zeigen.', 'Nein, ich knoble lieber weiter.'],
+      });
+      if (sure !== 0) return;
       for (const [index, page] of pages.entries()) {
         await this.card({ draw: (ctx) => drawSolutionPage(ctx, { door: this.door, page, index, count: pages.length }) });
       }
