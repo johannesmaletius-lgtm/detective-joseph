@@ -26,7 +26,7 @@ import { morseSignal } from '../effects/morse.js';
 //
 // Die linke Wagenseite wird so berechnet, die rechte ist dieselbe Rechnung gespiegelt.
 
-const BAND = { top: 80, height: 240 }; // nur in diesem waagerechten Band liegen Fenster
+const BAND = { top: 80, height: 380 }; // nur in diesem waagerechten Band liegen Fenster
 const SLICE_DISTANCE = 260;   // in diesem Abstand vom Fluchtpunkt gelten die feinsten Streifen (siehe sliceWidth)
 const TUNNEL_SLICE = 2;        // Breite der Streifen, in denen der Tunnel geprüft und gezeichnet wird
 const RIGHT_SIDE_SHIFT = 0.37; // die rechte Seite zeigt einen anderen Teil der Landschaft (Anteil der Bildbreite)
