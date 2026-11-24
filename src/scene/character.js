@@ -18,7 +18,9 @@ import { BodyLife } from '../animation/bodyLife.js';
 //       intro: ['ears-1'],              //   einmal zu Beginn (Übergang hinein)
 //       loop: ['ears-2', 'ears-3'],     //   im Wechsel, solange die Bewegung dauert
 //       outro: ['ears-1'],              //   einmal am Ende (Übergang zurück)
-//       frame: 0.16, loopFrame: 0.3, shake: 1.5 } }, // Sekunden pro Bild, Zittern in Pixeln
+//       frame: 0.16, loopFrame: 0.3, shake: 1.5, // Sekunden pro Bild, Zittern in Pixeln
+//       whileTalking: true } },         //   läuft auch weiter, wenn die Figur spricht (sonst bricht Sprechen sie ab)
+//     busyAction: 'stir',               // (optional) statt des starren busy.webp diese Bewegung abspielen
 //   }]                                  // blinzelt ab und zu und tut ab und zu etwas (Topf rühren, Kragen zupfen …)
 //
 // Laufen: moveTo(x, y, Sekunden) – hat die Figur Laufbilder (assets/characters/<figur>/walk-left, walk-right,
@@ -241,6 +243,10 @@ export class Character {
     const w = this.walk;
     const direction = w && w.view !== 'front' ? Math.sign(w.to.x - w.from.x) : 0;
     this.life.update(dt, { moving: !!w, talking: this.talking, direction });
+    if (this.action && (this.walk || (this.talking && !this.action.def.whileTalking))) {
+      this.action.resolve();
+      this.action = null;
+    }
     if (this.walk || this.talking || this.action) {
       this.blinkLeft = 0;
       this.busyLeft = 0;
@@ -256,8 +262,10 @@ export class Character {
     }
     this.nextBusy -= dt;
     if (this.nextBusy <= 0) {
-      this.busyLeft = between(BUSY_SECONDS);
-      this.nextBusy = this.randomBusyDelay() + this.busyLeft;
+      const seconds = between(BUSY_SECONDS);
+      this.nextBusy = this.randomBusyDelay() + seconds;
+      if (this.data.busyAction && this.pose === 'front') this.act(this.data.busyAction, seconds);
+      else this.busyLeft = seconds;
     }
   }
 
