@@ -74,6 +74,7 @@ Das Spiel beginnt mit der Wagenübersicht „Die Ringbahn“: 24 Wagen, jeden Ta
 | Rechtsklick auf einen Gegenstand | anschauen / lesen (mit einem Gegenstand in der Hand: loslassen) |
 | Notizbuch oben rechts oder Taste **N** | Josephs Notizen – hier steht, was er schon weiß (bei vielen Notizen: blättern) |
 | Taste **H** oder „Tipp“ im Notizbuch | nach Rückfrage der komplette Lösungsweg des Wagens (steht in `src/story/solutions.js`) |
+| Zahnrad → „Frühere Wagen ansehen“ | einen geschafften Wagen kurz ansehen (wer und was dort ist, Klick: anschauen); der jetzige Wagen wartet so lange (`src/ui/memory.js`) |
 | **Leertaste** oder Klick | Sprechtext überspringen |
 | In einer Nahansicht (Schloss, Puzzle, Verteilerkasten …) | Linksklick bedient sie, beim Puzzle mit gedrückter Maustaste ziehen |
 | **Esc** oder Rechtsklick | Nahansicht / Notizbuch schließen, Gegenstand loslassen |

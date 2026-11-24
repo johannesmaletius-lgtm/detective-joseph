@@ -29,6 +29,7 @@ export class Settings {
       { kind: 'slider', key: 'musicVolume', label: 'Musik' },
       { kind: 'slider', key: 'effects', label: 'Effekte' },
     );
+    if (!this.game.inCalendar && this.game.memory.doors().length) rows.push({ kind: 'memory', label: 'Frühere Wagen ansehen' });
     if (!this.game.inCalendar) rows.push({ kind: 'leave', label: 'Zur Wagenübersicht' });
     let y = PANEL.y + 64;
     for (const row of rows) {
@@ -96,6 +97,10 @@ export class Settings {
       this.game.notebook.close();
       this.game.view?.close();
       this.game.story.hint();
+    }
+    if (row.kind === 'memory' && this.game.memory.possible) {
+      this.close();
+      this.game.memory.openPicker();
     }
     if (row.kind === 'leave') {
       // Zweimal klicken: Der Wagen beginnt beim nächsten Mal von vorn (Spielstand der geschafften Türen bleibt)
@@ -211,6 +216,7 @@ export class Settings {
     for (const row of rows) {
       const hovered = this.mouse.x >= PANEL.x && this.mouse.x <= PANEL.x + PANEL.width && this.mouse.y >= row.y - ROW / 2 && this.mouse.y < row.y + ROW / 2;
       if (row.kind === 'hint') this.drawHint(ctx, row, hovered);
+      else if (row.kind === 'memory') this.drawMemory(ctx, row, hovered);
       else if (row.kind === 'leave') this.drawButton(ctx, row, hovered, this.leaveArmed ? 'Wirklich? Der Wagen beginnt dann von vorn' : row.label);
       else {
         ctx.fillStyle = '#f3e2bf';
@@ -234,6 +240,18 @@ export class Settings {
     ctx.font = `bold 18px ${SANS}`;
     ctx.textAlign = 'center';
     ctx.fillText(possible ? row.label : 'Tipp – gerade nicht möglich', x + w / 2, row.y + 1);
+  }
+
+  drawMemory(ctx, row, hovered) {
+    const possible = this.game.memory.possible;
+    const x = PANEL.x + 18, w = PANEL.width - 36, h = 36;
+    roundedRect(ctx, x, row.y - h / 2, w, h, 8);
+    ctx.fillStyle = !possible ? 'rgba(80, 70, 60, 0.5)' : hovered ? 'rgba(90, 110, 130, 0.95)' : 'rgba(70, 88, 106, 0.85)';
+    ctx.fill();
+    ctx.fillStyle = possible ? '#f3e2bf' : 'rgba(243, 226, 191, 0.5)';
+    ctx.font = `bold 18px ${SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(possible ? row.label : 'Frühere Wagen – gerade nicht möglich', x + w / 2, row.y + 1);
   }
 
   drawButton(ctx, row, hovered, label) {

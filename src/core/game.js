@@ -13,6 +13,7 @@ import { Voices } from '../audio/voices.js';
 import { Music, wagonTrack, MENU } from '../audio/music.js';
 import { Hints } from '../ui/hints.js';
 import { Settings } from '../ui/settings.js';
+import { Memory } from '../ui/memory.js';
 import { levels } from '../audio/levels.js';
 import { Notebook } from '../ui/notebook.js';
 import { CodeLock } from '../ui/codeLock.js';
@@ -93,6 +94,7 @@ export class Game {
     this.notebook = new Notebook();
     this.overlay = new Overlay();
     this.settings = new Settings(this); // Zahnrad oben rechts: Lösungsweg, Ton, Lautstärken
+    this.memory = new Memory(this);     // frühere Wagen kurz ansehen (aus den Einstellungen)
 
     // Nahansichten: Zahlenschloss und Rätsel (immer höchstens eine ist offen), siehe src/puzzles/
     this.views = {
@@ -260,6 +262,14 @@ export class Game {
       this.cursor.set({ kind: 'interact', label, visible: this.calendar.isOpen || this.overlay.blocksInput });
       return;
     }
+    // Erinnerung an einen früheren Wagen: der jetzige Wagen steht so lange still
+    if (this.memory.isOpen) {
+      this.memory.update(dt, this.input.mouse);
+      this.music.update(dt, this);
+      this.overlay.update(dt);
+      this.cursor.set({ kind: this.memory.label() ? 'look' : 'interact', label: this.memory.label() });
+      return;
+    }
     this.scene.update(dt);
     this.camera.shakeY = this.scene.motion?.shakeY ?? 0; // der Zug rumpelt
     this.player.update(dt, this.scene);
@@ -299,6 +309,12 @@ export class Game {
       }
       this.overlay.draw(ctx);
       if (this.calendar.isOpen) this.settings.draw(ctx);
+      this.cursor.draw(ctx, this.input.mouse);
+      return;
+    }
+
+    if (this.memory.isOpen) {
+      this.memory.draw(ctx);
       this.cursor.draw(ctx, this.input.mouse);
       return;
     }
@@ -360,11 +376,12 @@ export class Game {
     this.idleTime = 0;
     this.sound.start(); // Browser erlauben Ton erst nach der ersten Eingabe
     this.effects.prepareSamples();
-    const settingsVisible = this.inCalendar ? this.calendar.isOpen : this.overlay.fade < 0.5;
+    const settingsVisible = this.inCalendar ? this.calendar.isOpen : this.overlay.fade < 0.5 && !this.memory.isOpen;
     if (settingsVisible && !click.right && this.settings.handleClick(click)) return;
     if (settingsVisible && this.settings.isOpen) return;
     if (this.overlay.blocksInput) return this.overlay.handleClick(click);
     if (this.inCalendar) return this.calendar.isOpen && !click.right ? this.calendar.handleClick(click) : undefined;
+    if (this.memory.isOpen) return this.memory.handleClick(click);
     if (this.view) return this.view.handleClick(click, click.right);
     if (this.notebook.isOpen) {
       if (this.notebook.handleClick(click) === 'hint') {
@@ -425,6 +442,11 @@ export class Game {
     this.effects.prepareSamples();
     if (key === KEYS.close && this.settings.isOpen) return this.settings.close();
     if (this.inCalendar) {
+      if (key === KEYS.toggleSound) this.sound.toggleMute();
+      return;
+    }
+    if (this.memory.isOpen) {
+      if (key === KEYS.close) this.memory.handleKey();
       if (key === KEYS.toggleSound) this.sound.toggleMute();
       return;
     }
