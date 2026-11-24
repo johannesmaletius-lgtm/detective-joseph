@@ -38,10 +38,11 @@ function headOf(image) {
 
 // Je Ansicht: Breite des Mützenkörpers im Bild (ohne Schirm), seine Mitte (x) und die Unterkante (y).
 // width = Mützenbreite im Verhältnis zur Kopfbreite, bottom = Unterkante unter der Kopfoberkante (Bildpixel).
-const CAPS = {
-  front: { src: 'assets/characters/joseph/cap-front.webp', body: 233, center: 142, width: 1.1, bottom: 60 },
-  side: { src: 'assets/characters/joseph/cap-side.webp', body: 250, center: 140, width: 1.05, bottom: 63 },
-  back: { src: 'assets/characters/joseph/cap-back.webp', body: 245, center: 146, width: 1.1, bottom: 58 },
+// squash = Höhe gestaucht (die Mütze sitzt tief auf dem Kopf statt hoch obenauf).
+export const CAPS = {
+  front: { src: 'assets/characters/joseph/cap-front.webp', body: 233, center: 142, width: 1.2, bottom: 70, squash: 0.62 },
+  side: { src: 'assets/characters/joseph/cap-side.webp', body: 250, center: 140, width: 1.15, bottom: 70, squash: 0.62 },
+  back: { src: 'assets/characters/joseph/cap-back.webp', body: 245, center: 146, width: 1.2, bottom: 68, squash: 0.62 },
 };
 const IMAGES = {};
 function capImage(kind) {
@@ -68,7 +69,7 @@ export function drawConductorCap(ctx, image, facing) {
   const c = CAPS[kind];
   const scale = (head.w * c.width) / c.body;
   const w = cap.naturalWidth * scale;
-  const h = cap.naturalHeight * scale;
+  const h = cap.naturalHeight * scale * c.squash;
   const y = head.top + c.bottom - h;
   ctx.save();
   ctx.translate(head.cx, y);
