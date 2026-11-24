@@ -1,4 +1,7 @@
-import { BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, fineGrain, glow, line, rivet, roundedRect, screw, sheet, text, vignette, wood } from './common.js';
+import {
+  BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, cachedLayer, contactShadow, fineGrain, glow, line, plank, rivet, roundedRect, screw, sheet, text,
+  vignette, woodFrame,
+} from './common.js';
 
 // Gezeichnetes für Wagen 3 (Postwagen): die 24 Fächer, die Rohrpost-Weichen, der verschlüsselte Brief.
 
@@ -29,24 +32,89 @@ export function checkHoles(placement) {
     && placement.every((id, i) => !id || id === `r${HOLE_ROUNDS[i]}`);
 }
 
-export function drawHoles(ctx) {
-  wood(ctx, 220, 50, 840, 470, [96, 54, 26]);
+function paintHoles(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [56, 36, 22], seed: 31, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.6);
+  // Sortierschrank: Eichenkorpus mit Rahmen
+  woodFrame(c, 206, 40, 868, 494, { border: 24, tone: [120, 72, 36], seed: 32 });
+  plank(c, 230, 64, 820, 446, { tone: [108, 64, 32], seed: 33, knots: 2 });
   for (let round = 1; round <= 24; round++) {
     const r = holeRect(round);
-    ctx.fillStyle = '#2a170b';
-    ctx.fillRect(r.x, r.y, r.w, r.h);
-    ctx.fillStyle = '#d8c18c';
-    ctx.fillRect(r.x + r.w / 2 - 26, r.y + r.h + 1, 52, 13);
-    text(ctx, ROMAN[round - 1], r.x + r.w / 2, r.y + r.h + 12, { font: `bold 12px ${SERIF}`, align: 'center' });
+    // Fach: Tiefe, Innenschatten oben und links, heller Boden vorne
+    const inner = c.createLinearGradient(0, r.y, 0, r.y + r.h);
+    inner.addColorStop(0, '#120a04');
+    inner.addColorStop(1, '#3a2210');
+    c.fillStyle = inner;
+    c.fillRect(r.x, r.y, r.w, r.h);
+    const side = c.createLinearGradient(r.x, 0, r.x + 16, 0);
+    side.addColorStop(0, 'rgba(0, 0, 0, 0.55)');
+    side.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    c.fillStyle = side;
+    c.fillRect(r.x, r.y, 16, r.h);
+    c.fillStyle = 'rgba(160, 110, 60, 0.35)';
+    c.beginPath();
+    c.moveTo(r.x, r.y + r.h);
+    c.lineTo(r.x + 10, r.y + r.h - 10);
+    c.lineTo(r.x + r.w - 10, r.y + r.h - 10);
+    c.lineTo(r.x + r.w, r.y + r.h);
+    c.closePath();
+    c.fill();
+    // Kante des Fachs
+    c.strokeStyle = 'rgba(255, 220, 160, 0.22)';
+    c.lineWidth = 1.5;
+    line(c, r.x, r.y + r.h + 0.5, r.x + r.w, r.y + r.h + 0.5);
+    // Messing-Kartenhalter mit Runde
+    const hg = c.createLinearGradient(0, r.y + r.h + 1, 0, r.y + r.h + 15);
+    hg.addColorStop(0, '#f2d98c');
+    hg.addColorStop(1, '#8a6a24');
+    c.fillStyle = hg;
+    roundedRect(c, r.x + r.w / 2 - 30, r.y + r.h + 1, 60, 14, 2);
+    c.fill();
+    c.fillStyle = '#e8dab0';
+    c.fillRect(r.x + r.w / 2 - 26, r.y + r.h + 3, 52, 10);
+    text(c, ROMAN[round - 1], r.x + r.w / 2, r.y + r.h + 12, { font: `bold 11px ${SERIF}`, align: 'center' });
+  }
+  fineGrain(c, 230, 64, 820, 446, { seed: 34, count: 0.002 });
+  glow(c, 520, 120, 520, '255, 220, 160', 0.12);
+  // Weidenkorb mit losen Briefen
+  contactShadow(c, 640, 652, 470, 22, 0.6);
+  c.save();
+  c.beginPath();
+  c.moveTo(200, 560); c.lineTo(1080, 560); c.lineTo(1060, 646); c.lineTo(220, 646); c.closePath();
+  c.clip();
+  c.fillStyle = '#5a3a18';
+  c.fillRect(196, 556, 888, 94);
+  for (let row = 0; row < 6; row++) {
+    for (let x = 196 + (row % 2) * 14; x < 1090; x += 28) {
+      const y = 562 + row * 15;
+      const g = c.createLinearGradient(0, y, 0, y + 12);
+      g.addColorStop(0, '#c49a5a');
+      g.addColorStop(1, '#6a4a22');
+      c.fillStyle = g;
+      roundedRect(c, x, y, 24, 11, 5);
+      c.fill();
+    }
+  }
+  for (let x = 210; x < 1080; x += 28) {
+    c.fillStyle = 'rgba(40, 24, 8, 0.5)';
+    c.fillRect(x, 560, 3, 90);
+  }
+  c.restore();
+  const rim = c.createLinearGradient(0, 552, 0, 566);
+  rim.addColorStop(0, '#d8b070');
+  rim.addColorStop(1, '#6a4a22');
+  c.fillStyle = rim;
+  roundedRect(c, 194, 552, 892, 14, 7);
+  c.fill();
+}
+
+export function drawHoles(ctx) {
+  ctx.drawImage(cachedLayer('w3-holes', paintHoles), 0, 0, 1280, 720);
+  for (let round = 1; round <= 24; round++) {
+    const r = holeRect(round);
     if (FILLED.includes(round)) drawEnvelope(ctx, r.x + r.w / 2, r.y + r.h / 2 + 6, round, 0.92, true);
   }
-  // Korb mit losen Briefen
-  ctx.fillStyle = '#6b4a22';
-  ctx.fillRect(200, 560, 880, 86);
-  ctx.strokeStyle = '#3d2810';
-  ctx.lineWidth = 3;
-  for (let x = 210; x < 1080; x += 22) line(ctx, x, 560, x - 8, 646);
-  text(ctx, 'Lose Post', 640, 668, { font: `bold 16px ${PRINT}`, color: '#f1e0b8', align: 'center' });
+  text(ctx, 'Lose Post', 640, 676, { font: `bold 16px ${PRINT}`, color: '#f1e0b8', align: 'center' });
 }
 
 export function drawLetterToken(ctx, token, x, y) {

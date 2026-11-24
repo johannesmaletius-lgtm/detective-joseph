@@ -1,5 +1,7 @@
 import { drawSymbol } from '../../ui/symbols.js';
-import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import {
+  HAND, INK, PRINT, SERIF, cachedLayer, contactShadow, drawPicture, fineGrain, glow, line, plank, sheet, smudge, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 7 (Barwagen): Flaschenregal mit Gläsern, Bierdeckel, Zeitung.
 
@@ -210,28 +212,81 @@ export const COASTER_TALLY = [
 ];
 export const DOOR_SYMBOLS = ['tower', 'lanternRight', 'tunnel', 'lanternLeft'];
 
-export function drawCoaster(ctx) {
+function paintBarCounter(c) {
+  // Tresen aus Mahagoni, poliert, mit Lichtspiegelung
+  plank(c, 0, 0, 1280, 720, { tone: [92, 36, 22], seed: 71, knots: 1 });
+  for (let k = 1; k < 5; k++) {
+    c.fillStyle = 'rgba(20, 6, 2, 0.45)';
+    c.fillRect(0, k * 150 - 6, 1280, 2);
+  }
+  glow(c, 820, 140, 520, '255, 220, 170', 0.18);
+  vignette(c, 0, 0, 1280, 720, 0.7);
+  // Alte Glasränder auf dem Holz
+  for (const [x, y, r] of [[230, 180, 60], [1080, 560, 70], [1010, 150, 52]]) {
+    c.strokeStyle = 'rgba(255, 230, 200, 0.07)';
+    c.lineWidth = 5;
+    c.beginPath();
+    c.arc(x, y, r, 0, Math.PI * 2);
+    c.stroke();
+  }
+  // Der Bierdeckel: Pappe mit Kante und Schatten
   const cx = 640, cy = 360, r = 270;
-  ctx.save();
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-  ctx.shadowBlur = 30;
-  ctx.fillStyle = '#eadbb0';
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-  ctx.strokeStyle = '#8f2b1d';
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r - 18, 0, Math.PI * 2);
-  ctx.stroke();
-  // Glasränder
-  ctx.strokeStyle = 'rgba(140, 90, 40, 0.3)';
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  ctx.arc(cx + 70, cy - 60, 90, 0, Math.PI * 2);
-  ctx.stroke();
-  text(ctx, 'BARWAGEN · RINGBAHN', cx, cy - 190, { font: `bold 22px ${SERIF}`, color: '#8f2b1d', align: 'center' });
+  contactShadow(c, cx + 14, cy + 22, r + 20, r + 10, 0.6);
+  c.fillStyle = '#b8a47a';
+  c.beginPath();
+  c.arc(cx + 2, cy + 5, r, 0, Math.PI * 2);
+  c.fill();
+  const card = c.createRadialGradient(cx - 80, cy - 90, 40, cx, cy, r);
+  card.addColorStop(0, '#f3e6c2');
+  card.addColorStop(1, '#ddc99a');
+  c.fillStyle = card;
+  c.beginPath();
+  c.arc(cx, cy, r, 0, Math.PI * 2);
+  c.fill();
+  c.save();
+  c.beginPath();
+  c.arc(cx, cy, r, 0, Math.PI * 2);
+  c.clip();
+  fineGrain(c, cx - r, cy - r, r * 2, r * 2, { seed: 72, count: 0.006, dark: 0.12, light: 0.1, size: 1.8 });
+  // Wasserflecken und angestoßene Kante
+  smudge(c, cx + 120, cy + 80, 110, 90, 'rgba(150, 110, 60, 0.18)');
+  smudge(c, cx - 200, cy - 40, 60, 60, 'rgba(150, 110, 60, 0.12)');
+  c.restore();
+  // Geprägter Zackenrand
+  c.strokeStyle = 'rgba(120, 90, 50, 0.35)';
+  c.lineWidth = 2;
+  c.beginPath();
+  for (let i = 0; i <= 120; i++) {
+    const a = (i / 120) * Math.PI * 2, rr = r - 6 - (i % 2) * 4;
+    c.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  c.stroke();
+  c.strokeStyle = '#8f2b1d';
+  c.lineWidth = 8;
+  c.beginPath();
+  c.arc(cx, cy, r - 22, 0, Math.PI * 2);
+  c.stroke();
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(cx, cy, r - 32, 0, Math.PI * 2);
+  c.stroke();
+  // Glasrand vom Whiskyglas
+  c.strokeStyle = 'rgba(140, 90, 40, 0.28)';
+  c.lineWidth = 7;
+  c.beginPath();
+  c.arc(cx + 70, cy - 60, 90, 0.2, Math.PI * 1.85);
+  c.stroke();
+  c.strokeStyle = 'rgba(140, 90, 40, 0.14)';
+  c.lineWidth = 3;
+  c.beginPath();
+  c.arc(cx + 66, cy - 56, 82, 0, Math.PI * 2);
+  c.stroke();
+}
+
+export function drawCoaster(ctx) {
+  const cx = 640, cy = 360;
+  ctx.drawImage(cachedLayer('w7-coaster', paintBarCounter), 0, 0, 1280, 720);
+  text(ctx, 'BARWAGEN · RINGBAHN', cx, cy - 184, { font: `bold 22px ${SERIF}`, color: '#8f2b1d', align: 'center' });
   COASTER_TALLY.forEach(({ symbol, count }, i) => {
     const y = cy - 110 + i * 78;
     drawSymbol(ctx, symbol, cx - 150, y, 52, INK);

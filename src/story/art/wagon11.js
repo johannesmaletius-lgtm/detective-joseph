@@ -1,4 +1,6 @@
-import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import {
+  HAND, INK, PRINT, SERIF, cachedLayer, contactShadow, drawPicture, fineGrain, glow, line, plank, rivet, roundedRect, sheet, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 11 (Uhrenwagen): die Wand voller Uhren (eine geht mit dem Mond),
 // die Rundenuhr, Standuhr und Kuckucksuhr zum Stellen.
@@ -104,7 +106,7 @@ function hands(ctx, cx, cy, r, hour, minute, second) {
 }
 
 // Die Rundenuhr: ein Zeiger, einmal herum pro Runde. Oben „Tunnel“, roter Strich beim Ruf.
-export function drawRoundClock(ctx, cx, cy, r, progress, { big = false, bare = false } = {}) {
+export function drawRoundClock(ctx, cx, cy, r, progress, { big = false, bare = false, labelGap = 18 } = {}) {
   if (bare) ticks(ctx, cx, cy, r, '#d9c88a');
   else face(ctx, cx, cy, r, '#d9d2c0');
   if (!bare) {
@@ -129,8 +131,8 @@ export function drawRoundClock(ctx, cx, cy, r, progress, { big = false, bare = f
   ctx.lineWidth = big ? 8 : 5;
   line(ctx, cx + Math.cos(ca) * r * 0.74, cy + Math.sin(ca) * r * 0.74, cx + Math.cos(ca) * r * 0.98, cy + Math.sin(ca) * r * 0.98);
   if (big) {
-    text(ctx, 'Tunnel', cx, cy - r - 18, { font: `bold 20px ${PRINT}`, color: '#f3e2b4', align: 'center' });
-    text(ctx, 'Ruf', cx + Math.cos(ca) * (r + 34), cy + Math.sin(ca) * (r + 34) + 6, { font: `bold 20px ${HAND}`, color: '#ff8a70', align: 'center' });
+    text(ctx, 'Tunnel', cx, cy - r - labelGap, { font: `bold 20px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+    text(ctx, 'Ruf', cx + Math.cos(ca) * (r + labelGap + 16), cy + Math.sin(ca) * (r + labelGap + 16) + 6, { font: `bold 20px ${HAND}`, color: '#ff8a70', align: 'center' });
     for (let m = 10; m < 60; m += 10) {
       const a = (m / 60) * Math.PI * 2 - Math.PI / 2;
       text(ctx, String(m), cx + Math.cos(a) * r * 0.62, cy + Math.sin(a) * r * 0.62 + 6, { font: `16px ${SERIF}`, color: '#e9dfc0', align: 'center' });
@@ -151,9 +153,68 @@ export function drawRoundClock(ctx, cx, cy, r, progress, { big = false, bare = f
   ctx.fill();
 }
 
+// Wand mit Holzvertäfelung für die Nahansichten der Uhren
+function wall(c, seed) {
+  plank(c, 0, 0, 1280, 720, { tone: [74, 42, 22], seed, vertical: true, knots: 0 });
+  for (let x = 30; x < 1280; x += 140) {
+    c.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    c.fillRect(x, 0, 3, 720);
+  }
+  glow(c, 640, 120, 600, '255, 210, 140', 0.12);
+  vignette(c, 0, 0, 1280, 720, 0.7);
+}
+
+// Messinglünette mit Glasscheibe (Glanz) um ein Zifferblatt
+function bezel(c, cx, cy, r, width = 20) {
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  c.shadowBlur = 30;
+  c.shadowOffsetY = 12;
+  const g = c.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  g.addColorStop(0, '#fbe6a4');
+  g.addColorStop(0.4, '#c49a40');
+  g.addColorStop(0.7, '#8a6420');
+  g.addColorStop(1, '#4a3008');
+  c.fillStyle = g;
+  c.beginPath();
+  c.arc(cx, cy, r + width, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+  c.strokeStyle = 'rgba(255, 240, 190, 0.6)';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(cx, cy, r + width - 3, Math.PI * 0.9, Math.PI * 1.6);
+  c.stroke();
+  c.strokeStyle = 'rgba(40, 24, 4, 0.7)';
+  c.beginPath();
+  c.arc(cx, cy, r + 4, 0, Math.PI * 2);
+  c.stroke();
+}
+
+function glassGlare(c, cx, cy, r) {
+  c.save();
+  c.beginPath();
+  c.arc(cx, cy, r, 0, Math.PI * 2);
+  c.clip();
+  const g = c.createLinearGradient(cx - r, cy - r, cx + r * 0.2, cy + r * 0.2);
+  g.addColorStop(0, 'rgba(255, 255, 255, 0.16)');
+  g.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)');
+  g.addColorStop(0.51, 'rgba(255, 255, 255, 0)');
+  c.fillStyle = g;
+  c.fillRect(cx - r, cy - r, r * 2, r * 2);
+  c.restore();
+}
+
+function paintRoundClockCard(c) {
+  wall(c, 111);
+  bezel(c, 640, 350, 218, 24);
+  for (let i = 0; i < 4; i++) rivet(c, 640 + Math.cos(i * Math.PI / 2 + Math.PI / 4) * 230, 350 + Math.sin(i * Math.PI / 2 + Math.PI / 4) * 230, 4, [150, 120, 50]);
+}
+
 export function drawRoundClockCard(ctx, progress) {
-  wood(ctx, 340, 70, 600, 580, [104, 62, 30]);
-  drawRoundClock(ctx, 640, 350, 210, progress, { big: true });
+  ctx.drawImage(cachedLayer('w11-roundcard', paintRoundClockCard), 0, 0, 1280, 720);
+  drawRoundClock(ctx, 640, 350, 210, progress, { big: true, labelGap: 50 });
+  glassGlare(ctx, 640, 350, 218);
   text(ctx, 'Ein Zeiger, einmal herum pro Runde. Oben der Tunnel.', 640, 630, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 }
 
@@ -163,42 +224,229 @@ export const SET_SPOTS = [
   { id: 'minus', x: 400, y: 560, w: 120, h: 70, label: 'Minutenzeiger zurück (5 Minuten)' },
 ];
 
+function paintSetClock(c, cuckoo) {
+  wall(c, cuckoo ? 112 : 113);
+  contactShadow(c, 640, 676, 300, 22, 0.6);
+  if (cuckoo) {
+    // Kuckucksuhr: geschnitztes Häuschen mit Dach, Laub und Vogeltürchen
+    c.save();
+    c.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    c.shadowBlur = 30;
+    c.shadowOffsetY = 12;
+    c.fillStyle = '#4a2810';
+    c.fillRect(420, 150, 440, 520);
+    c.restore();
+    plank(c, 420, 150, 440, 520, { tone: [128, 76, 36], seed: 114, vertical: true, knots: 2 });
+    // Dach mit Schindeln
+    c.save();
+    c.beginPath();
+    c.moveTo(370, 226); c.lineTo(640, 46); c.lineTo(910, 226); c.lineTo(880, 240); c.lineTo(640, 80); c.lineTo(400, 240); c.closePath();
+    c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    c.shadowBlur = 14;
+    c.shadowOffsetY = 6;
+    c.fillStyle = '#5c2e12';
+    c.fill();
+    c.restore();
+    c.save();
+    c.beginPath();
+    c.moveTo(370, 226); c.lineTo(640, 46); c.lineTo(910, 226); c.lineTo(880, 240); c.lineTo(640, 80); c.lineTo(400, 240); c.closePath();
+    c.clip();
+    for (let k = 0; k < 40; k++) {
+      c.strokeStyle = 'rgba(30, 12, 2, 0.5)';
+      c.lineWidth = 1.5;
+      line(c, 360 + k * 14, 60, 360 + k * 14 - 30, 260);
+    }
+    c.restore();
+    c.fillStyle = 'rgba(255, 210, 150, 0.25)';
+    c.beginPath();
+    c.moveTo(370, 226); c.lineTo(640, 46); c.lineTo(644, 52); c.lineTo(376, 230); c.closePath();
+    c.fill();
+    // Giebelfeld mit Türchen und Kuckuck
+    c.fillStyle = '#6a3a18';
+    c.beginPath();
+    c.moveTo(420, 230); c.lineTo(640, 82); c.lineTo(860, 230); c.closePath();
+    c.fill();
+    c.fillStyle = '#1e1008';
+    roundedRect(c, 614, 98, 52, 50, 6);
+    c.fill();
+    c.fillStyle = '#7a4a1e';
+    c.fillRect(590, 100, 22, 46);
+    c.fillStyle = '#e7c23a';
+    c.beginPath();
+    c.ellipse(640, 124, 15, 12, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = '#b8842a';
+    c.beginPath();
+    c.moveTo(653, 120); c.lineTo(668, 125); c.lineTo(653, 130); c.closePath();
+    c.fill();
+    c.fillStyle = '#1e1008';
+    c.beginPath();
+    c.arc(645, 120, 2.5, 0, Math.PI * 2);
+    c.fill();
+    // Geschnitztes Laub links und rechts
+    for (const side of [-1, 1]) {
+      for (let k = 0; k < 6; k++) {
+        const lx = 640 + side * (240 + (k % 2) * 16), ly = 270 + k * 62;
+        c.save();
+        c.translate(lx, ly);
+        c.rotate(side * (0.5 + (k % 3) * 0.3));
+        c.fillStyle = k % 2 ? '#6a3c16' : '#7e4a1c';
+        c.beginPath();
+        c.ellipse(0, 0, 30, 14, 0, 0, Math.PI * 2);
+        c.fill();
+        c.strokeStyle = 'rgba(30, 12, 2, 0.6)';
+        c.lineWidth = 1.5;
+        line(c, -26, 0, 26, 0);
+        c.restore();
+      }
+    }
+  } else {
+    // Standuhr: Haube mit Säulen, Mahagoni
+    c.save();
+    c.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    c.shadowBlur = 30;
+    c.shadowOffsetY = 12;
+    c.fillStyle = '#2a1408';
+    c.fillRect(400, 60, 480, 620);
+    c.restore();
+    plank(c, 400, 60, 480, 620, { tone: [96, 40, 22], seed: 115, vertical: true, knots: 1 });
+    // Bogen oben
+    c.fillStyle = '#5a2410';
+    c.beginPath();
+    c.moveTo(380, 120); c.quadraticCurveTo(640, 10, 900, 120); c.lineTo(900, 136); c.lineTo(380, 136); c.closePath();
+    c.fill();
+    c.fillStyle = 'rgba(255, 210, 160, 0.25)';
+    c.fillRect(380, 134, 520, 2);
+    // Säulen mit Messingkapitellen
+    for (const x of [420, 860]) {
+      const col = c.createLinearGradient(x - 14, 0, x + 14, 0);
+      col.addColorStop(0, '#3a160a');
+      col.addColorStop(0.4, '#8a3a1c');
+      col.addColorStop(1, '#2a0e06');
+      c.fillStyle = col;
+      c.fillRect(x - 14, 150, 28, 400);
+      for (const y of [140, 550]) {
+        const cap = c.createLinearGradient(0, y, 0, y + 14);
+        cap.addColorStop(0, '#f2d98c');
+        cap.addColorStop(1, '#7a5a1a');
+        c.fillStyle = cap;
+        c.fillRect(x - 20, y, 40, 14);
+      }
+    }
+  }
+}
+
+// Zifferblatt: Emaille mit Minutenkranz und Messingrand
+function fancyFace(ctx, cx, cy, r) {
+  bezel(ctx, cx, cy, r, 18);
+  const dial = ctx.createRadialGradient(cx - r * 0.2, cy - r * 0.2, r * 0.1, cx, cy, r);
+  dial.addColorStop(0, '#fbf4de');
+  dial.addColorStop(1, '#dccfa8');
+  ctx.fillStyle = dial;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  fineGrain(ctx, cx - r, cy - r, r * 2, r * 2, { seed: 11, count: 0.002, dark: 0.08, light: 0.04 });
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.94, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.86, 0, Math.PI * 2);
+  ctx.stroke();
+  for (let i = 0; i < 60; i++) {
+    const a = (i / 60) * Math.PI * 2;
+    ctx.lineWidth = i % 5 ? 1.2 : 3.5;
+    const inner = i % 5 ? 0.88 : 0.84;
+    line(ctx, cx + Math.cos(a) * r * inner, cy + Math.sin(a) * r * inner, cx + Math.cos(a) * r * 0.94, cy + Math.sin(a) * r * 0.94);
+  }
+}
+
+// Zeiger aus gebläutem Stahl
+function fancyHands(ctx, cx, cy, r, hour, minute) {
+  const ha = ((hour % 12) + minute / 60) / 12 * Math.PI * 2;
+  const ma = (minute / 60) * Math.PI * 2;
+  const hand = (angle, length, width) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = '#1c2236';
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.4, r * 0.12);
+    ctx.lineTo(-width * 0.4, -length * 0.62);
+    ctx.quadraticCurveTo(-width * 1.6, -length * 0.74, 0, -length);
+    ctx.quadraticCurveTo(width * 1.6, -length * 0.74, width * 0.4, -length * 0.62);
+    ctx.lineTo(width * 0.4, r * 0.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  };
+  hand(ha, r * 0.52, 8);
+  hand(ma, r * 0.8, 6);
+  const g = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 9);
+  g.addColorStop(0, '#fbe6a4');
+  g.addColorStop(1, '#7a5a1a');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Messing-Druckknopf mit Gravur
+function brassButton(ctx, spot, label) {
+  const { x, y, w, h } = spot;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 5;
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  g.addColorStop(0, '#f6de94');
+  g.addColorStop(0.5, '#c49a40');
+  g.addColorStop(1, '#6a4a14');
+  ctx.fillStyle = g;
+  roundedRect(ctx, x, y, w, h, 12);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(60, 40, 8, 0.7)';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, x + 5, y + 5, w - 10, h - 10, 9);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255, 248, 220, 0.35)';
+  ctx.fillRect(x + 12, y + 4, w - 24, 2);
+  text(ctx, label, x + w / 2, y + 44, { font: `bold 22px ${PRINT}`, color: 'rgba(255, 240, 200, 0.6)', align: 'center' });
+  text(ctx, label, x + w / 2 - 1, y + 43, { font: `bold 22px ${PRINT}`, color: '#3a2608', align: 'center' });
+}
+
 export function drawSetClock(ctx, which, minute, running) {
   const cuckoo = which === 'cuckoo';
-  wood(ctx, 320, 40, 640, 620, cuckoo ? [120, 70, 30] : [84, 46, 22]);
-  if (cuckoo) {
-    ctx.fillStyle = '#5c2e12';
-    ctx.beginPath();
-    ctx.moveTo(400, 210);
-    ctx.lineTo(640, 70);
-    ctx.lineTo(880, 210);
-    ctx.fill();
-    ctx.fillStyle = '#e7c23a';
-    ctx.beginPath();
-    ctx.arc(640, 150, 18, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  face(ctx, 640, 340, 170);
-  hands(ctx, 640, 340, 170, cuckoo ? 11 : 2, minute, null);
+  ctx.drawImage(cachedLayer(`w11-set-${which}`, (c) => paintSetClock(c, cuckoo)), 0, 0, 1280, 720);
+  fancyFace(ctx, 640, 340, 170);
   // Minutenzahlen
   for (let m = 0; m < 60; m += 15) {
     const a = (m / 60) * Math.PI * 2 - Math.PI / 2;
-    text(ctx, m === 0 ? '12' : String(m / 5), 640 + Math.cos(a) * 124, 340 + Math.sin(a) * 124 + 10, { font: `bold 28px ${SERIF}`, color: INK, align: 'center' });
+    text(ctx, m === 0 ? '12' : String(m / 5), 640 + Math.cos(a) * 118, 340 + Math.sin(a) * 118 + 10, { font: `bold 30px ${SERIF}`, color: INK, align: 'center' });
   }
-  for (const spot of SET_SPOTS) {
-    ctx.fillStyle = '#3a2412';
-    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
-    ctx.strokeStyle = '#c9a24c';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(spot.x, spot.y, spot.w, spot.h);
-    text(ctx, spot.id === 'plus' ? '⟳ vor' : '⟲ zurück', spot.x + spot.w / 2, spot.y + 44, { font: `bold 22px ${PRINT}`, color: '#f3e2b4', align: 'center' });
-  }
-  text(ctx, `:${String(minute).padStart(2, '0')}`, 640, 600, { font: `bold 30px ${PRINT}`, color: '#f3e2b4', align: 'center' });
-  text(ctx, cuckoo ? 'Kuckucksuhr – geht nur halb so schnell' : 'Standuhr – geht anderthalbmal so schnell', 640, 650, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
-  if (running) text(ctx, 'läuft erst nach dem nächsten Tunnel von hier los', 640, 104, { font: `italic 16px ${SERIF}`, color: '#e9d8b0', align: 'center' });
+  fancyHands(ctx, 640, 340, 170, cuckoo ? 11 : 2, minute);
+  glassGlare(ctx, 640, 340, 170);
+  for (const spot of SET_SPOTS) brassButton(ctx, spot, spot.id === 'plus' ? '⟳ vor' : '⟲ zurück');
+  // Anzeige der Minuten in einem kleinen Emailleschild
+  ctx.fillStyle = '#efe6cf';
+  roundedRect(ctx, 584, 568, 112, 50, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#1c2a52';
+  ctx.lineWidth = 2;
+  roundedRect(ctx, 588, 572, 104, 42, 6);
+  ctx.stroke();
+  text(ctx, `:${String(minute).padStart(2, '0')}`, 640, 604, { font: `bold 30px ${PRINT}`, color: '#1c2a52', align: 'center' });
+  text(ctx, cuckoo ? 'Kuckucksuhr – geht nur halb so schnell' : 'Standuhr – geht anderthalbmal so schnell', 640, 656, { font: `16px ${PRINT}`, color: '#f3e2b4', align: 'center' });
+  if (running) text(ctx, 'läuft erst nach dem nächsten Tunnel von hier los', 640, 30, { font: `italic 16px ${SERIF}`, color: '#f3e2b4', align: 'center' });
 }
 
-// Herrn Ticks Zettel über seine Uhren
 export function drawTickNote(ctx) {
   sheet(ctx, 380, 150, 520, 400, {
     angle: 0.02,

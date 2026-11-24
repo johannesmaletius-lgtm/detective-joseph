@@ -1,5 +1,7 @@
 import { loadImage } from '../../core/assets.js';
-import { BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, glow, line, sheet, text, wood } from './common.js';
+import {
+  BLUE_INK, HAND, INK, PRINT, SERIF, TYPEWRITER, cachedLayer, contactShadow, glow, line, plank, rivet, roundedRect, sheet, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 14 (Zeitungswagen): das Kreuzworträtsel, die Zeitung vom 25. Dezember
 // mit herausgeschnittenen Wörtern, die Schnipsel und das Pressefoto mit der Bahnhofsuhr.
@@ -192,14 +194,171 @@ export function drawMagnified(ctx) {
   glow(ctx, 560, 280, 120, '255, 255, 255', 0.1);
 }
 
-export function drawArchive(ctx) {
-  wood(ctx, 300, 90, 680, 540, [96, 56, 28]);
-  for (let i = 0; i < 4; i++) {
-    ctx.fillStyle = '#5a3418';
-    ctx.fillRect(340, 130 + i * 120, 600, 100);
-    ctx.fillStyle = '#c9a24c';
-    ctx.fillRect(610, 170 + i * 120, 60, 16);
-    const years = ['A – F', 'G – M', 'N – S', '24. – 25. Dez.'];
-    text(ctx, years[i], 640, 214 + i * 120, { font: `16px ${TYPEWRITER}`, color: '#f3e2b4', align: 'center' });
+// Der Archivschrank, unterste Schublade aufgezogen: darin die einzige Zeitung vom 25. Dezember
+const DRAWERS = ['A – F', 'G – M', 'N – S', '24. – 25. Dez.'];
+
+function paintArchive(c) {
+  // Wand und Boden des Zeitungswagens
+  plank(c, 0, 0, 1280, 720, { tone: [70, 44, 26], seed: 141, vertical: true, knots: 0 });
+  for (let x = 40; x < 1280; x += 150) {
+    c.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    c.fillRect(x, 0, 3, 720);
   }
+  plank(c, 0, 640, 1280, 80, { tone: [64, 40, 22], seed: 142 });
+  c.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  c.fillRect(0, 636, 1280, 6);
+  vignette(c, 0, 0, 1280, 720, 0.65);
+  glow(c, 640, 120, 560, '255, 214, 150', 0.16);
+  contactShadow(c, 640, 646, 380, 26, 0.75);
+  // Korpus: Eiche, mit Sockel und Deckplatte
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  c.shadowBlur = 36;
+  c.shadowOffsetY = 14;
+  c.fillStyle = '#4a2a14';
+  c.fillRect(330, 70, 620, 572);
+  c.restore();
+  plank(c, 330, 70, 620, 572, { tone: [104, 62, 32], seed: 143, vertical: true, knots: 2 });
+  plank(c, 312, 56, 656, 26, { tone: [122, 74, 38], seed: 144 });
+  c.fillStyle = 'rgba(255, 220, 160, 0.3)';
+  c.fillRect(312, 56, 656, 2);
+  c.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  c.fillRect(330, 82, 620, 6);
+  plank(c, 322, 612, 636, 30, { tone: [78, 46, 24], seed: 145 });
+  c.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  c.fillRect(322, 612, 636, 3);
+  // Seitenkanten etwas dunkler
+  for (const [x, dir] of [[330, 1], [950, -1]]) {
+    const side = c.createLinearGradient(x, 0, x + dir * 26, 0);
+    side.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+    side.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    c.fillStyle = side;
+    c.fillRect(Math.min(x, x + dir * 26), 88, 26, 524);
+  }
+  // Drei geschlossene Schubladen
+  for (let i = 0; i < 3; i++) drawerFront(c, 356, 104 + i * 118, 568, 104, DRAWERS[i], 150 + i);
+  // Die unterste ist aufgezogen: dunkle Öffnung, darin die Schublade (Seitenwände, Hängeordner, Zeitung)
+  c.fillStyle = '#140c06';
+  c.fillRect(356, 458, 568, 140);
+  // Schubladenkasten nach vorne gezogen: Seitenwände in Perspektive
+  c.fillStyle = '#6a4020';
+  c.beginPath();
+  c.moveTo(356, 470); c.lineTo(330, 506); c.lineTo(330, 610); c.lineTo(356, 598); c.closePath();
+  c.fill();
+  c.beginPath();
+  c.moveTo(924, 470); c.lineTo(950, 506); c.lineTo(950, 610); c.lineTo(924, 598); c.closePath();
+  c.fill();
+  // Innenraum
+  const inside = c.createLinearGradient(0, 470, 0, 560);
+  inside.addColorStop(0, '#1c120a');
+  inside.addColorStop(1, '#3a2412');
+  c.fillStyle = inside;
+  c.beginPath();
+  c.moveTo(356, 470); c.lineTo(924, 470); c.lineTo(950, 506); c.lineTo(330, 506); c.closePath();
+  c.fill();
+  // Hängeordner hinten, leer bis auf alte Ausgaben
+  for (let k = 0; k < 9; k++) {
+    const x = 372 + k * 62;
+    c.fillStyle = k % 2 ? '#8a7a56' : '#9a8a62';
+    c.beginPath();
+    c.moveTo(x, 498); c.lineTo(x + 6, 474); c.lineTo(x + 50, 474); c.lineTo(x + 56, 498); c.closePath();
+    c.fill();
+    c.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    c.fillRect(x, 494, 56, 4);
+  }
+  // Die Zeitung: zusammengefaltet, schräg obenauf
+  c.save();
+  c.translate(560, 492);
+  c.rotate(-0.05);
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 12;
+  c.shadowOffsetY = 4;
+  const paper = c.createLinearGradient(0, -30, 0, 14);
+  paper.addColorStop(0, '#efe7d2');
+  paper.addColorStop(1, '#cfc3a2');
+  c.fillStyle = paper;
+  c.beginPath();
+  c.moveTo(-6, -34); c.lineTo(200, -38); c.lineTo(212, 12); c.lineTo(-14, 16); c.closePath();
+  c.fill();
+  c.shadowColor = 'transparent';
+  text(c, 'RINGBAHN-KURIER', 98, -14, { font: `bold 16px ${SERIF}`, align: 'center' });
+  c.strokeStyle = INK;
+  c.lineWidth = 1;
+  line(c, 4, -8, 194, -10);
+  text(c, '25. Dezember', 98, 4, { font: `italic 10px ${SERIF}`, align: 'center' });
+  c.fillStyle = 'rgba(30, 20, 12, 0.85)';
+  c.fillRect(10, 6, 52, 6);
+  c.fillRect(130, 6, 60, 6);
+  c.restore();
+  glow(c, 660, 480, 140, '255, 236, 190', 0.12);
+  // Schubladenfront vorne unten (aufgezogen, daher tiefer und etwas breiter)
+  drawerFront(c, 330, 506, 620, 106, DRAWERS[3], 153);
+  glow(c, 640, 60, 420, '255, 226, 170', 0.12);
+}
+
+// Eine Schubladenfront mit Profil, Messing-Kartenhalter und Griffmuschel
+function drawerFront(c, x, y, w, h, label, seed) {
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  c.shadowBlur = 10;
+  c.shadowOffsetY = 4;
+  c.fillStyle = '#5a3418';
+  c.fillRect(x, y, w, h);
+  c.restore();
+  plank(c, x, y, w, h, { tone: [118, 70, 36], seed, knots: 1 });
+  // Profil: Lichtkante oben/links, Schatten unten/rechts, innere Füllung
+  c.fillStyle = 'rgba(255, 224, 170, 0.22)';
+  c.fillRect(x, y, w, 2);
+  c.fillRect(x, y, 2, h);
+  c.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  c.fillRect(x, y + h - 3, w, 3);
+  c.fillRect(x + w - 3, y, 3, h);
+  c.strokeStyle = 'rgba(30, 14, 4, 0.45)';
+  c.lineWidth = 2;
+  c.strokeRect(x + 14, y + 12, w - 28, h - 24);
+  c.strokeStyle = 'rgba(255, 220, 160, 0.15)';
+  c.lineWidth = 1;
+  c.strokeRect(x + 16, y + 14, w - 28, h - 24);
+  const cx = x + w / 2;
+  // Kartenhalter aus Messing mit getippter Karte
+  const hg = c.createLinearGradient(0, y + 22, 0, y + 50);
+  hg.addColorStop(0, '#f2d98c');
+  hg.addColorStop(1, '#8a6a24');
+  c.fillStyle = hg;
+  roundedRect(c, cx - 70, y + 20, 140, 32, 4);
+  c.fill();
+  c.fillStyle = '#efe6cc';
+  c.fillRect(cx - 62, y + 25, 124, 22);
+  c.fillStyle = 'rgba(120, 90, 40, 0.25)';
+  c.fillRect(cx - 62, y + 25, 124, 3);
+  text(c, label, cx, y + 42, { font: `bold ${label.length > 8 ? 13 : 15}px ${TYPEWRITER}`, color: INK, align: 'center' });
+  rivet(c, cx - 66, y + 36, 2.5, [150, 120, 50]);
+  rivet(c, cx + 66, y + 36, 2.5, [150, 120, 50]);
+  // Griffmuschel
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 6;
+  c.shadowOffsetY = 3;
+  const pg = c.createLinearGradient(0, y + 60, 0, y + 84);
+  pg.addColorStop(0, '#f6de94');
+  pg.addColorStop(0.5, '#c49a40');
+  pg.addColorStop(1, '#6a4a14');
+  c.fillStyle = pg;
+  c.beginPath();
+  c.moveTo(cx - 44, y + 62);
+  c.lineTo(cx + 44, y + 62);
+  c.quadraticCurveTo(cx + 40, y + 86, cx, y + 86);
+  c.quadraticCurveTo(cx - 40, y + 86, cx - 44, y + 62);
+  c.fill();
+  c.restore();
+  c.fillStyle = 'rgba(40, 24, 6, 0.65)';
+  c.beginPath();
+  c.ellipse(cx, y + 66, 36, 5, 0, 0, Math.PI * 2);
+  c.fill();
+  rivet(c, cx - 48, y + 64, 3, [160, 128, 56]);
+  rivet(c, cx + 48, y + 64, 3, [160, 128, 56]);
+}
+
+export function drawArchive(ctx) {
+  ctx.drawImage(cachedLayer('w14-archive', paintArchive), 0, 0, 1280, 720);
 }

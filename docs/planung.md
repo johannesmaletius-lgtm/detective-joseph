@@ -118,6 +118,8 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 **Noch offen:** Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
+**Stand (24.11.2026, Nahansichten im Messing-Stil):** Neu gezeichnet (Rätsel, Klickflächen, Lösungen unverändert, jede Ansicht mit Lösung im Spiel nachgespielt): Schlüsselbrett (18, grüne Tafel im Eichenrahmen, aufgemalte Umrisse mit Messinghaken, Messingschlüssel mit Pappanhänger, Ablage darunter, „LOK“-Emailschild nach dem Lösen; Umrisse sitzen jetzt genau dort, wo der Schlüssel einrastet), Archivschrank (14, unterste Schublade aufgezogen mit der Zeitung), Glockenzettel (13, Balken mit drei Bronzeglocken, Zettel am Glockenseil). Dazu die übrigen flachen: Stellwerk (18, Stelltafel mit Leuchtfahrstraße und Messing-Drehknöpfen), Rundenuhr, Standuhr und Kuckucksuhr (11), Schließfächer (6), Kofferanhänger-Brett und Schild (2), Tablett mit Gläsern und Kakao (4), Bierdeckel (7), Mattscheibe mit Zahnrädern (8), Abrieb auf der Bronzetafel (13), Morsetafel als Emailleschild (16), Postfächer mit Weidenkorb (3), Kratzer/Spiegel (9), Miras Paket (20). Neue Helfer in `src/story/art/common.js`: `brassPlate`, `woodFrame`.
+
 
 **Stand (24.11.2026, lebendige Wagen):** Kleine Effekte im Code, `src/effects/ambience.js`, eingetragen je Szene unter `ambience` (Kerzenflamme, Lichtschein, Dampf, Funken, Staub, Sekundenzeiger; Erklärung oben in der Datei). Schnee fällt automatisch hinter allen Fenstern (nicht im Tunnel), Staub unter der Deckenlampe über `lampDust()` aus `wagonKit.js`. Speisewagen (4): sechs Kerzen, Küchenlampe, Dampf aus dem Topf. Uhrenwagen (11): sechs Wanduhren mit Sekundenzeiger (eine rückwärts) – Standuhr und Kuckucksuhr bewusst ohne, weil Rätsel. Musiksalon (12): Kronleuchter und Tischlampe. Kapelle (13): nur die Wandlaternen (Kranzkerzen und Standlaterne gehören zum Rätsel). Kessel (21) und Lok (22): Glut, Funken, Dampf. Dazu Lampenschein in 3, 5, 7, 14. Effekte sind nur gemalt, sie ändern keine Klickflächen. Flammen und Lichthöfe sind einmal vorbereitete Bildchen (schnell auf dem iPad). Im Tunnel brennen Kerzen (Speisewagen), die Wandlaternen der Kapelle, die Tischlaterne in der Bar und der Kronleuchter im Musiksalon weiter (`burns`, `Ambience.lights`).
 
@@ -204,3 +206,5 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Schaffnerabteil (18): Schlüsselbrett hat 8 Umrisse → Rätsel mit 8 Schlüsseln.
 
 **Nächster Schritt:** Online stellen (GitHub Pages).
+
+**Stand (24.11.2026, Vorschau auf der Endkarte):** Jede Endkarte (Tür 1–23) zeigt unten einen dunklen, langsam auftauchenden Ausschnitt aus dem Hintergrund des nächsten Wagens und einen neugierig machenden Satz („Morgen: …“ bzw. „Als Nächstes: …“, wenn die Tür schon offen ist). Sätze und Ausschnitte stehen in `src/story/previews.js` (Tür 24 nutzt das Schaffnerabteil aus Wagen 18). Nach Tür 24 keine Vorschau. Die alte Zeile „Morgen geht es weiter – im …“ erscheint nur noch, falls ein Bild fehlt.

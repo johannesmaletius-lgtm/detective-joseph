@@ -1,6 +1,8 @@
 import { loadImage } from '../../core/assets.js';
 import { STAINED } from '../../scene/chapelCar.js';
-import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import {
+  HAND, INK, PRINT, SERIF, cachedLayer, drawPicture, fineGrain, glow, grain, line, plank, rivet, roundedRect, screw, sheet, smudge, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 13 (Kapelle): Buntglas, Kerzenschein, der Adventskranz mit zwölf
 // Kerzen (je ein Zeichen für die Wagen 1–12), der Abrieb der Gedenktafel, die roten Lichtpunkte
@@ -213,20 +215,64 @@ export function rubSpots() {
   return PLAQUE_LINES.map((_, i) => ({ id: `band${i}`, band: i, x: 260, y: 170 + i * 66, w: 760, h: 66, label: 'Mit dem Bleistift reiben', quiet: true }));
 }
 
+// Die Bronzetafel an der Wand, darüber das Papier
+function paintPlaqueBoard(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [56, 34, 22], seed: 133, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.7);
+  glow(c, 640, 360, 560, '255, 200, 120', 0.12);
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  c.shadowBlur = 30;
+  c.shadowOffsetY = 12;
+  const frame = c.createLinearGradient(200, 110, 1080, 610);
+  frame.addColorStop(0, '#d8b46a');
+  frame.addColorStop(0.5, '#8a6428');
+  frame.addColorStop(1, '#4a3010');
+  c.fillStyle = frame;
+  roundedRect(c, 200, 110, 880, 500, 10);
+  c.fill();
+  c.restore();
+  const plate = c.createLinearGradient(0, 128, 0, 592);
+  plate.addColorStop(0, '#4a3a26');
+  plate.addColorStop(1, '#2a2016');
+  c.fillStyle = plate;
+  c.fillRect(218, 128, 844, 464);
+  grain(c, 218, 128, 844, 464, { seed: 134, count: 900, alpha: 0.3, size: 2.5 });
+  c.strokeStyle = 'rgba(255, 220, 150, 0.25)';
+  c.lineWidth = 2;
+  roundedRect(c, 203, 113, 874, 494, 9);
+  c.stroke();
+  for (const [x, y] of [[214, 124], [1066, 124], [214, 596], [1066, 596]]) screw(c, x, y, 8, x * 0.01);
+}
+
 export function drawRubbing(ctx, revealed, { dots = false, time = 0 } = {}) {
-  // Die Tafel unter dem Papier
-  ctx.fillStyle = '#3a2c1e';
-  ctx.fillRect(200, 110, 880, 500);
+  ctx.drawImage(cachedLayer('w13-plaque', paintPlaqueBoard), 0, 0, 1280, 720);
   sheet(ctx, 240, 140, 800, 440, {
     color: '#efe7d2',
     shade: '#ddd2b6',
     inner: (c) => {
+      fineGrain(c, 0, 0, 800, 440, { seed: 135, count: 0.003, dark: 0.08, light: 0.05 });
       PLAQUE_LINES.forEach((row, i) => {
         const shown = revealed[i];
         const y = 30 + i * 66;
         if (shown) {
-          c.fillStyle = 'rgba(48, 46, 52, 0.55)';
+          // Graphit, mit schrägen Bleistiftstrichen gerieben
+          const g = c.createLinearGradient(16, 0, 784, 0);
+          g.addColorStop(0, 'rgba(48, 46, 52, 0.35)');
+          g.addColorStop(0.1, 'rgba(48, 46, 52, 0.6)');
+          g.addColorStop(0.9, 'rgba(48, 46, 52, 0.6)');
+          g.addColorStop(1, 'rgba(48, 46, 52, 0.3)');
+          c.fillStyle = g;
           c.fillRect(16, y + 4, 768, 58);
+          c.save();
+          c.beginPath();
+          c.rect(16, y + 4, 768, 58);
+          c.clip();
+          c.strokeStyle = 'rgba(30, 28, 34, 0.25)';
+          c.lineWidth = 2;
+          for (let x = 0; x < 800; x += 7) line(c, x, y + 66, x + 30, y);
+          grain(c, 16, y + 4, 768, 58, { seed: 136 + i, count: 260, alpha: 0.25, light: true });
+          c.restore();
           // ausgesparte Buchstaben: hell auf dunkel gerieben
           text(c, row, 400, y + 46, { font: `bold 30px ${SERIF}`, color: '#efe7d2', align: 'center' });
         } else {
@@ -235,6 +281,15 @@ export function drawRubbing(ctx, revealed, { dots = false, time = 0 } = {}) {
       });
     },
   });
+  // Klebestreifen an den Ecken
+  for (const [x, y, a] of [[250, 146, -0.6], [1030, 146, 0.6], [250, 574, 0.6], [1030, 574, -0.6]]) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(a);
+    ctx.fillStyle = 'rgba(236, 226, 190, 0.7)';
+    ctx.fillRect(-28, -9, 56, 18);
+    ctx.restore();
+  }
   if (dots) drawLanternDots(ctx, time);
 }
 
@@ -281,15 +336,162 @@ export function drawFamilyPhoto(ctx) {
   ctx.restore();
 }
 
-// Zettel am Glockenbalken
+// Zettel am Glockenbalken: Balken mit drei Bronzeglocken, der Zettel ist ans Seil der großen gebunden
+function paintBellBeam(c) {
+  // Wand der Kapelle, oben dunkel, buntes Licht von den Fenstern
+  plank(c, 0, 0, 1280, 720, { tone: [56, 34, 22], seed: 131, vertical: true, knots: 0 });
+  for (let x = 64; x < 1280; x += 160) {
+    c.fillStyle = 'rgba(0, 0, 0, 0.32)';
+    c.fillRect(x, 0, 3, 720);
+  }
+  glow(c, 150, 420, 300, '120, 150, 255', 0.1);
+  glow(c, 1140, 380, 320, '255, 90, 70', 0.1);
+  glow(c, 640, 260, 520, '255, 206, 130', 0.14);
+  vignette(c, 0, 0, 1280, 720, 0.7);
+  // Der Balken
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  c.shadowBlur = 30;
+  c.shadowOffsetY = 16;
+  c.fillStyle = '#3a2210';
+  c.fillRect(-10, 40, 1300, 86);
+  c.restore();
+  plank(c, -10, 40, 1300, 86, { tone: [96, 58, 30], seed: 132, knots: 3 });
+  c.fillStyle = 'rgba(255, 220, 160, 0.22)';
+  c.fillRect(0, 40, 1280, 2);
+  const under = c.createLinearGradient(0, 100, 0, 126);
+  under.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  under.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+  c.fillStyle = under;
+  c.fillRect(0, 100, 1280, 26);
+  // Eisenbänder um den Balken
+  for (const x of [80, 450, 830, 1200]) {
+    c.fillStyle = '#2a2622';
+    c.fillRect(x - 14, 38, 28, 90);
+    c.fillStyle = 'rgba(200, 190, 170, 0.18)';
+    c.fillRect(x - 14, 38, 3, 90);
+    rivet(c, x, 56, 4, [110, 104, 96]);
+    rivet(c, x, 110, 4, [110, 104, 96]);
+  }
+  // Geschnitzte Inschrift
+  text(c, 'GLORIA · IN · EXCELSIS', 640, 92, { font: `bold 22px ${SERIF}`, color: 'rgba(30, 14, 4, 0.55)', align: 'center' });
+  text(c, 'GLORIA · IN · EXCELSIS', 639, 91, { font: `bold 22px ${SERIF}`, color: 'rgba(255, 220, 160, 0.16)', align: 'center' });
+  // Glocken: links klein, Mitte groß, rechts klein
+  for (const [x, size] of [[250, 110], [640, 190], [1030, 110]]) {
+    const lip = drawBell(c, x, 126, size);
+    // Glockenseil vom Klöppel bis nach unten
+    c.strokeStyle = '#8a6a3a';
+    c.lineWidth = size > 150 ? 8 : 6;
+    line(c, x + 2, lip, x + 6, 720);
+    c.strokeStyle = 'rgba(40, 24, 8, 0.6)';
+    c.lineWidth = 1.5;
+    for (let y = lip + 6; y < 720; y += 10) line(c, x - 1, y, x + 7, y + 6);
+  }
+}
+
+// Eine Bronzeglocke, Krone oben an (x, top). Gibt die Höhe des Glockenrands zurück.
+function drawBell(c, x, top, size) {
+  const h = size * 1.05, w = size;
+  // Joch aus Eisen
+  c.fillStyle = '#2a2622';
+  c.fillRect(x - w * 0.32, top - 4, w * 0.64, 16);
+  rivet(c, x - w * 0.26, top + 4, 3.5, [110, 104, 96]);
+  rivet(c, x + w * 0.26, top + 4, 3.5, [110, 104, 96]);
+  // Krone
+  c.strokeStyle = '#6a4a1e';
+  c.lineWidth = size * 0.06;
+  c.beginPath();
+  c.arc(x, top + 22, size * 0.1, Math.PI, 0);
+  c.stroke();
+  const y0 = top + 18;
+  const lipY = y0 + h;
+  // Körper
+  const body = () => {
+    c.beginPath();
+    c.moveTo(x - w * 0.24, y0);
+    c.bezierCurveTo(x - w * 0.34, y0 - 6, x - w * 0.34, y0 + h * 0.5, x - w * 0.36, y0 + h * 0.7);
+    c.bezierCurveTo(x - w * 0.38, y0 + h * 0.86, x - w * 0.5, y0 + h * 0.9, x - w * 0.54, lipY);
+    c.lineTo(x + w * 0.54, lipY);
+    c.bezierCurveTo(x + w * 0.5, y0 + h * 0.9, x + w * 0.38, y0 + h * 0.86, x + w * 0.36, y0 + h * 0.7);
+    c.bezierCurveTo(x + w * 0.34, y0 + h * 0.5, x + w * 0.34, y0 - 6, x + w * 0.24, y0);
+    c.closePath();
+  };
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  c.shadowBlur = 24;
+  c.shadowOffsetY = 10;
+  const g = c.createLinearGradient(x - w * 0.55, 0, x + w * 0.55, 0);
+  g.addColorStop(0, '#3a2410');
+  g.addColorStop(0.22, '#b07a32');
+  g.addColorStop(0.36, '#f0cc80');
+  g.addColorStop(0.5, '#a8722c');
+  g.addColorStop(0.8, '#6a4418');
+  g.addColorStop(1, '#2a1a0a');
+  c.fillStyle = g;
+  body();
+  c.fill();
+  c.restore();
+  // Patina und Zierbänder
+  c.save();
+  body();
+  c.clip();
+  grain(c, x - w * 0.6, y0, w * 1.2, h, { seed: size, count: 260, alpha: 0.2, size: 2.4 });
+  c.fillStyle = 'rgba(70, 140, 110, 0.12)';
+  c.fillRect(x - w * 0.6, y0, w * 0.25, h);
+  for (const f of [0.22, 0.28, 0.82, 0.88]) {
+    c.strokeStyle = 'rgba(40, 22, 6, 0.55)';
+    c.lineWidth = 2;
+    line(c, x - w, y0 + h * f, x + w, y0 + h * f);
+    c.strokeStyle = 'rgba(255, 226, 160, 0.3)';
+    c.lineWidth = 1;
+    line(c, x - w, y0 + h * f + 2, x + w, y0 + h * f + 2);
+  }
+  c.restore();
+  // Mündung mit Klöppel
+  c.fillStyle = '#140a04';
+  c.beginPath();
+  c.ellipse(x, lipY, w * 0.54, w * 0.08, 0, 0, Math.PI * 2);
+  c.fill();
+  c.strokeStyle = '#d8aa58';
+  c.lineWidth = 3;
+  c.beginPath();
+  c.ellipse(x, lipY, w * 0.54, w * 0.08, 0, 0, Math.PI);
+  c.stroke();
+  c.fillStyle = '#3a2a1a';
+  c.beginPath();
+  c.arc(x + 2, lipY + w * 0.05, w * 0.07, 0, Math.PI * 2);
+  c.fill();
+  return lipY + w * 0.1;
+}
+
 export function drawBellNote(ctx) {
-  sheet(ctx, 400, 220, 480, 260, {
+  ctx.drawImage(cachedLayer('w13-bellbeam', paintBellBeam), 0, 0, 1280, 720);
+  // Der Zettel, mit Bindfaden ans Seil der großen Glocke geknotet
+  ctx.strokeStyle = '#c8b890';
+  ctx.lineWidth = 2;
+  line(ctx, 644, 392, 600, 414);
+  line(ctx, 644, 392, 690, 414);
+  ctx.fillStyle = '#c8b890';
+  ctx.beginPath();
+  ctx.arc(644, 392, 5, 0, Math.PI * 2);
+  ctx.fill();
+  sheet(ctx, 420, 400, 440, 250, {
     angle: 0.02,
+    color: '#efe3c0',
+    shade: '#d6c494',
     inner: (c) => {
-      text(c, 'Lasst sie klingen', 240, 90, { font: `30px ${HAND}`, align: 'center' });
-      text(c, 'wie das Lied der Feier.', 240, 140, { font: `30px ${HAND}`, align: 'center' });
-      text(c, '(groß · klein · klein)', 240, 210, { font: `18px ${HAND}`, color: '#7a6a50', align: 'center' });
+      fineGrain(c, 0, 0, 440, 250, { seed: 13, count: 0.004, dark: 0.1, light: 0.05 });
+      // Lochung oben, ein wenig eingerissen
+      for (const hx of [180, 270]) {
+        c.fillStyle = '#4a3a24';
+        c.beginPath();
+        c.arc(hx, 14, 4, 0, Math.PI * 2);
+        c.fill();
+      }
+      smudge(c, 330, 170, 70, 50, 'rgba(140, 100, 50, 0.25)');
+      text(c, 'Lasst sie klingen', 220, 86, { font: `30px ${HAND}`, align: 'center' });
+      text(c, 'wie das Lied der Feier.', 220, 136, { font: `30px ${HAND}`, align: 'center' });
+      text(c, '(groß · klein · klein)', 220, 200, { font: `18px ${HAND}`, color: '#7a6a50', align: 'center' });
     },
   });
 }
-

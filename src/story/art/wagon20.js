@@ -1,6 +1,6 @@
 import {
   BLUE_INK, HAND, INK, PRINT, RED, SERIF, TYPEWRITER, cached, cachedLayer, contactShadow, drawPicture, glow, grain, line, plank, rivet, seeded,
-  roundedRect, sheet, text, wood,
+  roundedRect, sheet, text, vignette, wood,
 } from './common.js';
 
 // Gezeichnetes für Wagen 20 (Packwagen): Pakete und Anhänger, Frachtliste mit Sternen-Schablone,
@@ -910,23 +910,119 @@ export function ribbonSpots(left) {
   });
 }
 
+// Miras Paket von oben: selbst bemaltes Packpapier (Buntstift-Sterne und Tannen) auf dem Packtisch
+function paintGiftBox(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [96, 60, 30], seed: 201, knots: 3 });
+  for (let k = 1; k < 6; k++) {
+    c.fillStyle = 'rgba(30, 14, 4, 0.5)';
+    c.fillRect(0, k * 120, 1280, 2);
+  }
+  vignette(c, 0, 0, 1280, 720, 0.65);
+  glow(c, 640, 300, 560, '255, 214, 150', 0.14);
+  contactShadow(c, 660, 390, 380, 300, 0.7);
+  // Seitenkante (Dicke des Kartons)
+  c.fillStyle = '#4a1822';
+  c.beginPath();
+  c.moveTo(340, 600); c.lineTo(940, 600); c.lineTo(952, 616); c.lineTo(352, 616); c.closePath();
+  c.fill();
+  c.beginPath();
+  c.moveTo(940, 150); c.lineTo(952, 166); c.lineTo(952, 616); c.lineTo(940, 600); c.closePath();
+  c.fill();
+  // Deckel mit Papier
+  const paper = c.createLinearGradient(340, 150, 940, 600);
+  paper.addColorStop(0, '#9a3646');
+  paper.addColorStop(1, '#6a2232');
+  c.fillStyle = paper;
+  c.fillRect(340, 150, 600, 450);
+  c.save();
+  c.beginPath();
+  c.rect(340, 150, 600, 450);
+  c.clip();
+  const r = seeded(202);
+  for (let i = 0; i < 34; i++) {
+    const x = 350 + r() * 580, y = 160 + r() * 430;
+    c.save();
+    c.translate(x, y);
+    c.rotate(r() * 1.2 - 0.6);
+    if (r() < 0.6) {
+      // Buntstift-Stern
+      c.strokeStyle = r() < 0.5 ? 'rgba(255, 214, 90, 0.8)' : 'rgba(255, 245, 220, 0.7)';
+      c.lineWidth = 2.5;
+      c.beginPath();
+      for (let k = 0; k < 6; k++) {
+        const a = -Math.PI / 2 + k * (Math.PI * 4 / 5), rr = 14 + r() * 6;
+        c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+      }
+      c.stroke();
+    } else {
+      // kleine Tanne
+      c.fillStyle = 'rgba(60, 140, 80, 0.7)';
+      c.beginPath();
+      c.moveTo(0, -16); c.lineTo(11, 8); c.lineTo(-11, 8); c.closePath();
+      c.fill();
+      c.fillStyle = 'rgba(120, 70, 30, 0.8)';
+      c.fillRect(-2, 8, 4, 6);
+    }
+    c.restore();
+  }
+  grain(c, 340, 150, 600, 450, { seed: 203, count: 600, alpha: 0.12, light: true });
+  // Knicke im Papier
+  c.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  c.lineWidth = 2;
+  line(c, 340, 162, 940, 168);
+  line(c, 352, 150, 358, 600);
+  c.restore();
+  c.fillStyle = 'rgba(255, 220, 220, 0.18)';
+  c.fillRect(340, 150, 600, 2);
+  c.fillRect(340, 150, 2, 450);
+}
+
 export function drawGiftBox(ctx, { left }) {
-  ctx.fillStyle = '#1a120c';
-  ctx.fillRect(280, 90, 720, 560);
-  ctx.fillStyle = '#7a2a3a';
-  ctx.fillRect(340, 150, 600, 450);
-  text(ctx, 'Für Papa', 400, 128, { font: `bold 26px ${HAND}`, color: '#ffe7a0', align: 'center' });
-  // von unten nach oben zeichnen
+  ctx.drawImage(cachedLayer('w20-giftbox', paintGiftBox), 0, 0, 1280, 720);
+  // Kartonanhänger „Für Papa“
+  ctx.save();
+  ctx.translate(400, 118);
+  ctx.rotate(-0.06);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 3;
+  ctx.fillStyle = '#d8b878';
+  ctx.beginPath();
+  ctx.moveTo(-70, -20); ctx.lineTo(60, -20); ctx.lineTo(76, 0); ctx.lineTo(60, 20); ctx.lineTo(-70, 20); ctx.closePath();
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#5a3a14';
+  ctx.beginPath();
+  ctx.arc(62, 0, 3, 0, Math.PI * 2);
+  ctx.fill();
+  text(ctx, 'Für Papa', -4, 9, { font: `bold 24px ${HAND}`, color: '#8a1a22', align: 'center' });
+  ctx.restore();
+  // Bänder: von unten nach oben, Satin mit Glanzstreifen, an der Kante ums Paket gelegt
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(326, 136, 640, 494);
+  ctx.clip();
   for (const id of [...LAYER].reverse()) {
     if (!left.includes(id)) continue;
     const r = RIBBONS.find((q) => q.id === id);
-    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-    ctx.lineWidth = 34;
-    line(ctx, r.from[0] + 3, r.from[1] + 4, r.to[0] + 3, r.to[1] + 4);
+    const [x0, y0] = r.from, [x1, y1] = r.to;
+    ctx.lineCap = 'butt';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.lineWidth = 32;
+    line(ctx, x0 + 4, y0 + 6, x1 + 4, y1 + 6);
     ctx.strokeStyle = r.color;
     ctx.lineWidth = 28;
-    line(ctx, r.from[0], r.from[1], r.to[0], r.to[1]);
+    line(ctx, x0, y0, x1, y1);
+    // Glanz in der Mitte, dunklere Ränder
+    const a = Math.atan2(y1 - y0, x1 - x0), nx = -Math.sin(a), ny = Math.cos(a);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.lineWidth = 3;
+    for (const side of [-1, 1]) line(ctx, x0 + nx * 12 * side, y0 + ny * 12 * side, x1 + nx * 12 * side, y1 + ny * 12 * side);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 4;
+    line(ctx, x0 - nx * 4, y0 - ny * 4, x1 - nx * 4, y1 - ny * 4);
   }
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------- Kelle und Karte

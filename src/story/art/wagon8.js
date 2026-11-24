@@ -1,5 +1,7 @@
 import { loadImage } from '../../core/assets.js';
-import { PRINT, SERIF, TYPEWRITER, cached, fineGrain, line, plank, rivet, roundedRect, seeded, sheet, text, vignette, wood } from './common.js';
+import {
+  PRINT, SERIF, TYPEWRITER, brassPlate, cached, cachedLayer, fineGrain, glow, line, plank, rivet, roundedRect, screw, seeded, sheet, text, vignette,
+} from './common.js';
 
 // Gezeichnetes für Wagen 8 (Bordkino): Kinokarte, acht Filmbilder, Projektor-Schärfe, Standbild.
 
@@ -597,56 +599,166 @@ export function drawBlurred(ctx, image, x, y, w, h, amount) {
   ctx.restore();
 }
 
+function paintProjectorPanel(c) {
+  plank(c, 0, 0, 1280, 720, { tone: [40, 26, 18], seed: 81, vertical: true, knots: 0 });
+  vignette(c, 0, 0, 1280, 720, 0.7);
+  // Gehäuse des Projektors: dunkles Blech mit Hammerschlaglack
+  c.save();
+  c.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  c.shadowBlur = 36;
+  c.shadowOffsetY = 14;
+  c.fillStyle = '#1e1c1a';
+  roundedRect(c, 160, 50, 960, 640, 18);
+  c.fill();
+  c.restore();
+  const body = c.createLinearGradient(0, 50, 0, 690);
+  body.addColorStop(0, '#3a3836');
+  body.addColorStop(1, '#1c1a18');
+  c.fillStyle = body;
+  roundedRect(c, 160, 50, 960, 640, 18);
+  c.fill();
+  const r = seeded(82);
+  for (let i = 0; i < 900; i++) {
+    c.fillStyle = r() < 0.5 ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.12)';
+    c.beginPath();
+    c.arc(170 + r() * 940, 60 + r() * 620, 1 + r() * 3, 0, Math.PI * 2);
+    c.fill();
+  }
+  c.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  c.lineWidth = 2;
+  roundedRect(c, 162, 52, 956, 636, 17);
+  c.stroke();
+  for (let i = 0; i <= 10; i++) for (const y of [66, 674]) rivet(c, 180 + i * 92, y, 4, [120, 116, 108]);
+  // Mattscheibe: Lichtschacht mit Messingrahmen
+  c.fillStyle = '#0a0908';
+  roundedRect(c, 314, 64, 652, 382, 10);
+  c.fill();
+  const fg = c.createLinearGradient(0, 70, 0, 440);
+  fg.addColorStop(0, '#d8b462');
+  fg.addColorStop(1, '#6a4a16');
+  c.strokeStyle = fg;
+  c.lineWidth = 12;
+  c.strokeRect(324, 74, 632, 362);
+  c.fillStyle = '#000';
+  c.fillRect(330, 80, 620, 350);
+  for (const [x, y] of [[324, 74], [956, 74], [324, 436], [956, 436]]) screw(c, x, y, 6, x * 0.01);
+  // Typenschild
+  brassPlate(c, 560, 452, 160, 24);
+  text(c, 'MATTSCHEIBE', 640, 469, { font: `bold 12px ${PRINT}`, color: '#3a2a10', align: 'center' });
+  // Achsen-Lager unter den Rädern
+  for (const spot of FOCUS_SPOTS) {
+    c.fillStyle = '#121110';
+    c.beginPath();
+    c.arc(spot.cx, spot.cy, spot.r + 34, 0, Math.PI * 2);
+    c.fill();
+    c.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    c.lineWidth = 2;
+    c.stroke();
+  }
+}
+
 export function drawFocus(ctx, state, picture) {
-  ctx.fillStyle = '#16120f';
-  ctx.fillRect(160, 50, 960, 640);
+  ctx.drawImage(cachedLayer('w8-focus', paintProjectorPanel), 0, 0, 1280, 720);
   // Vorschau auf der Mattscheibe
-  ctx.fillStyle = '#000';
-  ctx.fillRect(330, 80, 620, 350);
   drawBlurred(ctx, picture, 340, 90, 600, 330, blurAmount(state));
-  ctx.strokeStyle = '#4b4f55';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(330, 80, 620, 350);
-  text(ctx, 'Mattscheibe', 640, 456, { font: `15px ${PRINT}`, color: '#bdb5a4', align: 'center' });
+  // Mattglas: feines Korn und weiches Licht
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 250, 235, 0.05)';
+  ctx.fillRect(330, 80, 620, 350);
+  const sheen = ctx.createLinearGradient(330, 80, 950, 430);
+  sheen.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+  sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(330, 80, 620, 350);
+  ctx.restore();
+  // Verbindung zwischen den Rädern: Zahnriemen
+  ctx.save();
+  ctx.strokeStyle = '#2a2420';
+  ctx.lineWidth = 12;
+  line(ctx, 420, 560 - 40, 860, 560 - 40);
+  line(ctx, 420, 560 + 40, 860, 560 + 40);
+  ctx.strokeStyle = 'rgba(200, 180, 140, 0.35)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 6]);
+  line(ctx, 420, 520 - 4, 860, 520 - 4);
+  line(ctx, 420, 600 + 4, 860, 600 + 4);
+  ctx.restore();
   // Zahnräder: das große Rad dreht das kleine mit
   for (const spot of FOCUS_SPOTS) {
     const value = state[spot.id];
     drawGear(ctx, spot.cx, spot.cy, spot.r, value);
-    text(ctx, spot.id === 'a' ? 'Objektiv' : 'Bildfenster', spot.cx, spot.cy + spot.r + 30, { font: `bold 17px ${PRINT}`, color: '#e9d8b0', align: 'center' });
+    text(ctx, spot.id === 'a' ? 'Objektiv' : 'Bildfenster', spot.cx, spot.cy + spot.r + 54, { font: `bold 17px ${PRINT}`, color: '#e9d8b0', align: 'center' });
   }
-  // Verbindung zwischen den Rädern
-  ctx.strokeStyle = '#7a6a4a';
-  ctx.lineWidth = 8;
-  line(ctx, 490, 560, 790, 560);
-  text(ctx, 'Achtung: Das Objektiv dreht das Bildfenster mit.', 640, 530, { font: `italic 15px ${SERIF}`, color: '#bdb5a4', align: 'center' });
+  text(ctx, 'Achtung: Das Objektiv', 640, 556, { font: `italic 15px ${SERIF}`, color: '#d8cfb8', align: 'center' });
+  text(ctx, 'dreht das Bildfenster mit.', 640, 576, { font: `italic 15px ${SERIF}`, color: '#d8cfb8', align: 'center' });
 }
 
 function drawGear(ctx, cx, cy, r, value) {
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate((value / 8) * Math.PI * 2);
-  ctx.fillStyle = '#9a8a62';
-  ctx.beginPath();
-  for (let i = 0; i < 16; i++) {
-    const a0 = (i / 16) * Math.PI * 2, a1 = ((i + 0.5) / 16) * Math.PI * 2;
-    ctx.lineTo(Math.cos(a0) * r, Math.sin(a0) * r);
-    ctx.lineTo(Math.cos(a1) * (r - 10), Math.sin(a1) * (r - 10));
-  }
-  ctx.fill();
-  ctx.fillStyle = '#5d533b';
-  ctx.beginPath();
-  ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
-  ctx.fill();
-  // Markierung
-  ctx.fillStyle = '#e9d8b0';
-  ctx.beginPath();
-  ctx.arc(0, -r + 18, 6, 0, Math.PI * 2);
+  const teeth = () => {
+    ctx.beginPath();
+    for (let i = 0; i < 16; i++) {
+      const a0 = ((i - 0.2) / 16) * Math.PI * 2, a1 = ((i + 0.2) / 16) * Math.PI * 2;
+      const a2 = ((i + 0.3) / 16) * Math.PI * 2, a3 = ((i + 0.7) / 16) * Math.PI * 2;
+      ctx.lineTo(Math.cos(a0) * r, Math.sin(a0) * r);
+      ctx.lineTo(Math.cos(a1) * r, Math.sin(a1) * r);
+      ctx.lineTo(Math.cos(a2) * (r - 11), Math.sin(a2) * (r - 11));
+      ctx.lineTo(Math.cos(a3) * (r - 11), Math.sin(a3) * (r - 11));
+    }
+    ctx.closePath();
+  };
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetX = 4;
+  ctx.shadowOffsetY = 6;
+  const g = ctx.createLinearGradient(-r, -r, r, r);
+  g.addColorStop(0, '#f2d98c');
+  g.addColorStop(0.5, '#b08a3a');
+  g.addColorStop(1, '#5a3e12');
+  ctx.fillStyle = g;
+  teeth();
   ctx.fill();
   ctx.restore();
-  // Skala 0–7 außen
+  ctx.strokeStyle = 'rgba(60, 40, 10, 0.7)';
+  ctx.lineWidth = 1.5;
+  teeth();
+  ctx.stroke();
+  // Speichen (Aussparungen)
+  ctx.fillStyle = '#121110';
+  for (let k = 0; k < 4; k++) {
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.68, k * Math.PI / 2 + 0.3, k * Math.PI / 2 + Math.PI / 2 - 0.3);
+    ctx.arc(0, 0, r * 0.4, k * Math.PI / 2 + Math.PI / 2 - 0.45, k * Math.PI / 2 + 0.45, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Nabe
+  const hub = ctx.createRadialGradient(-6, -6, 2, 0, 0, r * 0.3);
+  hub.addColorStop(0, '#e8e2d2');
+  hub.addColorStop(1, '#4a4438');
+  ctx.fillStyle = hub;
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
+  ctx.fill();
+  screw(ctx, 0, 0, 7, 0.4);
+  // Markierung
+  ctx.fillStyle = '#fff0c0';
+  ctx.strokeStyle = '#3a2808';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, -r + 20, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+  // Skala 0–7 außen (graviert)
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-    text(ctx, String(i), cx + Math.cos(a) * (r + 18), cy + Math.sin(a) * (r + 18) + 6, { font: `14px ${PRINT}`, color: i === value ? '#ffd36b' : '#8f8672', align: 'center' });
+    const tx = cx + Math.cos(a) * (r + 20), ty = cy + Math.sin(a) * (r + 20) + 6;
+    if (i === value) glow(ctx, tx, ty - 5, 16, '255, 211, 107', 0.45);
+    text(ctx, String(i), tx, ty, { font: `bold 15px ${PRINT}`, color: i === value ? '#ffd36b' : '#9a9080', align: 'center' });
   }
 }
 
