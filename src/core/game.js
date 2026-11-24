@@ -26,6 +26,7 @@ import { Binoculars } from '../puzzles/binoculars.js';
 import { Crt } from '../puzzles/crt.js';
 import { PictureView } from '../puzzles/picture.js';
 import { ArrangeView } from '../puzzles/arrange.js';
+import { ModelRailwayView } from '../puzzles/modelRailway.js';
 import { DialogueView } from '../ui/dialogue.js';
 import { Story } from '../story/story.js';
 import { COLORS, FONTS, outlinedText } from '../ui/text.js';
@@ -108,6 +109,7 @@ export class Game {
       crt: new Crt(),
       picture: new PictureView(),   // allgemeine Nahansicht mit anklickbaren Stellen (ab Wagen 4)
       arrange: new ArrangeView(),   // Kärtchen ordnen (ab Wagen 4)
+      railway: new ModelRailwayView(), // Miras Modellbahn (Wagen 15)
       dialogue: new DialogueView(), // Gesprächsauswahl
     };
     for (const view of Object.values(this.views)) {

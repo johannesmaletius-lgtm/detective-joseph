@@ -1,57 +1,12 @@
-import { drawSymbol } from './wagon13.js';
-import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text, wood } from './common.js';
+import { HAND, INK, PRINT, SERIF, drawPicture, glow, line, sheet, text } from './common.js';
 
 // Gezeichnetes für Wagen 15 (Spielzimmer): die vierzehn Modellbahn-Wagen, das Innere des
 // Puppenhaus-Bahnhofs mit den Figuren und Miras Zeichnung.
 
 // ---------------------------------------------------------------- Modellbahn
-// Jeder Mini-Wagen hat ein winziges Zeichen für einen der Wagen 1–14
+// Jeder Mini-Wagen hat ein winziges Zeichen für einen der Wagen 1–14 (gezeichnet in railway.js)
 export const MINI = ['bench', 'suitcase', 'letter', 'glass', 'bed', 'umbrella', 'whisky', 'film', 'mirror', 'horn', 'clock', 'note', 'chapel', 'newspaper'];
-const COLORS = ['#3a6ea5', '#a5463a', '#3a8a5a', '#8a3a7a', '#b07a2a', '#4a4a8a', '#7a5a3a', '#2a2a2a', '#9aa0a8', '#6a7a3a', '#a0703a', '#5a2a4a', '#8a6a4a', '#606060'];
-const START = [9, 3, 12, 0, 6, 13, 2, 10, 5, 8, 1, 11, 4, 7]; // Mini-Wagen auf Platz 0, 1, …
-
-// Plätze auf den beiden Gleisen des Bilds (oben hinter der Lok, unten bis zum Tunnel)
-export const MINI_SLOTS = Array.from({ length: 14 }, (_, i) => ({
-  x: (i < 7 ? 232 : 80) + (i % 7) * 140,
-  y: i < 7 ? 148 : 424,
-  w: 124,
-  h: 86,
-  label: `${i + 1}`,
-}));
-
-export const MINI_TOKENS = START.map((wagon, slot) => ({ id: `mini${wagon}`, wagon, slot }));
-
-export function drawRailwayTable(ctx) {
-  drawPicture(ctx, 'assets/closeups/modellbahn.webp', 0, 0, 1280, 720);
-  // Hinweis in der freien Wiese zwischen den Gleisen (ganz unten steht die Hilfezeile der Ansicht)
-  ctx.fillStyle = 'rgba(20, 12, 6, 0.62)';
-  ctx.beginPath();
-  ctx.roundRect(330, 352, 620, 34, 8);
-  ctx.fill();
-  text(ctx, 'Hinter der Lok der erste Wagen. „Papa hat sie immer richtig hingestellt.“', 640, 375, { font: `17px ${PRINT}`, color: '#f0e2bc', align: 'center' });
-}
-
-export function drawMini(ctx, token, x, y) {
-  const wagon = Number(token.id.slice(4));
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.fillStyle = COLORS[wagon];
-  ctx.fillRect(-56, -34, 112, 58);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.fillRect(-56, -34, 112, 8);
-  ctx.fillStyle = '#1a1a1a';
-  ctx.fillRect(-60, -40, 120, 8);
-  for (const wx of [-36, 36]) {
-    ctx.beginPath();
-    ctx.arc(wx, 30, 10, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  // Fensterchen mit dem Zeichen
-  ctx.fillStyle = '#f3ead2';
-  ctx.fillRect(-20, -24, 40, 36);
-  drawSymbol(ctx, MINI[wagon], 0, -6);
-  ctx.restore();
-}
+export const MINI_START = [9, 3, 12, 0, 6, 13, 2, 10, 5, 8, 1, 11, 4, 7]; // Mini-Wagen auf Platz 0, 1, …
 
 // ---------------------------------------------------------------- Puppenhaus-Bahnhof
 export const FIGURE_SLOTS = [
