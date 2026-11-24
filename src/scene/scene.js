@@ -43,6 +43,8 @@ function loadForegroundList() {
   foregroundList ??= fetch(FOREGROUND).then((response) => (response.ok ? response.json() : {})).catch(() => ({}));
   return foregroundList;
 }
+// Stellen, durch die Joseph weitergeht
+const EXITS = new Set(['door', 'hatch', 'archLeft', 'archRight', 'ahead']);
 
 export class Scene {
   constructor(data) {
@@ -94,9 +96,14 @@ export class Scene {
   // Passt den Mauszeiger jeder Stelle an das an, was ein Linksklick wirklich tut:
   // Kann man dort etwas tun (use) oder einen Gegenstand benutzen (items), zeigt er die Hand –
   // gibt es nur etwas anzuschauen, das Auge. Ein Sprech-Zeiger ('talk') bleibt, wie er ist.
+  // Ausgänge (Tür zum nächsten Wagen, Luke, Gänge) zeigen einen Pfeil in die Gehrichtung.
   fitCursors(script) {
     for (const hotspot of this.hotspots) {
       if (hotspot.cursor === 'talk') continue;
+      if (EXITS.has(hotspot.id)) {
+        hotspot.cursor = { left: 'exitLeft', right: 'exitRight' }[hotspot.facing] ?? 'exit';
+        continue;
+      }
       const reactions = script?.hotspots?.[hotspot.id] ?? {};
       const canUse = Boolean(reactions.use) || Object.keys(reactions.items ?? {}).length > 0;
       hotspot.cursor = canUse ? 'interact' : 'look';
