@@ -157,11 +157,7 @@ export const wagon4 = {
 
   onSqueal(story) {
     if (story.flags.registerOpen) return;
-    const bruno = story.character('bruno');
-    bruno.pose = 'left';
-    story.wait(Math.max(0.5, story.squealUntil - story.motion.time)).then(() => {
-      bruno.pose = 'front';
-    });
+    story.character('bruno').act('ears', Math.max(0.5, story.squealUntil - story.motion.time));
     if (!story.flags.squealSeen && story.flags.trayGuarded && !story.isBusy) {
       story.flags.squealSeen = true;
       story.respond(async () => {

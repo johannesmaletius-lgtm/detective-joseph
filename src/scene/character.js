@@ -14,6 +14,11 @@ import { BodyLife } from '../animation/bodyLife.js';
 //     color: '#ffd9a0',                 // Farbe seiner Sprechtexte
 //     when: 'merker',                   // (optional) nur sichtbar, solange der Merker gesetzt ist
 //     idle: ['blink', 'busy'],          // (optional) Zusatzbilder blink.webp und busy.webp im Ordner (nur Pose 'front'):
+//     actions: { ears: {                // (optional) kurze Bewegungen aus mehreren Bildern im Ordner, abgespielt mit act('ears', Sekunden):
+//       intro: ['ears-1'],              //   einmal zu Beginn (Übergang hinein)
+//       loop: ['ears-2', 'ears-3'],     //   im Wechsel, solange die Bewegung dauert
+//       outro: ['ears-1'],              //   einmal am Ende (Übergang zurück)
+//       frame: 0.16, loopFrame: 0.3, shake: 1.5 } }, // Sekunden pro Bild, Zittern in Pixeln
 //   }]                                  // blinzelt ab und zu und tut ab und zu etwas (Topf rühren, Kragen zupfen …)
 //
 // Laufen: moveTo(x, y, Sekunden) – hat die Figur Laufbilder (assets/characters/<figur>/walk-left, walk-right,
@@ -91,6 +96,8 @@ export class Character {
     const entries = await Promise.all(POSES.map(async (pose) => [pose, await loadImage(`${this.data.poses}/${pose}.webp`)]));
     this.images = Object.fromEntries(entries);
     for (const name of this.data.idle ?? []) this.images[name] = await loadImage(`${this.data.poses}/${name}.webp`);
+    const actionFrames = Object.values(this.data.actions ?? {}).flatMap((a) => [...(a.intro ?? []), ...(a.loop ?? []), ...(a.outro ?? [])]);
+    for (const name of new Set(actionFrames)) this.images[name] = await loadImage(`${this.data.poses}/${name}.webp`);
     const folder = this.data.poses.split('/').pop();
     const meta = (await loadWalkIndex())[folder];
     if (!meta) return;
@@ -109,6 +116,7 @@ export class Character {
   image() {
     const frames = this.walk && this.walkFrames[this.walk.view];
     if (frames) return frames[Math.floor(this.stepPhase * frames.length) % frames.length];
+    if (this.action) return this.images[this.actionFrame()] ?? this.images.front;
     if (this.talking) return this.images.talk ?? this.images.front;
     if (this.pose === 'front' && !this.walk) {
       if (this.busyLeft > 0 && this.images.busy) return this.images.busy;
@@ -144,6 +152,46 @@ export class Character {
     });
   }
 
+  // Spielt eine Bewegung aus data.actions ab (Übergang hinein, Wiederholung für "seconds", Übergang zurück).
+  // Läuft schon eine, wird sie nur verlängert. Fertig, wenn die Figur wieder normal steht.
+  act(name, seconds = 2) {
+    const def = this.data.actions?.[name];
+    if (!def) return Promise.resolve();
+    const intro = def.intro ?? [], outro = def.outro ?? [];
+    const frame = def.frame ?? 0.16;
+    if (this.action?.name === name && this.action.age < this.action.loopEnd) {
+      this.action.loopEnd = Math.max(this.action.loopEnd, this.action.age + seconds);
+      this.action.end = this.action.loopEnd + outro.length * frame;
+      return this.action.done;
+    }
+    this.action?.resolve();
+    let resolve;
+    const done = new Promise((r) => { resolve = r; });
+    const loopStart = intro.length * frame;
+    const loopEnd = loopStart + Math.max(0, seconds);
+    this.action = { name, def, age: 0, loopStart, loopEnd, end: loopEnd + outro.length * frame, resolve, done };
+    return done;
+  }
+
+  actionFrame() {
+    const { def, age, loopStart, loopEnd } = this.action;
+    const frame = def.frame ?? 0.16;
+    if (age < loopStart) return def.intro[Math.floor(age / frame)];
+    if (age < loopEnd && def.loop?.length) return def.loop[Math.floor((age - loopStart) / (def.loopFrame ?? frame)) % def.loop.length];
+    const outro = def.outro ?? [];
+    return outro[Math.min(outro.length - 1, Math.floor((age - loopEnd) / frame))] ?? def.loop?.[0];
+  }
+
+  updateAction(dt) {
+    const a = this.action;
+    if (!a) return;
+    a.age += dt;
+    if (a.age >= a.end) {
+      this.action = null;
+      a.resolve();
+    }
+  }
+
   // Ein- oder ausblenden (alpha 0 … 1)
   fade(to, seconds = 0.6) {
     this.fadeTween?.resolve();
@@ -153,6 +201,7 @@ export class Character {
   }
 
   update(dt) {
+    this.updateAction(dt);
     this.updateIdle(dt);
     this.updateFade(dt);
     if (!this.walk) return;
@@ -192,7 +241,7 @@ export class Character {
     const w = this.walk;
     const direction = w && w.view !== 'front' ? Math.sign(w.to.x - w.from.x) : 0;
     this.life.update(dt, { moving: !!w, talking: this.talking, direction });
-    if (this.walk || this.talking) {
+    if (this.walk || this.talking || this.action) {
       this.blinkLeft = 0;
       this.busyLeft = 0;
       return;
@@ -241,6 +290,8 @@ export class Character {
     ctx.globalAlpha = this.alpha;
     if (!this.data.clipBottom) drawShadow(ctx, this.x, this.y, height);
     ctx.translate(this.x, top + drawHeight);
+    const shake = this.action && this.action.age >= this.action.loopStart && this.action.age < this.action.loopEnd ? this.action.def.shake ?? 0 : 0;
+    if (shake) ctx.translate((Math.random() - 0.5) * 2 * shake, (Math.random() - 0.5) * shake);
     this.life.apply(ctx);
     ctx.drawImage(image, -width / 2, -drawHeight, width, drawHeight);
     ctx.restore();
