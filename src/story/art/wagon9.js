@@ -1,6 +1,6 @@
 import { loadImage } from '../../core/assets.js';
 import { STAND_MIRRORS, WALL_MIRRORS } from '../../scene/mirrorCar.js';
-import { HAND, PRINT, glow, line, text, wood } from './common.js';
+import { HAND, PRINT, SERIF, cachedLayer, glow, grain, line, rrect, seeded, smudge, text, wood } from './common.js';
 
 // Gezeichnetes für Wagen 9 (Spiegelwagen): was in den Spiegeln zu sehen ist, die Hebel,
 // die Kratzer (Spiegelschrift) und der Lichtplan mit den vier Standspiegeln.
@@ -222,77 +222,383 @@ export function planSpots() {
   });
 }
 
+// Der Plan hängt gerahmt im Wagen: vergilbtes Papier, Tusche und Wasserfarbe, Grundriss von oben.
+const SEPIA = '#4a2e18';
+
 export function drawPlan(ctx, turns, { lit = true, time = 0 } = {}) {
   const { x, y, cell, cols, rows } = GRID;
   const W = cols * cell, H = rows * cell;
-  wood(ctx, x - 90, y - 110, W + 180, H + 190, [70, 40, 22]);
-  // Boden des Wagens
-  ctx.fillStyle = '#2b1d14';
-  ctx.fillRect(x, y, W, H);
-  ctx.fillStyle = 'rgba(140, 32, 26, 0.55)';
-  ctx.fillRect(x + cell * 1.6, y, cell * 1.8, H);
-  ctx.strokeStyle = 'rgba(255, 230, 170, 0.12)';
-  ctx.lineWidth = 1;
-  for (let i = 1; i < cols; i++) line(ctx, x + i * cell, y, x + i * cell, y + H);
-  for (let i = 1; i < rows; i++) line(ctx, x, y + i * cell, x + W, y + i * cell);
-  ctx.strokeStyle = '#c9a24c';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(x, y, W, H);
-  // Tür mit Glasauge
+  ctx.drawImage(cachedLayer('w9-plan', paintPlanPaper), 0, 0, 1280, 720);
   const eye = cellCenter(PLAN_EYE.col, 0);
-  ctx.fillStyle = '#5d5a44';
-  ctx.fillRect(eye.x - 60, y - 40, 120, 36);
-  ctx.fillStyle = '#e9f2f0';
-  ctx.beginPath();
-  ctx.arc(eye.x, y - 22, 12, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#2a7a6a';
-  ctx.beginPath();
-  ctx.arc(eye.x, y - 22, 6, 0, Math.PI * 2);
-  ctx.fill();
-  text(ctx, 'Tür · Glasauge', eye.x, y - 52, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
-  // Lampe
-  const start = cellCenter(PLAN_START.col, PLAN_START.row);
-  text(ctx, 'Lichtstrahl der Deckenlampe', start.x, y + H + 50, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });
 
   // Strahl
   const beam = traceBeam(turns);
   if (lit) {
+    const pts = beam.points.map((p, i) => (i === 0 ? { x: cellCenter(p.col, p.row).x, y: y + H + 22 } : cellCenter(p.col, p.row)));
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    for (const [width, color] of [[16, 'rgba(255, 230, 160, 0.18)'], [6, 'rgba(255, 240, 200, 0.75)'], [2, '#fffbe8']]) {
+    for (const [width, color] of [[26, 'rgba(255, 200, 90, 0.16)'], [12, 'rgba(255, 214, 120, 0.35)'], [5, 'rgba(255, 236, 180, 0.9)'], [2, '#fffbea']]) {
       ctx.strokeStyle = color;
       ctx.lineWidth = width;
       ctx.beginPath();
-      beam.points.forEach((p, i) => {
-        const c = cellCenter(p.col, p.row);
-        if (i === 0) ctx.moveTo(c.x, y + H + 24);
-        else ctx.lineTo(c.x, c.y);
-      });
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
       ctx.stroke();
     }
+    // Staub, der im Licht tanzt
+    let total = 0;
+    const lengths = pts.slice(1).map((p, i) => {
+      const d = Math.hypot(p.x - pts[i].x, p.y - pts[i].y);
+      total += d;
+      return d;
+    });
+    for (let k = 0; k < 26; k++) {
+      let along = ((k / 26) * total + time * 40) % total;
+      let seg = 0;
+      while (seg < lengths.length - 1 && along > lengths[seg]) along -= lengths[seg++];
+      const a = pts[seg], b = pts[seg + 1];
+      const t = along / (lengths[seg] || 1);
+      const wobble = Math.sin(time * 2 + k * 1.7) * 4;
+      ctx.fillStyle = `rgba(255, 250, 225, ${0.5 + 0.4 * Math.sin(time * 3 + k)})`;
+      ctx.beginPath();
+      ctx.arc(a.x + (b.x - a.x) * t + wobble, a.y + (b.y - a.y) * t - wobble, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
-    if (beam.hit) glow(ctx, eye.x, y - 22, 60, '255, 245, 200', 0.6 + 0.2 * Math.sin(time * 6));
+    if (beam.hit) glow(ctx, eye.x, y - 22, 70, '255, 245, 200', 0.6 + 0.2 * Math.sin(time * 6));
   }
 
-  // Spiegel
-  for (const m of PLAN_MIRRORS) {
-    const c = cellCenter(m.col, m.row);
-    ctx.fillStyle = '#3c2a18';
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, 34, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#c9a24c';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    const slash = turns[m.id] === '/';
-    ctx.strokeStyle = '#dff3f6';
-    ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
-    if (slash) line(ctx, c.x - 24, c.y + 24, c.x + 24, c.y - 24);
-    else line(ctx, c.x - 24, c.y - 24, c.x + 24, c.y + 24);
-    text(ctx, m.id, c.x + 30, c.y - 26, { font: `bold 18px ${PRINT}`, color: '#f3e2b4' });
-  }
+  // Standspiegel von oben: Messingfuß mit drei Beinen, darauf der drehbare Spiegel
+  for (const m of PLAN_MIRRORS) drawStandMirror(ctx, m, turns[m.id] === '/');
   return beam;
+}
+
+function drawStandMirror(ctx, m, slash) {
+  const c = cellCenter(m.col, m.row);
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  // Schatten
+  ctx.fillStyle = 'rgba(60, 36, 16, 0.22)';
+  ctx.beginPath();
+  ctx.ellipse(5, 6, 38, 36, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // drei Beine mit Kugelfüßen
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 3;
+  for (let k = 0; k < 3; k++) {
+    const a = -Math.PI / 2 + (k * Math.PI * 2) / 3 + 0.3;
+    line(ctx, Math.cos(a) * 14, Math.sin(a) * 14, Math.cos(a) * 36, Math.sin(a) * 36);
+    ctx.fillStyle = '#c99a3c';
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * 37, Math.sin(a) * 37, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  // Drehteller mit Gradteilung
+  const plate = ctx.createRadialGradient(-6, -6, 2, 0, 0, 24);
+  plate.addColorStop(0, '#f5dc96');
+  plate.addColorStop(0.7, '#c08a30');
+  plate.addColorStop(1, '#7a5218');
+  ctx.fillStyle = plate;
+  ctx.beginPath();
+  ctx.arc(0, 0, 24, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  for (let k = 0; k < 24; k++) {
+    const a = (k * Math.PI * 2) / 24;
+    const r0 = k % 6 ? 20 : 16;
+    line(ctx, Math.cos(a) * r0, Math.sin(a) * r0, Math.cos(a) * 23, Math.sin(a) * 23);
+  }
+  // Drehpfeil
+  ctx.strokeStyle = 'rgba(74, 46, 24, 0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, 44, -2.6, -1.4);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(74, 46, 24, 0.55)';
+  ctx.beginPath();
+  const ax = Math.cos(-1.4) * 44, ay = Math.sin(-1.4) * 44;
+  ctx.moveTo(ax + 6, ay - 1);
+  ctx.lineTo(ax - 3, ay - 5);
+  ctx.lineTo(ax - 2, ay + 4);
+  ctx.fill();
+  // Spiegel: Glas mit Goldrahmen, beidseitig verspiegelt
+  ctx.rotate(slash ? -Math.PI / 4 : Math.PI / 4);
+  ctx.shadowColor = 'rgba(40, 20, 6, 0.45)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 3;
+  ctx.fillStyle = '#a8762a';
+  rrect(ctx, -38, -7, 76, 14, 5);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  const glass = ctx.createLinearGradient(-34, -4, 34, 4);
+  glass.addColorStop(0, '#cfe4ea');
+  glass.addColorStop(0.45, '#ffffff');
+  glass.addColorStop(0.55, '#b5d2da');
+  glass.addColorStop(1, '#e6f2f4');
+  ctx.fillStyle = glass;
+  ctx.fillRect(-33, -3.5, 66, 7);
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.2;
+  rrect(ctx, -38, -7, 76, 14, 5);
+  ctx.stroke();
+  for (const ex of [-38, 38]) {
+    ctx.fillStyle = '#e8c467';
+    ctx.beginPath();
+    ctx.arc(ex, 0, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+  // Buchstabe im kleinen Schild
+  const lx = c.x + 34, ly = c.y - 32;
+  ctx.fillStyle = '#f3e6c4';
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(lx, ly, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  text(ctx, m.id, lx, ly + 6, { font: `bold 16px ${SERIF}`, color: SEPIA, align: 'center' });
+}
+
+function paintPlanPaper(ctx) {
+  const { x, y, cell, cols, rows } = GRID;
+  const W = cols * cell, H = rows * cell;
+  const PX = 322, PY = 48, PW = 636, PH = 636;
+  // Goldrahmen
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  const frame = ctx.createLinearGradient(PX - 24, PY - 24, PX + PW + 24, PY + PH + 24);
+  frame.addColorStop(0, '#f2d27a');
+  frame.addColorStop(0.3, '#9a6a1e');
+  frame.addColorStop(0.55, '#e8c060');
+  frame.addColorStop(1, '#6a4410');
+  ctx.fillStyle = frame;
+  ctx.fillRect(PX - 24, PY - 24, PW + 48, PH + 48);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(60, 36, 8, 0.7)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(PX - 16, PY - 16, PW + 32, PH + 32);
+  ctx.strokeStyle = 'rgba(255, 240, 190, 0.6)';
+  ctx.setLineDash([2, 4]);
+  ctx.strokeRect(PX - 10, PY - 10, PW + 20, PH + 20);
+  ctx.setLineDash([]);
+  for (const [cx, cy] of [[PX - 12, PY - 12], [PX + PW + 12, PY - 12], [PX - 12, PY + PH + 12], [PX + PW + 12, PY + PH + 12]]) {
+    const rosette = ctx.createRadialGradient(cx - 3, cy - 3, 1, cx, cy, 14);
+    rosette.addColorStop(0, '#fff0b8');
+    rosette.addColorStop(1, '#8a5a14');
+    ctx.fillStyle = rosette;
+    ctx.beginPath();
+    for (let k = 0; k < 16; k++) {
+      const a = (k * Math.PI) / 8;
+      const r = k % 2 ? 8 : 15;
+      ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    }
+    ctx.fill();
+  }
+  // Papier: vergilbt, Ränder dunkler, Stockflecken, Faltlinien
+  const paper = ctx.createRadialGradient(640, 360, 120, 640, 360, 480);
+  paper.addColorStop(0, '#f1e4c2');
+  paper.addColorStop(0.75, '#e2cf9e');
+  paper.addColorStop(1, '#c4a46a');
+  ctx.fillStyle = paper;
+  ctx.fillRect(PX, PY, PW, PH);
+  grain(ctx, PX, PY, PW, PH, { seed: 9, count: 2600, alpha: 0.12 });
+  const random = seeded(99);
+  for (let i = 0; i < 18; i++) smudge(ctx, PX + random() * PW, PY + random() * PH, 6 + random() * 18, 6 + random() * 18, 'rgba(150, 100, 40, 0.22)');
+  ctx.strokeStyle = 'rgba(120, 90, 50, 0.18)';
+  ctx.lineWidth = 2;
+  line(ctx, PX, PY + PH / 2, PX + PW, PY + PH / 2);
+  line(ctx, PX + PW / 2, PY, PX + PW / 2, PY + PH);
+  ctx.strokeStyle = 'rgba(255, 250, 230, 0.25)';
+  ctx.lineWidth = 1;
+  line(ctx, PX, PY + PH / 2 + 2, PX + PW, PY + PH / 2 + 2);
+  // Zeichenrand
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(PX + 12, PY + 12, PW - 24, PH - 24);
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(PX + 16, PY + 16, PW - 32, PH - 32);
+
+  // Boden: Dielen längs, mit Tusche schraffiert und braun laviert
+  ctx.fillStyle = 'rgba(150, 96, 50, 0.32)';
+  ctx.fillRect(x, y, W, H);
+  ctx.strokeStyle = 'rgba(74, 46, 24, 0.28)';
+  ctx.lineWidth = 1;
+  for (let px = x + 25; px < x + W; px += 25) line(ctx, px, y, px, y + H);
+  const r2 = seeded(5);
+  for (let px = x; px < x + W; px += 25) {
+    for (let py = y + r2() * 80; py < y + H; py += 70 + r2() * 90) line(ctx, px, py, px + 25, py);
+  }
+  // Läufer: rote Lasur, Bordüre mit Rauten
+  const rx = x + cell * 1.6, rw = cell * 1.8;
+  ctx.fillStyle = 'rgba(168, 40, 30, 0.42)';
+  ctx.fillRect(rx, y, rw, H);
+  ctx.strokeStyle = 'rgba(200, 150, 50, 0.85)';
+  ctx.lineWidth = 2;
+  line(ctx, rx + 8, y, rx + 8, y + H);
+  line(ctx, rx + rw - 8, y, rx + rw - 8, y + H);
+  ctx.fillStyle = 'rgba(210, 160, 60, 0.7)';
+  for (let py = y + 14; py < y + H; py += 22) {
+    for (const bx of [rx + 8, rx + rw - 8]) {
+      ctx.beginPath();
+      ctx.moveTo(bx, py - 5);
+      ctx.lineTo(bx + 4, py);
+      ctx.lineTo(bx, py + 5);
+      ctx.lineTo(bx - 4, py);
+      ctx.fill();
+    }
+  }
+  ctx.strokeStyle = 'rgba(120, 30, 20, 0.35)';
+  ctx.lineWidth = 1;
+  for (let py = y + 40; py < y + H; py += 80) {
+    ctx.beginPath();
+    ctx.ellipse(rx + rw / 2, py, 20, 12, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Rasterlinien in Bleistift, Koordinaten am Rand
+  ctx.strokeStyle = 'rgba(80, 70, 60, 0.22)';
+  ctx.setLineDash([3, 5]);
+  for (let i = 1; i < cols; i++) line(ctx, x + i * cell, y, x + i * cell, y + H);
+  for (let i = 1; i < rows; i++) line(ctx, x, y + i * cell, x + W, y + i * cell);
+  ctx.setLineDash([]);
+  // Wände: doppelt gezogen und schraffiert
+  const wall = (wx, wy, ww, wh) => {
+    ctx.fillStyle = 'rgba(74, 46, 24, 0.18)';
+    ctx.fillRect(wx, wy, ww, wh);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(wx, wy, ww, wh);
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(74, 46, 24, 0.55)';
+    ctx.lineWidth = 1;
+    for (let k = -wh; k < ww + wh; k += 6) line(ctx, wx + k, wy, wx + k + wh, wy + wh);
+    ctx.restore();
+    ctx.strokeStyle = SEPIA;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(wx, wy, ww, wh);
+  };
+  wall(x - 16, y - 16, 16, H + 32);
+  wall(x + W, y - 16, 16, H + 32);
+  wall(x, y + H, W, 16);
+  wall(x, y - 16, cell * 1.9, 16);
+  wall(x + cell * 3.1, y - 16, cell * 1.9, 16);
+  // Wandspiegel: ovale Rahmen an beiden Längswänden, dazwischen Kerzenleuchter
+  for (const side of [0, 1]) {
+    const wx = side ? x + W : x;
+    for (const row of [0.9, 2.5, 4.1]) {
+      const wy = y + row * cell;
+      ctx.fillStyle = '#d8b25a';
+      ctx.strokeStyle = SEPIA;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(wx + (side ? -3 : 3), wy, 5, 34, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#e3f0f2';
+      ctx.beginPath();
+      ctx.ellipse(wx + (side ? -3 : 3), wy, 2, 28, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (const row of [1.7, 3.3]) {
+      const wy = y + row * cell;
+      const sx = wx + (side ? -10 : 10);
+      ctx.strokeStyle = SEPIA;
+      ctx.lineWidth = 1.2;
+      line(ctx, wx, wy, sx, wy);
+      ctx.fillStyle = 'rgba(255, 190, 80, 0.45)';
+      ctx.beginPath();
+      ctx.arc(sx, wy, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c0392b';
+      ctx.beginPath();
+      ctx.arc(sx, wy, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // Tür mit Glasauge
+  const eye = cellCenter(PLAN_EYE.col, 0);
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 2;
+  ctx.fillStyle = 'rgba(110, 74, 40, 0.55)';
+  ctx.fillRect(eye.x - 60, y - 40, 120, 30);
+  ctx.strokeRect(eye.x - 60, y - 40, 120, 30);
+  ctx.lineWidth = 1;
+  line(ctx, eye.x, y - 40, eye.x, y - 10);
+  const lens = ctx.createRadialGradient(eye.x - 3, y - 25, 1, eye.x, y - 22, 13);
+  lens.addColorStop(0, '#ffffff');
+  lens.addColorStop(0.5, '#9fd6c8');
+  lens.addColorStop(1, '#1f6a5a');
+  ctx.fillStyle = '#c99a3c';
+  ctx.beginPath();
+  ctx.arc(eye.x, y - 22, 16, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = lens;
+  ctx.beginPath();
+  ctx.arc(eye.x, y - 22, 11, 0, Math.PI * 2);
+  ctx.fill();
+  text(ctx, '← Tür mit Glasauge', eye.x + 72, y - 22, { font: `italic 15px ${SERIF}`, color: SEPIA });
+  // Deckenlampe (unten) – von dort kommt der Strahl
+  const lampX = cellCenter(PLAN_START.col, PLAN_START.row).x, lampY = y + H + 22;
+  ctx.fillStyle = '#c99a3c';
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let k = 0; k < 8; k++) {
+    const a = (k * Math.PI) / 4 + Math.PI / 8;
+    ctx.lineTo(lampX + Math.cos(a) * 13, lampY + Math.sin(a) * 13);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#fff3c8';
+  ctx.beginPath();
+  ctx.arc(lampX, lampY, 6, 0, Math.PI * 2);
+  ctx.fill();
+  text(ctx, 'Lichtstrahl der Deckenlampe', lampX, y + H + 56, { font: `italic 15px ${SERIF}`, color: SEPIA, align: 'center' });
+  // Titelschild
+  ctx.save();
+  ctx.translate(PX + 104, PY + 44);
+  ctx.fillStyle = 'rgba(245, 232, 200, 0.9)';
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1.2;
+  rrect(ctx, -80, -24, 160, 46, 6);
+  ctx.fill();
+  ctx.stroke();
+  text(ctx, 'SPIEGELWAGEN', 0, -3, { font: `bold 15px ${SERIF}`, color: SEPIA, align: 'center' });
+  text(ctx, 'Grundriss · Lichtführung', 0, 14, { font: `italic 11px ${SERIF}`, color: SEPIA, align: 'center' });
+  ctx.restore();
+  // Maßstab
+  const sx = PX + 40, sy = PY + PH - 34;
+  ctx.strokeStyle = SEPIA;
+  ctx.lineWidth = 1;
+  for (let k = 0; k < 4; k++) {
+    ctx.fillStyle = k % 2 ? 'rgba(245, 232, 200, 0.9)' : SEPIA;
+    ctx.fillRect(sx + k * 22, sy, 22, 5);
+    ctx.strokeRect(sx + k * 22, sy, 22, 5);
+  }
+  text(ctx, '0', sx, sy - 4, { font: `10px ${SERIF}`, color: SEPIA, align: 'center' });
+  text(ctx, '2 m', sx + 88, sy - 4, { font: `10px ${SERIF}`, color: SEPIA, align: 'center' });
+  // Stempel der Werkstatt
+  ctx.save();
+  ctx.translate(PX + PW - 74, PY + PH - 44);
+  ctx.rotate(-0.2);
+  ctx.scale(0.8, 0.8);
+  ctx.strokeStyle = 'rgba(170, 40, 30, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 28, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, 0, 22, 0, Math.PI * 2);
+  ctx.stroke();
+  text(ctx, 'RINGBAHN', 0, -4, { font: `bold 9px ${SERIF}`, color: 'rgba(170, 40, 30, 0.7)', align: 'center' });
+  text(ctx, 'Werkstatt', 0, 9, { font: `italic 9px ${SERIF}`, color: 'rgba(170, 40, 30, 0.7)', align: 'center' });
+  ctx.restore();
 }

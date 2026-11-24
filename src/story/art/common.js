@@ -1,5 +1,7 @@
 // Zeichenhilfen für die gezeichneten Blätter und Nahansichten ab Wagen 4.
 
+import { paintCanvas } from '../../core/paint.js';
+
 export const PRINT = '"Trebuchet MS", "Avenir Next", "Segoe UI", system-ui, sans-serif';
 export const SERIF = 'Georgia, "Times New Roman", serif';
 export const TYPEWRITER = '"Courier New", "Courier", monospace';
@@ -153,4 +155,69 @@ export function drawFilePage(ctx, { x = 330, y = 40, w = 620, h = 640, angle = 0
       for (const value of lines) ly = paragraph(c, value, 84, ly, w - 120, { font: `21px ${HAND}`, color: BLUE_INK, lineHeight: 30 });
     },
   });
+}
+
+// ---------------------------------------------------------------- Hilfen für aufwendigere Nahansichten
+
+// Ein gemaltes Bild nur einmal zeichnen und danach wiederverwenden (spart Arbeit in jedem Bild).
+const LAYERS = new Map();
+export function cachedLayer(key, draw, w = 1280, h = 720) {
+  if (!LAYERS.has(key)) LAYERS.set(key, paintCanvas(w, h, draw));
+  return LAYERS.get(key);
+}
+
+// Zufallszahlen, die bei jedem Aufruf gleich ausfallen (für Maserung, Körnung, Kratzer)
+export function seeded(seed = 1) {
+  let s = seed >>> 0 || 1;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+// Rechteck mit runden Ecken als Pfad
+export function rrect(ctx, x, y, w, h, r = 6) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+// Feine Körnung (Staub, Papierfasern, Filmkorn)
+export function grain(ctx, x, y, w, h, { seed = 7, count = 400, alpha = 0.08, light = false, size = 1.4 } = {}) {
+  const random = seeded(seed);
+  ctx.save();
+  for (let i = 0; i < count; i++) {
+    const a = alpha * (0.4 + random() * 0.6);
+    ctx.fillStyle = light ? `rgba(255, 250, 235, ${a})` : `rgba(20, 12, 6, ${a})`;
+    const s = size * (0.5 + random());
+    ctx.fillRect(x + random() * w, y + random() * h, s, s);
+  }
+  ctx.restore();
+}
+
+// Schraube mit Schlitz
+export function screw(ctx, x, y, r = 5, angle = 0.6) {
+  const g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, 0.5, x, y, r);
+  g.addColorStop(0, '#f4ead0');
+  g.addColorStop(0.5, '#a89a7a');
+  g.addColorStop(1, '#4a4232');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(30, 24, 16, 0.85)';
+  ctx.lineWidth = Math.max(1, r * 0.28);
+  line(ctx, x - Math.cos(angle) * r * 0.8, y - Math.sin(angle) * r * 0.8, x + Math.cos(angle) * r * 0.8, y + Math.sin(angle) * r * 0.8);
+}
+
+// Weicher Schatten unter einem Gegenstand
+export function contactShadow(ctx, cx, cy, rx, ry, alpha = 0.45) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(1, ry / rx);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+  g.addColorStop(0, `rgba(0, 0, 0, ${alpha})`);
+  g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
+  ctx.restore();
 }
