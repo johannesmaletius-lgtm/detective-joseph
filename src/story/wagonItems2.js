@@ -108,10 +108,7 @@ export const WAGON_ITEMS_2 = {
         c.fill();
       }, '#efe0bf');
     },
-    look: [
-      'Das Familienfoto aus der Kapelle: ein junger Schaffner, seine Frau, ihre kleine Tochter, ein Weihnachtsbaum. Er sieht aus wie ich.',
-      'Hinten drauf, mit Füller: „Martha und ich – seit dem 27. 04.“',
-    ],
+    look: 'Das Familienfoto aus der Kapelle: ein junger Schaffner, seine Frau, ihre kleine Tochter, ein Weihnachtsbaum. Er sieht aus wie ich.',
   },
 
   // ---------------------------------------------------------------- Wagen 14: Zeitungswagen

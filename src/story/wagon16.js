@@ -16,11 +16,11 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 //   2. Logbuch: Frequenzen 120, 135, 165, 210, 270 – die Abstände wachsen um 15 (15, 30, 45, 60) →
 //      nächste: 270 + 75 = 345 kHz. Am Funkgerät einstellen.
 //   3. Der Lautsprecher ist kaputt – Kopfhörer vom Tisch aufsetzen. Morsefunkspruch: „Hier Bahnhof.
-//      Zug 24 sofort halten. Weiche 7 falsch. Bitte antworten. 23:41.“ Am Ende vier Ziffern, die Joseph
-//      nicht lesen kann: ----. ----. ----. ----. → mit der Morsetafel an der Wand: 9999 (= Notruf) =
+//      Zug 24 sofort halten. Weiche 7 falsch. Bitte antworten.“ Am Ende vier Ziffern, die Joseph
+//      nicht lesen kann: ..--- ...-- ....- .---- → mit der Morsetafel an der Wand: 2341 (23:41) =
 //      Türcode. Die Stimme danach ist die des Schaffners.
 
-const DOOR_CODE = '9999';
+const DOOR_CODE = '2341';
 const UNIT = 0.11; // Länge eines kurzen Morsezeichens (Sekunden)
 
 export const wagon16 = {
@@ -233,7 +233,6 @@ async function playMessage(story) {
       '„ZUG 24 SOFORT HALTEN …“',
       '„WEICHE 7 FALSCH …“',
       '„BITTE ANTWORTEN …“',
-      '„23:41 …“',
     ];
     for (const word of words) {
       beep(story, '.-..-.--.', (on) => { light = on; });

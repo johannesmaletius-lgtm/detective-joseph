@@ -145,14 +145,12 @@ export function drawPhoto(ctx) {
     shade: '#dcccaa',
     inner: (c) => {
       text(c, 'K. und ich', 30, 70, { font: `30px ${HAND}`, color: '#27408f' });
-      text(c, 'Weihnachtsfeier im Speisewagen, 24. 12.', 30, 112, { font: `21px ${HAND}`, color: '#27408f' });
-      text(c, 'Und ab dem', 30, 152, { font: `21px ${HAND}`, color: '#27408f' });
-      text(c, '20. 04.', 150, 160, { font: `bold 40px ${HAND}`, color: '#27408f' });
-      text(c, 'bist du Rentner – merk ihn dir!', 30, 200, { font: `21px ${HAND}`, color: '#27408f' });
-      text(c, '– dein Schaffner', 370, 255, { font: `24px ${HAND}`, color: '#27408f', align: 'right' });
-      c.strokeStyle = 'rgba(39, 64, 143, 0.7)';
-      c.lineWidth = 2;
-      line(c, 148, 168, 290, 168);
+      text(c, 'Weihnachtsfeier im Speisewagen', 30, 120, { font: `24px ${HAND}`, color: '#27408f' });
+      text(c, '24. 12.', 30, 180, { font: `bold 44px ${HAND}`, color: '#27408f' });
+      text(c, '– dein Schaffner', 370, 250, { font: `24px ${HAND}`, color: '#27408f', align: 'right' });
+      c.strokeStyle = 'rgba(120, 90, 50, 0.4)';
+      c.lineWidth = 1;
+      line(c, 20, 200, 380, 200);
     },
   });
   text(ctx, 'Vorderseite', 390, 600, { font: `16px ${PRINT}`, color: '#e9d8b0', align: 'center' });

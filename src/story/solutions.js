@@ -42,8 +42,8 @@ export const SOLUTIONS = {
     'Mit der Stricknadel den Schlüssel herausstoßen, er fällt aufs Blatt → Blatt zurückziehen → Abteil 4 aufschließen.',
     'Suchbild Abteil 4: sechs Spuren finden (Hutschachtel, Brille, Schuhe, Fußspuren, Uniformknopf, Fahrschein „Runde 108“).',
     'Ilse spricht im Schlaf, nach jedem Tunnel ein Stück mehr (über 3 Runden zuhören): „… der Schlüssel liegt, wo der Mond nicht hinkommt.“',
-    'Kofferschlüssel im Schatten unter dem Tischchen am Fenster → Koffer im Bettkasten von Abteil 4 → Foto. Rückseite: zwei Daten – dick unterstrichen „Ab dem 20. 04. bist du Rentner – merk ihn dir!“',
-    'Tür: 2004 (nicht 2412).',
+    'Kofferschlüssel im Schatten unter dem Tischchen am Fenster → Koffer im Bettkasten von Abteil 4 → Foto, Rückseite „24. 12.“',
+    'Tür: 2412.',
   ],
   6: [
     'Glocke am Tresen läuten: „Nur gegen Fundschein. Fundscheine hinter der Klappe.“',
@@ -115,8 +115,8 @@ export const SOLUTIONS = {
     'Antenne mit der Kurbel nach links drehen (zum Turm in der Mitte des Kreises).',
     'Logbuch: 120, 135, 165, 210, 270 – die Abstände wachsen um 15 → 345 kHz einstellen.',
     'Kopfhörer vom Tisch aufsetzen und den Morsefunkspruch hören („Weiche 7 falsch“).',
-    'Die vier Ziffern am Ende (----. ----. ----. ----.) mit der Morsetafel an der Wand übersetzen → 9999 (Notruf).',
-    'Tür: 9999.',
+    'Die vier Ziffern am Ende (..--- ...-- ....- .----) mit der Morsetafel an der Wand übersetzen → 2341.',
+    'Tür: 2341.',
   ],
   17: [
     'Heizung: Ventil 1 und 2 auf, Ventil 3 zu → die Scheiben beschlagen. Fingerschrift: Rose genau 4 Liter.',
@@ -153,8 +153,7 @@ export const SOLUTIONS = {
     'Tür: 317.',
   ],
   22: [
-    'Fahrtenschreiber: bei Kilometer 24,7 (Weiche 7) steht 23:43, niemand hat gebremst.',
-    'Luke zum Tender: eingeritzt „Wofür ich das alles tue“ → Familienfoto ansehen (Rechtsklick im Inventar), Rückseite „Martha und ich – seit dem 27. 04.“ → 2704.',
+    'Fahrtenschreiber: bei Kilometer 24,7 steht 23:43 → Luke zum Tender: 2343.',
     'Im Tender verstecken und warten; genau um 23:31 herauskommen (zu früh verscheucht ihn, zu spät verpasst ihn – dann nächste Runde).',
     'Beweise in dieser Reihenfolge vorlegen: Familienfoto, Pressefoto, Miras Karte → er nimmt die Mütze ab.',
   ],
