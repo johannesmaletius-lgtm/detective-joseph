@@ -115,9 +115,11 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
 - Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
 
-**Noch offen:** Online stellen (GitHub Pages). Später: Vordergrund-Ebenen (Joseph hinter Sitzen).
+**Noch offen:** Online stellen (GitHub Pages).
 
 ## Übergabe für die nächste Session
+
+**Stand (24.11.2026, Vordergrund-Ebenen):** Joseph und die Figuren laufen hinter Möbeln vorbei, die weiter vorne stehen. Umrisse je Hintergrund in `tools/vordergrund.json` (Pixel des 1536er-Bilds, grob reicht – die Kante rastet per GrabCut an den Konturen ein; `depth` = Bodenhöhe in Spielkoordinaten, bei schrägen Möbeln eine Linie), `python3 tools/cut-foreground.py [wagon-XX] --preview ORDNER` schneidet `assets/scenes/<ordner>/vorne-*.webp` aus und schreibt `assets/scenes/vordergrund.json`. Das Spiel (`drawInDepth` in `src/scene/scene.js`) kopiert dann die Pixel des schon gemalten Bilds durch die Schablone und legt sie über Figuren, die dahinter stehen – keine Kanten, Requisiten/Licht bleiben. Laufbereiche und Klickflächen unverändert. Eingebaut: 2 Kofferstapel, 3 Postschalter, 4 alle sechs Tische, 5 Fenstertischchen, 7 Barhocker, 10 Mikrofonständer, 14 Lesetisch + Sessel, 21 Pumpe. In den anderen Wagen hält der Laufbereich Joseph schon vor allen Möbeln (mit Screenshots am ganzen Rand geprüft).
 
 **Stand (24.11.2026, leichter bedienbar):** Johannes: Rätsel bleiben, wie sie sind – sie sollen nur intuitiv zu bedienen sein. Daher: Alle Kärtchen-Rätsel (`src/puzzles/arrange.js`: Anhänger, Briefe, Tischkärtchen, Kartei, Filmbilder, Sicherungen, Modellbahn, Schlüssel, Negative, Paketanhänger) gehen jetzt auch mit Antippen statt Ziehen (antippen = in die Hand nehmen, nächster Klick legt ab); der Platz, auf dem es landet, leuchtet auf; Esc legt ein Kärtchen in der Hand zurück. Kofferstapel (2): Koffer in der Hand folgt der Maus, das Zielfeld zeigt grün/rot, ob er passt, Ziehen geht auch (neue Option `onRelease` in `src/puzzles/picture.js`). Spiegelwagen (9): Das Spiegelbild hält den Hebel 7 s statt 3,5 s (`GHOST_HOLD`), damit Joseph rechtzeitig hinlaufen kann.
 

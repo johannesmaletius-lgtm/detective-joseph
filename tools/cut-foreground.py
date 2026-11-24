@@ -15,7 +15,9 @@
 #            Die Kante rastet danach von selbst an den schwarzen Konturen ein (GrabCut im schmalen
 #            Band, Breite "band", Standard 4 Pixel). Was weiter hinten steht, darf nicht im Umriss liegen.
 #   depth:   Bodenhöhe in Spielkoordinaten (1280 × 720, wie der Laufbereich) – meist die Stelle,
-#            an der das vorderste Bein den Boden berührt.
+#            an der das vorderste Bein den Boden berührt. Steht das Möbel schräg (z. B. ein Pult an der
+#            Wand), eine Linie [[x1, y1], [x2, y2]] entlang der Unterkante – dazwischen und daneben wird
+#            die Höhe an der Stelle der Figur gerechnet.
 #   cut:     (optional) Flächen im Umriss, die sicher NICHT dazugehören (z. B. Boden zwischen Beinen)
 
 import json, os, sys
@@ -94,7 +96,7 @@ for src, entry in config.items():
         path = f'{os.path.dirname(src)}/vorne-{piece["name"]}.webp'
         Image.fromarray(out, 'RGBA').save(path, 'WEBP', quality=88, method=6)
         pieces.append({'name': piece['name'], 'image': path, 'x': x0, 'y': y0, 'width': x1 - x0, 'height': y1 - y0, 'depth': piece['depth']})
-        print(f'{path:48} {x1 - x0:4} × {y1 - y0:<4}  Bodenhöhe {piece["depth"]}')
+        print(f'{path:48} {x1 - x0:4} × {y1 - y0:<4}  Bodenhöhe {json.dumps(piece["depth"])}')
     result[src] = pieces
     if preview:
         a = union[..., None] / 255

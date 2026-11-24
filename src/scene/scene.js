@@ -32,8 +32,8 @@ const CLICK_MARKER_DURATION = 0.45; // Sekunden
 //
 // Vordergrund: Möbel, die im Bild weiter vorne stehen (Sitze, Tische, Kisten …), sind als ausgeschnittene
 // Stücke des Hintergrundbilds in assets/scenes/vordergrund.json eingetragen (erzeugt von
-// tools/cut-foreground.py). Jedes Stück hat eine Bodenhöhe (depth): Stehen die Füße einer Figur weiter
-// hinten (kleineres y), wird das Stück über die Figur gelegt. Das Stück wird dabei nicht neu gemalt,
+// tools/cut-foreground.py). Jedes Stück hat eine Bodenhöhe (depth, bei schräg stehenden Möbeln eine Linie):
+// Stehen die Füße einer Figur weiter hinten (kleineres y), wird das Stück über die Figur gelegt. Das Stück wird dabei nicht neu gemalt,
 // sondern Pixel für Pixel aus dem schon gezeichneten Bild kopiert (das ausgeschnittene Bild dient nur
 // als Schablone) – so gibt es keine Kanten, und was dort gerade liegt (Requisiten, Lichtschein), bleibt.
 const FOREGROUND = 'assets/scenes/vordergrund.json';
@@ -277,19 +277,28 @@ export class Scene {
   }
 
   // Figuren, Bilder mit Bodenhöhe (depth) und Vordergrund-Möbel, von hinten nach vorne.
-  // Bei gleicher Höhe steht die Figur vorne.
+  // Bei gleicher Höhe steht die Figur vorne. Ein Möbelstück kommt direkt nach der vordersten Figur,
+  // die hinter ihm steht (bei schräg stehenden Möbeln hängt das davon ab, wo die Figur steht).
   drawInDepth(ctx, player) {
     const figures = this.figures(player);
-    const farthest = figures.length ? figures[0].y : Infinity;
-    // Möbel, vor denen keine Figur steht, müssen nicht nachgezeichnet werden
-    const pieces = this.foreground.filter((piece) => piece.depth > farthest && this.copyPiece(ctx, piece));
-    const props = this.props.filter((prop) => prop.depth !== undefined && this.isActive(prop));
-    const order = [
-      ...figures.map((figure) => ({ y: figure.y, rank: 1, draw: () => figure.draw(ctx, this) })),
-      ...props.map((prop) => ({ y: prop.depth, rank: 0, draw: () => this.drawProp(ctx, prop) })),
-      ...pieces.map((piece) => ({ y: piece.depth, rank: 0, draw: () => this.pastePiece(ctx, piece) })),
-    ].sort((a, b) => a.y - b.y || a.rank - b.rank);
+    const order = figures.map((figure) => ({ y: figure.y, rank: 1, draw: () => figure.draw(ctx, this) }));
+    for (const prop of this.props) {
+      if (prop.depth !== undefined && this.isActive(prop)) order.push({ y: prop.depth, rank: 0, draw: () => this.drawProp(ctx, prop) });
+    }
+    for (const piece of this.foreground) {
+      const behind = figures.filter((figure) => figure.y < Scene.depthAt(piece, figure.x));
+      if (!behind.length || !this.copyPiece(ctx, piece)) continue; // keine Figur dahinter: nichts zu tun
+      order.push({ y: Math.max(...behind.map((figure) => figure.y)), rank: 2, draw: () => this.pastePiece(ctx, piece) });
+    }
+    order.sort((a, b) => a.y - b.y || a.rank - b.rank);
     for (const item of order) item.draw();
+  }
+
+  // Bodenhöhe eines Möbelstücks an der Stelle x: eine Zahl oder eine schräge Linie [[x1, y1], [x2, y2]]
+  static depthAt(piece, x) {
+    if (typeof piece.depth === 'number') return piece.depth;
+    const [[x1, y1], [x2, y2]] = piece.depth;
+    return y1 + ((x - x1) * (y2 - y1)) / (x2 - x1);
   }
 
   // Merkt sich, wie das Möbelstück gerade im Bild aussieht (genau die Pixel, ausgeschnitten mit der Schablone)
