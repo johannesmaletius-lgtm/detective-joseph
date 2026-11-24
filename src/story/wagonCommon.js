@@ -1,5 +1,6 @@
 import { isUnlocked, today } from '../advent/doors.js';
 import { FAKE_DATE, TEST_MODE } from '../config.js';
+import { loadPreview } from './previews.js';
 
 // Helfer, die alle Wagen ab Wagen 4 benutzen: Tunnel zählen, Zahlwörter, Anfang und Ende eines
 // Wagens, auf den Tunnel warten, Tipps.
@@ -85,14 +86,25 @@ export function hintFor(story, goal) {
 export async function finishWagon(story, { number, title, lines = [], nextTitle }) {
   await story.fadeOut(1.6);
   const minutes = Math.max(1, Math.round((performance.now() - (story.flags.startedAt ?? performance.now())) / 60000));
+  const preview = await nextPreview(number);
   await story.card({
     kind: 'end',
     title,
     lines: [...lines, `Gelöst in Runde ${story.lap} – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`,
-      ...(number < 24 ? [nextLine(number, nextTitle)] : [])],
+      ...(number < 24 && !preview ? [nextLine(number, nextTitle)] : [])],
+    preview,
     continueText: 'Klicken – zurück zu Detective Joseph',
   });
   story.finish();
+}
+
+// Vorschau auf den nächsten Wagen (dunkler Bildausschnitt + Satz, siehe previews.js); nach Tür 24 keine.
+// „Morgen:“ nur, wenn die nächste Tür wirklich erst morgen aufgeht.
+export async function nextPreview(number) {
+  const preview = number < 24 ? await loadPreview(number) : null;
+  if (!preview) return null;
+  const open = isUnlocked(number + 1, today(FAKE_DATE), TEST_MODE);
+  return { ...preview, label: open ? 'Als Nächstes' : 'Morgen' };
 }
 
 // Schlusszeile der Endkarte: „Morgen …“ nur, wenn die nächste Tür wirklich erst morgen aufgeht

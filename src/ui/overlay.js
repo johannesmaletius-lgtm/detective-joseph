@@ -213,17 +213,57 @@ function drawLetter(ctx, { lines, signature }) {
   ctx.restore();
 }
 
-function drawEnd(ctx, { title, lines }) {
+function drawEnd(ctx, { title, lines, preview, age }) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, 1280, 720);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  const top = preview ? 120 : 270;
   ctx.font = FONTS.title;
   ctx.fillStyle = COLORS.brass;
-  ctx.fillText(title, 640, 270);
+  ctx.fillText(title, 640, top);
   ctx.font = FONTS.subtitle;
   ctx.fillStyle = '#c9b48f';
-  lines.forEach((line, i) => ctx.fillText(line, 640, 350 + i * 42));
+  lines.forEach((line, i) => ctx.fillText(line, 640, top + 80 + i * 42));
+  if (preview) drawPreview(ctx, preview, age, top + 80 + lines.length * 42);
+}
+
+// Vorschau auf den nächsten Wagen: ein dunkler Ausschnitt, der langsam aus dem Schwarz auftaucht und ein wenig wandert
+function drawPreview(ctx, { canvas, text, label }, age, below) {
+  const w = 640, h = 240, x = 320, y = Math.max(below + 10, 330);
+  const show = Math.min(1, Math.max(0, (age - 0.5) / 2.5));
+  const drift = Math.sin(age * 0.25) * 0.5 + 0.5;
+  const zoom = 1.08;
+  const sw = canvas.width / zoom, sh = canvas.height / zoom;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.globalAlpha *= show;
+  ctx.filter = 'brightness(0.42) saturate(0.55) sepia(0.2)';
+  ctx.drawImage(canvas, (canvas.width - sw) * drift, (canvas.height - sh) / 2, sw, sh, x, y, w, h);
+  ctx.filter = 'none';
+  ctx.fillStyle = 'rgba(8, 10, 30, 0.35)';
+  ctx.fillRect(x, y, w, h);
+  const shade = ctx.createRadialGradient(640, y + h / 2, 60, 640, y + h / 2, w * 0.58);
+  shade.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  shade.addColorStop(0.55, 'rgba(0, 0, 0, 0.55)');
+  shade.addColorStop(1, 'rgba(0, 0, 0, 1)');
+  ctx.fillStyle = shade;
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalAlpha *= Math.min(1, Math.max(0, (age - 1.2) / 1.2));
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = FONTS.small;
+  ctx.fillStyle = 'rgba(217, 164, 65, 0.8)';
+  ctx.fillText(`${label}:`, 640, y + h + 30);
+  ctx.font = FONTS.subtitle;
+  ctx.fillStyle = '#c9b48f';
+  ctx.fillText(text, 640, y + h + 62);
+  ctx.restore();
 }
 
 function inside(point, { x, y, width, height }) {

@@ -1,7 +1,7 @@
 import { TUTORIAL_WAGON1 } from './tutorial.js';
 import { CameraFeed } from '../puzzles/cameraFeed.js';
 import { SUDOKU_CODE, drawCaseFile, drawPuzzlePage, drawSignalCard } from '../ui/cards.js';
-import { hintFor, nextLine } from './wagonCommon.js';
+import { hintFor, nextLine, nextPreview } from './wagonCommon.js';
 
 // ============================================================================================
 //  WAGEN 1 – „Die Ringbahn“
@@ -505,10 +505,12 @@ async function openDoor(story) {
     await story.fadeOut(1.6);
     story.note('Die Tür ist offen. Weiter nach vorne – in den nächsten Wagen.');
     const minutes = Math.max(1, Math.round((performance.now() - story.flags.startedAt) / 60000));
+    const preview = await nextPreview(1);
     await story.card({
       kind: 'end',
       title: 'Ende von Wagen 1',
-      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, nextLine(1)],
+      lines: [`Joseph ist in Runde ${story.lap} durch die Tür gegangen – nach ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}.`, ...(preview ? [] : [nextLine(1)])],
+      preview,
       continueText: 'Klicken – zurück zu Detective Joseph',
     });
     story.finish();
