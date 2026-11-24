@@ -115,7 +115,7 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Tür 16: Der Morsefunkspruch endet mit vier Ziffern (2341 = 23:41), die Joseph mit der Morsetafel übersetzen muss.
 - Mitgenommen (keep): Zahnrad (11), Familienfoto (13), Zeitung vom 25.12. (14), Miras Zeichnung (15), Kopfhörer (16).
 
-**Noch offen:** Online stellen (GitHub Pages).
+**Online:** https://johannesmaletius-lgtm.github.io/detective-joseph/ (jeder Push auf `main` geht automatisch online). Nichts mehr offen.
 
 ## Übergabe für die nächste Session
 **Stand (24.11.2026, Nahansichten im Messing-Stil):** Neu gezeichnet (Rätsel, Klickflächen, Lösungen unverändert, jede Ansicht mit Lösung im Spiel nachgespielt): Schlüsselbrett (18, grüne Tafel im Eichenrahmen, aufgemalte Umrisse mit Messinghaken, Messingschlüssel mit Pappanhänger, Ablage darunter, „LOK“-Emailschild nach dem Lösen; Umrisse sitzen jetzt genau dort, wo der Schlüssel einrastet), Archivschrank (14, unterste Schublade aufgezogen mit der Zeitung), Glockenzettel (13, Balken mit drei Bronzeglocken, Zettel am Glockenseil). Dazu die übrigen flachen: Stellwerk (18, Stelltafel mit Leuchtfahrstraße und Messing-Drehknöpfen), Rundenuhr, Standuhr und Kuckucksuhr (11), Schließfächer (6), Kofferanhänger-Brett und Schild (2), Tablett mit Gläsern und Kakao (4), Bierdeckel (7), Mattscheibe mit Zahnrädern (8), Abrieb auf der Bronzetafel (13), Morsetafel als Emailleschild (16), Postfächer mit Weidenkorb (3), Kratzer/Spiegel (9), Miras Paket (20). Neue Helfer in `src/story/art/common.js`: `brassPlate`, `woodFrame`.
@@ -205,6 +205,6 @@ Kleine Abweichungen vom Plan in Wagen 9–16:
 - Heizer (21) und anderer Joseph (22): beide Seitenansichten schauen nach rechts → eine spiegeln. Für die Enthüllung gibt es den anderen Joseph auch ohne Mütze.
 - Schaffnerabteil (18): Schlüsselbrett hat 8 Umrisse → Rätsel mit 8 Schlüsseln.
 
-**Nächster Schritt:** Online stellen (GitHub Pages).
+**Nächster Schritt:** Nichts offen – das Spiel ist online.
 
 **Stand (24.11.2026, Vorschau auf der Endkarte):** Jede Endkarte (Tür 1–23) zeigt unten einen dunklen, langsam auftauchenden Ausschnitt aus dem Hintergrund des nächsten Wagens und einen neugierig machenden Satz („Morgen: …“ bzw. „Als Nächstes: …“, wenn die Tür schon offen ist). Sätze und Ausschnitte stehen in `src/story/previews.js` (Tür 24 nutzt das Schaffnerabteil aus Wagen 18). Nach Tür 24 keine Vorschau. Die alte Zeile „Morgen geht es weiter – im …“ erscheint nur noch, falls ein Bild fehlt.
