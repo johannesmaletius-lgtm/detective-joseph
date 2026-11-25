@@ -1,8 +1,8 @@
 import { background, box, outside, perspective, train, windowSpots, lampDust } from './wagonKit.js';
 
 // Wagen 19 (Tür 19): das Fotolabor. Nur DATEN – was passiert, steht in src/story/wagon19.js.
-// Links der Vergrößerer, an der Wand die Kameratasche und die Lichtschalter, neben der Tür der
-// Vorhang der Dunkelkammer, rechts Flaschen, Laborzeituhr, Rotlicht und die drei Schalen.
+// Links der Vergrößerer, an der Wand die Kameratasche und die Lichtschalter, neben der Tür ein
+// Vorhang, rechts Flaschen, Laborzeituhr, Rotlicht und die drei Schalen.
 
 const WINDOWS = [
   { from: 46, to: 142, top: 106, bottom: 302 },
@@ -19,12 +19,12 @@ export const photoLab = {
   outside: outside(WINDOWS),
 
   animations: [
-    { id: 'tint', layer: 'front', x: 0, y: 0, width: 1280, height: 720 },
+    { id: 'tint', layer: 'over', x: 0, y: 0, width: 1280, height: 720 },
   ],
 
   // kleine Effekte (src/effects/ambience.js)
   ambience: [
-    lampDust(),
+    { ...lampDust(), when: 'roomLight' }, // Staub nur im Licht der Deckenlampe
   ],
 
   hotspots: [

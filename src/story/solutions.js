@@ -134,7 +134,7 @@ export const SOLUTIONS = {
   ],
   19: [
     'Kameratasche: „Tunnel, fast kein Licht“ → Blende 2, Zeit 1/15 → 215. Darin ein Film.',
-    'Dunkelkammer: Vorhang zu, Licht aus, Rotlicht an (in dieser Reihenfolge).',
+    'Dunkelkammer: Licht aus, Rotlicht an.',
     'Schalen: seifig (Lauge) – Essig (Säure) – Schwefel → entwickeln.',
     'Die 6 Negative nach den Lampen ordnen, die noch vor der Kamera liegen (5 … 0, zuletzt die Weiche).',
     'Das letzte Bild in den Vergrößerer: Kilometerstein 24,7 → Tür: 247.',

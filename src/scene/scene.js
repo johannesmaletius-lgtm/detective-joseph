@@ -233,7 +233,8 @@ export class Scene {
     this.drawClickMarker(ctx);
     this.drawInDepth(ctx, player);
 
-    // 4) Licht und Flackern liegen über allem – auch über Joseph
+    // 4) Licht und Flackern liegen über allem – auch über Joseph (Ebene 'over', z. B. Raumlicht im Fotolabor)
+    this.drawAnimations(ctx, 'over');
     this.outside?.drawLight(ctx);
     this.motion?.drawLamps(ctx, GAME_WIDTH, GAME_HEIGHT);
     if (this.darkLevel > 0) {

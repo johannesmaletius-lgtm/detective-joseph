@@ -6340,16 +6340,6 @@
   "kind": "rest"
  },
  {
-  "text": "Der Vorhang ist zu. Kein Licht kommt herein.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
-  "text": "Ein schwerer Vorhang. Er ist offen.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
   "text": "Das Rotlicht leuchtet.",
   "file": "wagon19.js",
   "kind": "rest"
@@ -6390,17 +6380,12 @@
   "kind": "rest"
  },
  {
-  "text": "Durch den offenen Vorhang fällt Licht auf den Film. Verdorben!",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
   "text": "Ohne Rotlicht? Ich sehe nichts … Der Film rutscht mir weg. Verdorben.",
   "file": "wagon19.js",
   "kind": "rest"
  },
  {
-  "text": "Vorhang zu, Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.",
+  "text": "Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.",
   "file": "wagon19.js",
   "kind": "rest"
  },
@@ -6436,6 +6421,11 @@
  },
  {
   "text": "Ich sehe nichts.",
+  "file": "wagon19.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Ein schwerer Vorhang. Er ist offen.",
   "file": "wagon19.js",
   "kind": "rest"
  },
@@ -6486,16 +6476,6 @@
  },
  {
   "text": "Licht aus.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
-  "text": "Vorhang zu.",
-  "file": "wagon19.js",
-  "kind": "rest"
- },
- {
-  "text": "Vorhang auf.",
   "file": "wagon19.js",
   "kind": "rest"
  },

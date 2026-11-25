@@ -11,7 +11,7 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tryCode, tunnels, waitForTun
 // DIE RÄTSEL
 //   1. Kameratasche des Bordfotografen: Zahlenschloss. Im Deckel die Belichtungstabelle, dazu die
 //      Notiz „Tunnel, fast kein Licht“ → Blende 2, Zeit 1/15 → 215. Darin ein unentwickelter Film.
-//   2. Dunkelkammer in der richtigen Reihenfolge: Vorhang zu, Licht aus, Rotlicht an. Sonst ist der
+//   2. Dunkelkammer: Licht aus, Rotlicht an. Sonst ist der
 //      Film verdorben – nach dem Tunnel liegt er wieder in der Tasche (Zeitschleife).
 //   3. Drei unbeschriftete Flaschen nach Geruch und halb zerrissener Anleitung in die Schalen:
 //      Entwickler = Lauge (seifig) – Stoppbad = Säure (Essig) – Fixierer (Schwefel). Dann entwickeln.
@@ -44,8 +44,7 @@ export const wagon19 = {
     const f = story.flags;
     f.roomLight = true;
     f.redLight = false;
-    f.curtainClosed = false;
-    story.scene.paintSpot('tint', (ctx) => paintTint(ctx, { roomLight: f.roomLight || story.isDark, redLight: f.redLight }));
+    story.scene.paintSpot('tint', (ctx) => paintTint(ctx, { roomLight: f.roomLight, redLight: f.redLight, tunnel: story.isDark }));
   },
 
   hotspots: {
@@ -58,8 +57,7 @@ export const wagon19 = {
       use: (story) => toggle(story, 'roomLight'),
     },
     curtain: {
-      look: (story) => story.say(story.flags.curtainClosed ? 'Der Vorhang ist zu. Kein Licht kommt herein.' : 'Ein schwerer Vorhang. Er ist offen.'),
-      use: (story) => toggle(story, 'curtainClosed'),
+      look: 'Ein schwerer Vorhang. Er ist offen.',
     },
     redLight: {
       look: (story) => story.say(story.flags.redLight ? 'Das Rotlicht leuchtet.' : 'Eine rote Lampe. Aus.'),
@@ -140,10 +138,9 @@ async function openBag(story) {
 async function toggle(story, flag) {
   const f = story.flags;
   f[flag] = !f[flag];
-  story.sound(flag === 'curtainClosed' ? 'slide' : 'click');
+  story.sound('click');
   const lines = {
     roomLight: f.roomLight ? 'Licht an.' : 'Licht aus.',
-    curtainClosed: f.curtainClosed ? 'Vorhang zu.' : 'Vorhang auf.',
     redLight: f.redLight ? 'Rotlicht an.' : 'Rotlicht aus.',
   };
   await story.say(lines[flag]);
@@ -151,7 +148,7 @@ async function toggle(story, flag) {
 }
 
 function darkroomReady(f) {
-  return f.curtainClosed && !f.roomLight && f.redLight;
+  return !f.roomLight && f.redLight;
 }
 
 // ============================================================================================
@@ -202,11 +199,11 @@ async function develop(story) {
         f.filmRuined = true;
         story.remove('film');
         story.sound('wrong');
-        await story.say(f.roomLight ? 'Ich öffne die Dose – Licht! Der Film ist belichtet. Verdorben.' : !f.curtainClosed ? 'Durch den offenen Vorhang fällt Licht auf den Film. Verdorben!' : 'Ohne Rotlicht? Ich sehe nichts … Der Film rutscht mir weg. Verdorben.');
-        await story.say('Vorhang zu, Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.');
+        await story.say(f.roomLight ? 'Ich öffne die Dose – Licht! Der Film ist belichtet. Verdorben.' : 'Ohne Rotlicht? Ich sehe nichts … Der Film rutscht mir weg. Verdorben.');
+        await story.say('Licht aus, Rotlicht an – das muss stimmen, bevor ich die Dose öffne.');
         if (!f.ruinNoted) {
           f.ruinNoted = true;
-          story.note('Dunkelkammer: Vorhang zu, Licht aus, Rotlicht an – erst dann den Film öffnen. Ein verdorbener Film liegt nach dem Tunnel wieder in der Tasche.');
+          story.note('Dunkelkammer: Licht aus, Rotlicht an – erst dann den Film öffnen. Ein verdorbener Film liegt nach dem Tunnel wieder in der Tasche.');
         }
         return;
       }
@@ -311,7 +308,7 @@ function currentGoal(story) {
     if (!darkroomReady(f)) {
       return { id: 'dark', lines: [
         'Den Film nur in der Dunkelkammer öffnen. Was gehört dazu?',
-        'Vorhang zu, Licht aus, Rotlicht an.',
+        'Licht aus, Rotlicht an.',
       ] };
     }
     return { id: 'chem', lines: [

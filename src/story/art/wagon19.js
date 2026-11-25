@@ -6,12 +6,68 @@ import {
 // Gezeichnetes für Wagen 19 (Fotolabor): Belichtungstabelle, Flaschen und Schalen, Kontaktbogen,
 // das vergrößerte Tunnelfoto (ChatGPT-Bild) mit dem Kilometerstein.
 
-// ---------------------------------------------------------------- Raum: Licht aus / Rotlicht
-export function paintTint(ctx, { roomLight, redLight }) {
-  if (roomLight) return;
-  ctx.fillStyle = redLight ? 'rgba(40, 0, 0, 0.72)' : 'rgba(0, 0, 0, 0.86)';
-  ctx.fillRect(0, 0, 1280, 720);
-  if (redLight) glow(ctx, 1055, 200, 380, '255, 40, 30', 0.35);
+// ---------------------------------------------------------------- Raum: Deckenlicht / Rotlicht
+// Die Lampen im Hintergrundbild sind leuchtend gemalt. Ist eine aus, wird ihr Glas abgedunkelt;
+// ist sie an, bekommt sie einen Lichtschein. Im Tunnel ist der Strom weg (dunkel macht es das Spiel).
+const CEILING = [
+  [[480, 0], [552, 0], [544, 42], [492, 42]], // Leuchtröhre links
+  [[728, 0], [800, 0], [790, 42], [736, 42]], // Leuchtröhre rechts
+];
+const DOME = { x: 640, y: 66, rx: 31, ry: 20 };
+const BULB = { x: 1054, y: 182, rx: 26, ry: 34 };
+
+export function paintTint(ctx, { roomLight, redLight, tunnel }) {
+  if (tunnel) return;
+  if (roomLight) {
+    CEILING.forEach((quad) => glow(ctx, center(quad).x, 24, 150, '255, 210, 130', 0.18));
+    glow(ctx, DOME.x, DOME.y + 8, 120, '255, 210, 130', 0.2);
+  } else {
+    // Deckenlampen aus: Glas grau-dunkel
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = 'rgb(70, 62, 58)';
+    CEILING.forEach((quad) => { poly(ctx, quad); ctx.fill(); });
+    ctx.beginPath();
+    ctx.ellipse(DOME.x, DOME.y, DOME.rx, DOME.ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = redLight ? 'rgba(40, 0, 0, 0.72)' : 'rgba(0, 0, 0, 0.86)';
+    ctx.fillRect(0, 0, 1280, 720);
+  }
+  if (redLight) {
+    // Rotlicht an: Glas glüht, roter Schein in den Raum
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createRadialGradient(BULB.x - 6, BULB.y - 8, 2, BULB.x, BULB.y, BULB.ry);
+    g.addColorStop(0, 'rgba(255, 170, 140, 0.9)');
+    g.addColorStop(0.5, 'rgba(255, 50, 30, 0.55)');
+    g.addColorStop(1, 'rgba(200, 0, 0, 0.1)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(BULB.x, BULB.y, BULB.rx, BULB.ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    glow(ctx, BULB.x, BULB.y, roomLight ? 160 : 420, '255, 40, 30', roomLight ? 0.3 : 0.4);
+  } else {
+    // Rotlicht aus: Glas dunkles Weinrot
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = roomLight ? 'rgb(110, 85, 85)' : 'rgb(60, 50, 50)';
+    ctx.beginPath();
+    ctx.ellipse(BULB.x, BULB.y, BULB.rx, BULB.ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function poly(ctx, points) {
+  ctx.beginPath();
+  points.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.closePath();
+}
+
+function center(points) {
+  return { x: points.reduce((a, [x]) => a + x, 0) / points.length };
 }
 
 // ---------------------------------------------------------------- Kameratasche
