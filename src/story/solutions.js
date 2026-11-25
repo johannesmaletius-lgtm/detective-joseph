@@ -166,7 +166,7 @@ export const SOLUTIONS = {
     'Die Mütze des Schaffners aufsetzen.',
     'Lautsprecheranlage: Wagen 4, 5, 7, 12, 15 und 21 einschalten → Durchsage sprechen.',
     'Die Plombe am roten Hebel mit der Lochzange vom Schreibtisch öffnen.',
-    'Am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben.',
+    'Am Fenster die Kilometersteine zählen und genau bei 24,7 die Kelle heben – Joseph ruft dabei „Jetzt!“ ins Mikrofon, vorne in der Lok hört es der andere Joseph.',
     'Im Schlussbild die letzte Kerze anzünden.',
   ],
 };
