@@ -321,7 +321,7 @@ Nahansichten: `src/story/art/wagonN.js`, Szenen: `baggageCar`, `postCar`, `green
 | 21 | Kesselwagen, Heizer | Druck von 42 auf genau 25 (rot −8, gelb −5, blau +3): gelb 4×, blau 1×; Pumpe nur bergab (wenn die Kohlen rutschen); Spind-Foto: Dienstnummer am Ärmel | Tür **317** |
 | 22 | Lok, der andere Joseph | Fahrtenschreiber: km 24,7 = 23:43 → Luke **2343**; im Tender warten, um halb zwölf herauskommen (23:30–23:32); Beweise: Familienfoto, Pressefoto, Miras Karte → er nimmt die Mütze ab | Luke **2343** |
 | 23 | Wartungsgang, Herr Tick | Kopfhörer aufsetzen (Rechtsklick im Inventar); Kreidezeichen an sechs Abzweigungen: links, geradeaus, rechts, geradeaus (dunkel – Taschenlampe auf die Wand), links, rechts; Turm = Tor; Zahnrad in die leere Achse | – |
-| 24 | Heiligabend | Mütze aufsetzen; Lautsprecheranlage: Wagen 4, 5, 7, 12, 15, 21 → Durchsage; Lochzange vom Schreibtisch auf die Plombe; am Fenster bei Kilometerstein 24,7 die Kelle heben; im Schlussbild die letzte Kerze anzünden | – |
+| 24 | Heiligabend | Mütze aufsetzen; Lautsprecheranlage: Wagen 4, 5, 7, 12, 15, 21 → Durchsage; Lochzange vom Schreibtisch auf die Plombe; am Fenster bei Kilometerstein 24,7 die Kelle heben (Joseph ruft dabei „Jetzt!“ ins Mikrofon, der andere Joseph hört es in der Lok – vorne ist die Stirnlampe aus); im Schlussbild die letzte Kerze anzünden | – |
 
 ## Wagen 4–8
 
@@ -333,7 +333,7 @@ auf Taste **H**. Die ganze Rätselkette steht oben in der jeweiligen Datei `src/
 | Wagen | Ort, Figuren | Rätsel (kurz) | Code(s) |
 | --- | --- | --- | --- |
 | 4 | Speisewagen, Koch Bruno | Tischordnung aus Brunos Erinnerungen + Schal und Fliegerbrille an den Stühlen; nach dem ersten Tunnel riecht Glas 3 nach Bittermandel; Bruno serviert „von hinten nach vorne, erst links, dann rechts“ → Glas 3 = Herr K.; Rechnung unter dem Tablett nur nehmen, wenn die Räder quietschen; Kasse: 7 × 14 + 5 × 4 + 2 × 2 | Kasse **122** |
-| 5 | Schlafwagen, Oma Ilse (schläft) | Abteil 4: Blatt aus dem Fahrgastbuch unter die Tür, Stricknadel aus Ilses Schublade (nur beim Quietschen öffnen, sonst wacht sie auf und zieht die Notbremse); Suchbild Abteil 4 (6 Spuren); Ilses Satz über 3 Runden; Schlüssel im Schatten unter dem Tischchen; Foto im Bettkasten | Tür **2412** |
+| 5 | Schlafwagen, Oma Ilse (schläft) | Abteil 4: Blatt aus dem Fahrgastbuch unter die Tür, Stricknadel aus Ilses Schublade (nur beim Quietschen öffnen, sonst wacht sie auf und zieht die Notbremse); Suchbild Abteil 4 (7 Spuren, u. a. Fenster einen Spalt offen, Riegel von außen verbogen → Herr K. wurde durchs Fenster geholt); Ilses Satz über 3 Runden; Schlüssel im Schatten unter dem Tischchen; Foto im Bettkasten | Tür **2412** |
 | 6 | Fundbüro, Stimme des Schaffners | Glocke; Kartei: Herrn K.s Karten nach Runde ordnen → Lagernummern; Klappe; Fundschein: 8 Sachen im Regal finden; Schließfach 12: Taschenuhr auf 12 Uhr stellen, im Tunnel springt der Deckel auf | Klappe **7249**, Tür **0612** |
 | 7 | Barwagen, Herr K., Barkeeper | Münze im Aschenbecher → Musikbox, hinter der Zeitung am hinteren Tisch lauschen; Whisky (rauchig, drei Gläser fehlen) für Herrn K.; sein Bierdeckel: Strichlisten neben den vier Zeichen aus Wagen 1, auf der Tür in anderer Reihenfolge | Tür **1926** (Turm, Laterne →, Tunnel, Laterne ←) |
 | 8 | Bordkino | Kinokarte (Sessel + Popcornmaschine) → Filmdose; 8 Filmbilder nach dem Mond ordnen; Projektor scharf stellen (Objektiv 3, Bildfenster 7: Objektiv 3×, dann Bildfenster 2×); Filmrand: „Runde 0108“ | Dose **312**, Tür **0108** |

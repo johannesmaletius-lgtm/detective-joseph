@@ -13,9 +13,10 @@ import { finishWagon, hintFor, inTunnel, skipIntro, tunnels, waitForTunnel, wago
 //      den Schlüssel von außen herausstoßen – er fällt aufs Blatt – Blatt zurückziehen.
 //      Die Stricknadel liegt in Ilses Schublade. Die quietscht und weckt Ilse – außer, die Räder
 //      quietschen gerade lauter. Wird Ilse wach, schreit sie und zieht die Notbremse (sie geht nicht).
-//   2. Suchbild Abteil 4: sechs Spuren (Hutschachtel leer, Brille, Schuhe, Fußspuren auf Socken,
-//      Knopf einer Schaffneruniform, Fahrschein „Runde 108“) → Herr K. ist wie im Schlaf gegangen,
-//      nach vorne, Richtung Tunnel – zusammen mit jemandem in Uniform.
+//   2. Suchbild Abteil 4: sieben Spuren (Hutschachtel leer, Brille, Schuhe, Fußspuren auf Socken bis
+//      unters Fenster, Fenster einen Spalt offen mit von außen verbogenem Riegel, Knopf einer
+//      Schaffneruniform, Fahrschein „Runde 108“) → Herr K. ist nicht durch die (von innen abgeschlossene)
+//      Tür gegangen: Jemand in Uniform hat ihn durchs Fenster geholt, außen am Zug entlang nach vorne.
 //   3. Ilse spricht im Schlaf, nach jedem Tunnel ein Stück mehr:
 //      „Er hat den Koffer …“ – „… unter Bett vier …“ – „… der Schlüssel liegt, wo der Mond nicht hinkommt.“
 //   4. Wo der Mond nicht hinkommt: der Schatten unter dem Tischchen am Fenster → Kofferschlüssel →
@@ -332,7 +333,7 @@ async function openCompartment(story) {
   f.found ??= [];
   if (!f.compartmentSeen) {
     f.compartmentSeen = true;
-    await story.say('Herr K.? … Niemand da. Das Bett ist zerwühlt und kalt.');
+    await story.say('Herr K.? … Niemand da. Das Bett ist zerwühlt und kalt. Und es zieht.');
   }
   await story.view('picture', {
     draw: (ctx) => drawCompartment(ctx, f.found),
@@ -347,12 +348,20 @@ const REMARKS = {
   hatbox: ['Eine Hutschachtel. Leer.', 'Den Hut hat er also mitgenommen.'],
   glasses: ['Seine Brille liegt auf den Büchern.', 'Ohne Brille sieht er doch kaum etwas. Wer geht ohne Brille los?'],
   shoes: ['Seine Schuhe, ordentlich nebeneinander.', 'Er ist auf Socken gegangen. Mitten im Winter.'],
-  footprints: ['Feuchte Fußspuren. Socken – vom Bett zur Tür.', 'Sie führen nach vorne. Richtung Lok … Richtung Tunnel.'],
+  footprints: ['Feuchte Fußspuren. Socken – vom Bett zum Fenster.', 'Nicht zur Tür. Sie hören direkt unter dem Fenster auf.'],
   button: ['Ein Messingknopf mit einem Flügelrad darauf.', 'Der stammt von einer Schaffneruniform. Herr K. trägt keine Uniform.'],
   ticket: ['Ein Fahrschein, in die Zeitung gesteckt: „Ringbahn – gültig für 1 Runde“.', 'Entwertet. Mit Stempel: „Runde 108“.'],
   coat: ['Sein Mantel hängt noch am Haken. Mit rotem Schal.'],
   cup: ['Eine Tasse mit kaltem Tee. Halb ausgetrunken.'],
-  window: ['Der Mond scheint herein. Aufs Bett – aber nicht unters Bett.'],
+  window: [
+    'Das Fenster steht einen Spalt offen. Eiskalte Luft zieht herein.',
+    'Und der Riegel ist verbogen – von außen.',
+    'Er ist nicht durch die Tür gegangen. Jemand hat ihn durchs Fenster geholt – außen am Zug entlang.',
+  ],
+};
+// beim zweiten Mal kürzer
+const AGAIN = {
+  window: ['Das Fenster einen Spalt offen, der Riegel von außen verbogen. Hier ist er raus.'],
 };
 
 async function inspect(story, spot) {
@@ -360,15 +369,15 @@ async function inspect(story, spot) {
   if (spot.id === 'bedDrawer') return openSuitcase(story);
   const first = !f.found.includes(spot.id);
   if (first) f.found.push(spot.id);
-  for (const line of REMARKS[spot.id]) await story.say(line);
+  for (const line of (!first && AGAIN[spot.id]) || REMARKS[spot.id]) await story.say(line);
   const clues = COMPARTMENT_SPOTS.filter((s) => s.clue && f.found.includes(s.id)).length;
-  if (first && spot.clue && clues === 6 && !f.searchDone) {
+  if (first && spot.clue && clues === COMPARTMENT_SPOTS.filter((s) => s.clue).length && !f.searchDone) {
     f.searchDone = true;
     story.sound('success');
     await story.say('Ohne Brille, ohne Schuhe, ohne Mantel – aber mit Hut. Mitten in der Nacht.');
-    await story.say('Als wäre er im Schlaf aufgestanden und einfach losgegangen. Nach vorne, zum Tunnel.');
-    await story.say('Und jemand in Schaffneruniform war bei ihm.');
-    story.note('Abteil 4, sechs Spuren: leere Hutschachtel, Brille, Schuhe, Fußspuren auf Socken Richtung Tunnel, Knopf einer Schaffneruniform, Fahrschein „Runde 108“. Herr K. ist wie im Schlaf losgegangen – freiwillig, nach vorne zum Tunnel. Jemand in Uniform war dabei.');
+    await story.say('Die Tür war von innen abgeschlossen. Er ist wie im Schlaf mitgegangen – durchs Fenster, außen am Zug entlang nach vorne.');
+    await story.say('Und wer ihn geholt hat, trug eine Schaffneruniform.');
+    story.note('Abteil 4, sieben Spuren: leere Hutschachtel, Brille, Schuhe, Fußspuren auf Socken bis unters Fenster, Fenster einen Spalt offen mit von außen verbogenem Riegel, Knopf einer Schaffneruniform, Fahrschein „Runde 108“. Die Tür war von innen abgeschlossen – Herr K. ist nicht durch die Tür gegangen. Jemand in Uniform hat ihn durchs Fenster geholt, außen am Zug entlang nach vorne. Herr K. ist wie im Schlaf mitgegangen.');
   }
 }
 
@@ -449,11 +458,11 @@ async function tryDoor(story) {
   }
   await story.cutscene(async () => {
     story.sound('door');
-    await story.say('Die Tür ist offen. Herr K. ist nach vorne gegangen – ich gehe hinterher.');
+    await story.say('Die Tür ist offen. Jemand hat Herrn K. nach vorne geholt – ich gehe hinterher.');
     await finishWagon(story, {
       number: 5,
       title: 'Ende von Wagen 5',
-      lines: ['Ein Foto: Herr K. und der Schaffner – Freunde.', 'Herr K. ist wie im Schlaf nach vorne gegangen. Ist er schon fort – oder noch im Zug?'],
+      lines: ['Ein Foto: Herr K. und der Schaffner – Freunde.', 'Jemand hat Herrn K. durchs Fenster geholt, außen am Zug entlang nach vorne. Ist er schon fort – oder noch im Zug?'],
       nextTitle: 'im Fundbüro',
     });
   });
@@ -490,8 +499,8 @@ function currentGoal(story) {
   }
   if (!f.searchDone) {
     return { id: 'search', lines: [
-      'In Herrn K.s Abteil muss es Spuren geben. Sechs Stück. Ich sehe mir alles genau an.',
-      'Kleine Dinge zählen: etwas auf dem Bücherstapel, etwas auf dem Boden vor dem Bett, etwas in der Zeitung.',
+      'In Herrn K.s Abteil muss es Spuren geben. Sieben Stück. Die Tür war von innen abgeschlossen – wie ist er rausgekommen?',
+      'Kleine Dinge zählen: etwas auf dem Bücherstapel, etwas auf dem Boden vor dem Bett, etwas in der Zeitung. Und das Fenster genau ansehen.',
     ] };
   }
   if (!(f.heard >= 3)) {
