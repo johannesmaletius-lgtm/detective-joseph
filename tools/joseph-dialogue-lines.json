@@ -5850,11 +5850,6 @@
   "kind": "rest"
  },
  {
-  "text": "Falsch. Miras Geburtstag … der 7. 11. – Tag und Monat, vier Ziffern.",
-  "file": "wagon15.js",
-  "kind": "rest"
- },
- {
   "text": "Das Funkgerät ist auf 345 kHz eingestellt.",
   "file": "wagon16.js",
   "kind": "rest"
@@ -6960,7 +6955,7 @@
   "kind": "rest"
  },
  {
-  "text": "Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.",
+  "text": "Vorne in der Lok hört er mich. Wir ziehen beide – Weiche 7 springt halb um. Der Zug bäumt sich auf, kreischt – und kippt.",
   "file": "wagon24.js",
   "kind": "rest"
  },

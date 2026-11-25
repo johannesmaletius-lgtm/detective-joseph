@@ -321,7 +321,7 @@ Nahansichten: `src/story/art/wagonN.js`, Szenen: `baggageCar`, `postCar`, `green
 | 21 | Kesselwagen, Heizer | Druck von 42 auf genau 25 (rot −8, gelb −5, blau +3): gelb 4×, blau 1×; Pumpe nur bergab (wenn die Kohlen rutschen); Spind-Foto: Dienstnummer am Ärmel | Tür **317** |
 | 22 | Lok, der andere Joseph | Fahrtenschreiber: km 24,7 = 23:43 → Luke **2343**; im Tender warten, um halb zwölf herauskommen (23:30–23:32); Beweise: Familienfoto, Pressefoto, Miras Karte → er nimmt die Mütze ab | Luke **2343** |
 | 23 | Wartungsgang, Herr Tick | Kopfhörer aufsetzen (Rechtsklick im Inventar); Kreidezeichen an sechs Abzweigungen: links, geradeaus, rechts, geradeaus (dunkel – Taschenlampe auf die Wand), links, rechts; Turm = Tor; Zahnrad in die leere Achse | – |
-| 24 | Heiligabend | Mütze aufsetzen; Lautsprecheranlage: Wagen 4, 5, 7, 12, 15, 21 → Durchsage; Lochzange vom Schreibtisch auf die Plombe; am Fenster bei Kilometerstein 24,7 die Kelle heben; im Schlussbild die letzte Kerze anzünden | – |
+| 24 | Heiligabend | Mütze aufsetzen; Lautsprecheranlage: Wagen 4, 5, 7, 12, 15, 21 → Durchsage; Lochzange vom Schreibtisch auf die Plombe; am Fenster bei Kilometerstein 24,7 die Kelle heben (Joseph ruft dabei „Jetzt!“ ins Mikrofon, der andere Joseph hört es in der Lok – vorne ist die Stirnlampe aus); im Schlussbild die letzte Kerze anzünden | – |
 
 ## Wagen 4–8
 
