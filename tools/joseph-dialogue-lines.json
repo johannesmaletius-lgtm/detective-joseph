@@ -2275,7 +2275,7 @@
   "kind": "moment"
  },
  {
-  "text": "Die Tür ist offen. Herr K. ist nach vorne gegangen – ich gehe hinterher.",
+  "text": "Die Tür ist offen. Jemand hat Herrn K. nach vorne geholt – ich gehe hinterher.",
   "file": "wagon5.js",
   "kind": "moment"
  },
@@ -2335,12 +2335,12 @@
   "kind": "moment"
  },
  {
-  "text": "Als wäre er im Schlaf aufgestanden und einfach losgegangen. Nach vorne, zum Tunnel.",
+  "text": "Die Tür war von innen abgeschlossen. Er ist wie im Schlaf mitgegangen – durchs Fenster, außen am Zug entlang nach vorne.",
   "file": "wagon5.js",
   "kind": "moment"
  },
  {
-  "text": "Und jemand in Schaffneruniform war bei ihm.",
+  "text": "Und wer ihn geholt hat, trug eine Schaffneruniform.",
   "file": "wagon5.js",
   "kind": "moment"
  },
@@ -4130,7 +4130,7 @@
   "kind": "rest"
  },
  {
-  "text": "Herr K.? … Niemand da. Das Bett ist zerwühlt und kalt.",
+  "text": "Herr K.? … Niemand da. Das Bett ist zerwühlt und kalt. Und es zieht.",
   "file": "wagon5.js",
   "kind": "rest"
  },
@@ -4255,12 +4255,12 @@
   "kind": "rest"
  },
  {
-  "text": "Feuchte Fußspuren. Socken – vom Bett zur Tür.",
+  "text": "Feuchte Fußspuren. Socken – vom Bett zum Fenster.",
   "file": "wagon5.js",
   "kind": "rest"
  },
  {
-  "text": "Sie führen nach vorne. Richtung Lok … Richtung Tunnel.",
+  "text": "Nicht zur Tür. Sie hören direkt unter dem Fenster auf.",
   "file": "wagon5.js",
   "kind": "rest"
  },
@@ -4295,7 +4295,22 @@
   "kind": "rest"
  },
  {
-  "text": "Der Mond scheint herein. Aufs Bett – aber nicht unters Bett.",
+  "text": "Das Fenster steht einen Spalt offen. Eiskalte Luft zieht herein.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Und der Riegel ist verbogen – von außen.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Er ist nicht durch die Tür gegangen. Jemand hat ihn durchs Fenster geholt – außen am Zug entlang.",
+  "file": "wagon5.js",
+  "kind": "rest"
+ },
+ {
+  "text": "Das Fenster einen Spalt offen, der Riegel von außen verbogen. Hier ist er raus.",
   "file": "wagon5.js",
   "kind": "rest"
  },

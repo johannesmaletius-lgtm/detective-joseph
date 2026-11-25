@@ -40,7 +40,7 @@ export const SOLUTIONS = {
     'Abteil 4 ist von innen abgeschlossen. Ein Blatt aus dem Fahrgastbuch unter der Tür durchschieben.',
     'Die Stricknadel liegt in Ilses Schublade – nur öffnen, wenn die Räder quietschen (sonst wacht Ilse auf und zieht die Notbremse).',
     'Mit der Stricknadel den Schlüssel herausstoßen, er fällt aufs Blatt → Blatt zurückziehen → Abteil 4 aufschließen.',
-    'Suchbild Abteil 4: sechs Spuren finden (Hutschachtel, Brille, Schuhe, Fußspuren, Uniformknopf, Fahrschein „Runde 108“).',
+    'Suchbild Abteil 4: sieben Spuren finden (Hutschachtel, Brille, Schuhe, Fußspuren bis unters Fenster, Fenster einen Spalt offen mit von außen verbogenem Riegel, Uniformknopf, Fahrschein „Runde 108“). Herr K. wurde durchs Fenster geholt, außen am Zug entlang.',
     'Ilse spricht im Schlaf, nach jedem Tunnel ein Stück mehr (über 3 Runden zuhören): „… der Schlüssel liegt, wo der Mond nicht hinkommt.“',
     'Kofferschlüssel im Schatten unter dem Tischchen am Fenster → Koffer im Bettkasten von Abteil 4 → Foto, Rückseite „24. 12.“',
     'Tür: 2412.',

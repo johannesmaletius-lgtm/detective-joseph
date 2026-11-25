@@ -188,7 +188,7 @@ async function talkToK(story) {
     await story.say('Sie sind in Gefahr! Jemand hat Ihr Weinglas vergiftet. Und im Tunnel …');
     await story.speakAs('k', 'Ich weiß, Junge. Ich weiß.');
     await story.speakAs('k', 'Lass mich in Ruhe. Ich warte.');
-    story.note('Herr K. steht im Barwagen – hierher ist er aus seinem Abteil gegangen, nach vorne. Er weiß, dass er in Gefahr ist, und will nicht mit mir reden. „Ich warte.“ Worauf? Auf den Ruf?');
+    story.note('Herr K. steht im Barwagen – hierher hat ihn jemand aus seinem Abteil geholt, durchs Fenster, außen am Zug entlang nach vorne. Er weiß, dass er in Gefahr ist, und will nicht mit mir reden. „Ich warte.“ Worauf? Auf den Ruf?');
     return;
   }
   if (f.served) {
